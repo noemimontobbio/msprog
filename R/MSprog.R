@@ -1,13 +1,26 @@
 
-
-#' Compute MS progression from longitudinal data.
+#' Compute multiple sclerosis progression from longitudinal data.
 #'
-#' @param data data.frame containing longitudinal data, including: subject ID, outcome value, date of visit.
+#' `MSprog` detects and characterises the progression (or improvement) events of an outcome measure
+#' (EDSS, NHPT, T25FW, or SDMT) for one or more subjects, based on repeated assessments
+#' through time and on the dates of acute episodes.
+#' Several qualitative and quantitative options are given as arguments that can be set
+#' by the user and reported as a complement to the results to ensure reproducibility.
+#'
+#' The events are detected sequentially by scanning the outcome values in chronological order.
+#' Progression events are classified as relapse-associated or relapse-independent based on their relative timing
+#' with respect to the relapses. Specifically, relapse-associated worsening (RAW) events
+#' are defined as confirmed progression events occurring within the influence of a relapse,
+#' while progression independent of relapse activity (PIRA) is established when the progression
+#' event occurs out of relapse influence, and with no relapses between baseline and confirmation.
+#'
+#'
+#' @param data data frame containing longitudinal data, including: subject ID, outcome value, date of visit.
 #' @param subj_col Name of data column with subject ID.
 #' @param value_col Name of data column with outcome value.
 #' @param date_col Name of data column with date of visit.
 #' @param subjects (optional) Subset of subjects.
-#' @param relapse (optional) data.frame containing longitudinal data, including: subject ID and relapse date.
+#' @param relapse (optional) data frame containing longitudinal data, including: subject ID and relapse date.
 #' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data.
 #' @param rdate_col Name of subject ID column for relapse data, if different from outcome data.
 #' @param outcome One of: \cr
@@ -47,10 +60,27 @@
 #' @return Two data.frame objects: \cr
 #' - summary of event sequence detected for each subject; \cr
 #' - extended info on each event for all subjects. \cr
+#' @importFrom stats na.omit setNames
+#' @importFrom dplyr %>% group_by_at vars slice n mutate across
 #' @export
+#' @examples
+#' data(toydata_visits)
+#' data(toydata_relapses)
+#' # EDSS progression
+#' output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses,
+#'     outcome='edss', conf_months=3, conf_tol_days=30, rel_infl=30,
+#'     event='multiple', baseline='roving', verbose=2)
+#' summary_EDSS = output[[1]] # summary of event sequence for each subject
+#' results_EDSS = output[[2]] # extended info on each event for all subjects
+#' # SDMT progression
+#' output <- MSprog(toydata_visits, 'id', 'SDMT', 'date', relapse=toydata_relapses,
+#'     outcome='sdmt', conf_months=3, conf_tol_days=30, rel_infl=30,
+#'     event='multiple', baseline='roving', verbose=2)
+#' summary_SDMT = output[[1]] # summary of event sequence for each subject
+#' results_SDMT = output[[2]] # extended info on each event for all subjects
 MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, outcome='edss', delta_fun=NULL,
-                   conf_months=c(6, 12), conf_tol_days=45, conf_left=FALSE, require_sust_months=0, rel_infl=30,
+                   conf_months=3, conf_tol_days=30, conf_left=FALSE, require_sust_months=0, rel_infl=30,
                    event='multiple', baseline='roving', sub_threshold=FALSE, relapse_rebl=FALSE,
                    min_value=0, prog_last_visit=FALSE, include_dates=FALSE, include_value=FALSE, verbose=2) {
 
@@ -115,9 +145,13 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
   nsub <- length(all_subj)
   max_nevents <- round(max(table(data[[subj_col]]))/2)
   results <- data.frame(matrix(nrow = nsub * max_nevents, ncol = 8 + length(conf_months) + (length(conf_months)-1) + 2))
-  colnames(results) <- c(subj_col, 'nevent', 'event_type', 'bldate', 'blvalue', 'date', 'value', 'time2event',
-                         paste0('conf', conf_months), paste0('PIRA_conf', conf_months[2:length(conf_months)]),
-                         'sust_days', 'sust_last')
+  allcol = c(subj_col, 'nevent', 'event_type', 'bldate', 'blvalue', 'date', 'value', 'time2event',
+             paste0('conf', conf_months), 'sust_days', 'sust_last')
+  if (length(conf_months)>1) {
+    allcol = c(allcol[1:(8+length(conf_months))],  paste0('PIRA_conf',
+                      conf_months[2:length(conf_months)]), 'sust_days', 'sust_last')
+    }
+  colnames(results) <- allcol
   results[[subj_col]] <- rep(all_subj, each = max_nevents)
   results$nevent <- rep(1:max_nevents, times = nsub)
 
@@ -147,7 +181,7 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
       message("\nSubject #", subjid, ": ", nvisits, " visit", ifelse(nvisits == 1, "", "s"),
               ", ", nrel, " relapse", ifelse(nrel == 1, "", "s"))
       if (any(ucounts > 1)) {
-        print("Found multiple visits in the same day: only keeping last")
+        message("Found multiple visits in the same day: only keeping last")
       }
     }
 
@@ -302,7 +336,7 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
             time2event <- c(time2event, difftime(data_id[change_idx,][[date_col]], bl[[date_col]]))
             for (m in conf_months) {
               conf[[as.character(m)]] <- c(conf[[as.character(m)]], as.integer(m %in% conf_t))
-              if (m!=conf_months[1]) {pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], "")}
+              if (m!=conf_months[1]) {pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], NA)}
             }
             sustd <- c(sustd, difftime(data_id[sust_idx,][[date_col]], data_id[conf_idx[[length(conf_idx)]],][[date_col]]))
             sustl <- c(sustl, as.integer(sust_idx == nvisits))
@@ -434,7 +468,7 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
 
                   if (phase==0 & event_type[length(event_type)] != 'PIRA') {
                     for (m in conf_months) {
-                      if (m!=conf_months[1]) {pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], NULL)}
+                      if (m!=conf_months[1]) {pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], NA)}
                     }
                   }
 
@@ -664,19 +698,21 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
             ifelse(sub_threshold, " (sub-threshold)", ""),
             ifelse(relapse_rebl, " (and post-relapse re-baseline)", ""),
             "\nRelapse influence: ", rel_infl, "dd\nEvents detected: ", event))
-      message("\n---\nTotal subjects: ", nsub,
-          "\n---\nProgressed: ", sum(summary$progression > 0), " (PIRA: ", sum(summary$PIRA > 0),
-          "; RAW: ", sum(summary$RAW > 0), ")")
-      if (!startsWith(event, "firstprog")) {
-      message("Improved: ", sum(summary$improvement > 0))
-      }
-      if (event %in% c('multiple', 'firstprogtype')) {
-      message("---\nProgression events: ",
-          sum(summary$progression), " (PIRA: ", sum(summary$PIRA), "; RAW: ", sum(summary$RAW), ")")
-      }
-      if (event=='multiple') {
-        message("Improvement events: ", sum(summary$improvement))
-      }
+      if (is.null(subjects) | length(subjects)>1) {
+          message("\n---\nTotal subjects: ", nsub,
+              "\n---\nProgressed subjects: ", sum(summary$progression > 0), " (PIRA: ", sum(summary$PIRA > 0),
+              "; RAW: ", sum(summary$RAW > 0), ")")
+          if (!startsWith(event, "firstprog")) {
+          message("Improved subjects: ", sum(summary$improvement > 0))
+          }
+          if (event %in% c('multiple', 'firstprogtype')) {
+          message("---\nProgression events: ",
+              sum(summary$progression), " (PIRA: ", sum(summary$PIRA), "; RAW: ", sum(summary$RAW), ")")
+          }
+          if (event=='multiple') {
+            message("Improvement events: ", sum(summary$improvement))
+          }
+        }
 
       if (min_value > 0) {
         message("---\n*** WARNING only progressions to ", toupper(outcome), ">=",

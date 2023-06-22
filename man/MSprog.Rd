@@ -2,7 +2,7 @@
 % Please edit documentation in R/MSprog.R
 \name{MSprog}
 \alias{MSprog}
-\title{Compute MS progression from longitudinal data.}
+\title{Compute multiple sclerosis progression from longitudinal data.}
 \usage{
 MSprog(
   data,
@@ -32,7 +32,7 @@ MSprog(
 )
 }
 \arguments{
-\item{data}{data.frame containing longitudinal data, including: subject ID, outcome value, date of visit.}
+\item{data}{data frame containing longitudinal data, including: subject ID, outcome value, date of visit.}
 
 \item{subj_col}{Name of data column with subject ID.}
 
@@ -42,7 +42,7 @@ MSprog(
 
 \item{subjects}{(optional) Subset of subjects.}
 
-\item{relapse}{(optional) data.frame containing longitudinal data, including: subject ID and relapse date.}
+\item{relapse}{(optional) data frame containing longitudinal data, including: subject ID and relapse date.}
 
 \item{rsubj_col}{Name of subject ID column for relapse data, if different from outcome data.}
 
@@ -103,5 +103,33 @@ Two data.frame objects: \cr
 - extended info on each event for all subjects. \cr
 }
 \description{
-Compute MS progression from longitudinal data.
+`MSprog` detects and characterises the progression (or improvement) events of an outcome measure
+(EDSS, NHPT, T25FW, or SDMT) for one or more subjects, based on repeated assessments
+through time and on the dates of acute episodes.
+Several qualitative and quantitative options are given as arguments that can be set
+by the user and reported as a complement to the results to ensure reproducibility.
+}
+\details{
+The events are detected sequentially by scanning the outcome values in chronological order.
+Progression events are classified as relapse-associated or relapse-independent based on their relative timing
+with respect to the relapses. Specifically, relapse-associated worsening (RAW) events
+are defined as confirmed progression events occurring within the influence of a relapse,
+while progression independent of relapse activity (PIRA) is established when the progression
+event occurs out of relapse influence, and with no relapses between baseline and confirmation.
+}
+\examples{
+data(toydata_visits)
+data(toydata_relapses)
+# EDSS progression
+output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses,
+    outcome='edss', conf_months=3, conf_tol_days=30, rel_infl=30,
+    event='multiple', baseline='roving', verbose=2)
+summary_EDSS = output[[1]] # summary of event sequence for each subject
+results_EDSS = output[[2]] # extended info on each event for all subjects
+# SDMT progression
+output <- MSprog(toydata_visits, 'id', 'SDMT', 'date', relapse=toydata_relapses,
+    outcome='sdmt', conf_months=3, conf_tol_days=30, rel_infl=30,
+    event='multiple', baseline='roving', verbose=2)
+summary_SDMT = output[[1]] # summary of event sequence for each subject
+results_SDMT = output[[2]] # extended info on each event for all subjects
 }

@@ -1,11 +1,13 @@
 
-
-
 #' Definition of progression deltas for different tests.
+#'
+#' `compute_delta` returns the minimum delta to be considered as a valid change
+#' from baseline of an outcome measure (EDSS, NHPT, T25FW, or SDMT).
 #'
 #' @param baseline Outcome value at baseline.
 #' @param outcome One of: \cr
 #'  'edss' (Extended Disability Status Scale ) [default]; \cr
+#'  'nhpt' (Nine-Hole Peg Test) \cr
 #'  'nhptD' (Nine-Hole Peg Test, dominant hand) \cr
 #'  'nhptND' (Nine-Hole Peg Test, non-dominant hand) \cr
 #'  't25fw' (Timed 25-Foot Walk) \cr
@@ -28,7 +30,7 @@ compute_delta <- function(baseline, outcome='edss') {
     } else {
       stop('invalid EDSS baseline')
     }
-  } else if (outcome %in% c('nhptD', 'nhptND', 't25fw')) {
+  } else if (outcome %in% c('nhpt', 'nhptD', 'nhptND', 't25fw')) {
     return(baseline/5)
   } else if (outcome == 'sdmt') {
     return(min(baseline/10, 3))
