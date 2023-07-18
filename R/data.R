@@ -10,14 +10,14 @@
 #'
 #' @usage data(toydata_visits)
 #'
-#' @format An object of class \code{"data.frame"}
+#' @format An object of class \code{data.frame}
 #' \describe{
 #'  \item{id}{Subject ID}
 #'  \item{date}{The visit date}
 #'  \item{EDSS}{A value between 0 and 10}
 #'  \item{SDMT}{A value between 0 and 110}
 #' }
-#' @references This data set was artificially created for the `msprog` package.
+#' @references This data set was artificially created for the \code{msprog} package.
 #' @keywords datasets
 #' @examples
 #'
@@ -30,7 +30,7 @@ NULL
 
 #' Synthetic Relapse Data
 #'
-#' Artificially generated relapse dates for some example patients in `toydata_visits` to illustrate the use of the package.
+#' Artificially generated relapse dates for some example patients in \code{toydata_visits} to illustrate the use of the package.
 #'
 #' @name toydata_relapses
 #'
@@ -38,12 +38,12 @@ NULL
 #'
 #' @usage data(toydata_relapses)
 #'
-#' @format An object of class \code{"data.frame"}
+#' @format An object of class \code{data.frame}
 #' \describe{
 #'  \item{id}{Subject ID}
 #'  \item{date}{The relapse date}
 #' }
-#' @references This data set was artificially created for the `msprog` package.
+#' @references This data set was artificially created for the \code{msprog} package.
 #' @keywords datasets
 #' @examples
 #'

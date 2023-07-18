@@ -5,7 +5,7 @@
 \alias{toydata_relapses}
 \title{Synthetic Relapse Data}
 \format{
-An object of class \code{"data.frame"}
+An object of class \code{data.frame}
 \describe{
  \item{id}{Subject ID}
  \item{date}{The relapse date}
@@ -15,7 +15,7 @@ An object of class \code{"data.frame"}
 data(toydata_relapses)
 }
 \description{
-Artificially generated relapse dates for 3 example patients to illustrate the use of the package.
+Artificially generated relapse dates for some example patients in \code{toydata_visits} to illustrate the use of the package.
 }
 \examples{
 
@@ -24,6 +24,6 @@ head(toydata_relapses)
 
 }
 \references{
-This data set was artificially created for the msprog package.
+This data set was artificially created for the \code{msprog} package.
 }
 \keyword{datasets}

@@ -2,8 +2,10 @@ Package: msprog
 Type: Package
 Title: Compute MS Progression from Longitudinal Data
 Version: 0.1.0
-Author: Noemi Montobbio
-Maintainer: Noemi Montobbio <noemi.montobbio@gmail.com>
+Authors@R: c(
+    person("Noemi", "Montobbio", , "noemi.montobbio@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-0302-393X")),
+    person("Francesca", "Bovis", role = c("ctb")))
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 Encoding: UTF-8

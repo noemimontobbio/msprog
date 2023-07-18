@@ -1,7 +1,7 @@
 
 #' Compute multiple sclerosis progression from longitudinal data.
 #'
-#' `MSprog` detects and characterises the progression (or improvement) events of an outcome measure
+#' \code{MSprog} detects and characterises the progression (or improvement) events of an outcome measure
 #' (EDSS, NHPT, T25FW, or SDMT) for one or more subjects, based on repeated assessments
 #' through time and on the dates of acute episodes.
 #' Several qualitative and quantitative options are given as arguments that can be set
@@ -15,49 +15,50 @@
 #' event occurs out of relapse influence, and with no relapses between baseline and confirmation.
 #'
 #'
-#' @param data data frame containing longitudinal data, including: subject ID, outcome value, date of visit.
+#' @param data \code{data.frame} containing longitudinal data, including: subject ID, outcome value, date of visit.
 #' @param subj_col Name of data column with subject ID.
 #' @param value_col Name of data column with outcome value.
 #' @param date_col Name of data column with date of visit.
-#' @param subjects (optional) Subset of subjects.
-#' @param relapse (optional) data frame containing longitudinal data, including: subject ID and relapse date.
-#' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data.
-#' @param rdate_col Name of subject ID column for relapse data, if different from outcome data.
+#' @param subjects Subset of subjects (list of IDs) [default is \code{NULL}].
+#' @param relapse \code{data.frame} containing longitudinal data, including: subject ID and relapse date [default is \code{NULL}].
+#' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].
+#' @param rdate_col Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].
 #' @param outcome One of: \cr
-#'  'edss' (Extended Disability Status Scale ) [default]; \cr
-#'  'nhptD' (Nine-Hole Peg Test, dominant hand) \cr
-#'  'nhptND' (Nine-Hole Peg Test, non-dominant hand) \cr
-#'  't25fw' (Timed 25-Foot Walk) \cr
-#'  'sdmt' (Symbol Digit Modalities Test).
-#' @param delta_fun (optional) Custom function specifying the minimum delta corresponding
-#' to a valid change from the provided baseline value.
-#' @param conf_months Period before confirmation (months).
+#'  \code{'edss'} (Extended Disability Status Scale ) [default]; \cr
+#'  \code{'nhpt'} (Nine-Hole Peg Test) \cr
+#'  \code{'nhptD'} (Nine-Hole Peg Test, dominant hand) \cr
+#'  \code{'nhptND'} (Nine-Hole Peg Test, non-dominant hand) \cr
+#'  \code{'t25fw'} (Timed 25-Foot Walk) \cr
+#'  \code{'sdmt'} (Symbol Digit Modalities Test).
+#' @param delta_fun Custom function specifying the minimum delta corresponding
+#' to a valid change from the provided baseline value. If none is specified [default], \code{compute_delta} for the specified outcome is used.
+#' @param conf_months Period before confirmation (months) [default is 3].
 #' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
-#' or list-like of length 2 (different tolerance on left and right).
-#' @param conf_left If TRUE, confirmation window is unbounded on the right.
-#' @param require_sust_months Minimum number of months from confirmation for which a change must be sustained to be retained as an event.
-#' @param rel_infl Influence of last relapse (days).
+#' or list-like of length 2 (different tolerance on left and right) [default is 45].
+#' @param conf_left If \code{TRUE}, confirmation window is unbounded on the right [default is \code{FALSE}].
+#' @param require_sust_months Minimum number of months from confirmation for which a change must be sustained to be retained as an event [default is 0].
+#' @param rel_infl Influence of last relapse (days) [default is 30].
 #' @param event One of: \cr
-#' 'first' (only the very first event - improvement or progression); \cr
-#' 'firsteach' (first improvement and first progression); \cr
-#' 'firstprog' (first progression); \cr
-#' 'firstprogtype' (first progression of each kind - PIRA, RAW, undefined); \cr
-#' 'multiple' (all events) [default]. \cr
+#' \code{'firstprog'} (first progression) [default]; \cr
+#' \code{'first'} (only the very first event - improvement or progression); \cr
+#' \code{'firsteach'} (first improvement and first progression); \cr
+#' \code{'firstprogtype'} (first progression of each kind - PIRA, RAW, undefined); \cr
+#' \code{'multiple'} (all events). \cr
 #' @param baseline One of: \cr
-#' 'fixed' (first outcome value out of relapse influence); \cr
-#' 'roving' (updated after each event to last confirmed outcome value out of relapse influence) [default].
-#' @param sub_threshold If TRUE, include confirmed sub-threshold events for roving baseline.
-#' @param relapse_rebl If TRUE, search for PIRA events again with post-relapse re-baseline.
-#' @param min_value Only consider progressions events where the outcome is >= value.
-#' @param prog_last_visit If TRUE, include progressions occurring at last visit (i.e. with no confirmation).
-#' @param include_dates If TRUE, report dates of events.
-#' @param include_value If TRUE, report value of outcome at event.
+#' \code{'fixed'} (first outcome value out of relapse influence) [default]; \cr
+#' \code{'roving'} (updated after each event to last confirmed outcome value out of relapse influence).
+#' @param sub_threshold If \code{TRUE}, include confirmed sub-threshold events for roving baseline [default is \code{FALSE}].
+#' @param relapse_rebl If \code{TRUE}, search for PIRA events again with post-relapse re-baseline [default is \code{FALSE}].
+#' @param min_value Only consider progressions events where the outcome is >= value [default is 0].
+#' @param prog_last_visit If \code{TRUE}, include progressions occurring at last visit (i.e. with no confirmation) [default is \code{FALSE}].
+#' @param include_dates If \code{TRUE}, report dates of events [default is \code{FALSE}].
+#' @param include_value If \code{TRUE}, report value of outcome at event [default is \code{FALSE}].
 #' @param verbose One of: \cr
 #' 0 (print no info); \cr
-#' 1 (print concise info); \cr
-#' 2 (print extended info) [default].
+#' 1 (print concise info) [default]; \cr
+#' 2 (print extended info).
 #'
-#' @return Two data.frame objects: \cr
+#' @return Two \code{data.frame} objects: \cr
 #' - summary of event sequence detected for each subject; \cr
 #' - extended info on each event for all subjects. \cr
 #' @importFrom stats na.omit setNames
@@ -81,8 +82,8 @@
 MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, outcome='edss', delta_fun=NULL,
                    conf_months=3, conf_tol_days=30, conf_left=FALSE, require_sust_months=0, rel_infl=30,
-                   event='multiple', baseline='roving', sub_threshold=FALSE, relapse_rebl=FALSE,
-                   min_value=0, prog_last_visit=FALSE, include_dates=FALSE, include_value=FALSE, verbose=2) {
+                   event='firstprog', baseline='fixed', sub_threshold=FALSE, relapse_rebl=FALSE,
+                   min_value=0, prog_last_visit=FALSE, include_dates=FALSE, include_value=FALSE, verbose=1) {
 
   # SETUP
 
@@ -108,9 +109,9 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
     names(relapse) = c(rsubj_col, rdate_col)
   }
 
-  # Remove missing values
-  data <- na.omit(data)
-  relapse <- na.omit(relapse)
+  # Remove missing values from columns of interest
+  data <- data[complete.cases(data[ , c(subj_col, value_col, date_col)]), ]
+  relapse <- relapse[complete.cases(relapse[ , c(rsubj_col, rdate_col)]), ]
 
   # Convert dates to datetime format
   data[[date_col]] <- as.Date(data[[date_col]])
@@ -165,9 +166,16 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
 
     data_id <- data[data[[subj_col]] == subjid, ]
 
+    # If more than one visit occur on the same day, only keep last
     ucounts <- table(data_id[, date_col])
     if (any(ucounts > 1)) {
       data_id <- data_id %>% group_by_at(vars(date_col)) %>% slice(n())
+    }
+
+    # Sort visits in chronological order
+    order_tmp <- order(data_id[[date_col]])
+    if (any(order_tmp != rownames(data_id))) {
+      data_id <- data_id[order_tmp, ]
     }
 
     nvisits <- nrow(data_id)
@@ -181,7 +189,10 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
       message("\nSubject #", subjid, ": ", nvisits, " visit", ifelse(nvisits == 1, "", "s"),
               ", ", nrel, " relapse", ifelse(nrel == 1, "", "s"))
       if (any(ucounts > 1)) {
-        message("Found multiple visits in the same day: only keeping last")
+        message("Found multiple visits in the same day: only keeping last.")
+      }
+      if (any(order_tmp != rownames(data_id))) {
+        message("Visits not listed in chronological order: sorting them.")
       }
     }
 

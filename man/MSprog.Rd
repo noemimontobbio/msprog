@@ -15,24 +15,24 @@ MSprog(
   rdate_col = NULL,
   outcome = "edss",
   delta_fun = NULL,
-  conf_months = c(6, 12),
-  conf_tol_days = 45,
+  conf_months = 3,
+  conf_tol_days = 30,
   conf_left = FALSE,
   require_sust_months = 0,
   rel_infl = 30,
-  event = "multiple",
-  baseline = "roving",
+  event = "firstprog",
+  baseline = "fixed",
   sub_threshold = FALSE,
   relapse_rebl = FALSE,
   min_value = 0,
   prog_last_visit = FALSE,
   include_dates = FALSE,
   include_value = FALSE,
-  verbose = 2
+  verbose = 1
 )
 }
 \arguments{
-\item{data}{data frame containing longitudinal data, including: subject ID, outcome value, date of visit.}
+\item{data}{\code{data.frame} containing longitudinal data, including: subject ID, outcome value, date of visit.}
 
 \item{subj_col}{Name of data column with subject ID.}
 
@@ -40,70 +40,71 @@ MSprog(
 
 \item{date_col}{Name of data column with date of visit.}
 
-\item{subjects}{(optional) Subset of subjects.}
+\item{subjects}{Subset of subjects (list of IDs) [default is \code{NULL}].}
 
-\item{relapse}{(optional) data frame containing longitudinal data, including: subject ID and relapse date.}
+\item{relapse}{\code{data.frame} containing longitudinal data, including: subject ID and relapse date [default is \code{NULL}].}
 
-\item{rsubj_col}{Name of subject ID column for relapse data, if different from outcome data.}
+\item{rsubj_col}{Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].}
 
-\item{rdate_col}{Name of subject ID column for relapse data, if different from outcome data.}
+\item{rdate_col}{Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].}
 
 \item{outcome}{One of: \cr
-'edss' (Extended Disability Status Scale ) [default]; \cr
-'nhptD' (Nine-Hole Peg Test, dominant hand) \cr
-'nhptND' (Nine-Hole Peg Test, non-dominant hand) \cr
-'t25fw' (Timed 25-Foot Walk) \cr
-'sdmt' (Symbol Digit Modalities Test).}
+\code{'edss'} (Extended Disability Status Scale ) [default]; \cr
+\code{'nhpt'} (Nine-Hole Peg Test) \cr
+\code{'nhptD'} (Nine-Hole Peg Test, dominant hand) \cr
+\code{'nhptND'} (Nine-Hole Peg Test, non-dominant hand) \cr
+\code{'t25fw'} (Timed 25-Foot Walk) \cr
+\code{'sdmt'} (Symbol Digit Modalities Test).}
 
-\item{delta_fun}{(optional) Custom function specifying the minimum delta corresponding
-to a valid change from the provided baseline value.}
+\item{delta_fun}{Custom function specifying the minimum delta corresponding
+to a valid change from the provided baseline value. If none is specified [default], \code{compute_delta} for the specified outcome is used.}
 
-\item{conf_months}{Period before confirmation (months).}
+\item{conf_months}{Period before confirmation (months) [default is \code{c(6,12)}].}
 
 \item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
-or list-like of length 2 (different tolerance on left and right).}
+or list-like of length 2 (different tolerance on left and right) [default is 45].}
 
-\item{conf_left}{If TRUE, confirmation window is unbounded on the right.}
+\item{conf_left}{If \code{TRUE}, confirmation window is unbounded on the right [default is \code{FALSE}].}
 
-\item{require_sust_months}{Minimum number of months from confirmation for which a change must be sustained to be retained as an event.}
+\item{require_sust_months}{Minimum number of months from confirmation for which a change must be sustained to be retained as an event [default is 0].}
 
-\item{rel_infl}{Influence of last relapse (days).}
+\item{rel_infl}{Influence of last relapse (days) [default is 30].}
 
 \item{event}{One of: \cr
-'first' (only the very first event - improvement or progression); \cr
-'firsteach' (first improvement and first progression); \cr
-'firstprog' (first progression); \cr
-'firstprogtype' (first progression of each kind - PIRA, RAW, undefined); \cr
-'multiple' (all events) [default]. \cr}
+\code{'firstprog'} (first progression) [default]; \cr
+\code{'first'} (only the very first event - improvement or progression); \cr
+\code{'firsteach'} (first improvement and first progression); \cr
+\code{'firstprogtype'} (first progression of each kind - PIRA, RAW, undefined); \cr
+\code{'multiple'} (all events). \cr}
 
 \item{baseline}{One of: \cr
-'fixed' (first outcome value out of relapse influence); \cr
-'roving' (updated after each event to last confirmed outcome value out of relapse influence) [default].}
+\code{'fixed'} (first outcome value out of relapse influence) [default]; \cr
+\code{'roving'} (updated after each event to last confirmed outcome value out of relapse influence).}
 
-\item{sub_threshold}{If TRUE, include confirmed sub-threshold events for roving baseline.}
+\item{sub_threshold}{If \code{TRUE}, include confirmed sub-threshold events for roving baseline [default is \code{FALSE}].}
 
-\item{relapse_rebl}{If TRUE, search for PIRA events again with post-relapse re-baseline.}
+\item{relapse_rebl}{If \code{TRUE}, search for PIRA events again with post-relapse re-baseline [default is \code{FALSE}].}
 
-\item{min_value}{Only consider progressions events where the outcome is >= value.}
+\item{min_value}{Only consider progressions events where the outcome is >= value [default is 0].}
 
-\item{prog_last_visit}{If TRUE, include progressions occurring at last visit (i.e. with no confirmation).}
+\item{prog_last_visit}{If \code{TRUE}, include progressions occurring at last visit (i.e. with no confirmation) [default is \code{FALSE}].}
 
-\item{include_dates}{If TRUE, report dates of events.}
+\item{include_dates}{If \code{TRUE}, report dates of events [default is \code{FALSE}].}
 
-\item{include_value}{If TRUE, report value of outcome at event.}
+\item{include_value}{If \code{TRUE}, report value of outcome at event [default is \code{FALSE}].}
 
 \item{verbose}{One of: \cr
 0 (print no info); \cr
-1 (print concise info); \cr
-2 (print extended info) [default].}
+1 (print concise info) [default]; \cr
+2 (print extended info).}
 }
 \value{
-Two data.frame objects: \cr
+Two \code{data.frame} objects: \cr
 - summary of event sequence detected for each subject; \cr
 - extended info on each event for all subjects. \cr
 }
 \description{
-`MSprog` detects and characterises the progression (or improvement) events of an outcome measure
+\code{MSprog} detects and characterises the progression (or improvement) events of an outcome measure
 (EDSS, NHPT, T25FW, or SDMT) for one or more subjects, based on repeated assessments
 through time and on the dates of acute episodes.
 Several qualitative and quantitative options are given as arguments that can be set

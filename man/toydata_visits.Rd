@@ -5,7 +5,7 @@
 \alias{toydata_visits}
 \title{Synthetic Longitudinal EDSS and SDMT Data}
 \format{
-An object of class \code{"data.frame"}
+An object of class \code{data.frame}
 \describe{
  \item{id}{Subject ID}
  \item{date}{The visit date}
@@ -18,7 +18,7 @@ data(toydata_visits)
 }
 \description{
 Small, artificially generated toy data set providing Extended Disability Status Scale (EDSS)
-and Symbol Digit Modalities Test (SDMT) information on 3 example patients
+and Symbol Digit Modalities Test (SDMT) information on 4 example patients
 to illustrate the use of the package.
 }
 \examples{
@@ -28,6 +28,6 @@ head(toydata_visits)
 
 }
 \references{
-This data set was artificially created for the msprog package.
+This data set was artificially created for the \code{msprog} package.
 }
 \keyword{datasets}

@@ -3,6 +3,8 @@ title: "Computing MS progression from longitudinal data"
 author: "Noemi Montobbio"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+bibliography: ../MSbiblio.bib
+csl: ../aaps-pharmscitech.csl
 vignette: >
   %\VignetteIndexEntry{Computing MS progression from longitudinal data}
   %\VignetteEngine{knitr::rmarkdown}
@@ -24,13 +26,13 @@ library(msprog)
 
 ## Input data
 
-The data should be organised in a `data.frame` object containing (at least) the following columns:
+The data must be organised in a `data.frame` object containing (at least) the following columns:
 
 * Subject IDs;
 * Visit dates;
 * Outcome values.
 
-The visits should be listed in chronological order.
+The visits should be listed in chronological order (if they are not, `msprog::MSprog` will sort them).
 
 The `msprog` package provides a toy dataset `toydata_visits` with artificially generated EDSS and SDMT assessments for four patients:
 ```{r}
@@ -49,22 +51,22 @@ data(toydata_relapses)
 head(toydata_relapses)
 ```
 
-## The `MSprog` function
+## Minimal example
 
-The `MSprog` function analyses the disability progression based on the provided visit and relapse data (default `outcome` is `'edss'`):
+Given data on visits and relapses in the form specified above, the `MSprog` function analyses the disability progression for each subject. Default `outcome` is `'edss'`.
 ```{r}
-output <- MSprog(toydata_visits, 
-                 subj_col='id', value_col='EDSS', date_col='date', 
-                 relapse=toydata_relapses)
+output <- MSprog(toydata_visits, # data on visits
+                 subj_col='id', value_col='EDSS', date_col='date', # specify column names
+                 relapse=toydata_relapses) # data on relapses
 ```
-The function prints progress info (the amount of info can be controlled using the argument `verbose`), and generates the following two `data.frame` objects.
+The function prints concise info (the argument `verbose` can be used to control the amount of printed info), and generates the following two `data.frame` objects.
 
 1. A summary of the event sequence detected for each subject:
 ```{r, indent = "     "}
 summary = output[[1]]
 print(summary)
 ```
-    where: `event_sequence` specifies the order of the events; the other columns count the events of each kind (improvement; progression; relapse-associated worsening, RAW [**REFERENCE**]; progression independent of relapse activity, PIRA [**REFERENCE**]; and progression that could not be classified as either RAW of PIRA with the available information).
+    where: `event_sequence` specifies the order of the events; the other columns count the events of each kind (improvement; progression; relapse-associated worsening, RAW; progression independent of relapse activity, PIRA; and progression that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent].
 
 2. Extended info on each event for all subjects:
 ```{r, indent = "     "}
@@ -73,19 +75,19 @@ print(results, row.names = FALSE)
 ```
     where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from baseline to event; `conf3` reports whether the event was confirmed; `sust_days` is the number of days for which the event was sustained *after confirmation*; `sust_last` reports whether the event was sustained until the last visit.
 
-Several qualitative and quantitative options for computing the progression are given as arguments of `MSprog` that can be set by the user. In order to ensure reproducibility, the results should always be complemented by the specific settings used to obtain them. In the following sections we will go into more detail about usage and best practices for each of the options.
+Several qualitative and quantitative options for computing the progression are given as optional arguments of `MSprog` that can be set by the user. In order to ensure reproducibility, the results should always be complemented by the specific settings used to obtain them. In the following sections we will go into more detail about usage and best practices for each of the options.
 
 ## Valid changes in the outcome measure
 
-The `MSprog` function detects the events sequentially by scanning the outcome values in chronological order, and each value is tested for its difference from the current reference value. The `compute_delta` function returns the minimum difference $\delta$ in the chosen outcome measure that is accepted as a valid change from a given reference value $x$ (value at baseline). The criterion varies based on the test under analysis.
+The `MSprog` function detects the events sequentially by scanning the outcome values in chronological order, and each value is tested for its difference from the current reference value. The `compute_delta` function returns the minimum difference $\delta$ in the chosen outcome measure that is accepted as a valid change from a given reference value $x$ (value at baseline). The criterion varies based on the test under analysis, see [@lorscheider2016; @bosma2010; @kalinowski2022; @strober2019].
 
-* Extended Disability Status Scale (EDSS): $\delta(x)=\begin{cases} 1.5 \quad \text{ if } x=0\\1 \quad\;\;\; \text{ if } 0 < x \leq 5\\0.5 \quad \text{ if } 5<x\leq 10\end{cases}$ [**REFERENCE**];
+* Extended Disability Status Scale (EDSS): $\delta(x)=\begin{cases} 1.5 \quad \text{ if } x=0\\1 \quad\;\;\; \text{ if } 0 < x \leq 5\\0.5 \quad \text{ if } 5<x\leq 10\end{cases}$;
 
-* Nine-Hole Peg Test (NHPT), for either the dominant or the non-dominant hand: $\delta(x) = \frac{x}{5}$ [**REFERENCE**];
+* Nine-Hole Peg Test (NHPT), for either the dominant or the non-dominant hand: $\delta(x) = \frac{x}{5}$;
 
-* Timed 25-Foot Walk (T25FW): $\delta(x) = \frac{x}{5}$ [**REFERENCE**];
+* Timed 25-Foot Walk (T25FW): $\delta(x) = \frac{x}{5}$;
 
-* Symbol Digit Modalities Test (SDMT): $\delta(x) = \min\left(3, \frac{x}{10}\right)$ [**REFERENCE**].
+* Symbol Digit Modalities Test (SDMT): $\delta(x) = \min\left(3, \frac{x}{10}\right)$.
 
 For example:
 ```{r}
@@ -105,8 +107,8 @@ and set `delta_fun=my_sdmt_delta` in `MSprog` when computing the progression.
 
 The baseline scheme can be set by using the `baseline` argument in `MSprog`. Two main baseline schemes can be adopted:
 
-* Fixed baseline (`baseline='fixed'`): the reference value is set to be the first outcome value found outside the influence of an acute event.
-* Roving baseline (`baseline='roving'`): the reference value is initially set as the first outcome value out of relapse influence, then updated after each event to the last confirmed outcome value (out of relapse influence). **This scheme is recommended in a "multiple events" setting** (see example below). The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog`: this moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$.
+* Fixed baseline (`baseline='fixed'`, default): the reference value is set to be the first outcome value found outside the influence of an acute event.
+* Roving baseline (`baseline='roving'`): the reference value is initially set as the first outcome value out of relapse influence, then updated after each event to the last confirmed outcome value (out of relapse influence). **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below). The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog`: this moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$.
 
 For example, extracting multiple EDSS events for subject `4` from `toydata_visits` with a fixed baseline would result in the following.
 ```{r}
@@ -130,7 +132,7 @@ Finally, on top of the chosen baseline scheme, *post-relapse re-baseline* can be
 
 ## Confirmation period
 
-An event is only validated if it is *confirmed*, that is, if the value change from baseline is maintained on a subsequent visit falling within a pre-defined confirmation period  [**REFERENCE**]. The chosen confirmation period depends on the type of study and on the frequency of visits, and can be set in `MSprog` by using the argument `conf_months`. If multiple values are specified (e.g., `conf_months=c(3,6)`), events are validated by checking for confirmation at the first time provided (3 months in this case), but the results table will also report whether each of them was also confirmed at subsequent times (6 months).
+An event is only validated if it is *confirmed*, that is, if the value change from baseline is maintained on a subsequent visit falling within a pre-specified confirmation period [@ontaneda2017]. The chosen confirmation period depends on the type of study and on the frequency of visits, and can be set in `MSprog` by using the argument `conf_months`. If multiple values are specified (e.g., `conf_months=c(3,6)`), events are validated by checking for confirmation at the first time provided (3 months in this case), but the results table will also report whether each of them was also confirmed at subsequent times (6 months).
 
 For instance, for subject `2` of `toydata_visits`:
 ```{r}
@@ -149,5 +151,22 @@ print(output[[2]], row.names = FALSE) # results
 ```
 
 The tolerance for the confirmation visit date can be set using the argument `conf_tol_days`. If a single number is specified (e.g., `conf_tol_days=45`), a symmetric tolerance interval is used: if the confirmation period is, say, 3 months, any visit within $[3\text{mm} - 45\text{dd}, 3\text{mm} + 45\text{dd}]$ will be a valid confirmation visit. Different tolerance on the left and on the right can be set by specifying two values (e.g., `conf_tol_days=c(30, 365)` will generate a window $[3\text{mm} - 30\text{dd}, 3\text{mm} + 365\text{dd}]$). Further, the argument `conf_left` allows to consider as valid any visit *after* a certain amount of time (e.g., `conf_tol_days=45` with `conf_left=TRUE` will result in the window $[3\text{mm} - 30\text{dd}, +\inf]$).
+
+
+
+## Printing progress info
+
+The `MSprog` function scans the outcome values of each subject in chronological order to detect the events. It is possible to visualize an extended log of the ongoing computations by setting `verbose=2`. See the example below.
+
+```{r}
+output <- MSprog(toydata_visits, 
+                 subj_col='id', value_col='EDSS', date_col='date', 
+                 event='multiple', baseline='roving', 
+                 relapse=toydata_relapses, verbose=2)
+```
+
+## References
+
+
 
 

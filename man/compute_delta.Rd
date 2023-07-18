@@ -10,17 +10,18 @@ compute_delta(baseline, outcome = "edss")
 \item{baseline}{Outcome value at baseline.}
 
 \item{outcome}{One of: \cr
-'edss' (Extended Disability Status Scale ) [default]; \cr
-'nhptD' (Nine-Hole Peg Test, dominant hand) \cr
-'nhptND' (Nine-Hole Peg Test, non-dominant hand) \cr
-'t25fw' (Timed 25-Foot Walk) \cr
-'sdmt' (Symbol Digit Modalities Test).}
+\code{'edss'} (Extended Disability Status Scale ) [default]; \cr
+\code{'nhpt'} (Nine-Hole Peg Test) \cr
+\code{'nhptD'} (Nine-Hole Peg Test, dominant hand) \cr
+\code{'nhptND'} (Nine-Hole Peg Test, non-dominant hand) \cr
+\code{'t25fw'} (Timed 25-Foot Walk) \cr
+\code{'sdmt'} (Symbol Digit Modalities Test).}
 }
 \value{
 Minimum delta corresponding to valid change from the provided baseline value.
 }
 \description{
-`compute_delta` returns the minimum delta to be considered as a valid change
+\code{compute_delta} returns the minimum delta to be considered as a valid change
 from baseline of an outcome measure (EDSS, NHPT, T25FW, or SDMT).
 }
 \examples{
