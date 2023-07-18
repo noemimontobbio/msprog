@@ -59,7 +59,7 @@ MSprog(
 \item{delta_fun}{Custom function specifying the minimum delta corresponding
 to a valid change from the provided baseline value. If none is specified [default], \code{compute_delta} for the specified outcome is used.}
 
-\item{conf_months}{Period before confirmation (months) [default is \code{c(6,12)}].}
+\item{conf_months}{Period before confirmation (months) [default is 3].}
 
 \item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 or list-like of length 2 (different tolerance on left and right) [default is 45].}

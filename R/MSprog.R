@@ -61,7 +61,7 @@
 #' @return Two \code{data.frame} objects: \cr
 #' - summary of event sequence detected for each subject; \cr
 #' - extended info on each event for all subjects. \cr
-#' @importFrom stats na.omit setNames
+#' @importFrom stats na.omit setNames complete.cases
 #' @importFrom dplyr %>% group_by_at vars slice n mutate across
 #' @export
 #' @examples

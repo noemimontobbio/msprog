@@ -3,8 +3,8 @@ title: "Computing MS progression from longitudinal data"
 author: "Noemi Montobbio"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
-bibliography: ../MSbiblio.bib
-csl: ../aaps-pharmscitech.csl
+bibliography: MSbiblio.bib
+csl: aaps-pharmscitech.csl
 vignette: >
   %\VignetteIndexEntry{Computing MS progression from longitudinal data}
   %\VignetteEngine{knitr::rmarkdown}
