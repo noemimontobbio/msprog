@@ -24,23 +24,24 @@ knitr::opts_chunk$set(
 
 Its core function, `MSprog`, detects and characterises the progression events of an outcome measure (EDSS, NHPT, T25FW, or SDMT) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes.
 
-The package also provides two toy datasets:
+The package also provides two toy datasets for function testing:
 
 * `toydata_visits`: artificially generated EDSS and SDMT assessments for four patients;
 * `toydata_relapses`: artificially generated relapse dates associated with the patients in `toydata_visits`.
 
+A tutorial is available as a package vignette: ***Computing MS progression from longitudinal data***.
 
 
 ## Installation
 
-You can install the development version of `msprog` from [GitHub](https://github.com/) with:
+You can install the development version of `msprog` from [GitHub](https://github.com/noemimontobbio/msprog) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("noemimontobbio/msprog")
+devtools::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
 ```
 
-## Usage
+## Example usage
 
 `MSprog` detects the events sequentially by scanning the outcome values in chronological order, and classifies progression events as relapse-associated or relapse-independent based on their relative timing with respect to the relapses [@lublin2014; @kappos2018; @silent]. Several qualitative and quantitative options are given as arguments that can be set by the user and reported as a complement to the results to ensure reproducibility. These include the baseline scheme (fixed or roving), the events to be detected (first or multiple, progression and/or improvement), the length of the relapse influence window and of the event confirmation period(s) with the relative tolerance. 
 
@@ -72,6 +73,10 @@ results = output[[2]]
 print(results, row.names = FALSE)
 ```
     where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from baseline to event; `conf3` reports whether the event was confirmed; `sust_days` is the number of days for which the event was sustained *after confirmation*; `sust_last` reports whether the event was sustained until the last visit.
-    
+
+For a more detailed introduction, please refer to the package vignettes.
+```{r}
+#browseVignettes('msprog')
+```
     
 ## References

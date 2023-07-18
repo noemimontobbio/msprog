@@ -15,24 +15,27 @@ events of an outcome measure (EDSS, NHPT, T25FW, or SDMT) for one or
 more subjects, based on repeated assessments through time and on the
 dates of acute episodes.
 
-The package also provides two toy datasets:
+The package also provides two toy datasets for function testing:
 
 - `toydata_visits`: artificially generated EDSS and SDMT assessments for
   four patients;
 - `toydata_relapses`: artificially generated relapse dates associated
   with the patients in `toydata_visits`.
 
+A tutorial is available as a package vignette: ***Computing MS
+progression from longitudinal data***.
+
 ## Installation
 
 You can install the development version of `msprog` from
-[GitHub](https://github.com/) with:
+[GitHub](https://github.com/noemimontobbio/msprog) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("noemimontobbio/msprog")
+devtools::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
 ```
 
-## Usage
+## Example usage
 
 `MSprog` detects the events sequentially by scanning the outcome values
 in chronological order, and classifies progression events as
@@ -114,6 +117,12 @@ function call.
     confirmed; `sust_days` is the number of days for which the event was
     sustained *after confirmation*; `sust_last` reports whether the
     event was sustained until the last visit.
+
+For a more detailed introduction, please refer to the package vignettes.
+
+``` r
+#browseVignettes('msprog')
+```
 
 ## References
 
