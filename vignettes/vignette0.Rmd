@@ -5,6 +5,7 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 bibliography: MSbiblio.bib
 csl: aaps-pharmscitech.csl
+link-citations: true
 vignette: >
   %\VignetteIndexEntry{Computing MS progression from longitudinal data}
   %\VignetteEngine{knitr::rmarkdown}
@@ -39,6 +40,8 @@ The `msprog` package provides a toy dataset `toydata_visits` with artificially g
 data(toydata_visits)
 head(toydata_visits)
 ```
+
+<br />
 
 For relapsing-remitting MS patients, an additional `data.frame` object with the dates of relapses is needed to correctly assess progression and characterise progression events as relapse-associated or relapse-independent. The dataset should contain (at least) the following columns:
 
@@ -75,6 +78,8 @@ print(results, row.names = FALSE)
 ```
     where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from baseline to event; `conf3` reports whether the event was confirmed; `sust_days` is the number of days for which the event was sustained *after confirmation*; `sust_last` reports whether the event was sustained until the last visit.
 
+<br />
+
 Several qualitative and quantitative options for computing the progression are given as optional arguments of `MSprog` that can be set by the user. In order to ensure reproducibility, the results should always be complemented by the specific settings used to obtain them. In the following sections we will go into more detail about usage and best practices for each of the options.
 
 ## Valid changes in the outcome measure
@@ -88,6 +93,7 @@ The `MSprog` function detects the events sequentially by scanning the outcome va
 * Timed 25-Foot Walk (T25FW): $\delta(x) = \frac{x}{5}$;
 
 * Symbol Digit Modalities Test (SDMT): $\delta(x) = \min\left(3, \frac{x}{10}\right)$.
+
 
 For example:
 ```{r}
@@ -110,14 +116,16 @@ The baseline scheme can be set by using the `baseline` argument in `MSprog`. Two
 * Fixed baseline (`baseline='fixed'`, default): the reference value is set to be the first outcome value found outside the influence of an acute event.
 * Roving baseline (`baseline='roving'`): the reference value is initially set as the first outcome value out of relapse influence, then updated after each event to the last confirmed outcome value (out of relapse influence). **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below). The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog`: this moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$.
 
+
 For example, extracting multiple EDSS events for subject `4` from `toydata_visits` with a fixed baseline would result in the following.
 ```{r}
-print(toydata_visits[toydata_visits$id==4,]) # EDSS visits
+print(toydata_visits[toydata_visits$id==4, c('date', 'EDSS')], row.names = FALSE) # EDSS visits
 output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses, subjects=4,
                 outcome='edss', conf_months=3, event='multiple', baseline='fixed', 
                 include_dates=TRUE, verbose=0)
 print(output[[2]], row.names = FALSE) # results
 ```
+
 Since the reference value was kept fixed at the first visit (EDSS = 4.5), the EDSS progression at visit 4 (EDSS = 5) was not detected. On the other hand, with a roving baseline scheme, the baseline is moved to visit 3 after the confirmed improvement and the progression event is correctly detected:
 ```{r}
 output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses, subjects=4,
@@ -126,31 +134,55 @@ output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses,
 print(output[[2]], row.names = FALSE) # results
 ```
 
+<br />
 
-Finally, on top of the chosen baseline scheme, *post-relapse re-baseline* can be applied by setting `rel_rebl=TRUE` in `MSprog`. If this is enabled, outcome values are scanned once more from the beginning by resetting the baseline after each relapse (first visit out of relapse influence) to classify potential events left undefined as PIRA.
+Finally, on top of the chosen baseline scheme, *post-relapse re-baseline* can be applied by setting `relapse_rebl=TRUE` in `MSprog`. If this is enabled, outcome values are scanned once more from the beginning by resetting the baseline after each relapse (first visit out of relapse influence) to classify potential events left undefined as PIRA.
 
 
 ## Confirmation period
 
-An event is only validated if it is *confirmed*, that is, if the value change from baseline is maintained on a subsequent visit falling within a pre-specified confirmation period [@ontaneda2017]. The chosen confirmation period depends on the type of study and on the frequency of visits, and can be set in `MSprog` by using the argument `conf_months`. If multiple values are specified (e.g., `conf_months=c(3,6)`), events are validated by checking for confirmation at the first time provided (3 months in this case), but the results table will also report whether each of them was also confirmed at subsequent times (6 months).
+An event is only validated if it is *confirmed*, that is, if the value change from baseline is maintained **up to** a subsequent visit falling within a pre-specified confirmation period [@ontaneda2017]. The chosen confirmation period depends on the type of study and on the frequency of visits, and can be set in `MSprog` by using the argument `conf_months`. If multiple values are specified (e.g., `conf_months=c(3,6)`), events are retained if confirmed by at least a visit falling within one of the specified periods (here, 3 or 6 months $\pm$ `conf_tol_days`)[^1]. The results table will report whether an event was confirmed in each of the specified periods.
 
-For instance, for subject `2` of `toydata_visits`:
+[^1]: An event is only confirmed if the value change from baseline is maintained **at all visits up to the confirmation visit**. So an event can only be confirmed at 6 months and *not* confirmed at 3 months if there are no valid confirmation visits falling within the 3-month window.
+
+
+Let's look at subject `2` from `toydata_visits`:
+```{r}
+print(toydata_visits[toydata_visits$id==2,c('date', 'EDSS')], row.names = FALSE) # EDSS visits
+print(toydata_relapses[toydata_relapses$id==2,], row.names = FALSE) # relapses
+```
+
+The following code detects 3- or 6-month confirmed events for subject `2`.
 ```{r}
 output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses, subjects=2,
-                outcome='edss', conf_months=c(3,6), verbose=0)
+                 outcome='edss', event='multiple', baseline='roving', 
+                 conf_months=c(3,6), verbose=0)
 print(output[[2]], row.names = FALSE) # results
 ```
 The validated events included in the results are a 3-month-confirmed RAW and a 3-month-confirmed PIRA. The RAW event was not confirmed at 6 months (`conf6` is `0`). The PIRA event was also confirmed at 6 months (`conf6` is `1`). However, since a relapse occurred before the 6-month confirmation, the event cannot be classified as a 6-month-confirmed PIRA (`PIRA_conf6` is `0`) but only as a 6-month-confirmed progression.
 
-The RAW event found for subject `2` constitutes a *temporary* accumulation of disability. Such events can be excluded from the `MSprog` output by requiring that each event be sustained for at least a certain amount of time, specified by argument `require_sust_months`. For instance:
+The RAW event found for subject `2` constitutes a *transient* accumulation of disability. Such events can be excluded from the `MSprog` output by requiring that each event be sustained for at least a certain amount of time, specified by argument `require_sust_months`. For instance:
 ```{r}
 output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses, subjects=2,
-                outcome='edss', conf_months=c(3,6), require_sust_months=6,
-                verbose=0)
+                outcome='edss', event='multiple', baseline='roving', 
+                conf_months=c(3,6), require_sust_months=6, verbose=0)
 print(output[[2]], row.names = FALSE) # results
 ```
 
-The tolerance for the confirmation visit date can be set using the argument `conf_tol_days`. If a single number is specified (e.g., `conf_tol_days=45`), a symmetric tolerance interval is used: if the confirmation period is, say, 3 months, any visit within $[3\text{mm} - 45\text{dd}, 3\text{mm} + 45\text{dd}]$ will be a valid confirmation visit. Different tolerance on the left and on the right can be set by specifying two values (e.g., `conf_tol_days=c(30, 365)` will generate a window $[3\text{mm} - 30\text{dd}, 3\text{mm} + 365\text{dd}]$). Further, the argument `conf_left` allows to consider as valid any visit *after* a certain amount of time (e.g., `conf_tol_days=45` with `conf_left=TRUE` will result in the window $[3\text{mm} - 30\text{dd}, +\inf]$).
+In this context, as the transient EDSS accumulation was not classified as an event, it did not trigger a re-baseline according to the roving baseline scheme. As a consequence, the PIRA event is classified as an undefined progression due to the presence of a relapse between baseline and confirmation. This can be handled by enabling *post-relapse re-baseline* (`relapse_rebl=TRUE`) to force a re-baseline after each relapse:
+```{r}
+output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses, subjects=2,
+                outcome='edss', event='multiple', baseline='roving', relapse_rebl=TRUE,
+                conf_months=c(3,6), require_sust_months=6, verbose=0)
+print(output[[2]], row.names = FALSE) # results
+```
+The event is now correctly classified as PIRA.
+
+A more detailed report of the event detection process in each of the three cases examined can be visualized by re-running the above code snippets with `verbose=2`, see next section.  
+
+<br />
+
+Finally, the tolerance for the confirmation visit date can be set using the argument `conf_tol_days`. If a single number is specified (e.g., `conf_tol_days=45`), a symmetric tolerance interval is used: if the confirmation period is, say, 3 months, any visit within $[3\text{mm} - 45\text{dd}, 3\text{mm} + 45\text{dd}]$ will be a valid confirmation visit. Different tolerance on the left and on the right can be set by specifying two values (e.g., `conf_tol_days=c(30, 365)` will generate a window $[3\text{mm} - 30\text{dd}, 3\text{mm} + 365\text{dd}]$). Further, the argument `conf_left` allows to consider as valid any visit *after* a certain amount of time (e.g., `conf_tol_days=45` with `conf_left=TRUE` will result in the window $[3\text{mm} - 30\text{dd}, +\inf]$).
 
 
 

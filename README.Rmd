@@ -2,6 +2,7 @@
 output: github_document
 bibliography: vignettes/MSbiblio.bib
 csl: vignettes/aaps-pharmscitech.csl
+link-citations: true
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -18,6 +19,7 @@ knitr::opts_chunk$set(
 # msprog: reproducible assessment of disability progression in MS
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 `msprog` provides tools for exhaustive and reproducible analysis of disability progression in multiple sclerosis (MS) from longitudinal data.
@@ -78,7 +80,9 @@ print(results, row.names = FALSE)
 ```
     where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from baseline to event; `conf3` reports whether the event was confirmed; `sust_days` is the number of days for which the event was sustained *after confirmation*; `sust_last` reports whether the event was sustained until the last visit.
 
-For a more detailed introduction, please refer to the package vignettes.
+<br />
+
+For detailed indications on usage and best practices, please refer to the package vignettes.
 ```{r}
 #browseVignettes('msprog')
 ```

@@ -253,8 +253,14 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
           }
         }
       }
-      if (bl_idx > nvisits - 1) {
-        break
+
+      # if (bl_idx > nvisits - 1) {
+      #   break
+      # }
+      if (bl_idx > nvisits) {
+        bl_idx <- nvisits
+        proceed <- 0
+        message("Not enough visits left: end process")
       }
 
       bl <- data_id[bl_idx, ]
@@ -504,7 +510,8 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
                     }
                   }
 
-                    if (baseline == 'roving' || (event_type[length(event_type)] == 'PIRA' && phase == 1)) {
+                    if ((baseline == 'roving' && phase == 0) # || (event_type[length(event_type)] == 'PIRA' && phase == 1)
+                        ) {
                       bl_idx <- ifelse(is.na(next_change), nvisits, next_change - 1) # set new baseline at last confirmation time
                       search_idx <- bl_idx + 1
                     } else {
@@ -554,11 +561,11 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
       }
 
 
-
         if (relapse_rebl && phase == 0 && !proceed) { # && !("PIRA" %in% event_type)
           phase <- 1
           proceed <- 1
-          search_idx <- bl_idx + 1
+          bl_idx <- 1
+          search_idx <- 2 #bl_idx + 1 #
           if (verbose == 2) {
             message("Completed search with fixed baseline, re-search for PIRA events with post-relapse rebaseline")
           }
@@ -574,7 +581,9 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
                           }
                         }
 
-        if (proceed && search_idx <= nvisits && relapse_rebl && phase == 1) {
+        if (proceed && search_idx <= nvisits &&
+            any(is_rel[date_dict[[as.character(bl_idx)]]:date_dict[[as.character(search_idx)]]]) # if search_idx has been moved after another relapse
+            && relapse_rebl && phase == 1) {
           if (bl_idx < nvisits) {
             bl_idx <- sapply(bl_idx, function (ib) {
             out <- NA
@@ -597,12 +606,11 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
                           ", searching for events from visit no.", search_idx, " on")
             }
           }
-        }
-
-        if (proceed && (is.na(bl_idx) || bl_idx > nvisits - 1)) {
-          proceed <- 0
-          if (verbose == 2) {
-            message("Not enough visits after current baseline: end process")
+          if (proceed && (is.na(bl_idx) || bl_idx > nvisits - 1)) {
+            proceed <- 0
+            if (verbose == 2) {
+              message("Not enough visits after current baseline: end process")
+            }
           }
         }
 
