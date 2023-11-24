@@ -22,12 +22,14 @@ MSprog(
   rel_infl = 30,
   event = "firstprog",
   baseline = "fixed",
+  pira_def = 0,
   sub_threshold = FALSE,
   relapse_rebl = FALSE,
   min_value = 0,
   prog_last_visit = FALSE,
   include_dates = FALSE,
   include_value = FALSE,
+  include_stable = TRUE,
   verbose = 1
 )
 }
@@ -48,13 +50,15 @@ MSprog(
 
 \item{rdate_col}{Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].}
 
-\item{outcome}{One of: \cr
-\code{'edss'} (Extended Disability Status Scale ) [default]; \cr
-\code{'nhpt'} (Nine-Hole Peg Test) \cr
-\code{'nhptD'} (Nine-Hole Peg Test, dominant hand) \cr
-\code{'nhptND'} (Nine-Hole Peg Test, non-dominant hand) \cr
-\code{'t25fw'} (Timed 25-Foot Walk) \cr
-\code{'sdmt'} (Symbol Digit Modalities Test).}
+\item{outcome}{One of:
+\itemize{
+\item{\code{'edss'}}{ (Extended Disability Status Scale ) [default];}
+ \item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
+ \item{\code{'nhptD'}}{ (Nine-Hole Peg Test, dominant hand);}
+ \item{\code{'nhptND'}}{ (Nine-Hole Peg Test, non-dominant hand);}
+ \item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
+ \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test).}
+ }}
 
 \item{delta_fun}{Custom function specifying the minimum delta corresponding
 to a valid change from the provided baseline value. If none is specified [default], \code{compute_delta} for the specified outcome is used.}
@@ -70,16 +74,28 @@ or list-like of length 2 (different tolerance on left and right) [default is 45]
 
 \item{rel_infl}{Influence of last relapse (days) [default is 30].}
 
-\item{event}{One of: \cr
-\code{'firstprog'} (first progression) [default]; \cr
-\code{'first'} (only the very first event - improvement or progression); \cr
-\code{'firsteach'} (first improvement and first progression); \cr
-\code{'firstprogtype'} (first progression of each kind - PIRA, RAW, undefined); \cr
-\code{'multiple'} (all events). \cr}
+\item{event}{One of:
+\itemize{
+\item{\code{'firstprog'}}{ (first progression) [default];}
+\item{\code{'first'}}{ (only the very first event - improvement or progression);}
+\item{\code{'firsteach'}}{ (first improvement and first progression);}
+\item{\code{'firstprogtype'}}{ (first progression of each kind - PIRA, RAW, undefined);}
+\item{\code{'multiple'}}{ (all events).}
+}}
 
-\item{baseline}{One of: \cr
-\code{'fixed'} (first outcome value out of relapse influence) [default]; \cr
-\code{'roving'} (updated after each event to last confirmed outcome value out of relapse influence).}
+\item{baseline}{One of:
+\itemize{
+\item{\code{'fixed'}}{ (first outcome value out of relapse influence) [default];}
+\item{\code{'roving'}}{ (updated after each event to last confirmed outcome value out of relapse influence).}
+}}
+
+\item{pira_def}{One of:
+\itemize{
+ \item{0}{ (no relapses between baseline and confirmation,
+as in [Cagol et al, JAMA Neurol 2022, doi:10.1001/jamaneurol.2022.1025]);}
+\item{1}{ (no relapses in [baseline, progression+\code{rel_infl}] and in [confirmation-\code{rel_infl}, confirmation+\code{rel_infl}],
+as in [Kappos et al, JAMA Neurol 2020, doi:10.1001/jamaneurol.2020.1568]).}
+}}
 
 \item{sub_threshold}{If \code{TRUE}, include confirmed sub-threshold events for roving baseline [default is \code{FALSE}].}
 
@@ -93,15 +109,21 @@ or list-like of length 2 (different tolerance on left and right) [default is 45]
 
 \item{include_value}{If \code{TRUE}, report value of outcome at event [default is \code{FALSE}].}
 
-\item{verbose}{One of: \cr
-0 (print no info); \cr
-1 (print concise info) [default]; \cr
-2 (print extended info).}
+\item{include_stable}{If \code{TRUE}, include subjects with no events in extended output \code{data.frame} with time2event = total follow up [default is \code{TRUE}].}
+
+\item{verbose}{One of:
+\itemize{
+ \item{0}{ (print no info);}
+ \item{1}{ (print concise info) [default];}
+ \item{2}{ (print extended info).}
+ }}
 }
 \value{
-Two \code{data.frame} objects: \cr
-- summary of event sequence detected for each subject; \cr
-- extended info on each event for all subjects. \cr
+Two \code{data.frame} objects:
+\itemize{
+\item{summary of event sequence detected for each subject;}
+\item{extended info on each event for all subjects.}
+}
 }
 \description{
 \code{MSprog} detects and characterises the progression (or improvement) events of an outcome measure
@@ -131,6 +153,6 @@ results_EDSS = output[[2]] # extended info on each event for all subjects
 output <- MSprog(toydata_visits, 'id', 'SDMT', 'date', relapse=toydata_relapses,
     outcome='sdmt', conf_months=3, conf_tol_days=30, rel_infl=30,
     event='multiple', baseline='roving', verbose=2)
-summary_SDMT = output[[1]] # summary of event sequence for each subject
-results_SDMT = output[[2]] # extended info on each event for all subjects
+summary_SDMT <- output[[1]] # summary of event sequence for each subject
+results_SDMT <- output[[2]] # extended info on each event for all subjects
 }

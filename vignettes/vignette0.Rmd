@@ -69,14 +69,18 @@ The function prints concise info (the argument `verbose` can be used to control 
 summary = output[[1]]
 print(summary)
 ```
-    where: `event_sequence` specifies the order of the events; the other columns count the events of each kind (improvement; progression; relapse-associated worsening, RAW; progression independent of relapse activity, PIRA; and progression that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent].
+    where: `event_sequence`[^1] specifies the order of the events; the other columns count the events of each kind (improvement; progression; relapse-associated worsening, RAW; progression independent of relapse activity, PIRA; and progression that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent].
 
 2. Extended info on each event for all subjects:
 ```{r, indent = "     "}
 results = output[[2]]
 print(results, row.names = FALSE)
 ```
-    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from baseline to event; `conf3` reports whether the event was confirmed; `sust_days` is the number of days for which the event was sustained *after confirmation*; `sust_last` reports whether the event was sustained until the last visit.
+    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from baseline to event[^2]; `conf3` reports whether the event was confirmed; `sust_days` is the number of days for which the event was sustained *after confirmation*; `sust_last` reports whether the event was sustained until the last visit.
+
+[^1]: In this example, `event_sequence` can contain a maximum of one event, as we are not specifying the argument `event` - which defaults to `firstprog` (only detect the first progression event). For the same reason, `nevent` in `results` can only be 0 or 1 in this example. In a multiple-event setting (`event=multiple`), more than one event per subject can be detected. See [the relevant section](#multiple).
+[^2]: For subjects with no events, `time2event` is the total follow-up length. To omit these subjects, set `include_stable=FALSE` in `MSprog`.
+
 
 <br />
 
@@ -97,25 +101,26 @@ The `MSprog` function detects the events sequentially by scanning the outcome va
 
 For example:
 ```{r}
-compute_delta(4) # default outcome measure is 'edss'
-compute_delta(10, outcome='t25fw')
+print(compute_delta(4)) # default outcome measure is 'edss'
+print(compute_delta(10, outcome='t25fw'))
 ```
 
-This function is used as default `delta_fun` in the `MSprog` function to assess progression. Alternatively, a custom `delta_fun` can be provided. To change the minimum $\delta$ for SDMT to, say, "either 4 points or 20% of the reference value", we would define:
+The `compute_delta` function is used as default `delta_fun` in the `MSprog` function to assess progression. Alternatively, a custom `delta_fun` can be provided. To change the minimum $\delta$ for SDMT to, say, "either 4 points or 20% of the reference value", we would define:
 ```{r}
 my_sdmt_delta <- function(x) {min(4, x/5)}
-my_sdmt_delta(50) # my delta
-compute_delta(50, outcome='sdmt') # default delta
+print(my_sdmt_delta(50)) # my delta
+print(compute_delta(50, outcome='sdmt')) # default delta
 ```
 and set `delta_fun=my_sdmt_delta` in `MSprog` when computing the progression.
 
-## Baseline scheme
+## Baseline scheme and multiple events {#multiple}
 
 The baseline scheme can be set by using the `baseline` argument in `MSprog`. Two main baseline schemes can be adopted:
 
 * Fixed baseline (`baseline='fixed'`, default): the reference value is set to be the first outcome value found outside the influence of an acute event.
 * Roving baseline (`baseline='roving'`): the reference value is initially set as the first outcome value out of relapse influence, then updated after each event to the last confirmed outcome value (out of relapse influence). **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below). The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog`: this moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$.
 
+The argument `event` allows to specify which events to detect. By default, it is set to `firstprog` (only detect the first progression event). It can be set to `multiple` to sequentially detect all progression (or improvement) events.
 
 For example, extracting multiple EDSS events for subject `4` from `toydata_visits` with a fixed baseline would result in the following.
 ```{r}
@@ -136,14 +141,14 @@ print(output[[2]], row.names = FALSE) # results
 
 <br />
 
-Finally, on top of the chosen baseline scheme, *post-relapse re-baseline* can be applied by setting `relapse_rebl=TRUE` in `MSprog`. If this is enabled, outcome values are scanned once more from the beginning by resetting the baseline after each relapse (first visit out of relapse influence) to classify potential events left undefined as PIRA.
+Finally, on top of the chosen baseline scheme, *post-relapse re-baseline* @kappos2020 can be applied by setting `relapse_rebl=TRUE` in `MSprog`. If this is enabled, outcome values are scanned once more from the beginning by resetting the baseline after each relapse (first visit out of relapse influence) to classify potential events left undefined as PIRA.
 
 
 ## Confirmation period
 
-An event is only validated if it is *confirmed*, that is, if the value change from baseline is maintained **up to** a subsequent visit falling within a pre-specified confirmation period [@ontaneda2017]. The chosen confirmation period depends on the type of study and on the frequency of visits, and can be set in `MSprog` by using the argument `conf_months`. If multiple values are specified (e.g., `conf_months=c(3,6)`), events are retained if confirmed by at least a visit falling within one of the specified periods (here, 3 or 6 months $\pm$ `conf_tol_days`)[^1]. The results table will report whether an event was confirmed in each of the specified periods.
+An event is only validated if it is *confirmed*, that is, if the value change from baseline is maintained **up to** a subsequent visit falling within a pre-specified confirmation period [@ontaneda2017]. The chosen confirmation period depends on the type of study and on the frequency of visits, and can be set in `MSprog` by using the argument `conf_months`. If multiple values are specified (e.g., `conf_months=c(3,6)`), events are retained if confirmed by at least a visit falling within one of the specified periods (here, 3 or 6 months $\pm$ `conf_tol_days`)[^3]. The results table will report whether an event was confirmed in each of the specified periods.
 
-[^1]: An event is only confirmed if the value change from baseline is maintained **at all visits up to the confirmation visit**. So an event can only be confirmed at 6 months and *not* confirmed at 3 months if there are no valid confirmation visits falling within the 3-month window.
+[^3]: An event is only confirmed if the value change from baseline is maintained **at all visits up to the confirmation visit**. So an event can only be confirmed at 6 months and *not* confirmed at 3 months if there are no valid confirmation visits falling within the 3-month window.
 
 
 Let's look at subject `2` from `toydata_visits`:

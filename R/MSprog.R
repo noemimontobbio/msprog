@@ -23,13 +23,15 @@
 #' @param relapse \code{data.frame} containing longitudinal data, including: subject ID and relapse date [default is \code{NULL}].
 #' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].
 #' @param rdate_col Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].
-#' @param outcome One of: \cr
-#'  \code{'edss'} (Extended Disability Status Scale ) [default]; \cr
-#'  \code{'nhpt'} (Nine-Hole Peg Test) \cr
-#'  \code{'nhptD'} (Nine-Hole Peg Test, dominant hand) \cr
-#'  \code{'nhptND'} (Nine-Hole Peg Test, non-dominant hand) \cr
-#'  \code{'t25fw'} (Timed 25-Foot Walk) \cr
-#'  \code{'sdmt'} (Symbol Digit Modalities Test).
+#' @param outcome One of:
+#' \itemize{
+##' \item{\code{'edss'}}{ (Extended Disability Status Scale ) [default];}
+#'  \item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
+#'  \item{\code{'nhptD'}}{ (Nine-Hole Peg Test, dominant hand);}
+#'  \item{\code{'nhptND'}}{ (Nine-Hole Peg Test, non-dominant hand);}
+#'  \item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
+#'  \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test).}
+#'  }
 #' @param delta_fun Custom function specifying the minimum delta corresponding
 #' to a valid change from the provided baseline value. If none is specified [default], \code{compute_delta} for the specified outcome is used.
 #' @param conf_months Period before confirmation (months) [default is 3].
@@ -38,29 +40,46 @@
 #' @param conf_left If \code{TRUE}, confirmation window is unbounded on the right [default is \code{FALSE}].
 #' @param require_sust_months Minimum number of months from confirmation for which a change must be sustained to be retained as an event [default is 0].
 #' @param rel_infl Influence of last relapse (days) [default is 30].
-#' @param event One of: \cr
-#' \code{'firstprog'} (first progression) [default]; \cr
-#' \code{'first'} (only the very first event - improvement or progression); \cr
-#' \code{'firsteach'} (first improvement and first progression); \cr
-#' \code{'firstprogtype'} (first progression of each kind - PIRA, RAW, undefined); \cr
-#' \code{'multiple'} (all events). \cr
-#' @param baseline One of: \cr
-#' \code{'fixed'} (first outcome value out of relapse influence) [default]; \cr
-#' \code{'roving'} (updated after each event to last confirmed outcome value out of relapse influence).
+#' @param event One of:
+#' \itemize{
+#' \item{\code{'firstprog'}}{ (first progression) [default];}
+#' \item{\code{'first'}}{ (only the very first event - improvement or progression);}
+#' \item{\code{'firsteach'}}{ (first improvement and first progression);}
+#' \item{\code{'firstprogtype'}}{ (first progression of each kind - PIRA, RAW, undefined);}
+#' \item{\code{'multiple'}}{ (all events).}
+#' }
+#' @param baseline One of:
+#' \itemize{
+#' \item{\code{'fixed'}}{ (first outcome value out of relapse influence) [default];}
+#' \item{\code{'roving'}}{ (updated after each event to last confirmed outcome value out of relapse influence).}
+#' }
+#' @param pira_def One of:
+#' \itemize{
+#'  \item{0}{ (no relapses between baseline and confirmation,
+#' as in [Cagol et al, JAMA Neurol 2022, doi:10.1001/jamaneurol.2022.1025]);}
+#' \item{1}{ (no relapses in [baseline, progression+\code{rel_infl}] and in [confirmation-\code{rel_infl}, confirmation+\code{rel_infl}],
+#' as in [Kappos et al, JAMA Neurol 2020, doi:10.1001/jamaneurol.2020.1568]).}
+#' }
+#'
 #' @param sub_threshold If \code{TRUE}, include confirmed sub-threshold events for roving baseline [default is \code{FALSE}].
 #' @param relapse_rebl If \code{TRUE}, search for PIRA events again with post-relapse re-baseline [default is \code{FALSE}].
 #' @param min_value Only consider progressions events where the outcome is >= value [default is 0].
 #' @param prog_last_visit If \code{TRUE}, include progressions occurring at last visit (i.e. with no confirmation) [default is \code{FALSE}].
 #' @param include_dates If \code{TRUE}, report dates of events [default is \code{FALSE}].
 #' @param include_value If \code{TRUE}, report value of outcome at event [default is \code{FALSE}].
-#' @param verbose One of: \cr
-#' 0 (print no info); \cr
-#' 1 (print concise info) [default]; \cr
-#' 2 (print extended info).
+#' @param include_stable If \code{TRUE}, include subjects with no events in extended output \code{data.frame} with time2event = total follow up [default is \code{TRUE}].
+#' @param verbose One of:
+#' \itemize{
+#'  \item{0}{ (print no info);}
+#'  \item{1}{ (print concise info) [default];}
+#'  \item{2}{ (print extended info).}
+#'  }
 #'
-#' @return Two \code{data.frame} objects: \cr
-#' - summary of event sequence detected for each subject; \cr
-#' - extended info on each event for all subjects. \cr
+#' @return Two \code{data.frame} objects:
+#' \itemize{
+#' \item{summary of event sequence detected for each subject;}
+#' \item{extended info on each event for all subjects.}
+#' }
 #' @importFrom stats na.omit setNames complete.cases
 #' @importFrom dplyr %>% group_by_at vars slice n mutate across
 #' @export
@@ -77,18 +96,19 @@
 #' output <- MSprog(toydata_visits, 'id', 'SDMT', 'date', relapse=toydata_relapses,
 #'     outcome='sdmt', conf_months=3, conf_tol_days=30, rel_infl=30,
 #'     event='multiple', baseline='roving', verbose=2)
-#' summary_SDMT = output[[1]] # summary of event sequence for each subject
-#' results_SDMT = output[[2]] # extended info on each event for all subjects
+#' summary_SDMT <- output[[1]] # summary of event sequence for each subject
+#' results_SDMT <- output[[2]] # extended info on each event for all subjects
 MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, outcome='edss', delta_fun=NULL,
                    conf_months=3, conf_tol_days=30, conf_left=FALSE, require_sust_months=0, rel_infl=30,
-                   event='firstprog', baseline='fixed', sub_threshold=FALSE, relapse_rebl=FALSE,
-                   min_value=0, prog_last_visit=FALSE, include_dates=FALSE, include_value=FALSE, verbose=1) {
+                   event='firstprog', baseline='fixed', pira_def=0, sub_threshold=FALSE, relapse_rebl=FALSE,
+                   min_value=0, prog_last_visit=FALSE, include_dates=FALSE, include_value=FALSE,
+                   include_stable=TRUE, verbose=1) {
 
   # SETUP
 
   if (length(conf_tol_days)==1) {
-    conf_tol_days = c(conf_tol_days, conf_tol_days)
+    conf_tol_days <- c(conf_tol_days, conf_tol_days)
   }
 
 
@@ -105,8 +125,8 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
   }
 
   if (is.null(relapse)) {
-    relapse = data.frame(matrix(nrow = 0, ncol = 2))
-    names(relapse) = c(rsubj_col, rdate_col)
+    relapse <- data.frame(matrix(nrow = 0, ncol = 2))
+    names(relapse) <- c(rsubj_col, rdate_col)
   }
 
   # Remove missing values from columns of interest
@@ -116,6 +136,10 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
   # Convert dates to datetime format
   data[[date_col]] <- as.Date(data[[date_col]])
   relapse[[rdate_col]] <- as.Date(relapse[[rdate_col]])
+  # Convert dates to days from minimum
+  global_start <- min(min(data[[date_col]]), min(relapse[[rdate_col]]))
+  data[[date_col]] = as.numeric(difftime(data[[date_col]], global_start), units='days')
+  relapse[[rdate_col]] = as.numeric(difftime(relapse[[rdate_col]], global_start), units='days')
 
   if (!is.null(subjects)) {
   data <- data[data[[subj_col]] %in% subjects,]
@@ -146,10 +170,10 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
   nsub <- length(all_subj)
   max_nevents <- round(max(table(data[[subj_col]]))/2)
   results <- data.frame(matrix(nrow = nsub * max_nevents, ncol = 8 + length(conf_months) + (length(conf_months)-1) + 2))
-  allcol = c(subj_col, 'nevent', 'event_type', 'bldate', 'blvalue', 'date', 'value', 'time2event',
+  allcol <- c(subj_col, 'nevent', 'event_type', 'bldate', 'blvalue', 'date', 'value', 'time2event',
              paste0('conf', conf_months), 'sust_days', 'sust_last')
   if (length(conf_months)>1) {
-    allcol = c(allcol[1:(8+length(conf_months))],  paste0('PIRA_conf',
+    allcol <- c(allcol[1:(8+length(conf_months))],  paste0('PIRA_conf',
                       conf_months[2:length(conf_months)]), 'sust_days', 'sust_last')
     }
   colnames(results) <- allcol
@@ -160,6 +184,8 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
   colnames(summary) <- c('event_sequence', 'improvement', 'progression', 'RAW', 'PIRA', 'undefined_prog')
   rownames(summary) <- all_subj
 
+
+  total_fu <- setNames(all_subj, rep(0, nsub))
 
 
   for (subjid in all_subj) {
@@ -181,9 +207,12 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
     nvisits <- nrow(data_id)
     first_visit <- min(data_id[[date_col]])
     relapse_id <- relapse[relapse[[rsubj_col]] == subjid, ]
-    relapse_id <- relapse_id[relapse_id[[rdate_col]] >= first_visit - as.difftime(rel_infl, units = "days"), ]
+    relapse_id <- relapse_id[relapse_id[[rdate_col]] >= first_visit - rel_infl, ] #as.difftime(rel_infl, units = "days") #_d_#
     relapse_dates <- relapse_id[[rdate_col]]
     nrel <- length(relapse_dates)
+
+    total_fu[subjid] = data_id[nvisits,date_col] - data_id[1,date_col]
+
 
     if (verbose == 2) {
       message("\nSubject #", subjid, ": ", nvisits, " visit", ifelse(nvisits == 1, "", "s"),
@@ -260,7 +289,9 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
       if (bl_idx > nvisits) {
         bl_idx <- nvisits
         proceed <- 0
-        message("Not enough visits left: end process")
+        if (verbose == 2) {
+          message("Not enough visits left: end process")
+        }
       }
 
       bl <- data_id[bl_idx, ]
@@ -283,8 +314,8 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
         conf_idx <- lapply(conf_window, function(t) {
           match_idx <- NULL
           for (x in (change_idx + 1):nvisits) {
-            if (difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]]) >= t[1] &&
-                difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]]) <= t[2] &&
+            if (data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] >= t[1] && #difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]])
+                data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] <= t[2] && #difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]]) #_d_#
                 data_id[x, 'closest_rel_minus'] > rel_infl) {
               match_idx <- x
               break
@@ -298,7 +329,8 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
         conf_idx <- Filter(Negate(is.null), conf_idx)
         }
         if (verbose == 2) {
-          message(toupper(outcome), " change at visit no.", change_idx, " (", data_id[change_idx,][[date_col]],
+          message(toupper(outcome), " change at visit no.", change_idx, " (",
+                  global_start + as.difftime(data_id[change_idx,][[date_col]], units = "days"),
                        "); potential confirmation visits available: no.", paste(conf_idx, collapse = ", "))
         }
 
@@ -346,16 +378,16 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
             sust_idx <- ifelse(is.na(next_nonsust), nvisits, next_nonsust - 1)
             event_type <- c(event_type, "impr")
             event_index <- c(event_index, change_idx)
-            bldate <- c(bldate, as.character(bl[[date_col]]))
+            bldate <- c(bldate, as.character(global_start + as.difftime(bl[[date_col]], units='days')))
             blvalue <- c(blvalue, bl[[value_col]])
-            edate <- c(edate, as.character(data_id[change_idx,][[date_col]]))
+            edate <- c(edate, as.character(global_start + as.difftime(data_id[change_idx,][[date_col]], units='days')))
             evalue <- c(evalue, data_id[change_idx,][[value_col]])
-            time2event <- c(time2event, difftime(data_id[change_idx,][[date_col]], bl[[date_col]]))
+            time2event <- c(time2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
             for (m in conf_months) {
               conf[[as.character(m)]] <- c(conf[[as.character(m)]], as.integer(m %in% conf_t))
               if (m!=conf_months[1]) {pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], NA)}
             }
-            sustd <- c(sustd, difftime(data_id[sust_idx,][[date_col]], data_id[conf_idx[[length(conf_idx)]],][[date_col]]))
+            sustd <- c(sustd, data_id[sust_idx,][[date_col]] - data_id[conf_idx[[length(conf_idx)]],][[date_col]])
             sustl <- c(sustl, as.integer(sust_idx == nvisits))
 
             if (baseline == "roving") {
@@ -366,9 +398,11 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
             }
 
             if (verbose == 2) {
-              message(toupper(outcome), " improvement (visit no.", change_idx, ", ", data_id[change_idx,][[date_col]],
+              message(toupper(outcome), " improvement (visit no.", change_idx, ", ",
+                      global_start + as.difftime(data_id[change_idx,][[date_col]], units='days'),
                            ") confirmed at ", paste(conf_t, collapse = ", "), " months, sustained up to visit no.", sust_idx,
-                           " (", data_id[sust_idx,][[date_col]], ")")
+                           " (",
+                      global_start + as.difftime(data_id[sust_idx,][[date_col]], units='days'), ")")
               message("New settings: baseline at visit no.", bl_idx, ", searching for events from visit no.",
                            ifelse(search_idx > nvisits, "-", search_idx), " on")
             }
@@ -446,7 +480,7 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
 
                 valid_prog <- 1
                 if (require_sust_months) {
-                  valid_prog <- is.na(next_nonsust) || difftime(data_id[next_nonsust,][[date_col]],
+                  valid_prog <- is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
                                 data_id[conf_idx[[length(conf_idx)]],][[date_col]]) > require_sust_months * 30.44
                 }
 
@@ -457,8 +491,20 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
                     event_type <- c(event_type, 'RAW')
                     event_index <- c(event_index, change_idx)
                   } else if (data_id[change_idx, 'closest_rel_minus'] > rel_infl) { # event occurs out of relapse influence
-                    rel_inbetween <- sapply(conf_idx,
-                              function(ic) any(is_rel[date_dict[[as.character(bl_idx)]]:date_dict[[as.character(ic)]]]))
+                    # rel_inbetween <- sapply(conf_idx,
+                    #           function(ic) any(is_rel[date_dict[[as.character(bl_idx)]]:date_dict[[as.character(ic)]]]))
+                    if (pira_def==0) {
+                      rel_inbetween <- sapply(conf_idx,
+                              function(ic) ifelse(length(relapse_dates)>0,
+                                                  any((data_id[bl_idx,][[date_col]]<=relapse_dates)
+                                                  & (relapse_dates<=data_id[ic,][[date_col]])), FALSE))
+                    } else if (pira_def==1) {
+                      rel_inbetween <- sapply(conf_idx,
+                              function(ic) ifelse(length(relapse_dates)>0, any(
+                                ((data_id[bl_idx,][[date_col]]<=relapse_dates) & (relapse_dates<=data_id[change_idx,][[date_col]]+rel_infl))
+                                | ((data_id[ic,][[date_col]]-rel_infl<=relapse_dates) & (relapse_dates<=data_id[ic,][[date_col]]+rel_infl))),
+                                FALSE))
+                    }
                     if (any(rel_inbetween)) {
                       if (min(which(rel_inbetween))>1) {
                       pconf_idx <- conf_idx[1:(min(which(rel_inbetween)) - 1)] } else {pconf_idx = list()}
@@ -490,23 +536,24 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
                   }
 
                   if (event_type[length(event_type)] == 'PIRA' || phase == 0) {
-                    bldate <- c(bldate, as.character(bl[[date_col]]))
+                    bldate <- c(bldate, as.character(global_start + as.difftime(bl[[date_col]], units='days')))
                     blvalue <- c(blvalue, bl[[value_col]])
-                    edate <- c(edate, as.character(data_id[change_idx,][[date_col]]))
+                    edate <- c(edate, as.character(global_start + as.difftime(data_id[change_idx,][[date_col]], units='days')))
                     evalue <- c(evalue, data_id[change_idx,][[value_col]])
-                    time2event <- c(time2event, difftime(data_id[change_idx,][[date_col]], bl[[date_col]]))
+                    time2event <- c(time2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
                     for (m in conf_months) {
                       conf[[as.character(m)]] <- c(conf[[as.character(m)]], as.integer(m %in% conf_t))
                     }
-                    sustd <- c(sustd, difftime(data_id[sust_idx,][[date_col]],
-                                               data_id[conf_idx[[length(conf_idx)]],][[date_col]]))
+                    sustd <- c(sustd, data_id[sust_idx,][[date_col]]
+                                              - data_id[conf_idx[[length(conf_idx)]],][[date_col]])
                     sustl <- c(sustl, as.integer(sust_idx == nvisits))
 
                     if (verbose == 2) {
                       message(toupper(outcome), " progression[", event_type[length(event_type)],
-                                   "] (visit no.", change_idx, ", ", data_id[change_idx,][[date_col]],
+                                   "] (visit no.", change_idx, ", ",
+                                  global_start + as.difftime(data_id[change_idx,][[date_col]], units='days'),
                                    ") confirmed at ", paste(conf_t, collapse = ", "), " months, sustained up to visit no.", sust_idx,
-                                   " (", data_id[sust_idx,][[date_col]], ")")
+                                   " (", global_start + as.difftime(data_id[sust_idx,][[date_col]], units='days'), ")")
                     }
                   }
 
@@ -661,6 +708,14 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
       event_order <- event_order[first_events]
     }
 
+    if ((length(event_type)==0) & include_stable) {
+      results <- results[-subj_index[2:length(subj_index)], ]
+      rownames(results) <- NULL # reset column names
+      results[results[[subj_col]]==subjid, 'nevent'] = 0
+      results[results[[subj_col]]==subjid, 'time2event'] = total_fu[subjid]
+      results[results[[subj_col]]==subjid, 'event_type'] = ''
+    }
+    else {
     results <- results[-subj_index[(length(event_type) + 1):length(subj_index)], ]
     rownames(results) <- NULL # reset column names
 
@@ -682,6 +737,13 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
       if (m!=conf_months[1]) {
       results[results[[subj_col]] == subjid, paste0("PIRA_conf", m)] <- pira_conf[[as.character(m)]][event_order]}
     }
+    }
+  } else if (include_stable) {
+    results <- results[-subj_index[2:length(subj_index)], ]
+    rownames(results) <- NULL # reset column names
+    results[results[[subj_col]]==subjid, 'nevent'] = 0
+    results[results[[subj_col]]==subjid, 'time2event'] = total_fu[subjid]
+    results[results[[subj_col]]==subjid, 'event_type'] = ''
   } else {
     results <- results[-subj_index, ]
     rownames(results) <- NULL # reset column names
@@ -747,7 +809,6 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
       columns <- columns[!endsWith(columns, "value")]
     }
     results <- results[, columns]
-
 
 
   return(list(summary, results))
