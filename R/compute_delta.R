@@ -33,6 +33,6 @@ compute_delta <- function(baseline, outcome='edss') {
   } else if (outcome %in% c('nhpt', 'nhptD', 'nhptND', 't25fw')) {
     return(baseline/5)
   } else if (outcome == 'sdmt') {
-    return(min(baseline/10, 3))
+    return(min(unlist(c(baseline/10, 3))))
   }
 }

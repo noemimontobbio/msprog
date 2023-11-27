@@ -107,7 +107,7 @@ print(compute_delta(10, outcome='t25fw'))
 
 The `compute_delta` function is used as default `delta_fun` in the `MSprog` function to assess progression. Alternatively, a custom `delta_fun` can be provided. To change the minimum $\delta$ for SDMT to, say, "either 4 points or 20% of the reference value", we would define:
 ```{r}
-my_sdmt_delta <- function(x) {min(4, x/5)}
+my_sdmt_delta <- function(x) {min(unlist(c(x/5, 4)))}
 print(my_sdmt_delta(50)) # my delta
 print(compute_delta(50, outcome='sdmt')) # default delta
 ```

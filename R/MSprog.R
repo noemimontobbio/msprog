@@ -211,7 +211,7 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
     relapse_dates <- relapse_id[[rdate_col]]
     nrel <- length(relapse_dates)
 
-    total_fu[subjid] = data_id[nvisits,date_col] - data_id[1,date_col]
+    total_fu[subjid] = data_id[nvisits,][[date_col]] - data_id[1,][[date_col]]
 
 
     if (verbose == 2) {
@@ -268,7 +268,7 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
     while (proceed) {
 
       # Set baseline (skip if within relapse influence)
-      while (proceed && data_id[bl_idx, 'closest_rel_minus'] <= rel_infl) {
+      while (proceed && data_id[bl_idx,][['closest_rel_minus']] <= rel_infl) {
         if (verbose == 2) {
           message("Baseline (visit no.", bl_idx,
                        ") is within relapse influence: moved to visit no.", bl_idx + 1)
@@ -297,7 +297,7 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
       bl <- data_id[bl_idx, ]
 
       # Event detection
-      change_idx <- match(TRUE, data_id[search_idx:nvisits, value_col] != as.numeric(bl[value_col]))
+      change_idx <- match(TRUE, data_id[search_idx:nvisits, value_col] != as.numeric(bl[[value_col]]))
       if (!is.na(change_idx)) {
         change_idx <- search_idx + change_idx - 1
       }
@@ -316,7 +316,7 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
           for (x in (change_idx + 1):nvisits) {
             if (data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] >= t[1] && #difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]])
                 data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] <= t[2] && #difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]]) #_d_#
-                data_id[x, 'closest_rel_minus'] > rel_infl) {
+                data_id[x,][['closest_rel_minus']] > rel_infl) {
               match_idx <- x
               break
             }
@@ -340,8 +340,8 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
         # CONFIRMED IMPROVEMENT:
         # --------------------
         if (length(conf_idx) > 0 &&
-            data_id[change_idx, value_col] - bl[[value_col]] <= - delta(bl[[value_col]]) &&
-            all(sapply((change_idx + 1):conf_idx[[1]], function(x) data_id[x, value_col] - bl[[value_col]]
+            data_id[change_idx,][[value_col]] - bl[[value_col]] <= - delta(bl[[value_col]]) &&
+            all(sapply((change_idx + 1):conf_idx[[1]], function(x) data_id[x,][[value_col]] - bl[[value_col]]
                        <= -delta(bl[[value_col]]))) &&
             phase == 0) {
           if (conf_idx[[1]]==nvisits) {next_change <- NA} else {
@@ -371,7 +371,7 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
 
           valid_impr <- 1
           if (require_sust_months) {
-            valid_impr <- is.na(next_nonsust) || (data_id[next_nonsust, date_col]
+            valid_impr <- is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]]
                                  - data_id[conf_idx[[length(conf_idx)]], date_col]) > require_sust_months * 30.44
           }
           if (valid_impr) {
@@ -418,8 +418,8 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
       # Confirmed sub-threshold improvement: RE-BASELINE
       # ------------------------------------------------
       else if (length(conf_idx) > 0 && # confirmation visits available
-          data_id[change_idx, value_col] < bl[value_col] && # value decreased from baseline
-          data_id[conf_idx[[1]], value_col] < bl[value_col] && # decrease is confirmed
+          data_id[change_idx,][[value_col]] < bl[[value_col]] && # value decreased from baseline
+          data_id[conf_idx[[1]],][[value_col]] < bl[[value_col]] && # decrease is confirmed
           baseline == 'roving' && sub_threshold &&
           phase == 0) { # skip if re-checking for PIRA after post-relapse re-baseline
 
@@ -438,14 +438,14 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
 
       # CONFIRMED PROGRESSION:
       # ---------------------
-      else if (data_id[change_idx, value_col] >= min_value &&
-         data_id[change_idx, value_col] - bl[value_col] >= delta(bl[value_col]) && # value increased (>delta) from baseline
+      else if (data_id[change_idx,][[value_col]] >= min_value &&
+         data_id[change_idx,][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]) && # value increased (>delta) from baseline
 
          ((length(conf_idx) > 0 && # confirmation visits available
            all(sapply((change_idx + 1):conf_idx[[1]],
-              function(x) data_id[x, value_col] - bl[value_col] >= delta(bl[value_col]))) && # increase is confirmed at first valid date
+              function(x) data_id[x,][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]))) && # increase is confirmed at first valid date
           all(sapply((change_idx + 1):conf_idx[[1]],
-              function(x) data_id[x, value_col] >= min_value)) # confirmation above min_value too
+              function(x) data_id[x,][[value_col]] >= min_value)) # confirmation above min_value too
           ) || (prog_last_visit && change_idx == nvisits))
 
          ) {
@@ -487,10 +487,10 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
                 if (valid_prog) {
                   sust_idx <- ifelse(is.na(next_nonsust), nvisits, next_nonsust - 1)
 
-                  if (phase == 0 && data_id[change_idx, 'closest_rel_minus'] <= rel_infl) { # event occurs within relapse influence
+                  if (phase == 0 && data_id[change_idx,][['closest_rel_minus']] <= rel_infl) { # event occurs within relapse influence
                     event_type <- c(event_type, 'RAW')
                     event_index <- c(event_index, change_idx)
-                  } else if (data_id[change_idx, 'closest_rel_minus'] > rel_infl) { # event occurs out of relapse influence
+                  } else if (data_id[change_idx,][['closest_rel_minus']] > rel_infl) { # event occurs out of relapse influence
                     # rel_inbetween <- sapply(conf_idx,
                     #           function(ic) any(is_rel[date_dict[[as.character(bl_idx)]]:date_dict[[as.character(ic)]]]))
                     if (pira_def==0) {
@@ -580,8 +580,8 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
 
        # Confirmed sub-threshold progression: RE-BASELINE
        # ------------------------------------------------
-      else if (length(conf_idx) > 0 && data_id[change_idx, value_col] > bl[[value_col]]
-               && data_id[conf_idx[[1]], value_col] > bl[[value_col]] && baseline == "roving"
+      else if (length(conf_idx) > 0 && data_id[change_idx,][[value_col]] > bl[[value_col]]
+               && data_id[conf_idx[[1]],][[value_col]] > bl[[value_col]] && baseline == "roving"
                && sub_threshold && phase == 0) {
         if (conf_idx[[1]]==nvisits) {
           next_change <- NA} else {
@@ -636,7 +636,7 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
             out <- NA
             for (x in (ib + 1):nvisits) { # visits after current baseline (or after last confirmed PIRA)
               if (any(is_rel[date_dict[[as.character(ib)]]:date_dict[[as.character(x)]]]) # after a relapse
-                  & (data_id[x, 'closest_rel_minus'] > rel_infl) # out of relapse influence
+                  & (data_id[x,][['closest_rel_minus']] > rel_infl) # out of relapse influence
                   ){
                 out <- x
                 break
