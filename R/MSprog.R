@@ -715,28 +715,28 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
       results[results[[subj_col]]==subjid, 'time2event'] = total_fu[subjid]
       results[results[[subj_col]]==subjid, 'event_type'] = ''
     }
+    else if (length(event_type)==0) {
+      results <- results[-subj_index, ]
+      rownames(results) <- NULL # reset column names
+      }
     else {
     results <- results[-subj_index[(length(event_type) + 1):length(subj_index)], ]
     rownames(results) <- NULL # reset column names
-
     results[results[[subj_col]] == subjid, "event_type"] <- event_type
     results[results[[subj_col]] == subjid, "bldate"] <- bldate[event_order]
     results[results[[subj_col]] == subjid, "blvalue"] <- blvalue[event_order]
     results[results[[subj_col]] == subjid, "date"] <- edate[event_order]
     results[results[[subj_col]] == subjid, "value"] <- evalue[event_order]
     results[results[[subj_col]] == subjid, "time2event"] <- time2event[event_order]
-
     for (m in conf_months) {
       results[results[[subj_col]] == subjid, paste0("conf", m)] <- conf[[as.character(m)]][event_order]
-    }
-
+      }
     results[results[[subj_col]] == subjid, "sust_days"] <- sustd[event_order]
     results[results[[subj_col]] == subjid, "sust_last"] <- sustl[event_order]
-
     for (m in conf_months) {
       if (m!=conf_months[1]) {
       results[results[[subj_col]] == subjid, paste0("PIRA_conf", m)] <- pira_conf[[as.character(m)]][event_order]}
-    }
+      }
     }
   } else if (include_stable) {
     results <- results[-subj_index[2:length(subj_index)], ]
