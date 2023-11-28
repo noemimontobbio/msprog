@@ -9,11 +9,11 @@ MSprog(
   subj_col,
   value_col,
   date_col,
+  outcome,
   subjects = NULL,
   relapse = NULL,
   rsubj_col = NULL,
   rdate_col = NULL,
-  outcome = "edss",
   delta_fun = NULL,
   conf_months = 3,
   conf_tol_days = 30,
@@ -42,6 +42,15 @@ MSprog(
 
 \item{date_col}{Name of data column with date of visit.}
 
+\item{outcome}{Specifies the outcome type. Must be one of the following:
+\itemize{
+\item{\code{'edss'}}{ (Extended Disability Status Scale ) [default];}
+ \item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
+ \item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
+ \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test);}
+ \item{\code{NULL}}{ (only accepted when specifying a custom \code{delta_fun})}
+ }}
+
 \item{subjects}{Subset of subjects (list of IDs) [default is \code{NULL}].}
 
 \item{relapse}{\code{data.frame} containing longitudinal data, including: subject ID and relapse date [default is \code{NULL}].}
@@ -49,16 +58,6 @@ MSprog(
 \item{rsubj_col}{Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].}
 
 \item{rdate_col}{Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].}
-
-\item{outcome}{One of:
-\itemize{
-\item{\code{'edss'}}{ (Extended Disability Status Scale ) [default];}
- \item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
- \item{\code{'nhptD'}}{ (Nine-Hole Peg Test, dominant hand);}
- \item{\code{'nhptND'}}{ (Nine-Hole Peg Test, non-dominant hand);}
- \item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
- \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test).}
- }}
 
 \item{delta_fun}{Custom function specifying the minimum delta corresponding
 to a valid change from the provided baseline value. If none is specified [default], \code{compute_delta} for the specified outcome is used.}
@@ -74,7 +73,7 @@ or list-like of length 2 (different tolerance on left and right) [default is 45]
 
 \item{rel_infl}{Influence of last relapse (days) [default is 30].}
 
-\item{event}{One of:
+\item{event}{Specifies which events to detect. Must be one of the following:
 \itemize{
 \item{\code{'firstprog'}}{ (first progression) [default];}
 \item{\code{'first'}}{ (only the very first event - improvement or progression);}
@@ -83,13 +82,13 @@ or list-like of length 2 (different tolerance on left and right) [default is 45]
 \item{\code{'multiple'}}{ (all events).}
 }}
 
-\item{baseline}{One of:
+\item{baseline}{Specifies the baseline scheme. Must be one of the following:
 \itemize{
 \item{\code{'fixed'}}{ (first outcome value out of relapse influence) [default];}
 \item{\code{'roving'}}{ (updated after each event to last confirmed outcome value out of relapse influence).}
 }}
 
-\item{pira_def}{One of:
+\item{pira_def}{Specifies which definition of PIRA to use. Must be one of the following:
 \itemize{
  \item{0}{ (no relapses between baseline and confirmation,
 as in [Cagol et al, JAMA Neurol 2022, doi:10.1001/jamaneurol.2022.1025]);}
@@ -144,14 +143,14 @@ event occurs out of relapse influence, and with no relapses between baseline and
 data(toydata_visits)
 data(toydata_relapses)
 # EDSS progression
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses,
-    outcome='edss', conf_months=3, conf_tol_days=30, rel_infl=30,
+output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
+    relapse=toydata_relapses, conf_months=3, conf_tol_days=30, rel_infl=30,
     event='multiple', baseline='roving', verbose=2)
 summary_EDSS = output[[1]] # summary of event sequence for each subject
 results_EDSS = output[[2]] # extended info on each event for all subjects
 # SDMT progression
-output <- MSprog(toydata_visits, 'id', 'SDMT', 'date', relapse=toydata_relapses,
-    outcome='sdmt', conf_months=3, conf_tol_days=30, rel_infl=30,
+output <- MSprog(toydata_visits, 'id', 'SDMT', 'date', 'sdmt',
+    relapse=toydata_relapses, conf_months=3, conf_tol_days=30, rel_infl=30,
     event='multiple', baseline='roving', verbose=2)
 summary_SDMT <- output[[1]] # summary of event sequence for each subject
 results_SDMT <- output[[2]] # extended info on each event for all subjects

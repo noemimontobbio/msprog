@@ -8,8 +8,6 @@
 #' @param outcome One of: \cr
 #'  \code{'edss'} (Extended Disability Status Scale ) [default]; \cr
 #'  \code{'nhpt'} (Nine-Hole Peg Test) \cr
-#'  \code{'nhptD'} (Nine-Hole Peg Test, dominant hand) \cr
-#'  \code{'nhptND'} (Nine-Hole Peg Test, non-dominant hand) \cr
 #'  \code{'t25fw'} (Timed 25-Foot Walk) \cr
 #'  \code{'sdmt'} (Symbol Digit Modalities Test).
 #'
@@ -30,9 +28,11 @@ compute_delta <- function(baseline, outcome='edss') {
     } else {
       stop('invalid EDSS baseline')
     }
-  } else if (outcome %in% c('nhpt', 'nhptD', 'nhptND', 't25fw')) {
+  } else if (outcome %in% c('nhpt', 't25fw')) {
     return(baseline/5)
   } else if (outcome == 'sdmt') {
     return(min(unlist(c(baseline/10, 3))))
-  }
+  } else {
+  stop('invalid outcome type')
+    }
 }

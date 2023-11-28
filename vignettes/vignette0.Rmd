@@ -56,24 +56,32 @@ head(toydata_relapses)
 
 ## Minimal example
 
-Given data on visits and relapses in the form specified above, the `MSprog` function analyses the disability progression for each subject. Default `outcome` is `'edss'`.
+Given data on visits and relapses in the form specified above, the `MSprog` function analyses the disability progression for each subject for the outcome of interest. We can test it on the EDSS toy data:
 ```{r}
-output <- MSprog(toydata_visits, # data on visits
+output_edss <- MSprog(toydata_visits, # data on visits
                  subj_col='id', value_col='EDSS', date_col='date', # specify column names
+                 outcome='edss', # specify outcome type
+                 relapse=toydata_relapses) # data on relapses
+```
+or on the SDMT toy data:
+```{r}
+output_sdmt <- MSprog(toydata_visits, # data on visits
+                 subj_col='id', value_col='SDMT', date_col='date', # specify column names
+                 outcome='sdmt', # specify outcome type
                  relapse=toydata_relapses) # data on relapses
 ```
 The function prints concise info (the argument `verbose` can be used to control the amount of printed info), and generates the following two `data.frame` objects.
 
 1. A summary of the event sequence detected for each subject:
 ```{r, indent = "     "}
-summary = output[[1]]
+summary = output_edss[[1]]
 print(summary)
 ```
     where: `event_sequence`[^1] specifies the order of the events; the other columns count the events of each kind (improvement; progression; relapse-associated worsening, RAW; progression independent of relapse activity, PIRA; and progression that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent].
 
 2. Extended info on each event for all subjects:
 ```{r, indent = "     "}
-results = output[[2]]
+results = output_edss[[2]]
 print(results, row.names = FALSE)
 ```
     where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from baseline to event[^2]; `conf3` reports whether the event was confirmed; `sust_days` is the number of days for which the event was sustained *after confirmation*; `sust_last` reports whether the event was sustained until the last visit.
@@ -105,7 +113,14 @@ print(compute_delta(4)) # default outcome measure is 'edss'
 print(compute_delta(10, outcome='t25fw'))
 ```
 
-The `compute_delta` function is used as default `delta_fun` in the `MSprog` function to assess progression. Alternatively, a custom `delta_fun` can be provided. To change the minimum $\delta$ for SDMT to, say, "either 4 points or 20% of the reference value", we would define:
+The `compute_delta` function is used as default `delta_fun` in the `MSprog` function to assess progression. In this case, the threshold $\delta$ used to assess progression is computed based on the argument `outcome` given to `MSprog`. For instance, calling:
+```{r}
+output <- MSprog(toydata_visits,
+                 subj_col='id', value_col='SDMT', date_col='date',
+                 outcome='sdmt', # outcome type influences delta computation <---
+                 relapse=toydata_relapses, verbose=0) 
+```
+progression will be defined as a worsening of either 4 SDMT points or 20% of the reference SDMT value. Alternatively, a custom `delta_fun` can be provided. To change the minimum $\delta$ for SDMT to, say, "either 4 points or 20% of the reference value", we would define:
 ```{r}
 my_sdmt_delta <- function(x) {min(unlist(c(x/5, 4)))}
 print(my_sdmt_delta(50)) # my delta
@@ -125,16 +140,16 @@ The argument `event` allows to specify which events to detect. By default, it is
 For example, extracting multiple EDSS events for subject `4` from `toydata_visits` with a fixed baseline would result in the following.
 ```{r}
 print(toydata_visits[toydata_visits$id==4, c('date', 'EDSS')], row.names = FALSE) # EDSS visits
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses, subjects=4,
-                outcome='edss', conf_months=3, event='multiple', baseline='fixed', 
+output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', subjects=4,
+                relapse=toydata_relapses, conf_months=3, event='multiple', baseline='fixed', 
                 include_dates=TRUE, verbose=0)
 print(output[[2]], row.names = FALSE) # results
 ```
 
 Since the reference value was kept fixed at the first visit (EDSS = 4.5), the EDSS progression at visit 4 (EDSS = 5) was not detected. On the other hand, with a roving baseline scheme, the baseline is moved to visit 3 after the confirmed improvement and the progression event is correctly detected:
 ```{r}
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses, subjects=4,
-                outcome='edss', conf_months=3, event='multiple', baseline='roving', 
+output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', relapse=toydata_relapses, subjects=4,
+                conf_months=3, event='multiple', baseline='roving', 
                 include_dates=TRUE, verbose=0)
 print(output[[2]], row.names = FALSE) # results
 ```
@@ -159,8 +174,8 @@ print(toydata_relapses[toydata_relapses$id==2,], row.names = FALSE) # relapses
 
 The following code detects 3- or 6-month confirmed events for subject `2`.
 ```{r}
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses, subjects=2,
-                 outcome='edss', event='multiple', baseline='roving', 
+output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', relapse=toydata_relapses, subjects=2,
+                 event='multiple', baseline='roving', 
                  conf_months=c(3,6), verbose=0)
 print(output[[2]], row.names = FALSE) # results
 ```
@@ -168,16 +183,16 @@ The validated events included in the results are a 3-month-confirmed RAW and a 3
 
 The RAW event found for subject `2` constitutes a *transient* accumulation of disability. Such events can be excluded from the `MSprog` output by requiring that each event be sustained for at least a certain amount of time, specified by argument `require_sust_months`. For instance:
 ```{r}
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses, subjects=2,
-                outcome='edss', event='multiple', baseline='roving', 
+output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', relapse=toydata_relapses, subjects=2,
+                event='multiple', baseline='roving', 
                 conf_months=c(3,6), require_sust_months=6, verbose=0)
 print(output[[2]], row.names = FALSE) # results
 ```
 
 In this context, as the transient EDSS accumulation was not classified as an event, it did not trigger a re-baseline according to the roving baseline scheme. As a consequence, the PIRA event is classified as an undefined progression due to the presence of a relapse between baseline and confirmation. This can be handled by enabling *post-relapse re-baseline* (`relapse_rebl=TRUE`) to force a re-baseline after each relapse:
 ```{r}
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses, subjects=2,
-                outcome='edss', event='multiple', baseline='roving', relapse_rebl=TRUE,
+output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', relapse=toydata_relapses, subjects=2,
+                event='multiple', baseline='roving', relapse_rebl=TRUE,
                 conf_months=c(3,6), require_sust_months=6, verbose=0)
 print(output[[2]], row.names = FALSE) # results
 ```
@@ -197,7 +212,8 @@ The `MSprog` function scans the outcome values of each subject in chronological 
 
 ```{r}
 output <- MSprog(toydata_visits, 
-                 subj_col='id', value_col='EDSS', date_col='date', 
+                 subj_col='id', value_col='EDSS', date_col='date',
+                 outcome='edss',
                  event='multiple', baseline='roving', 
                  relapse=toydata_relapses, verbose=2)
 ```

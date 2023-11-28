@@ -12,8 +12,6 @@ compute_delta(baseline, outcome = "edss")
 \item{outcome}{One of: \cr
 \code{'edss'} (Extended Disability Status Scale ) [default]; \cr
 \code{'nhpt'} (Nine-Hole Peg Test) \cr
-\code{'nhptD'} (Nine-Hole Peg Test, dominant hand) \cr
-\code{'nhptND'} (Nine-Hole Peg Test, non-dominant hand) \cr
 \code{'t25fw'} (Timed 25-Foot Walk) \cr
 \code{'sdmt'} (Symbol Digit Modalities Test).}
 }

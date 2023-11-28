@@ -19,19 +19,18 @@
 #' @param subj_col Name of data column with subject ID.
 #' @param value_col Name of data column with outcome value.
 #' @param date_col Name of data column with date of visit.
+#' @param outcome Specifies the outcome type. Must be one of the following:
+#' \itemize{
+##' \item{\code{'edss'}}{ (Extended Disability Status Scale ) [default];}
+#'  \item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
+#'  \item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
+#'  \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test);}
+#'  \item{\code{NULL}}{ (only accepted when specifying a custom \code{delta_fun})}
+#'  }
 #' @param subjects Subset of subjects (list of IDs) [default is \code{NULL}].
 #' @param relapse \code{data.frame} containing longitudinal data, including: subject ID and relapse date [default is \code{NULL}].
 #' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].
 #' @param rdate_col Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].
-#' @param outcome One of:
-#' \itemize{
-##' \item{\code{'edss'}}{ (Extended Disability Status Scale ) [default];}
-#'  \item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
-#'  \item{\code{'nhptD'}}{ (Nine-Hole Peg Test, dominant hand);}
-#'  \item{\code{'nhptND'}}{ (Nine-Hole Peg Test, non-dominant hand);}
-#'  \item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
-#'  \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test).}
-#'  }
 #' @param delta_fun Custom function specifying the minimum delta corresponding
 #' to a valid change from the provided baseline value. If none is specified [default], \code{compute_delta} for the specified outcome is used.
 #' @param conf_months Period before confirmation (months) [default is 3].
@@ -40,7 +39,7 @@
 #' @param conf_left If \code{TRUE}, confirmation window is unbounded on the right [default is \code{FALSE}].
 #' @param require_sust_months Minimum number of months from confirmation for which a change must be sustained to be retained as an event [default is 0].
 #' @param rel_infl Influence of last relapse (days) [default is 30].
-#' @param event One of:
+#' @param event Specifies which events to detect. Must be one of the following:
 #' \itemize{
 #' \item{\code{'firstprog'}}{ (first progression) [default];}
 #' \item{\code{'first'}}{ (only the very first event - improvement or progression);}
@@ -48,12 +47,12 @@
 #' \item{\code{'firstprogtype'}}{ (first progression of each kind - PIRA, RAW, undefined);}
 #' \item{\code{'multiple'}}{ (all events).}
 #' }
-#' @param baseline One of:
+#' @param baseline Specifies the baseline scheme. Must be one of the following:
 #' \itemize{
 #' \item{\code{'fixed'}}{ (first outcome value out of relapse influence) [default];}
 #' \item{\code{'roving'}}{ (updated after each event to last confirmed outcome value out of relapse influence).}
 #' }
-#' @param pira_def One of:
+#' @param pira_def Specifies which definition of PIRA to use. Must be one of the following:
 #' \itemize{
 #'  \item{0}{ (no relapses between baseline and confirmation,
 #' as in [Cagol et al, JAMA Neurol 2022, doi:10.1001/jamaneurol.2022.1025]);}
@@ -87,25 +86,32 @@
 #' data(toydata_visits)
 #' data(toydata_relapses)
 #' # EDSS progression
-#' output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', relapse=toydata_relapses,
-#'     outcome='edss', conf_months=3, conf_tol_days=30, rel_infl=30,
+#' output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
+#'     relapse=toydata_relapses, conf_months=3, conf_tol_days=30, rel_infl=30,
 #'     event='multiple', baseline='roving', verbose=2)
 #' summary_EDSS = output[[1]] # summary of event sequence for each subject
 #' results_EDSS = output[[2]] # extended info on each event for all subjects
 #' # SDMT progression
-#' output <- MSprog(toydata_visits, 'id', 'SDMT', 'date', relapse=toydata_relapses,
-#'     outcome='sdmt', conf_months=3, conf_tol_days=30, rel_infl=30,
+#' output <- MSprog(toydata_visits, 'id', 'SDMT', 'date', 'sdmt',
+#'     relapse=toydata_relapses, conf_months=3, conf_tol_days=30, rel_infl=30,
 #'     event='multiple', baseline='roving', verbose=2)
 #' summary_SDMT <- output[[1]] # summary of event sequence for each subject
 #' results_SDMT <- output[[2]] # extended info on each event for all subjects
-MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
-                   relapse=NULL, rsubj_col=NULL, rdate_col=NULL, outcome='edss', delta_fun=NULL,
+MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
+                   relapse=NULL, rsubj_col=NULL, rdate_col=NULL, delta_fun=NULL,
                    conf_months=3, conf_tol_days=30, conf_left=FALSE, require_sust_months=0, rel_infl=30,
                    event='firstprog', baseline='fixed', pira_def=0, sub_threshold=FALSE, relapse_rebl=FALSE,
                    min_value=0, prog_last_visit=FALSE, include_dates=FALSE, include_value=FALSE,
                    include_stable=TRUE, verbose=1) {
 
   # SETUP
+
+  if (is.null(outcome) ||
+      !(tolower(outcome) %in% c('edss', 'nhpt', 't25fw', 'sdmt'))) {
+    outcome <- NULL
+  } else {
+    outcome <- tolower(outcome)
+  }
 
   if (length(conf_tol_days)==1) {
     conf_tol_days <- c(conf_tol_days, conf_tol_days)
@@ -149,6 +155,9 @@ MSprog <- function(data, subj_col, value_col, date_col, subjects=NULL,
   # Define progression delta
   delta <- function(value) {
     if (is.null(delta_fun)) {
+      if (is.null(outcome)) {
+        stop('Either specify a valid outcome type (`outcome` argument) or provide a custom `delta_fun`')
+      }
     return(compute_delta(value, outcome))
     } else return(delta_fun(value))
   }

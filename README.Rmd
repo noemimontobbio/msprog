@@ -61,6 +61,7 @@ data(toydata_relapses)
 # Compute progression
 output <- MSprog(toydata_visits,                                   # provide data on visits
                  subj_col='id', value_col='EDSS', date_col='date', # specify column names
+                 outcome='edss',                                   # specify outcome type
                  event='multiple', baseline='roving',              # modify default options on event detection
                  relapse=toydata_relapses)                         # provide data on relapses
 ```
