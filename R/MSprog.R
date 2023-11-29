@@ -55,7 +55,7 @@
 #' @param pira_def Specifies which definition of PIRA to use. Must be one of the following:
 #' \itemize{
 #'  \item{0}{ (no relapses between baseline and confirmation,
-#' as in [Cagol et al, JAMA Neurol 2022, doi:10.1001/jamaneurol.2022.1025]);}
+#' as in [Muller et al, JAMA Neurol 2023, doi:10.1001/jamaneurol.2023.3331]);}
 #' \item{1}{ (no relapses in [baseline, progression+\code{rel_infl}] and in [confirmation-\code{rel_infl}, confirmation+\code{rel_infl}],
 #' as in [Kappos et al, JAMA Neurol 2020, doi:10.1001/jamaneurol.2020.1568]).}
 #' }
@@ -106,6 +106,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
 
   # SETUP
 
+  warnings <- list()
+
+  if (length(conf_tol_days)==1) {
+    conf_tol_days = c(conf_tol_days, conf_tol_days)
+  }
+
   if (is.null(outcome) ||
       !(tolower(outcome) %in% c('edss', 'nhpt', 't25fw', 'sdmt'))) {
     outcome <- NULL
@@ -113,15 +119,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     outcome <- tolower(outcome)
   }
 
-  if (length(conf_tol_days)==1) {
-    conf_tol_days <- c(conf_tol_days, conf_tol_days)
-  }
-
-
   if (is.null(relapse)) {
     relapse_rebl <- FALSE
   }
-
 
   if (is.null(rsubj_col)) {
     rsubj_col <- subj_col
@@ -151,6 +151,27 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
   data <- data[data[[subj_col]] %in% subjects,]
   relapse <- relapse[relapse[[rsubj_col]] %in% subjects,]
   }
+
+  # Check if values are in correct range
+  if (!is.null(outcome)) {
+    if (any(data[[value_col]]<0)) {
+      stop('invalid ', toupper(outcome),' scores')
+    }
+    else if (outcome=='edss' & any(data[[value_col]]>10)) {
+      stop('invalid ', toupper(outcome),' scores')
+    }
+    else if (outcome=='sdmt' & any(data[[value_col]]>110)) {
+      stop('SDMT scores >110')
+    }
+    else if (outcome=='nhpt' & any(data[[value_col]]>300)) {
+      warnings <- c(warnings, 'NHPT scores >300')
+    }
+    else if (outcome=='t25fw' & any(data[[value_col]]>180)) {
+      warnings <- c(warnings, 'T25FW scores >180')
+    }
+}
+
+
 
   # Define progression delta
   delta <- function(value) {
@@ -194,7 +215,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
   rownames(summary) <- all_subj
 
 
-  total_fu <- setNames(all_subj, rep(0, nsub))
+  total_fu <- setNames(rep(0, nsub), all_subj)
 
 
   for (subjid in all_subj) {
@@ -234,12 +255,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
       }
     }
 
-    all_dates <- unique(c(data_id[[date_col]], relapse_dates))
-    sorted_ind <- order(all_dates)
-    all_dates <- all_dates[sorted_ind]
-    is_rel <- all_dates %in% relapse_dates
-
-    date_dict <- setNames(1:length(all_dates), sorted_ind)
+    # all_dates <- unique(c(data_id[[date_col]], relapse_dates))
+    # sorted_ind <- order(all_dates)
+    # all_dates <- all_dates[sorted_ind]
+    # is_rel <- all_dates %in% relapse_dates
+    # date_dict <- setNames(1:length(all_dates), sorted_ind)
 
     if (length(relapse_dates) > 0) {
       relapse_df <- data.frame(split(rep(relapse_dates, each=nrow(data_id)),
@@ -638,13 +658,15 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                         }
 
         if (proceed && search_idx <= nvisits &&
-            any(is_rel[date_dict[[as.character(bl_idx)]]:date_dict[[as.character(search_idx)]]]) # if search_idx has been moved after another relapse
+            # any(is_rel[date_dict[[as.character(bl_idx)]]:date_dict[[as.character(search_idx)]]])
+            any((data_id[bl_idx,][[date_col]]<=relapse_dates) & (relapse_dates<=data_id[search_idx,][[date_col]])) # if search_idx has been moved after another relapse
             && relapse_rebl && phase == 1) {
           if (bl_idx < nvisits) {
             bl_idx <- sapply(bl_idx, function (ib) {
             out <- NA
             for (x in (ib + 1):nvisits) { # visits after current baseline (or after last confirmed PIRA)
-              if (any(is_rel[date_dict[[as.character(ib)]]:date_dict[[as.character(x)]]]) # after a relapse
+              if (#any(is_rel[date_dict[[as.character(ib)]]:date_dict[[as.character(x)]]])
+                 any((data_id[ib,][[date_col]]<=relapse_dates) & (relapse_dates<=data_id[x,][[date_col]])) # after a relapse
                   & (data_id[x,][['closest_rel_minus']] > rel_infl) # out of relapse influence
                   ){
                 out <- x
@@ -805,7 +827,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
         }
 
       if (min_value > 0) {
-        message("---\n*** WARNING only progressions to ", toupper(outcome), ">=",
+        message("---\n*** NOTE: only progressions to ", toupper(outcome), ">=",
                 min_value, " are considered ***\n")
       }
     }
@@ -818,6 +840,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
       columns <- columns[!endsWith(columns, "value")]
     }
     results <- results[, columns]
+
+    for (w in warnings) {
+        warning(w)
+      }
 
 
   return(list(summary, results))

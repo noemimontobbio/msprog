@@ -96,15 +96,15 @@ Several qualitative and quantitative options for computing the progression are g
 
 ## Valid changes in the outcome measure
 
-The `MSprog` function detects the events sequentially by scanning the outcome values in chronological order, and each value is tested for its difference from the current reference value. The `compute_delta` function returns the minimum difference $\delta$ in the chosen outcome measure that is accepted as a valid change from a given reference value $x$ (value at baseline). The criterion varies based on the test under analysis, see [@lorscheider2016; @bosma2010; @kalinowski2022; @strober2019].
+The `MSprog` function detects the events sequentially by scanning the outcome values in chronological order, and each value is tested for its difference from the current reference value. The `compute_delta` function returns the minimum difference $\delta$ in the chosen outcome measure that is accepted as a valid change from a given reference value $x$ (value at baseline). The threshold $\delta$ is computed differently based on the test under analysis (see [@lorscheider2016; @bosma2010; @kalinowski2022; @strober2019]):
 
 * Extended Disability Status Scale (EDSS): $\delta(x)=\begin{cases} 1.5 \quad \text{ if } x=0\\1 \quad\;\;\; \text{ if } 0 < x \leq 5\\0.5 \quad \text{ if } 5<x\leq 10\end{cases}$;
 
-* Nine-Hole Peg Test (NHPT), for either the dominant or the non-dominant hand: $\delta(x) = \frac{x}{5}$;
+* Nine-Hole Peg Test (NHPT), for either the dominant or the non-dominant hand: 20% of reference $x$;
 
-* Timed 25-Foot Walk (T25FW): $\delta(x) = \frac{x}{5}$;
+* Timed 25-Foot Walk (T25FW): 20% of reference $x$;
 
-* Symbol Digit Modalities Test (SDMT): $\delta(x) = \min\left(3, \frac{x}{10}\right)$.
+* Symbol Digit Modalities Test (SDMT): either 3 points or 10% of reference $x$.
 
 
 For example:
@@ -117,10 +117,10 @@ The `compute_delta` function is used as default `delta_fun` in the `MSprog` func
 ```{r}
 output <- MSprog(toydata_visits,
                  subj_col='id', value_col='SDMT', date_col='date',
-                 outcome='sdmt', # outcome type influences delta computation <---
+                 outcome='sdmt', # ---> outcome type influences delta computation <---
                  relapse=toydata_relapses, verbose=0) 
 ```
-progression will be defined as a worsening of either 4 SDMT points or 20% of the reference SDMT value. Alternatively, a custom `delta_fun` can be provided. To change the minimum $\delta$ for SDMT to, say, "either 4 points or 20% of the reference value", we would define:
+disability progression will be defined as a worsening of either 3 SDMT points or 10% of the reference SDMT value. Alternatively, a custom `delta_fun` can be provided. To change the minimum $\delta$ for SDMT to, say, "either 4 points or 20% of the reference value", we would define:
 ```{r}
 my_sdmt_delta <- function(x) {min(unlist(c(x/5, 4)))}
 print(my_sdmt_delta(50)) # my delta

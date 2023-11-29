@@ -10,13 +10,20 @@ compute_delta(baseline, outcome = "edss")
 \item{baseline}{Outcome value at baseline.}
 
 \item{outcome}{One of: \cr
-\code{'edss'} (Extended Disability Status Scale ) [default]; \cr
-\code{'nhpt'} (Nine-Hole Peg Test) \cr
-\code{'t25fw'} (Timed 25-Foot Walk) \cr
-\code{'sdmt'} (Symbol Digit Modalities Test).}
+\itemize{
+\item{\code{'edss'}}{ (Extended Disability Status Scale ) [default];}
+ \item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
+ \item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
+ \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test).}
+ }}
 }
 \value{
-Minimum delta corresponding to valid change from the provided baseline value.
+Minimum delta corresponding to valid change from the provided baseline value. Specifically:
+\itemize{
+ \item{EDSS: }{1.5 if \code{baseline==0}, 1 if \code{0<baseline<=5}, 0.5 if \code{baseline>=5.5};}
+ \item{NHPT and T25FW: }{20\% of \code{baseline};}
+ \item{SDMT: }{either 3 points or 10\% of \code{baseline}.}
+ }
 }
 \description{
 \code{compute_delta} returns the minimum delta to be considered as a valid change

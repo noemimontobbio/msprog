@@ -91,7 +91,7 @@ or list-like of length 2 (different tolerance on left and right) [default is 45]
 \item{pira_def}{Specifies which definition of PIRA to use. Must be one of the following:
 \itemize{
  \item{0}{ (no relapses between baseline and confirmation,
-as in [Cagol et al, JAMA Neurol 2022, doi:10.1001/jamaneurol.2022.1025]);}
+as in [Muller et al, JAMA Neurol 2023, doi:10.1001/jamaneurol.2023.3331]);}
 \item{1}{ (no relapses in [baseline, progression+\code{rel_infl}] and in [confirmation-\code{rel_infl}, confirmation+\code{rel_infl}],
 as in [Kappos et al, JAMA Neurol 2020, doi:10.1001/jamaneurol.2020.1568]).}
 }}
