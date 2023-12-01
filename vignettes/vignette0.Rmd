@@ -84,7 +84,7 @@ print(summary)
 results = output_edss[[2]]
 print(results, row.names = FALSE)
 ```
-    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from baseline to event[^2]; `conf3` reports whether the event was confirmed; `sust_days` is the number of days for which the event was sustained *after confirmation*; `sust_last` reports whether the event was sustained until the last visit.
+    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from start of follow-up to event[^2]; `bl2event` is the number of days from current baseline to event; `conf3` reports whether the event was confirmed; `sust_days` is the number of days for which the event was sustained *after confirmation*; `sust_last` reports whether the event was sustained until the last visit.
 
 [^1]: In this example, `event_sequence` can contain a maximum of one event, as we are not specifying the argument `event` - which defaults to `firstprog` (only detect the first progression event). For the same reason, `nevent` in `results` can only be 0 or 1 in this example. In a multiple-event setting (`event=multiple`), more than one event per subject can be detected. See [the relevant section](#multiple).
 [^2]: For subjects with no events, `time2event` is the total follow-up length. To omit these subjects, set `include_stable=FALSE` in `MSprog`.

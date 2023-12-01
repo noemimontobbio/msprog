@@ -199,11 +199,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
   all_subj <- unique(data[[subj_col]])
   nsub <- length(all_subj)
   max_nevents <- round(max(table(data[[subj_col]]))/2)
-  results <- data.frame(matrix(nrow = nsub * max_nevents, ncol = 8 + length(conf_months) + (length(conf_months)-1) + 2))
-  allcol <- c(subj_col, 'nevent', 'event_type', 'bldate', 'blvalue', 'date', 'value', 'time2event',
+  results <- data.frame(matrix(nrow = nsub * max_nevents, ncol = 9 + length(conf_months) + (length(conf_months)-1) + 2))
+  allcol <- c(subj_col, 'nevent', 'event_type', 'bldate', 'blvalue', 'date', 'value', 'time2event', 'bl2event',
              paste0('conf', conf_months), 'sust_days', 'sust_last')
   if (length(conf_months)>1) {
-    allcol <- c(allcol[1:(8+length(conf_months))],  paste0('PIRA_conf',
+    allcol <- c(allcol[1:(9+length(conf_months))],  paste0('PIRA_conf',
                       conf_months[2:length(conf_months)]), 'sust_days', 'sust_last')
     }
   colnames(results) <- allcol
@@ -281,7 +281,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
 
     event_type <- ""
     event_index <- NULL
-    bldate <- edate <- blvalue <- evalue <- time2event <- sustd <- sustl <- vector()
+    bldate <- edate <- blvalue <- evalue <- time2event <- bl2event <- sustd <- sustl <- vector()
     conf <- pira_conf <- list()
     for (m in conf_months) {
       conf[[as.character(m)]] <- vector()
@@ -411,7 +411,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
             blvalue <- c(blvalue, bl[[value_col]])
             edate <- c(edate, as.character(global_start + as.difftime(data_id[change_idx,][[date_col]], units='days')))
             evalue <- c(evalue, data_id[change_idx,][[value_col]])
-            time2event <- c(time2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
+            bl2event <- c(bl2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
+            time2event <- c(time2event, data_id[change_idx,][[date_col]] - data_id[1,][[date_col]])
             for (m in conf_months) {
               conf[[as.character(m)]] <- c(conf[[as.character(m)]], as.integer(m %in% conf_t))
               if (m!=conf_months[1]) {pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], NA)}
@@ -569,7 +570,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                     blvalue <- c(blvalue, bl[[value_col]])
                     edate <- c(edate, as.character(global_start + as.difftime(data_id[change_idx,][[date_col]], units='days')))
                     evalue <- c(evalue, data_id[change_idx,][[value_col]])
-                    time2event <- c(time2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
+                    bl2event <- c(bl2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
+                    time2event <- c(time2event, data_id[change_idx,][[date_col]] - data_id[1,][[date_col]])
                     for (m in conf_months) {
                       conf[[as.character(m)]] <- c(conf[[as.character(m)]], as.integer(m %in% conf_t))
                     }
@@ -744,6 +746,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
       rownames(results) <- NULL # reset column names
       results[results[[subj_col]]==subjid, 'nevent'] = 0
       results[results[[subj_col]]==subjid, 'time2event'] = total_fu[subjid]
+      results[results[[subj_col]] == subjid, 'date'] = global_start + as.difftime(data_id[nvisits,][[date_col]], units='days')
       results[results[[subj_col]]==subjid, 'event_type'] = ''
     }
     else if (length(event_type)==0) {
@@ -759,6 +762,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     results[results[[subj_col]] == subjid, "date"] <- edate[event_order]
     results[results[[subj_col]] == subjid, "value"] <- evalue[event_order]
     results[results[[subj_col]] == subjid, "time2event"] <- time2event[event_order]
+    results[results[[subj_col]] == subjid, "bl2event"] <- bl2event[event_order]
     for (m in conf_months) {
       results[results[[subj_col]] == subjid, paste0("conf", m)] <- conf[[as.character(m)]][event_order]
       }
