@@ -21,7 +21,7 @@
 #' @param date_col Name of data column with date of visit.
 #' @param outcome Specifies the outcome type. Must be one of the following:
 #' \itemize{
-##' \item{\code{'edss'}}{ (Extended Disability Status Scale ) [default];}
+##' \item{\code{'edss'}}{ (Expanded Disability Status Scale) [default];}
 #'  \item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
 #'  \item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
 #'  \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test);}
@@ -52,14 +52,15 @@
 #' \item{\code{'fixed'}}{ (first outcome value out of relapse influence) [default];}
 #' \item{\code{'roving'}}{ (updated after each event to last confirmed outcome value out of relapse influence).}
 #' }
-#' @param pira_def Specifies which definition of PIRA to use. Must be one of the following:
+#' @param relapse_indep Specifies relapse-free intervals for PIRA definition.
+#' Must be given in the form produced by function \code{relapse_indep_from_bounds},
+#' by specifying the intervals around baseline (\code{b0} and \code{b1}),
+#' event (\code{e0} and \code{e1}), and confirmation (\code{e0} and \code{e1}). For instance:
 #' \itemize{
-#'  \item{0}{ (no relapses between baseline and confirmation,
-#' as in [Muller et al, JAMA Neurol 2023, doi:10.1001/jamaneurol.2023.3331]);}
-#' \item{1}{ (no relapses in [baseline, progression+\code{rel_infl}] and in [confirmation-\code{rel_infl}, confirmation+\code{rel_infl}],
-#' as in [Kappos et al, JAMA Neurol 2020, doi:10.1001/jamaneurol.2020.1568]).}
+#' \item{[Muller JAMA Neurol 2023](high-specificity def)}{ No relapses between baseline and confirmation: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)} [default];}
+#' \item{[Muller JAMA Neurol 2023]}{ No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)}}
+#' \item{[Kappos JAMA Neurol 2020]}{ No relapses within baseline->event+30dd and within confirmation+-30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
 #' }
-#'
 #' @param sub_threshold If \code{TRUE}, include confirmed sub-threshold events for roving baseline [default is \code{FALSE}].
 #' @param relapse_rebl If \code{TRUE}, search for PIRA events again with post-relapse re-baseline [default is \code{FALSE}].
 #' @param min_value Only consider progressions events where the outcome is >= value [default is 0].
@@ -100,7 +101,7 @@
 MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, delta_fun=NULL,
                    conf_months=3, conf_tol_days=30, conf_left=FALSE, require_sust_months=0, rel_infl=30,
-                   event='firstprog', baseline='fixed', pira_def=0, sub_threshold=FALSE, relapse_rebl=FALSE,
+                   event='firstprog', baseline='fixed', relapse_indep=NULL, sub_threshold=FALSE, relapse_rebl=FALSE,
                    min_value=0, prog_last_visit=FALSE, include_dates=FALSE, include_value=FALSE,
                    include_stable=TRUE, verbose=1) {
 
@@ -169,7 +170,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     else if (outcome=='t25fw' & any(data[[value_col]]>180)) {
       warnings <- c(warnings, 'T25FW scores >180')
     }
-}
+  }
 
 
 
@@ -183,6 +184,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     } else return(delta_fun(value))
   }
 
+
   # Define a confirmation window for each value of conf_months
   conf_window <- lapply(conf_months, function(t) {
     lower <- as.integer(t * 30.44) - conf_tol_days[1]
@@ -194,6 +196,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     return(c(lower, upper))
   })
 
+
+  # Define relapse-free intervals for PIRA definition
+  if (is.null(relapse_indep)) {
+    relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)
+  }
+
+
+  #################################################################
   # Assess progression
 
   all_subj <- unique(data[[subj_col]])
@@ -523,18 +533,55 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                   } else if (data_id[change_idx,][['closest_rel_minus']] > rel_infl) { # event occurs out of relapse influence
                     # rel_inbetween <- sapply(conf_idx,
                     #           function(ic) any(is_rel[date_dict[[as.character(bl_idx)]]:date_dict[[as.character(ic)]]]))
-                    if (pira_def==0) {
-                      rel_inbetween <- sapply(conf_idx,
-                              function(ic) ifelse(length(relapse_dates)>0,
-                                                  any((data_id[bl_idx,][[date_col]]<=relapse_dates)
-                                                  & (relapse_dates<=data_id[ic,][[date_col]])), FALSE))
-                    } else if (pira_def==1) {
-                      rel_inbetween <- sapply(conf_idx,
-                              function(ic) ifelse(length(relapse_dates)>0, any(
-                                ((data_id[bl_idx,][[date_col]]<=relapse_dates) & (relapse_dates<=data_id[change_idx,][[date_col]]+rel_infl))
-                                | ((data_id[ic,][[date_col]]-rel_infl<=relapse_dates) & (relapse_dates<=data_id[ic,][[date_col]]+rel_infl))),
-                                FALSE))
+
+
+                    left <- right <- list()
+
+                    for (iic in 1:length(conf_idx)) {
+
+                      left[[iic]] <- list()
+                      right[[iic]] <- list()
+
+                      ic <- conf_idx[[iic]]
+
+                      for (point in c('bl', 'event', 'conf')) {
+                        t <- ifelse(point == 'bl', bl[[date_col]],
+                                    ifelse(point == 'event', data_id[change_idx,][[date_col]],
+                                           data_id[ic,][[date_col]]))
+
+                        if (!is.null(relapse_indep[[point]][[1]])) {
+                          t0 <- t - relapse_indep[[point]][[1]]
+                        }
+
+                        if (!is.null(relapse_indep[[point]][[2]])) {
+                          t1 <- t + relapse_indep[[point]][[2]]
+
+                          if (t1 > t0) {
+                            left[[iic]] <- append(left[[iic]], t0)
+                            right[[iic]] <- append(right[[iic]], t1)
+                          }
+                        }
+                      }
                     }
+
+                    rel_inbetween <- sapply(1:length(conf_idx), function(iic) {
+                      any(sapply(1:length(left[[iic]]), function(j) {
+                        any((left[[iic]][j] <= relapse_dates) & (relapse_dates <= right[[iic]][j]))
+                      }))
+                    })
+
+                    # if (pira_def==0) {
+                    #   rel_inbetween <- sapply(conf_idx,
+                    #           function(ic) ifelse(length(relapse_dates)>0,
+                    #                               any((data_id[bl_idx,][[date_col]]<=relapse_dates)
+                    #                               & (relapse_dates<=data_id[ic,][[date_col]])), FALSE))
+                    # } else if (pira_def==1) {
+                    #   rel_inbetween <- sapply(conf_idx,
+                    #           function(ic) ifelse(length(relapse_dates)>0, any(
+                    #             ((data_id[bl_idx,][[date_col]]<=relapse_dates) & (relapse_dates<=data_id[change_idx,][[date_col]]+rel_infl))
+                    #             | ((data_id[ic,][[date_col]]-rel_infl<=relapse_dates) & (relapse_dates<=data_id[ic,][[date_col]]+rel_infl))),
+                    #             FALSE))
+                    # }
                     if (any(rel_inbetween)) {
                       if (min(which(rel_inbetween))>1) {
                       pconf_idx <- conf_idx[1:(min(which(rel_inbetween)) - 1)] } else {pconf_idx = list()}
@@ -697,6 +744,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
 
     } #while (proceed)
 
+  #################################################################
 
   subj_index <- as.numeric(row.names(results[results[subj_col] == subjid, ]))
 
@@ -778,6 +826,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     rownames(results) <- NULL # reset column names
     results[results[[subj_col]]==subjid, 'nevent'] = 0
     results[results[[subj_col]]==subjid, 'time2event'] = total_fu[subjid]
+    results[results[[subj_col]] == subjid, 'date'] = global_start + as.difftime(data_id[nvisits,][[date_col]], units='days')
     results[results[[subj_col]]==subjid, 'event_type'] = ''
   } else {
     results <- results[-subj_index, ]
@@ -806,6 +855,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
 
 
   } #for (subjid in all_subj)
+
+  #################################################################
 
     if (verbose >= 1) {
       message(paste("\n---\nOutcome: ", toupper(outcome), "\nConfirmation at: ",

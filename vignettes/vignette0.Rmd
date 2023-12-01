@@ -92,13 +92,13 @@ print(results, row.names = FALSE)
 
 <br />
 
-Several qualitative and quantitative options for computing the progression are given as optional arguments of `MSprog` that can be set by the user. In order to ensure reproducibility, the results should always be complemented by the specific settings used to obtain them. In the following sections we will go into more detail about usage and best practices for each of the options.
+Several qualitative and quantitative options for computing the progression are given as optional arguments of `MSprog` that can be set by the user. In order to ensure reproducibility, the results should always be complemented by the specific settings used to obtain them. In the following sections we will go into more detail about usage and best practices for the different options. Please refer to the documentation (by typing `?MSprog`) for a complete illustration of all function arguments.
 
 ## Valid changes in the outcome measure
 
 The `MSprog` function detects the events sequentially by scanning the outcome values in chronological order, and each value is tested for its difference from the current reference value. The `compute_delta` function returns the minimum difference $\delta$ in the chosen outcome measure that is accepted as a valid change from a given reference value $x$ (value at baseline). The threshold $\delta$ is computed differently based on the test under analysis (see [@lorscheider2016; @bosma2010; @kalinowski2022; @strober2019]):
 
-* Extended Disability Status Scale (EDSS): $\delta(x)=\begin{cases} 1.5 \quad \text{ if } x=0\\1 \quad\;\;\; \text{ if } 0 < x \leq 5\\0.5 \quad \text{ if } 5<x\leq 10\end{cases}$;
+* Expanded Disability Status Scale (EDSS): $\delta(x)=\begin{cases} 1.5 \quad \text{ if } x=0\\1 \quad\;\;\; \text{ if } 0 < x \leq 5\\0.5 \quad \text{ if } 5<x\leq 10\end{cases}$;
 
 * Nine-Hole Peg Test (NHPT), for either the dominant or the non-dominant hand: 20% of reference $x$;
 

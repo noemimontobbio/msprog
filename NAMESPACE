@@ -2,6 +2,7 @@
 
 export(MSprog)
 export(compute_delta)
+export(relapse_indep_from_bounds)
 importFrom(dplyr,"%>%")
 importFrom(dplyr,across)
 importFrom(dplyr,group_by_at)

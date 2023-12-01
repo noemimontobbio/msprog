@@ -24,8 +24,10 @@ The package also provides two toy datasets for function testing:
 - `toydata_relapses`: artificially generated relapse dates associated
   with the patients in `toydata_visits`.
 
-A detailed tutorial is available as a package vignette: ***Computing MS
-progression from longitudinal data***.
+Please refer to the documentation for function usage (e.g. `?MSprog`)
+and data structure (e.g. `?toydata_visits`). A detailed tutorial is
+available as a package vignette: ***Computing MS progression from
+longitudinal data***.
 
 ## Installation
 

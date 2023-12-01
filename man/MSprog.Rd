@@ -22,7 +22,7 @@ MSprog(
   rel_infl = 30,
   event = "firstprog",
   baseline = "fixed",
-  pira_def = 0,
+  relapse_indep = NULL,
   sub_threshold = FALSE,
   relapse_rebl = FALSE,
   min_value = 0,
@@ -44,7 +44,7 @@ MSprog(
 
 \item{outcome}{Specifies the outcome type. Must be one of the following:
 \itemize{
-\item{\code{'edss'}}{ (Extended Disability Status Scale ) [default];}
+\item{\code{'edss'}}{ (Expanded Disability Status Scale) [default];}
  \item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
  \item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
  \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test);}
@@ -88,12 +88,14 @@ or list-like of length 2 (different tolerance on left and right) [default is 45]
 \item{\code{'roving'}}{ (updated after each event to last confirmed outcome value out of relapse influence).}
 }}
 
-\item{pira_def}{Specifies which definition of PIRA to use. Must be one of the following:
+\item{relapse_indep}{Specifies relapse-free intervals for PIRA definition.
+Must be given in the form produced by function \code{relapse_indep_from_bounds},
+by specifying the intervals around baseline (\code{b0} and \code{b1}),
+event (\code{e0} and \code{e1}), and confirmation (\code{e0} and \code{e1}). For instance:
 \itemize{
- \item{0}{ (no relapses between baseline and confirmation,
-as in [Muller et al, JAMA Neurol 2023, doi:10.1001/jamaneurol.2023.3331]);}
-\item{1}{ (no relapses in [baseline, progression+\code{rel_infl}] and in [confirmation-\code{rel_infl}, confirmation+\code{rel_infl}],
-as in [Kappos et al, JAMA Neurol 2020, doi:10.1001/jamaneurol.2020.1568]).}
+\item{[Muller JAMA Neurol 2023](high-specificity def)}{ No relapses between baseline and confirmation: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)} [default];}
+\item{[Muller JAMA Neurol 2023]}{ No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)}}
+\item{[Kappos JAMA Neurol 2020]}{ No relapses within baseline->event+30dd and within confirmation+-30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
 }}
 
 \item{sub_threshold}{If \code{TRUE}, include confirmed sub-threshold events for roving baseline [default is \code{FALSE}].}
