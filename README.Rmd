@@ -79,7 +79,7 @@ print(summary)
 results = output[[2]]
 print(results, row.names = FALSE)
 ```
-    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf3` reports whether the event was confirmed; `sust_days` is the number of days for which the event was sustained *after confirmation*; `sust_last` reports whether the event was sustained until the last visit.
+    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed at 12 weeks; `sust_days` is the number of days for which the event was sustained *after confirmation*; `sust_last` reports whether the event was sustained until the last visit.
 
 <br />
 
