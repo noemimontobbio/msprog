@@ -311,7 +311,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     while (proceed) {
 
       # Set baseline (skip if within relapse influence)
-      while (proceed && data_id[bl_idx,][['closest_rel_minus']] <= relapse_to_bl) {
+      while (proceed && data_id[bl_idx,][['closest_rel_minus']] < relapse_to_bl) {
         if (verbose == 2) {
           message("Baseline (visit no.", bl_idx,
                        ") is within relapse influence: moved to visit no.", bl_idx + 1)
@@ -340,10 +340,28 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
       bl <- data_id[bl_idx, ]
 
       # Event detection
-      change_idx <- match(TRUE, data_id[search_idx:nvisits, value_col] != as.numeric(bl[[value_col]]))
-      if (!is.na(change_idx)) {
-        change_idx <- search_idx + change_idx - 1
+      change_idx <- NA
+      if (search_idx<=nvisits) {
+      for (x in search_idx:nvisits) {
+          if ((data_id[x,][[value_col]] != bl[[value_col]]) &
+              (data_id[x,][['closest_rel_minus']] >= relapse_to_event)) {
+            change_idx <- x
+            break
+          }
       }
+      }
+      #
+      if (search_idx<=nvisits) {
+      change_idx1 <- match(TRUE, data_id[search_idx:nvisits, value_col] != bl[[value_col]])
+      if (!is.na(change_idx1)) {
+        change_idx1 <- search_idx + change_idx1 - 1
+      } } else {change_idx1 = NA}
+      #
+
+      if ((is.na(change_idx) & !is.na(change_idx1)) ||
+          (is.na(change_idx1) & !is.na(change_idx)) ||
+          (!is.na(change_idx1) & !is.na(change_idx) & change_idx!=change_idx1)) {stop('uffa')}
+
 
       if (is.na(change_idx) | change_idx>nvisits) {
         proceed <- 0
@@ -359,7 +377,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
           for (x in (change_idx + 1):nvisits) {
             if (data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] >= t[1] && #difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]])
                 data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] <= t[2] && #difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]]) #_d_#
-                data_id[x,][['closest_rel_minus']] > relapse_to_conf) {
+                data_id[x,][['closest_rel_minus']] >= relapse_to_conf) {
               match_idx <- x
               break
             }
@@ -592,7 +610,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                     } else {pconf_idx = conf_idx}
 
                     if (length(pconf_idx) > 0
-                      && data_id[pconf_idx[[length(pconf_idx)]], 'closest_rel_plus'] <= relapse_to_conf) {
+                      && data_id[pconf_idx[[length(pconf_idx)]], 'closest_rel_plus'] < relapse_to_conf) {
                       pconf_idx <- pconf_idx[-length(pconf_idx)]
                     }
                     pconf_t <- conf_t[seq_along(pconf_idx)]
@@ -720,7 +738,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
             for (x in (ib + 1):nvisits) { # visits after current baseline (or after last confirmed PIRA)
               if (#any(is_rel[date_dict[[as.character(ib)]]:date_dict[[as.character(x)]]])
                  any((data_id[ib,][[date_col]]<=relapse_dates) & (relapse_dates<=data_id[x,][[date_col]])) # after a relapse
-                  & (data_id[x,][['closest_rel_minus']] > relapse_to_bl) # out of relapse influence
+                  & (data_id[x,][['closest_rel_minus']] >= relapse_to_bl) # out of relapse influence
                   ){
                 out <- x
                 break
