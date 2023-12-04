@@ -19,7 +19,10 @@ MSprog(
   conf_tol_days = 30,
   conf_left = FALSE,
   require_sust_months = 0,
-  rel_infl = 30,
+  rel_infl_bl = 30,
+  rel_infl_event = 0,
+  rel_infl_conf = 30,
+  relapse_assoc = 90,
   event = "firstprog",
   baseline = "fixed",
   relapse_indep = NULL,
@@ -71,7 +74,13 @@ or list-like of length 2 (different tolerance on left and right) [default is 45]
 
 \item{require_sust_months}{Minimum number of months from confirmation for which a change must be sustained to be retained as an event [default is 0].}
 
-\item{rel_infl}{Influence of last relapse (days) [default is 30].}
+\item{rel_infl_bl}{Minimum distance from a relapse (days) for a visit to be used as baseline (otherwise the next available visit is used as baseline) [default is 30].}
+
+\item{rel_infl_event}{Minimum distance from a relapse (days) for an event to be considered as such [default is 0].}
+
+\item{rel_infl_conf}{Minimum distance from a relapse (days) for a visit to be a valid confirmation visit [default is 30].}
+
+\item{relapse_assoc}{Maximum distance from last relapse for a progression event to be considered as RAW (days) [default is 90].}
 
 \item{event}{Specifies which events to detect. Must be one of the following:
 \itemize{
@@ -146,13 +155,13 @@ data(toydata_visits)
 data(toydata_relapses)
 # EDSS progression
 output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
-    relapse=toydata_relapses, conf_months=3, conf_tol_days=30, rel_infl=30,
+    relapse=toydata_relapses, conf_months=3, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=2)
 summary_EDSS = output[[1]] # summary of event sequence for each subject
 results_EDSS = output[[2]] # extended info on each event for all subjects
 # SDMT progression
 output <- MSprog(toydata_visits, 'id', 'SDMT', 'date', 'sdmt',
-    relapse=toydata_relapses, conf_months=3, conf_tol_days=30, rel_infl=30,
+    relapse=toydata_relapses, conf_months=3, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=2)
 summary_SDMT <- output[[1]] # summary of event sequence for each subject
 results_SDMT <- output[[2]] # extended info on each event for all subjects

@@ -38,7 +38,10 @@
 #' or list-like of length 2 (different tolerance on left and right) [default is 45].
 #' @param conf_left If \code{TRUE}, confirmation window is unbounded on the right [default is \code{FALSE}].
 #' @param require_sust_months Minimum number of months from confirmation for which a change must be sustained to be retained as an event [default is 0].
-#' @param rel_infl Influence of last relapse (days) [default is 30].
+#' @param rel_infl_bl Minimum distance from a relapse (days) for a visit to be used as baseline (otherwise the next available visit is used as baseline) [default is 30].
+#' @param rel_infl_event Minimum distance from a relapse (days) for an event to be considered as such [default is 0].
+#' @param relapse_assoc Maximum distance from last relapse for a progression event to be considered as RAW (days) [default is 90].
+#' @param rel_infl_conf Minimum distance from a relapse (days) for a visit to be a valid confirmation visit [default is 30].
 #' @param event Specifies which events to detect. Must be one of the following:
 #' \itemize{
 #' \item{\code{'firstprog'}}{ (first progression) [default];}
@@ -88,19 +91,20 @@
 #' data(toydata_relapses)
 #' # EDSS progression
 #' output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
-#'     relapse=toydata_relapses, conf_months=3, conf_tol_days=30, rel_infl=30,
+#'     relapse=toydata_relapses, conf_months=3, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=2)
 #' summary_EDSS = output[[1]] # summary of event sequence for each subject
 #' results_EDSS = output[[2]] # extended info on each event for all subjects
 #' # SDMT progression
 #' output <- MSprog(toydata_visits, 'id', 'SDMT', 'date', 'sdmt',
-#'     relapse=toydata_relapses, conf_months=3, conf_tol_days=30, rel_infl=30,
+#'     relapse=toydata_relapses, conf_months=3, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=2)
 #' summary_SDMT <- output[[1]] # summary of event sequence for each subject
 #' results_SDMT <- output[[2]] # extended info on each event for all subjects
 MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, delta_fun=NULL,
-                   conf_months=3, conf_tol_days=30, conf_left=FALSE, require_sust_months=0, rel_infl=30,
+                   conf_months=3, conf_tol_days=30, conf_left=FALSE, require_sust_months=0,
+                   rel_infl_bl=30, rel_infl_event=0, rel_infl_conf=30, relapse_assoc=90,
                    event='firstprog', baseline='fixed', relapse_indep=NULL, sub_threshold=FALSE, relapse_rebl=FALSE,
                    min_value=0, prog_last_visit=FALSE, include_dates=FALSE, include_value=FALSE,
                    include_stable=TRUE, verbose=1) {
@@ -247,7 +251,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     nvisits <- nrow(data_id)
     first_visit <- min(data_id[[date_col]])
     relapse_id <- relapse[relapse[[rsubj_col]] == subjid, ]
-    relapse_id <- relapse_id[relapse_id[[rdate_col]] >= first_visit - rel_infl, ] #as.difftime(rel_infl, units = "days") #_d_#
+    relapse_id <- relapse_id[relapse_id[[rdate_col]] >= first_visit - rel_infl_bl, ] #as.difftime(rel_infl_bl, units = "days") #_d_#
     relapse_dates <- relapse_id[[rdate_col]]
     nrel <- length(relapse_dates)
 
@@ -307,7 +311,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     while (proceed) {
 
       # Set baseline (skip if within relapse influence)
-      while (proceed && data_id[bl_idx,][['closest_rel_minus']] <= rel_infl) {
+      while (proceed && data_id[bl_idx,][['closest_rel_minus']] <= rel_infl_bl) {
         if (verbose == 2) {
           message("Baseline (visit no.", bl_idx,
                        ") is within relapse influence: moved to visit no.", bl_idx + 1)
@@ -355,7 +359,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
           for (x in (change_idx + 1):nvisits) {
             if (data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] >= t[1] && #difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]])
                 data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] <= t[2] && #difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]]) #_d_#
-                data_id[x,][['closest_rel_minus']] > rel_infl) {
+                data_id[x,][['closest_rel_minus']] > rel_infl_conf) {
               match_idx <- x
               break
             }
@@ -527,10 +531,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                 if (valid_prog) {
                   sust_idx <- ifelse(is.na(next_nonsust), nvisits, next_nonsust - 1)
 
-                  if (phase == 0 && data_id[change_idx,][['closest_rel_minus']] <= rel_infl) { # event occurs within relapse influence
+                  if (phase == 0 && data_id[change_idx,][['closest_rel_minus']] <= relapse_assoc) { # event is relapse-associated
                     event_type <- c(event_type, 'RAW')
                     event_index <- c(event_index, change_idx)
-                  } else if (data_id[change_idx,][['closest_rel_minus']] > rel_infl) { # event occurs out of relapse influence
+                  } else if (data_id[change_idx,][['closest_rel_minus']] > relapse_assoc) { # # event is not relapse-associated
                     # rel_inbetween <- sapply(conf_idx,
                     #           function(ic) any(is_rel[date_dict[[as.character(bl_idx)]]:date_dict[[as.character(ic)]]]))
 
@@ -588,7 +592,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                     } else {pconf_idx = conf_idx}
 
                     if (length(pconf_idx) > 0
-                      && data_id[pconf_idx[[length(pconf_idx)]], 'closest_rel_plus'] <= rel_infl) {
+                      && data_id[pconf_idx[[length(pconf_idx)]], 'closest_rel_plus'] <= rel_infl_conf) {
                       pconf_idx <- pconf_idx[-length(pconf_idx)]
                     }
                     pconf_t <- conf_t[seq_along(pconf_idx)]
@@ -716,7 +720,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
             for (x in (ib + 1):nvisits) { # visits after current baseline (or after last confirmed PIRA)
               if (#any(is_rel[date_dict[[as.character(ib)]]:date_dict[[as.character(x)]]])
                  any((data_id[ib,][[date_col]]<=relapse_dates) & (relapse_dates<=data_id[x,][[date_col]])) # after a relapse
-                  & (data_id[x,][['closest_rel_minus']] > rel_infl) # out of relapse influence
+                  & (data_id[x,][['closest_rel_minus']] > rel_infl_bl) # out of relapse influence
                   ){
                 out <- x
                 break
@@ -864,7 +868,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
             ifelse(conf_left, "inf", conf_tol_days[2]), "dd)\nBaseline: ", baseline,
             ifelse(sub_threshold, " (sub-threshold)", ""),
             ifelse(relapse_rebl, " (and post-relapse re-baseline)", ""),
-            "\nRelapse influence: ", rel_infl, "dd\nEvents detected: ", event))
+            "\nRelapse influence (baseline): ", rel_infl_bl, "dd\nRelapse influence (event): ",
+            rel_infl_event, "dd\nRelapse influence (confirmation): ", rel_infl_conf, "dd\nEvents detected: ", event))
       if (is.null(subjects) | length(subjects)>1) {
           message("\n---\nTotal subjects: ", nsub,
               "\n---\nProgressed subjects: ", sum(summary$progression > 0), " (PIRA: ", sum(summary$PIRA > 0),

@@ -84,8 +84,8 @@ print(results, row.names = FALSE)
 <br />
 
 For detailed indications on usage and best practices, please refer to the package vignettes.
-```{r}
-#browseVignettes('msprog')
+```{r, message=FALSE}
+browseVignettes('msprog')
 ```
     
 ## References

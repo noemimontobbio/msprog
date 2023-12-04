@@ -74,7 +74,9 @@ output <- MSprog(toydata_visits,                                   # provide dat
 #> Outcome:  EDSS 
 #> Confirmation at:  3 mm (- 30 dd, + 30 dd)
 #> Baseline:  roving   
-#> Relapse influence:  30 dd
+#> Relapse influence (baseline):  30 dd
+#> Relapse influence (event):  0 dd
+#> Relapse influence (confirmation):  30 dd
 #> Events detected:  multiple
 #> 
 #> ---
@@ -135,7 +137,7 @@ For detailed indications on usage and best practices, please refer to
 the package vignettes.
 
 ``` r
-#browseVignettes('msprog')
+browseVignettes('msprog')
 ```
 
 ## References
