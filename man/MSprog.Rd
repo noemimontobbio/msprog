@@ -19,9 +19,9 @@ MSprog(
   conf_tol_days = 30,
   conf_left = FALSE,
   require_sust_months = 0,
-  rel_infl_bl = 30,
-  rel_infl_event = 0,
-  rel_infl_conf = 30,
+  relapse_to_bl = 30,
+  relapse_to_event = 0,
+  relapse_to_conf = 30,
   relapse_assoc = 90,
   event = "firstprog",
   baseline = "fixed",
@@ -74,11 +74,11 @@ or list-like of length 2 (different tolerance on left and right) [default is 45]
 
 \item{require_sust_months}{Minimum number of months from confirmation for which a change must be sustained to be retained as an event [default is 0].}
 
-\item{rel_infl_bl}{Minimum distance from a relapse (days) for a visit to be used as baseline (otherwise the next available visit is used as baseline) [default is 30].}
+\item{relapse_to_bl}{Minimum distance from a relapse (days) for a visit to be used as baseline (otherwise the next available visit is used as baseline) [default is 30].}
 
-\item{rel_infl_event}{Minimum distance from a relapse (days) for an event to be considered as such [default is 0].}
+\item{relapse_to_event}{Minimum distance from a relapse (days) for an event to be considered as such [default is 0].}
 
-\item{rel_infl_conf}{Minimum distance from a relapse (days) for a visit to be a valid confirmation visit [default is 30].}
+\item{relapse_to_conf}{Minimum distance from a relapse (days) for a visit to be a valid confirmation visit [default is 30].}
 
 \item{relapse_assoc}{Maximum distance from last relapse for a progression event to be considered as RAW (days) [default is 90].}
 
