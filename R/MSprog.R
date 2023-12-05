@@ -351,16 +351,16 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
       }
       }
       #
-      if (search_idx<=nvisits) {
-      change_idx1 <- match(TRUE, data_id[search_idx:nvisits, value_col] != bl[[value_col]])
-      if (!is.na(change_idx1)) {
-        change_idx1 <- search_idx + change_idx1 - 1
-      } } else {change_idx1 = NA}
+      # if (search_idx<=nvisits) {
+      # change_idx1 <- match(TRUE, data_id[search_idx:nvisits, value_col] != bl[[value_col]])
+      # if (!is.na(change_idx1)) {
+      #   change_idx1 <- search_idx + change_idx1 - 1
+      # } } else {change_idx1 = NA}
       #
-
-      if ((is.na(change_idx) & !is.na(change_idx1)) ||
-          (is.na(change_idx1) & !is.na(change_idx)) ||
-          (!is.na(change_idx1) & !is.na(change_idx) & change_idx!=change_idx1)) {stop('uffa')}
+      # if ((is.na(change_idx) & !is.na(change_idx1)) ||
+      #     (is.na(change_idx1) & !is.na(change_idx)) ||
+      #     (!is.na(change_idx1) & !is.na(change_idx) & change_idx!=change_idx1)) {stop('uffa')}
+      #
 
 
       if (is.na(change_idx) | change_idx>nvisits) {
