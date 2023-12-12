@@ -35,9 +35,10 @@
 #' to a valid change from the provided baseline value. If none is specified [default], \code{compute_delta} for the specified outcome is used.
 #' @param conf_weeks Period before confirmation (weeks) [default is 12].
 #' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
-#' or list-like of length 2 (different tolerance on left and right) [default is 45].
+#' or list-like of length 2 (different tolerance on left and right).
+#' In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}. [default is 45]
 #' @param conf_unbounded_right If \code{TRUE}, confirmation window is unbounded on the right [default is \code{FALSE}].
-#' @param require_sust_weeks Minimum number of weeks from confirmation for which a change must be sustained to be retained as an event [default is 0].
+#' @param require_sust_weeks Minimum number of weeks for which a change must be sustained to be retained as an event [default is 0].
 #' @param relapse_to_bl Minimum distance from last relapse (days) for a visit to be used as baseline (otherwise the next available visit is used as baseline) [default is 30].
 #' @param relapse_to_event Minimum distance from last relapse (days) for an event to be considered as such [default is 0].
 #' @param relapse_to_conf Minimum distance from last relapse (days) for a visit to be a valid confirmation visit [default is 30].
@@ -60,8 +61,8 @@
 #' by specifying the intervals around baseline (\code{b0} and \code{b1}),
 #' event (\code{e0} and \code{e1}), and confirmation (\code{e0} and \code{e1}). For instance:
 #' \itemize{
-#' \item{[Muller JAMA Neurol 2023](high-specificity def)}{ No relapses between baseline and confirmation: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)} [default];}
-#' \item{[Muller JAMA Neurol 2023]}{ No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)}}
+#' \item{[Muller JAMA Neurol 2023]}{ No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)} [default];}
+#' \item{[Muller JAMA Neurol 2023](high-specificity def)}{ No relapses between baseline and confirmation: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)};}
 #' \item{[Kappos JAMA Neurol 2020]}{ No relapses within baseline->event+30dd and within confirmation+-30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
 #' }
 #' @param sub_threshold If \code{TRUE}, include confirmed sub-threshold events for roving baseline [default is \code{FALSE}].
@@ -203,7 +204,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
 
   # Define relapse-free intervals for PIRA definition
   if (is.null(relapse_indep)) {
-    relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)
+    relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)
   }
 
 
@@ -213,13 +214,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
   all_subj <- unique(data[[subj_col]])
   nsub <- length(all_subj)
   max_nevents <- round(max(table(data[[subj_col]]))/2)
-  results <- data.frame(matrix(nrow = nsub * max_nevents, ncol = 9 + length(conf_weeks) + (length(conf_weeks)-1) + 2))
+  results <- data.frame(matrix(nrow = nsub * max_nevents, ncol = 9 + length(conf_weeks)*2 + 2)) #length(conf_weeks) + (length(conf_weeks)-1)
   allcol <- c(subj_col, 'nevent', 'event_type', 'bldate', 'blvalue', 'date', 'value', 'time2event', 'bl2event',
-             paste0('conf', conf_weeks), 'sust_days', 'sust_last')
-  if (length(conf_weeks)>1) {
-    allcol <- c(allcol[1:(9+length(conf_weeks))],  paste0('PIRA_conf',
-                      conf_weeks[2:length(conf_weeks)]), 'sust_days', 'sust_last')
-    }
+             paste0('conf', conf_weeks), paste0('PIRA_conf', conf_weeks), 'sust_days', 'sust_last')
+  # if (length(conf_weeks)>1) {
+  #   allcol <- c(allcol[1:(9+length(conf_weeks))],  paste0('PIRA_conf',
+  #                     conf_weeks[2:length(conf_weeks)]), 'sust_days', 'sust_last')
+  #   }
   colnames(results) <- allcol
   results[[subj_col]] <- rep(all_subj, each = max_nevents)
   results$nevent <- rep(1:max_nevents, times = nsub)
@@ -299,8 +300,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     conf <- pira_conf <- list()
     for (m in conf_weeks) {
       conf[[as.character(m)]] <- vector()
-      if (m!=conf_weeks[1]) {pira_conf[[as.character(m)]] <- vector()}
-    }
+      # if (m!=conf_weeks[1]) {
+        pira_conf[[as.character(m)]] <- vector()}
+    # }
 
     bl_idx <- 1
     search_idx <- 2
@@ -433,7 +435,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
           valid_impr <- 1
           if (require_sust_weeks) {
             valid_impr <- is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]]
-                                 - data_id[conf_idx[[length(conf_idx)]], date_col]) > require_sust_weeks * 7
+                                 - data_id[change_idx, date_col]) > require_sust_weeks * 7
           }
           if (valid_impr) {
             sust_idx <- ifelse(is.na(next_nonsust), nvisits, next_nonsust - 1)
@@ -447,9 +449,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
             time2event <- c(time2event, data_id[change_idx,][[date_col]] - data_id[1,][[date_col]])
             for (m in conf_weeks) {
               conf[[as.character(m)]] <- c(conf[[as.character(m)]], as.integer(m %in% conf_t))
-              if (m!=conf_weeks[1]) {pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], NA)}
-            }
-            sustd <- c(sustd, data_id[sust_idx,][[date_col]] - data_id[conf_idx[[length(conf_idx)]],][[date_col]])
+              # if (m!=conf_weeks[1]) {
+                pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], NA)}
+            # }
+            sustd <- c(sustd, data_id[sust_idx,][[date_col]] - data_id[change_idx,][[date_col]])
             sustl <- c(sustl, as.integer(sust_idx == nvisits))
 
             if (baseline == "roving") {
@@ -543,7 +546,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                 valid_prog <- 1
                 if (require_sust_weeks) {
                   valid_prog <- is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
-                                data_id[conf_idx[[length(conf_idx)]],][[date_col]]) > require_sust_weeks * 7
+                                data_id[change_idx,][[date_col]]) > require_sust_weeks * 7
                 }
 
                 if (valid_prog) {
@@ -604,10 +607,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                     #             | ((data_id[ic,][[date_col]]-rel_infl<=relapse_dates) & (relapse_dates<=data_id[ic,][[date_col]]+rel_infl))),
                     #             FALSE))
                     # }
-                    if (any(rel_inbetween)) {
-                      if (min(which(rel_inbetween))>1) {
-                      pconf_idx <- conf_idx[1:(min(which(rel_inbetween)) - 1)] } else {pconf_idx = list()}
-                    } else {pconf_idx = conf_idx}
+
+                    pconf_idx <- conf_idx[!rel_inbetween]
+                    # if (any(rel_inbetween)) {
+                    #   if (min(which(rel_inbetween))>1) {
+                    #   pconf_idx <- conf_idx[1:(min(which(rel_inbetween)) - 1)] } else {pconf_idx = list()}
+                    # } else {pconf_idx = conf_idx}
 
                     if (length(pconf_idx) > 0
                       && data_id[pconf_idx[[length(pconf_idx)]], 'closest_rel_plus'] < relapse_to_conf) {
@@ -617,9 +622,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
 
                     if (length(pconf_idx) > 0) {
                       for (m in conf_weeks) {
-                        if (m!=conf_weeks[1]) {
+                        # if (m!=conf_weeks[1]) {
                         pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], as.integer(m %in% pconf_t))}
-                      }
+                      # }
                       event_type <- c(event_type, 'PIRA')
                       event_index <- c(event_index, change_idx)
                     } else if (phase == 0) {
@@ -630,8 +635,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
 
                   if (phase==0 & event_type[length(event_type)] != 'PIRA') {
                     for (m in conf_weeks) {
-                      if (m!=conf_weeks[1]) {pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], NA)}
-                    }
+                      # if (m!=conf_weeks[1]) {
+                        pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], NA)}
+                    # }
                   }
 
                   if (event_type[length(event_type)] == 'PIRA' || phase == 0) {
@@ -644,8 +650,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                     for (m in conf_weeks) {
                       conf[[as.character(m)]] <- c(conf[[as.character(m)]], as.integer(m %in% conf_t))
                     }
-                    sustd <- c(sustd, data_id[sust_idx,][[date_col]]
-                                              - data_id[conf_idx[[length(conf_idx)]],][[date_col]])
+                    sustd <- c(sustd, data_id[sust_idx,][[date_col]] - data_id[change_idx,][[date_col]])
                     sustl <- c(sustl, as.integer(sust_idx == nvisits))
 
                     if (verbose == 2) {
@@ -839,9 +844,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     results[results[[subj_col]] == subjid, "sust_days"] <- sustd[event_order]
     results[results[[subj_col]] == subjid, "sust_last"] <- sustl[event_order]
     for (m in conf_weeks) {
-      if (m!=conf_weeks[1]) {
+      # if (m!=conf_weeks[1]) {
       results[results[[subj_col]] == subjid, paste0("PIRA_conf", m)] <- pira_conf[[as.character(m)]][event_order]}
-      }
+      # }
     }
   } else if (include_stable) {
     results <- results[-subj_index[2:length(subj_index)], ]

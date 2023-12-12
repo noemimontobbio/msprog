@@ -45,7 +45,7 @@ devtools::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
 
 ## Usage
 
-`MSprog` detects the events sequentially by scanning the outcome values in chronological order, and classifies progression events as relapse-associated or relapse-independent based on their relative timing with respect to the relapses [@lublin2014; @kappos2018; @silent]. 
+`MSprog` detects the events sequentially by scanning the outcome values in chronological order, and classifies progression events as relapse-associated or relapse-independent based on their relative timing with respect to the relapses [@lublin2014; @kappos2018; @silent].
 
 Several qualitative and quantitative options for event detection are given as arguments that can be set by the user and reported as a complement to the results to ensure reproducibility. These include the baseline scheme (fixed or roving), the events to be detected (first or multiple, progression and/or improvement), the length of the relapse influence window and of the event confirmation period(s) with the relative tolerance.
 

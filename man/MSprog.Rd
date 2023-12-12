@@ -68,11 +68,12 @@ to a valid change from the provided baseline value. If none is specified [defaul
 \item{conf_weeks}{Period before confirmation (weeks) [default is 12].}
 
 \item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
-or list-like of length 2 (different tolerance on left and right) [default is 45].}
+or list-like of length 2 (different tolerance on left and right).
+In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}. [default is 45]}
 
 \item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right [default is \code{FALSE}].}
 
-\item{require_sust_weeks}{Minimum number of weeks from confirmation for which a change must be sustained to be retained as an event [default is 0].}
+\item{require_sust_weeks}{Minimum number of weeks for which a change must be sustained to be retained as an event [default is 0].}
 
 \item{relapse_to_bl}{Minimum distance from last relapse (days) for a visit to be used as baseline (otherwise the next available visit is used as baseline) [default is 30].}
 
@@ -102,8 +103,8 @@ Must be given in the form produced by function \code{relapse_indep_from_bounds},
 by specifying the intervals around baseline (\code{b0} and \code{b1}),
 event (\code{e0} and \code{e1}), and confirmation (\code{e0} and \code{e1}). For instance:
 \itemize{
-\item{[Muller JAMA Neurol 2023](high-specificity def)}{ No relapses between baseline and confirmation: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)} [default];}
-\item{[Muller JAMA Neurol 2023]}{ No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)}}
+\item{[Muller JAMA Neurol 2023]}{ No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)} [default];}
+\item{[Muller JAMA Neurol 2023](high-specificity def)}{ No relapses between baseline and confirmation: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)};}
 \item{[Kappos JAMA Neurol 2020]}{ No relapses within baseline->event+30dd and within confirmation+-30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
 }}
 
