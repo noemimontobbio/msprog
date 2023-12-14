@@ -49,6 +49,8 @@
 #' \item{\code{'first'}}{ (only the very first event - improvement or progression);}
 #' \item{\code{'firsteach'}}{ (first improvement and first progression);}
 #' \item{\code{'firstprogtype'}}{ (first progression of each kind - PIRA, RAW, undefined);}
+#' \item{\code{'firstPIRA'}}{ (first PIRA);}
+#' \item{\code{'firstRAW'}}{ (first RAW);}
 #' \item{\code{'multiple'}}{ (all events).}
 #' }
 #' @param baseline Specifies the baseline scheme. Must be one of the following:
@@ -57,9 +59,9 @@
 #' \item{\code{'roving'}}{ (updated after each event to last confirmed outcome value out of relapse influence).}
 #' }
 #' @param relapse_indep Specifies relapse-free intervals for PIRA definition.
-#' Must be given in the form produced by function \code{relapse_indep_from_bounds},
+#' Must be given in the form produced by function \code{relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1)},
 #' by specifying the intervals around baseline (\code{b0} and \code{b1}),
-#' event (\code{e0} and \code{e1}), and confirmation (\code{e0} and \code{e1}). For instance:
+#' event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For instance:
 #' \itemize{
 #' \item{[Muller JAMA Neurol 2023]}{ No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)} [default];}
 #' \item{[Muller JAMA Neurol 2023](high-specificity def)}{ No relapses between baseline and confirmation: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)};}
@@ -406,7 +408,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
             data_id[change_idx,][[value_col]] - bl[[value_col]] <= - delta(bl[[value_col]]) &&
             all(sapply((change_idx + 1):conf_idx[[1]], function(x) data_id[x,][[value_col]] - bl[[value_col]]
                        <= -delta(bl[[value_col]]))) &&
-            phase == 0) {
+            phase == 0 &&
+            !((event %in% c('firstprog', 'firstprogtype', 'firstPIRA', 'firstRAW')) && baseline=='fixed')
+            ) {
           if (conf_idx[[1]]==nvisits) {next_change <- NA} else {
           next_change <- which(data_id[(conf_idx[[1]] + 1):nvisits, value_col] - bl[[value_col]]
                                > -delta(bl[[value_col]]))[1] + conf_idx[[1]]
@@ -553,9 +557,18 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                   sust_idx <- ifelse(is.na(next_nonsust), nvisits, next_nonsust - 1)
 
                   if (phase == 0 && data_id[change_idx,][['closest_rel_minus']] <= relapse_assoc) { # event is relapse-associated
+                    if (event=='firstPIRA' & baseline=='fixed') {
+                      search_idx <- change_idx + 1 # skip this event if only searching for PIRA with a fixed baseline
+                      next
+                    }
                     event_type <- c(event_type, 'RAW')
                     event_index <- c(event_index, change_idx)
-                  } else if (data_id[change_idx,][['closest_rel_minus']] > relapse_assoc) { # # event is not relapse-associated
+                  } else if (data_id[change_idx,][['closest_rel_minus']] > relapse_assoc) { # event is not relapse-associated
+                    if (event=='firstRAW' & baseline=='fixed') {
+                      search_idx <- change_idx + 1 # skip this event if only searching for RAW with a fixed baseline
+                      next
+                    }
+
                     # rel_inbetween <- sapply(conf_idx,
                     #           function(ic) any(is_rel[date_dict[[as.character(bl_idx)]]:date_dict[[as.character(ic)]]]))
 
@@ -726,7 +739,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
         if (proceed && ((event == "first" && length(event_type) > 1) ||
                         (event == "firsteach" && ("impr" %in% event_type) && ("prog" %in% event_type)) ||
                         (event == "firstprog" && (("RAW" %in% event_type) || ("PIRA" %in% event_type) || ("prog" %in% event_type))) ||
-                        (event == "firstprogtype" && ("RAW" %in% event_type) && ("PIRA" %in% event_type) && ("prog" %in% event_type)))) {
+                        (event == "firstprogtype" && ("RAW" %in% event_type) && ("PIRA" %in% event_type) && ("prog" %in% event_type)) ||
+                        (event == "firstPIRA" && ("PIRA" %in% event_type)) ||
+                        (event == "firstRAW" && ("RAW" %in% event_type)))
+            ) {
                           proceed <- 0
                           if (verbose == 2) {
                             message("First events already found: end process")
@@ -808,6 +824,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
         first_events <- c(prog_idx)
       } else if (event == "firstprogtype") {
         first_events <- c(raw_idx, pira_idx, undef_prog_idx)
+      } else if (event == "firstPIRA") {
+        first_events <- pira_idx
+      } else if (event == "firstRAW") {
+        first_events <- raw_idx
       }
 
       if (event=='first') {first_events <- 1} else {first_events <- unique(na.omit(first_events))}
@@ -897,7 +917,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
           message("\n---\nTotal subjects: ", nsub,
               "\n---\nProgressed subjects: ", sum(summary$progression > 0), " (PIRA: ", sum(summary$PIRA > 0),
               "; RAW: ", sum(summary$RAW > 0), ")")
-          if (!startsWith(event, "firstprog")) {
+          if (!(event %in% c('firstprog', 'firstprogtype', 'firstPIRA', 'firstRAW'))) {
           message("Improved subjects: ", sum(summary$improvement > 0))
           }
           if (event %in% c('multiple', 'firstprogtype')) {

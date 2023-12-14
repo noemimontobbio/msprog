@@ -45,7 +45,7 @@ devtools::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
 
 ## Usage
 
-`MSprog` detects the events sequentially by scanning the outcome values in chronological order, and classifies progression events as relapse-associated or relapse-independent based on their relative timing with respect to the relapses [@lublin2014; @kappos2018; @silent].
+`MSprog` detects the events sequentially by scanning the outcome values in chronological order, and classifies progression events as relapse-associated or relapse-independent based on their relative timing with respect to the relapses [@lublin2014; @kappos2018; @silent2019].
 
 Several qualitative and quantitative options for event detection are given as arguments that can be set by the user and reported as a complement to the results to ensure reproducibility. These include the baseline scheme (fixed or roving), the events to be detected (first or multiple, progression and/or improvement), the length of the relapse influence window and of the event confirmation period(s) with the relative tolerance.
 
@@ -79,7 +79,7 @@ print(summary)
 results = output[[2]]
 print(results, row.names = FALSE)
 ```
-    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed at 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
+    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed at 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit. 
 
 <br />
 

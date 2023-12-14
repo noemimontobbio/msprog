@@ -44,7 +44,8 @@ devtools::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
 `MSprog` detects the events sequentially by scanning the outcome values
 in chronological order, and classifies progression events as
 relapse-associated or relapse-independent based on their relative timing
-with respect to the relapses \[[1](#ref-lublin2014)–[3](#ref-silent)\].
+with respect to the relapses
+\[[1](#ref-lublin2014)–[3](#ref-silent2019)\].
 
 Several qualitative and quantitative options for event detection are
 given as arguments that can be set by the user and reported as a
@@ -171,7 +172,7 @@ a prospective cohort study. Multiple Sclerosis Journal \[Internet\].
 
 </div>
 
-<div id="ref-silent" class="csl-entry">
+<div id="ref-silent2019" class="csl-entry">
 
 3\. University of California SFM-ET, Cree BAC, Hollenbach JA, Bove R,
 Kirkish G, Sacco S, et al. Silent progression in disease activity–free

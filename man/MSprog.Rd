@@ -89,6 +89,8 @@ In all cases, the right end of the interval is ignored if \code{conf_unbounded_r
 \item{\code{'first'}}{ (only the very first event - improvement or progression);}
 \item{\code{'firsteach'}}{ (first improvement and first progression);}
 \item{\code{'firstprogtype'}}{ (first progression of each kind - PIRA, RAW, undefined);}
+\item{\code{'firstPIRA'}}{ (first PIRA);}
+\item{\code{'firstRAW'}}{ (first RAW);}
 \item{\code{'multiple'}}{ (all events).}
 }}
 
@@ -99,9 +101,9 @@ In all cases, the right end of the interval is ignored if \code{conf_unbounded_r
 }}
 
 \item{relapse_indep}{Specifies relapse-free intervals for PIRA definition.
-Must be given in the form produced by function \code{relapse_indep_from_bounds},
+Must be given in the form produced by function \code{relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1)},
 by specifying the intervals around baseline (\code{b0} and \code{b1}),
-event (\code{e0} and \code{e1}), and confirmation (\code{e0} and \code{e1}). For instance:
+event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For instance:
 \itemize{
 \item{[Muller JAMA Neurol 2023]}{ No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)} [default];}
 \item{[Muller JAMA Neurol 2023](high-specificity def)}{ No relapses between baseline and confirmation: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)};}
