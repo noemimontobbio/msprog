@@ -74,7 +74,7 @@ head(toydata_relapses)
 
 <br />
 
-The following code detects, for each subject in the toy dataset, the first EDSS PIRA event (`event=firstPIRA`) confirmed at $\geq$ 12 or $\geq$ 24 weeks (`conf_weeks=c(12,24)`, `conf_tol_days=0`, `conf_unbounded_right=TRUE`), for two different definitions of PIRA.
+The following code detects, for each subject in the toy dataset, the first EDSS PIRA event (`event=firstPIRA`) confirmed at $\geq$ 12 or $\geq$ 24 weeks (`conf_weeks=c(12,24)`, `conf_tol_days=0`, `conf_unbounded_right=TRUE`), for two different definitions of PIRA. We set `verbose=2` to print an extended log of the computations performed.
 
 * Roving baseline, and absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation @muller2023:
   ```{r}
@@ -83,7 +83,7 @@ The following code detects, for each subject in the toy dataset, the first EDSS 
                  conf_weeks=c(12,24), conf_tol_days=0, conf_unbounded_right=TRUE,
                  event='firstPIRA', baseline='roving',
                  relapse_indep=relapse_indep_from_bounds(0,0,90,30,90,30),
-                 verbose=0)
+                 verbose=2)
   print(output[[2]], row.names = FALSE) # results
   ```
 
@@ -94,7 +94,7 @@ The following code detects, for each subject in the toy dataset, the first EDSS 
                  conf_weeks=c(12,24), conf_tol_days=0, conf_unbounded_right=TRUE,
                  event='firstPIRA', baseline='fixed', relapse_rebl=TRUE,
                  relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,30,30,30),
-                 verbose=0)
+                 verbose=2)
   print(output[[2]], row.names = FALSE) # results
   ```
 

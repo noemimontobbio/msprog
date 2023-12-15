@@ -472,7 +472,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                            ") confirmed at ", paste(conf_t, collapse = ", "), " weeks, sustained up to visit no.", sust_idx,
                            " (",
                       global_start + as.difftime(data_id[sust_idx,][[date_col]], units='days'), ")")
-              message("New settings: baseline at visit no.", bl_idx, ", searching for events from visit no.",
+              message("Baseline at visit no.", bl_idx, ", searching for events from visit no.",
                            ifelse(search_idx > nvisits, "-", search_idx), " on")
             }
           } else {
@@ -500,7 +500,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
         search_idx <- next_change
         if (verbose == 2) {
           message("Confirmed sub-threshold ", toupper(outcome), " improvement (visit no.", change_idx, ")")
-          message("New settings: baseline at visit no.", bl_idx, ", searching for events from visit no.",
+          message("Baseline at visit no.", bl_idx, ", searching for events from visit no.",
                        ifelse(is.na(search_idx), "-", search_idx), " on")
         }
       }
@@ -684,7 +684,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                     }
 
                     if (verbose == 2 && phase == 0) {
-                      message("New settings: baseline at visit no.", bl_idx, ", searching for events from visit no.",
+                      message("Baseline at visit no.", bl_idx, ", searching for events from visit no.",
                                    ifelse(search_idx > nvisits, "-", search_idx), " on")
                     }
                   } else {
@@ -709,7 +709,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
         search_idx <- bl_idx + 1
         if (verbose == 2) {
           message("Confirmed sub-threshold", toupper(outcome), "progression (visit no.", change_idx, ")")
-          message("New settings: baseline at visit no.", bl_idx,
+          message("Baseline at visit no.", bl_idx,
                       ", searching for events from visit no.", search_idx, " on")
         }
       }
@@ -745,7 +745,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
             ) {
                           proceed <- 0
                           if (verbose == 2) {
-                            message("First events already found: end process")
+                            message("\'", event, "\'", " events already found: end process")
                           }
                         }
 
@@ -772,7 +772,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
           if (!is.na(bl_idx)) {
             search_idx <- bl_idx + 1
             if (verbose == 2) {
-              message("New settings: baseline at visit no.", bl_idx,
+              message("[post-relapse rebaseline] Baseline at visit no.", bl_idx,
                           ", searching for events from visit no.", search_idx, " on")
             }
           }
@@ -782,6 +782,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
               message("Not enough visits after current baseline: end process")
             }
           }
+        } else if (proceed && search_idx <= nvisits && relapse_rebl && phase == 1 &&
+                   !any((data_id[bl_idx,][[date_col]]<=relapse_dates) & (relapse_dates<=data_id[search_idx,][[date_col]])) # if search_idx has been moved after another relapse
+                   && verbose==2) {
+          message("[post-relapse rebaseline] Baseline at visit no.", bl_idx,
+                  ", searching for events from visit no.", search_idx, " on")
         }
 
 
