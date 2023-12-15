@@ -5,9 +5,8 @@ Version: 0.1.0
 Authors@R: c(
     person("Noemi", "Montobbio", , "noemi.montobbio@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0302-393X")),
-    person("Francesca", "Bovis", role = c("ctb")))
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+    person("Francesca", "Bovis", role = c("rev")))
+Description: msprog provides tools for exhaustive and reproducible analysis of disability progression in multiple sclerosis (MS) from longitudinal data.
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
