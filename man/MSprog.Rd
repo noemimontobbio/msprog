@@ -133,6 +133,8 @@ with time2event = total follow up [default is \code{TRUE}].}
  \item{1}{ (print concise info) [default];}
  \item{2}{ (print extended info).}
  }}
+
+\item{devtest_conf}{[to be removed soon] Temporary test - for developer's use only.}
 }
 \value{
 Two \code{data.frame} objects:

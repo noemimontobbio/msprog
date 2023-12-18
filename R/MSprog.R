@@ -82,6 +82,7 @@
 #'  \item{1}{ (print concise info) [default];}
 #'  \item{2}{ (print extended info).}
 #'  }
+#' @param devtest_conf [to be removed soon] Temporary test - for developer's use only.
 #'
 #' @return Two \code{data.frame} objects:
 #' \itemize{
