@@ -513,8 +513,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
          data_id[change_idx,][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]) && # value increased (>delta) from baseline
 
          ((length(conf_idx) > 0 && # confirmation visits available
-           all(sapply((change_idx + 1):conf_idx[[1]],
-              function(x) data_id[x,][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]))) && # increase is confirmed at first valid date
+           # all(sapply((change_idx + 1):conf_idx[[1]],
+           #    function(x) data_id[x,][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]))) && # increase is confirmed at first valid date
+           data_id[conf_idx[[1]],][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]) && # !!!!!!!!!!!!!!!
           all(sapply((change_idx + 1):conf_idx[[1]],
               function(x) data_id[x,][[value_col]] >= min_value)) # confirmation above min_value too
           ) || (prog_last_visit && change_idx == nvisits))
@@ -551,8 +552,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
 
                 valid_prog <- 1
                 if (require_sust_weeks) {
-                  valid_prog <- is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
-                                data_id[change_idx,][[date_col]]) > require_sust_weeks * 7
+                  # valid_prog <- is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
+                  #               data_id[change_idx,][[date_col]]) > require_sust_weeks * 7
+                  valid_prog <- data_id[nvisits,][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]) # !!!!!!!!!!!!!!!!
                 }
 
                 if (valid_prog) {
