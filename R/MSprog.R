@@ -112,7 +112,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30, relapse_assoc=90,
                    event='firstprog', baseline='fixed', relapse_indep=NULL, sub_threshold=FALSE, relapse_rebl=FALSE,
                    min_value=0, prog_last_visit=FALSE, include_dates=FALSE, include_value=FALSE,
-                   include_stable=TRUE, verbose=1) {
+                   include_stable=TRUE, verbose=1,
+                   devtest_conf=FALSE # developer tests
+                   ) {
 
   # SETUP
 
@@ -513,9 +515,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
          data_id[change_idx,][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]) && # value increased (>delta) from baseline
 
          ((length(conf_idx) > 0 && # confirmation visits available
-           # all(sapply((change_idx + 1):conf_idx[[1]],
-           #    function(x) data_id[x,][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]))) && # increase is confirmed at first valid date
-           data_id[conf_idx[[1]],][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]) && # !!!!!!!!!!!!!!!
+           ifelse(devtest_conf,
+              data_id[conf_idx[[1]],][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]), # [to remove after testing] increase is confirmed at first valid date
+              all(sapply((change_idx + 1):conf_idx[[1]],
+               function(x) data_id[x,][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]])))  # increase is confirmed at (all visits up to) first valid date
+           ) &&
           all(sapply((change_idx + 1):conf_idx[[1]],
               function(x) data_id[x,][[value_col]] >= min_value)) # confirmation above min_value too
           ) || (prog_last_visit && change_idx == nvisits))
@@ -552,9 +556,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
 
                 valid_prog <- 1
                 if (require_sust_weeks) {
-                  # valid_prog <- is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
-                  #               data_id[change_idx,][[date_col]]) > require_sust_weeks * 7
-                  valid_prog <- data_id[nvisits,][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]) # !!!!!!!!!!!!!!!!
+                  valid_prog <- ifelse(devtest_conf,
+                    data_id[nvisits,][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]), # [to remove after testing] progression confirmed at last visit
+                    is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
+                                data_id[change_idx,][[date_col]]) > require_sust_weeks * 7 # progression sustained up to end of follow-up, or for `require_sust_weeks` weeks
+                  )
                 }
 
                 if (valid_prog) {
