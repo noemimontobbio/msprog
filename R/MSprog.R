@@ -21,14 +21,14 @@
 #' @param date_col Name of data column with date of visit.
 #' @param outcome Specifies the outcome type. Must be one of the following:
 #' \itemize{
-##' \item{\code{'edss'}}{ (Expanded Disability Status Scale) [default];}
+##' \item{\code{'edss'}}{ (Expanded Disability Status Scale);}
 #'  \item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
 #'  \item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
 #'  \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test);}
 #'  \item{\code{NULL}}{ (only accepted when specifying a custom \code{delta_fun})}
 #'  }
 #' @param subjects Subset of subjects (list of IDs) [default is \code{NULL}].
-#' @param relapse \code{data.frame} containing longitudinal data, including: subject ID and relapse date [default is \code{NULL}].
+#' @param relapse \code{data.frame} containing longitudinal data, including: subject ID and relapse date. [default is \code{NULL}]
 #' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].
 #' @param rdate_col Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].
 #' @param delta_fun Custom function specifying the minimum delta corresponding
@@ -36,7 +36,7 @@
 #' @param conf_weeks Period before confirmation (weeks) [default is 12].
 #' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 #' or list-like of length 2 (different tolerance on left and right).
-#' In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}. [default is 45]
+#' In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}. [default is 30]
 #' @param conf_unbounded_right If \code{TRUE}, confirmation window is unbounded on the right [default is \code{FALSE}].
 #' @param require_sust_weeks Minimum number of weeks for which a change must be sustained to be retained as an event [default is 0].
 #' @param relapse_to_bl Minimum distance from last relapse (days) for a visit to be used as baseline (otherwise the next available visit is used as baseline) [default is 30].
@@ -67,13 +67,15 @@
 #' \item{[Muller JAMA Neurol 2023](high-specificity def)}{ No relapses between baseline and confirmation: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)};}
 #' \item{[Kappos JAMA Neurol 2020]}{ No relapses within baseline->event+30dd and within confirmation+-30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
 #' }
-#' @param sub_threshold If \code{TRUE}, include confirmed sub-threshold events for roving baseline [default is \code{FALSE}].
-#' @param relapse_rebl If \code{TRUE}, search for PIRA events again with post-relapse re-baseline [default is \code{FALSE}].
+#' @param sub_threshold If \code{TRUE} - and only if \code{baseline} is \code{'roving'} - move roving baseline
+#' at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of \code{delta_fun}) [default is \code{FALSE}].
+#' @param relapse_rebl If \code{TRUE}, re-baseline after every relapse to search for PIRA events [default is \code{FALSE}].
 #' @param min_value Only consider progressions events where the outcome is >= value [default is 0].
 #' @param prog_last_visit If \code{TRUE}, include progressions occurring at last visit (i.e. with no confirmation) [default is \code{FALSE}].
 #' @param include_dates If \code{TRUE}, report dates of events [default is \code{FALSE}].
 #' @param include_value If \code{TRUE}, report value of outcome at event [default is \code{FALSE}].
-#' @param include_stable If \code{TRUE}, include subjects with no events in extended output \code{data.frame} with time2event = total follow up [default is \code{TRUE}].
+#' @param include_stable If \code{TRUE}, subjects with no events are included in extended output \code{data.frame},
+#' with time2event = total follow up [default is \code{TRUE}].
 #' @param verbose One of:
 #' \itemize{
 #'  \item{0}{ (print no info);}

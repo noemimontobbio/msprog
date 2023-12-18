@@ -47,7 +47,7 @@ MSprog(
 
 \item{outcome}{Specifies the outcome type. Must be one of the following:
 \itemize{
-\item{\code{'edss'}}{ (Expanded Disability Status Scale) [default];}
+\item{\code{'edss'}}{ (Expanded Disability Status Scale);}
  \item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
  \item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
  \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test);}
@@ -56,7 +56,7 @@ MSprog(
 
 \item{subjects}{Subset of subjects (list of IDs) [default is \code{NULL}].}
 
-\item{relapse}{\code{data.frame} containing longitudinal data, including: subject ID and relapse date [default is \code{NULL}].}
+\item{relapse}{\code{data.frame} containing longitudinal data, including: subject ID and relapse date. [default is \code{NULL}]}
 
 \item{rsubj_col}{Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].}
 
@@ -69,7 +69,7 @@ to a valid change from the provided baseline value. If none is specified [defaul
 
 \item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 or list-like of length 2 (different tolerance on left and right).
-In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}. [default is 45]}
+In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}. [default is 30]}
 
 \item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right [default is \code{FALSE}].}
 
@@ -110,9 +110,10 @@ event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For
 \item{[Kappos JAMA Neurol 2020]}{ No relapses within baseline->event+30dd and within confirmation+-30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
 }}
 
-\item{sub_threshold}{If \code{TRUE}, include confirmed sub-threshold events for roving baseline [default is \code{FALSE}].}
+\item{sub_threshold}{If \code{TRUE} - and only if \code{baseline} is \code{'roving'} - move roving baseline
+at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of \code{delta_fun}) [default is \code{FALSE}].}
 
-\item{relapse_rebl}{If \code{TRUE}, search for PIRA events again with post-relapse re-baseline [default is \code{FALSE}].}
+\item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse to search for PIRA events [default is \code{FALSE}].}
 
 \item{min_value}{Only consider progressions events where the outcome is >= value [default is 0].}
 
@@ -122,7 +123,8 @@ event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For
 
 \item{include_value}{If \code{TRUE}, report value of outcome at event [default is \code{FALSE}].}
 
-\item{include_stable}{If \code{TRUE}, include subjects with no events in extended output \code{data.frame} with time2event = total follow up [default is \code{TRUE}].}
+\item{include_stable}{If \code{TRUE}, subjects with no events are included in extended output \code{data.frame},
+with time2event = total follow up [default is \code{TRUE}].}
 
 \item{verbose}{One of:
 \itemize{
