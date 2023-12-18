@@ -33,7 +33,8 @@ MSprog(
   include_dates = FALSE,
   include_value = FALSE,
   include_stable = TRUE,
-  verbose = 1
+  verbose = 1,
+  devtest_conf = FALSE
 )
 }
 \arguments{
