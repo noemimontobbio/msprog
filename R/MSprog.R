@@ -27,7 +27,7 @@
 #'  \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test);}
 #'  \item{\code{NULL}}{ (only accepted when specifying a custom \code{delta_fun})}
 #'  }
-#' @param subjects Subset of subjects (list of IDs) [default is \code{NULL}].
+#' @param subjects Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included. [default is \code{NULL}].
 #' @param relapse \code{data.frame} containing longitudinal data, including: subject ID and relapse date. [default is \code{NULL}]
 #' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].
 #' @param rdate_col Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].
@@ -38,25 +38,28 @@
 #' or list-like of length 2 (different tolerance on left and right).
 #' In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}. [default is 30]
 #' @param conf_unbounded_right If \code{TRUE}, confirmation window is unbounded on the right [default is \code{FALSE}].
-#' @param require_sust_weeks Minimum number of weeks for which a change must be sustained to be retained as an event [default is 0].
+#' @param require_sust_weeks Minimum number of weeks for which a confirmed change must be sustained to be retained as an event [default is 0].
 #' @param relapse_to_bl Minimum distance from last relapse (days) for a visit to be used as baseline (otherwise the next available visit is used as baseline) [default is 30].
 #' @param relapse_to_event Minimum distance from last relapse (days) for an event to be considered as such [default is 0].
 #' @param relapse_to_conf Minimum distance from last relapse (days) for a visit to be a valid confirmation visit [default is 30].
-#' @param relapse_assoc Maximum distance from last relapse for a progression event to be considered as RAW (days) [default is 90].
+#' @param relapse_assoc Maximum distance from last relapse (days) for a progression event to be considered as RAW [default is 90].
 #' @param event Specifies which events to detect. Must be one of the following:
 #' \itemize{
 #' \item{\code{'firstprog'}}{ (first progression) [default];}
 #' \item{\code{'first'}}{ (only the very first event - improvement or progression);}
-#' \item{\code{'firsteach'}}{ (first improvement and first progression);}
-#' \item{\code{'firstprogtype'}}{ (first progression of each kind - PIRA, RAW, undefined);}
+#' \item{\code{'firsteach'}}{ (first improvement and first progression - in chronological order);}
+#' \item{\code{'firstprogtype'}}{ (first progression of each kind - PIRA, RAW, and undefined, in chronological order);}
 #' \item{\code{'firstPIRA'}}{ (first PIRA);}
 #' \item{\code{'firstRAW'}}{ (first RAW);}
-#' \item{\code{'multiple'}}{ (all events).}
+#' \item{\code{'multiple'}}{ (all events in chronological order).}
 #' }
 #' @param baseline Specifies the baseline scheme. Must be one of the following:
 #' \itemize{
-#' \item{\code{'fixed'}}{ (first outcome value out of relapse influence) [default];}
-#' \item{\code{'roving'}}{ (updated after each event to last confirmed outcome value out of relapse influence).}
+#' \item{\code{'fixed'}}{ (first valid outcome value) [default];}
+#' \item{\code{'roving_impr'}}{ (updated every time the value is lower than the previous measure and confirmed at the following visit;
+#' suitable for a first-progression setting to discard fluctuations around baseline);}
+#' \item{\code{'roving'}}{ (updated after each event to last valid confirmed outcome value;
+#' suitable for a multiple-event setting).}
 #' }
 #' @param relapse_indep Specifies relapse-free intervals for PIRA definition.
 #' Must be given in the form produced by function \code{relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1)},
@@ -67,7 +70,7 @@
 #' \item{[Muller JAMA Neurol 2023](high-specificity def)}{ No relapses between baseline and confirmation: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)};}
 #' \item{[Kappos JAMA Neurol 2020]}{ No relapses within baseline->event+30dd and within confirmation+-30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
 #' }
-#' @param sub_threshold If \code{TRUE} - and only if \code{baseline} is \code{'roving'} - move roving baseline
+#' @param sub_threshold If \code{TRUE} - and only if \code{baseline} is \code{'roving'} or \code{'roving_impr'} - move roving baseline
 #' at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of \code{delta_fun}) [default is \code{FALSE}].
 #' @param relapse_rebl If \code{TRUE}, re-baseline after every relapse to search for PIRA events [default is \code{FALSE}].
 #' @param min_value Only consider progressions events where the outcome is >= value [default is 0].
@@ -425,19 +428,34 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
           }
           conf_t <- conf_t[seq_along(conf_idx)]
 
-          # sustained until:
+          # # next change from last confirmation
+          # next_change <- NA
+          # if (conf_idx[[length(conf_idx)]]<nvisits) {
+          #   for (x in (conf_idx[[length(conf_idx)]] + 1):nvisits) {
+          #     if ((data_id[x,][[value_col]] - bl[[value_col]]) > -delta(bl[[value_col]]) ||
+          #         abs(data_id[x,][[value_col]] - data_id[conf_idx[[length(conf_idx)]],][[value_col]])
+          #         >= delta(data_id[conf_idx[[length(conf_idx)]],][[value_col]])) {
+          #       next_change <- x
+          #       break
+          #     }
+          #   }
+          #   next_nonsust <- which(data_id[(conf_idx[[length(conf_idx)]] + 1):nvisits, value_col]
+          #                         - bl[[value_col]] > -delta(bl[[value_col]]))[1] + conf_idx[[length(conf_idx)]]
+          # } else {next_nonsust <- NA}
+
+          # next change from first confirmation
           next_change <- NA
-          if (conf_idx[[length(conf_idx)]]<nvisits) {
-            for (x in (conf_idx[[length(conf_idx)]] + 1):nvisits) {
+          if (conf_idx[[1]]<nvisits) {
+            for (x in (conf_idx[[1]] + 1):nvisits) {
               if ((data_id[x,][[value_col]] - bl[[value_col]]) > -delta(bl[[value_col]]) ||
-                  abs(data_id[x,][[value_col]] - data_id[conf_idx[[length(conf_idx)]],][[value_col]])
-                  >= delta(data_id[conf_idx[[length(conf_idx)]],][[value_col]])) {
+                  abs(data_id[x,][[value_col]] - data_id[conf_idx[[1]],][[value_col]])
+                  >= delta(data_id[conf_idx[[1]],][[value_col]])) {
                 next_change <- x
                 break
               }
             }
-            next_nonsust <- which(data_id[(conf_idx[[length(conf_idx)]] + 1):nvisits, value_col]
-                                  - bl[[value_col]] > -delta(bl[[value_col]]))[1] + conf_idx[[length(conf_idx)]]
+            next_nonsust <- which(data_id[(conf_idx[[1]] + 1):nvisits, value_col]
+                                  - bl[[value_col]] > -delta(bl[[value_col]]))[1] + conf_idx[[1]]
           } else {next_nonsust <- NA}
 
 
@@ -464,7 +482,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
             sustd <- c(sustd, data_id[sust_idx,][[date_col]] - data_id[change_idx,][[date_col]])
             sustl <- c(sustl, as.integer(sust_idx == nvisits))
 
-            if (baseline == "roving") {
+            if (baseline %in% c('roving', 'roving_impr')) {
               bl_idx <- ifelse(is.na(next_change), nvisits, next_change - 1)
               search_idx <- bl_idx + 1
             } else {
@@ -493,14 +511,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
       # ------------------------------------------------
       else if (length(conf_idx) > 0 && # confirmation visits available
           data_id[change_idx,][[value_col]] < bl[[value_col]] && # value decreased from baseline
-          data_id[conf_idx[[1]],][[value_col]] < bl[[value_col]] && # decrease is confirmed
-          baseline == 'roving' && sub_threshold &&
+          all(sapply((change_idx + 1):conf_idx[[1]], function(x) data_id[x,][[value_col]] < bl[[value_col]])) &&  # decrease is confirmed
+          baseline %in% c('roving', 'roving_impr') && sub_threshold &&
           phase == 0) { # skip if re-checking for PIRA after post-relapse re-baseline
 
         if (conf_idx[[1]]==nvisits) {
           next_change <- NA} else {
             next_change <- which(data_id[(conf_idx[[1]] + 1):nvisits, value_col]
-                                 > bl[[value_col]])[1] + conf_idx[[1]] }
+                                 >= bl[[value_col]])[1] + conf_idx[[1]] }
         bl_idx <- ifelse(is.na(next_change), nvisits, next_change - 1) # set new baseline at last consecutive decreased value
         search_idx <- next_change
         if (verbose == 2) {
@@ -539,19 +557,39 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                  conf_t <- conf_t[seq_along(conf_idx)]
 
 
-                 # sustained until:
+                 # # next event from last confirmation
+                 # next_change <- NA
+                 # if (conf_idx[[length(conf_idx)]]<nvisits) {
+                 #   for (x in (conf_idx[[length(conf_idx)]] + 1):nvisits) {
+                 #     if (data_id[x,][[value_col]] - bl[[value_col]] < delta(bl[[value_col]]) || # either not sustained
+                 #         abs(data_id[x,][[value_col]] - data_id[conf_idx[[length(conf_idx)]],][[value_col]])
+                 #         >= delta(data_id[conf_idx[[length(conf_idx)]],][[value_col]])) {  # or further change from *last* confirmation
+                 #       next_change <- x
+                 #       break
+                 #     }
+                 #   }
+                 #  next_nonsust <- which(data_id[(conf_idx[[length(conf_idx)]] + 1):nvisits, value_col]
+                 #                   - bl[[value_col]] < delta(bl[[value_col]]))[1] + conf_idx[[length(conf_idx)]]
+                 # } else {next_nonsust <- NA}
+
+                 # next...
                  next_change <- NA
-                 if (conf_idx[[length(conf_idx)]]<nvisits) {
-                   for (x in (conf_idx[[length(conf_idx)]] + 1):nvisits) {
-                     if (data_id[x,][[value_col]] - bl[[value_col]] < delta(bl[[value_col]]) ||
-                         abs(data_id[x,][[value_col]] - data_id[conf_idx[[length(conf_idx)]],][[value_col]])
-                         >= delta(data_id[conf_idx[[length(conf_idx)]],][[value_col]])) {
+                 if (conf_idx[[1]]<nvisits) {
+                   # ...valid change from first confirmation visit:
+                   for (x in (conf_idx[[1]] + 1):nvisits) {
+                     if (data_id[x,][[value_col]] - bl[[value_col]] < delta(bl[[value_col]]) || # either not sustained
+                         abs(data_id[x,][[value_col]] - data_id[conf_idx[[1]],][[value_col]])
+                         >= delta(data_id[conf_idx[[1]],][[value_col]])) {  # or further change from *first* confirmation
                        next_change <- x
                        break
                      }
                    }
-                  next_nonsust <- which(data_id[(conf_idx[[length(conf_idx)]] + 1):nvisits, value_col]
-                                   - bl[[value_col]] < delta(bl[[value_col]]))[1] + conf_idx[[length(conf_idx)]]
+                   # ...valid change from event:
+                   next_change_ev <- which(abs(data_id[(change_idx + 1):nvisits, value_col]
+                                         - bl[[value_col]]) >= delta(bl[[value_col]]))[1] + change_idx
+                   # ...non-sustained value:
+                   next_nonsust <- which(data_id[(conf_idx[[1]] + 1):nvisits, value_col]
+                                         - bl[[value_col]] < delta(bl[[value_col]]))[1] + conf_idx[[1]]
                  } else {next_nonsust <- NA}
 
 
@@ -686,13 +724,16 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                     }
                   }
 
-                    if ((baseline == 'roving' && phase == 0) # || (event_type[length(event_type)] == 'PIRA' && phase == 1)
+                    if ((baseline == 'roving' && phase == 0)
                         ) {
                       bl_idx <- ifelse(is.na(next_change), nvisits, next_change - 1) # set new baseline at last confirmation time
                       search_idx <- bl_idx + 1
+                    } else if ((event_type[length(event_type)]!='PIRA' & event=='firstPIRA') ||
+                               (event_type[length(event_type)]!='RAW' & event=='firstRAW')) {
+                      search_idx <- ifelse(is.na(next_change_ev), nvisits, next_change_ev)
                     } else {
-                      search_idx <- ifelse(is.na(next_change), nvisits, next_change) # next_nonsust
-                    }
+                      search_idx <- ifelse(is.na(next_change), nvisits, next_change)
+                      }
 
                     if (verbose == 2 && phase == 0) {
                       message("Baseline at visit no.", bl_idx, ", searching for events from visit no.",
@@ -709,13 +750,15 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
 
        # Confirmed sub-threshold progression: RE-BASELINE
        # ------------------------------------------------
-      else if (length(conf_idx) > 0 && data_id[change_idx,][[value_col]] > bl[[value_col]]
-               && data_id[conf_idx[[1]],][[value_col]] > bl[[value_col]] && baseline == "roving"
+      else if (length(conf_idx) > 0
+               && data_id[change_idx,][[value_col]] > bl[[value_col]]
+               && all(sapply((change_idx + 1):conf_idx[[1]], function(x) data_id[x,][[value_col]] > bl[[value_col]]))
+               && baseline == 'roving'
                && sub_threshold && phase == 0) {
         if (conf_idx[[1]]==nvisits) {
           next_change <- NA} else {
         next_change <- which(data_id[(conf_idx[[1]] + 1):nvisits, value_col]
-                             < bl[[value_col]])[1] + conf_idx[[1]] }
+                             <= bl[[value_col]])[1] + conf_idx[[1]] }
         bl_idx <- ifelse(is.na(next_change), nvisits, next_change - 1)
         search_idx <- bl_idx + 1
         if (verbose == 2) {

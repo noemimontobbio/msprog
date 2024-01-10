@@ -55,7 +55,7 @@ MSprog(
  \item{\code{NULL}}{ (only accepted when specifying a custom \code{delta_fun})}
  }}
 
-\item{subjects}{Subset of subjects (list of IDs) [default is \code{NULL}].}
+\item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included. [default is \code{NULL}].}
 
 \item{relapse}{\code{data.frame} containing longitudinal data, including: subject ID and relapse date. [default is \code{NULL}]}
 
@@ -74,7 +74,7 @@ In all cases, the right end of the interval is ignored if \code{conf_unbounded_r
 
 \item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right [default is \code{FALSE}].}
 
-\item{require_sust_weeks}{Minimum number of weeks for which a change must be sustained to be retained as an event [default is 0].}
+\item{require_sust_weeks}{Minimum number of weeks for which a confirmed change must be sustained to be retained as an event [default is 0].}
 
 \item{relapse_to_bl}{Minimum distance from last relapse (days) for a visit to be used as baseline (otherwise the next available visit is used as baseline) [default is 30].}
 
@@ -82,23 +82,26 @@ In all cases, the right end of the interval is ignored if \code{conf_unbounded_r
 
 \item{relapse_to_conf}{Minimum distance from last relapse (days) for a visit to be a valid confirmation visit [default is 30].}
 
-\item{relapse_assoc}{Maximum distance from last relapse for a progression event to be considered as RAW (days) [default is 90].}
+\item{relapse_assoc}{Maximum distance from last relapse (days) for a progression event to be considered as RAW [default is 90].}
 
 \item{event}{Specifies which events to detect. Must be one of the following:
 \itemize{
 \item{\code{'firstprog'}}{ (first progression) [default];}
 \item{\code{'first'}}{ (only the very first event - improvement or progression);}
-\item{\code{'firsteach'}}{ (first improvement and first progression);}
-\item{\code{'firstprogtype'}}{ (first progression of each kind - PIRA, RAW, undefined);}
+\item{\code{'firsteach'}}{ (first improvement and first progression - in chronological order);}
+\item{\code{'firstprogtype'}}{ (first progression of each kind - PIRA, RAW, and undefined, in chronological order);}
 \item{\code{'firstPIRA'}}{ (first PIRA);}
 \item{\code{'firstRAW'}}{ (first RAW);}
-\item{\code{'multiple'}}{ (all events).}
+\item{\code{'multiple'}}{ (all events in chronological order).}
 }}
 
 \item{baseline}{Specifies the baseline scheme. Must be one of the following:
 \itemize{
-\item{\code{'fixed'}}{ (first outcome value out of relapse influence) [default];}
-\item{\code{'roving'}}{ (updated after each event to last confirmed outcome value out of relapse influence).}
+\item{\code{'fixed'}}{ (first valid outcome value) [default];}
+\item{\code{'roving_impr'}}{ (updated every time the value is lower than the previous measure and confirmed at the following visit;
+suitable for a first-progression setting to discard fluctuations around baseline);}
+\item{\code{'roving'}}{ (updated after each event to last valid confirmed outcome value;
+suitable for a multiple-event setting).}
 }}
 
 \item{relapse_indep}{Specifies relapse-free intervals for PIRA definition.
@@ -111,7 +114,7 @@ event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For
 \item{[Kappos JAMA Neurol 2020]}{ No relapses within baseline->event+30dd and within confirmation+-30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
 }}
 
-\item{sub_threshold}{If \code{TRUE} - and only if \code{baseline} is \code{'roving'} - move roving baseline
+\item{sub_threshold}{If \code{TRUE} - and only if \code{baseline} is \code{'roving'} or \code{'roving_impr'} - move roving baseline
 at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of \code{delta_fun}) [default is \code{FALSE}].}
 
 \item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse to search for PIRA events [default is \code{FALSE}].}

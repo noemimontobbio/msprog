@@ -25,6 +25,15 @@ This vignette illustrates how to use the `msprog` package to study the progressi
 library(msprog)
 ```
 
+<!-- ```{r} -->
+<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R') -->
+<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/compute_delta.R') -->
+<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R') -->
+<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData') -->
+<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData') -->
+<!-- library(dplyr) -->
+<!-- ``` -->
+
 ## Input data
 
 The data must be organised in a `data.frame` object containing (at least) the following columns:
@@ -130,10 +139,11 @@ and set `delta_fun=my_sdmt_delta` in `MSprog` when computing the progression.
 
 ## Baseline scheme and multiple events {#multiple}
 
-The baseline scheme can be set by using the `baseline` argument in `MSprog`. Two main baseline schemes can be adopted:
+The baseline scheme can be set by using the `baseline` argument in `MSprog`. The following alternative baseline schemes can be adopted:
 
-* Fixed baseline (`baseline='fixed'`, default): the reference value is set to be the first outcome value found outside the influence of an acute event.
-* Roving baseline (`baseline='roving'`): the reference value is initially set as the first outcome value out of relapse influence, then updated after each event to the last confirmed outcome value (out of relapse influence). **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below). The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog`: this moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$.
+* Fixed baseline (`baseline='fixed'`, default): the reference value is set to be the first valid outcome value.
+* Improvement-based roving baseline (`baseline='roving_impr'`): the reference value is initially set as the first valid outcome value, then updated after each confirmed improvement to the next valid outcome value. This scheme is suitable for a first-progression setting to discard fluctuations around the baseline [@muller2023]. The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog`: this moves the reference value after *any* confirmed improvement, even if the difference from the current reference is smaller than the minimum $\delta$.
+* Roving baseline (`baseline='roving'`): the reference value is initially set as the first valid outcome value, then updated after each event to the last confirmed outcome value (out of relapse influence). **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below). The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog`: this moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$.
 
 The argument `event` allows to specify which events to detect. By default, it is set to `firstprog` (only detect the first progression event). It can be set to `multiple` to sequentially detect all progression (or improvement) events.
 
