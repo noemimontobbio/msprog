@@ -584,13 +584,15 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                        break
                      }
                    }
-                   # ...valid change from event:
-                   next_change_ev <- which(abs(data_id[(change_idx + 1):nvisits, value_col]
-                                         - bl[[value_col]]) >= delta(bl[[value_col]]))[1] + change_idx
                    # ...non-sustained value:
                    next_nonsust <- which(data_id[(conf_idx[[1]] + 1):nvisits, value_col]
                                          - bl[[value_col]] < delta(bl[[value_col]]))[1] + conf_idx[[1]]
-                 } else {next_nonsust <- NA}
+                 } else {
+                   next_nonsust <- NA
+                 }
+                 # ...valid change from event:
+                 next_change_ev <- which(abs(data_id[(change_idx + 1):nvisits, value_col]
+                                             - bl[[value_col]]) >= delta(bl[[value_col]]))[1] + change_idx
 
 
                 valid_prog <- 1
