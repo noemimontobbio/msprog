@@ -27,22 +27,23 @@
 #'  \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test);}
 #'  \item{\code{NULL}}{ (only accepted when specifying a custom \code{delta_fun})}
 #'  }
-#' @param subjects Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included. [default is \code{NULL}].
+#' @param subjects Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included. [default is \code{NULL}]
 #' @param relapse \code{data.frame} containing longitudinal data, including: subject ID and relapse date. [default is \code{NULL}]
-#' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].
-#' @param rdate_col Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].
+#' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data. [default is \code{NULL}]
+#' @param rdate_col Name of subject ID column for relapse data, if different from outcome data. [default is \code{NULL}]
 #' @param delta_fun Custom function specifying the minimum delta corresponding
 #' to a valid change from the provided baseline value. If none is specified [default], \code{compute_delta} for the specified outcome is used.
-#' @param conf_weeks Period before confirmation (weeks) [default is 12].
+#' @param conf_weeks Period before confirmation (weeks). [default is 12]
 #' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 #' or list-like of length 2 (different tolerance on left and right).
 #' In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}. [default is 30]
-#' @param conf_unbounded_right If \code{TRUE}, confirmation window is unbounded on the right [default is \code{FALSE}].
-#' @param require_sust_weeks Minimum number of weeks for which a confirmed change must be sustained to be retained as an event [default is 0].
-#' @param relapse_to_bl Minimum distance from last relapse (days) for a visit to be used as baseline (otherwise the next available visit is used as baseline) [default is 30].
-#' @param relapse_to_event Minimum distance from last relapse (days) for an event to be considered as such [default is 0].
-#' @param relapse_to_conf Minimum distance from last relapse (days) for a visit to be a valid confirmation visit [default is 30].
-#' @param relapse_assoc Maximum distance from last relapse (days) for a progression event to be considered as RAW [default is 90].
+#' @param conf_unbounded_right If \code{TRUE}, confirmation window is unbounded on the right. [default is \code{FALSE}]
+#' @param require_sust_weeks Minimum number of weeks for which a confirmed change must be sustained to be retained as an event. [default is 0]
+#' @param relapse_to_bl Minimum distance from last relapse (days) for a visit to be used as baseline
+#' (otherwise the next available visit is used as baseline). [default is 30]
+#' @param relapse_to_event Minimum distance from last relapse (days) for an event to be considered as such. [default is 0]
+#' @param relapse_to_conf Minimum distance from last relapse (days) for a visit to be a valid confirmation visit. [default is 30]
+#' @param relapse_assoc Maximum distance from last relapse (days) for a progression event to be considered as RAW. [default is 90]
 #' @param event Specifies which events to detect. Must be one of the following:
 #' \itemize{
 #' \item{\code{'firstprog'}}{ (first progression) [default];}
@@ -71,14 +72,15 @@
 #' \item{[Kappos JAMA Neurol 2020]}{ No relapses within baseline->event+30dd and within confirmation+-30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
 #' }
 #' @param sub_threshold If \code{TRUE} - and only if \code{baseline} is \code{'roving'} or \code{'roving_impr'} - move roving baseline
-#' at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of \code{delta_fun}) [default is \code{FALSE}].
-#' @param relapse_rebl If \code{TRUE}, re-baseline after every relapse to search for PIRA events [default is \code{FALSE}].
-#' @param min_value Only consider progressions events where the outcome is >= value [default is 0].
-#' @param prog_last_visit If \code{TRUE}, include progressions occurring at last visit (i.e. with no confirmation) [default is \code{FALSE}].
-#' @param include_dates If \code{TRUE}, report dates of events [default is \code{FALSE}].
-#' @param include_value If \code{TRUE}, report value of outcome at event [default is \code{FALSE}].
+#' at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of \code{delta_fun}). [default is \code{FALSE}]
+#' @param relapse_rebl If \code{TRUE}, re-baseline after every relapse to search for PIRA events. [default is \code{FALSE}]
+#' @param min_value Only consider progressions events where the outcome is >= value. [default is 0]
+#' @param prog_last_visit If \code{TRUE}, include progressions occurring at last visit (i.e. with no confirmation).
+#' If a numeric value N is passed, unconfirmed events are includes only if occurring within N days of follow up. [default is \code{FALSE}]
+#' @param include_dates If \code{TRUE}, report dates of events. [default is \code{FALSE}]
+#' @param include_value If \code{TRUE}, report value of outcome at event. [default is \code{FALSE}]
 #' @param include_stable If \code{TRUE}, subjects with no events are included in extended output \code{data.frame},
-#' with time2event = total follow up [default is \code{TRUE}].
+#' with time2event = total follow up. [default is \code{TRUE}]
 #' @param verbose One of:
 #' \itemize{
 #'  \item{0}{ (print no info);}
@@ -185,6 +187,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     else if (outcome=='t25fw' & any(data[[value_col]]>180)) {
       warnings <- c(warnings, 'T25FW scores >180')
     }
+  }
+
+  if (prog_last_visit==T) {
+    prog_last_visit = Inf
   }
 
 
@@ -443,7 +449,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
           #                         - bl[[value_col]] > -delta(bl[[value_col]]))[1] + conf_idx[[length(conf_idx)]]
           # } else {next_nonsust <- NA}
 
-          # next change from first confirmation
+          # next change from first confirmation #_r_#
           next_change <- NA
           if (conf_idx[[1]]<nvisits) {
             for (x in (conf_idx[[1]] + 1):nvisits) {
@@ -482,7 +488,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
             sustd <- c(sustd, data_id[sust_idx,][[date_col]] - data_id[change_idx,][[date_col]])
             sustl <- c(sustl, as.integer(sust_idx == nvisits))
 
-            if (baseline %in% c('roving', 'roving_impr')) {
+            if (baseline %in% c('roving', 'roving_impr')) { #_r_#
               bl_idx <- ifelse(is.na(next_change), nvisits, next_change - 1)
               search_idx <- bl_idx + 1
             } else {
@@ -512,7 +518,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
       else if (length(conf_idx) > 0 && # confirmation visits available
           data_id[change_idx,][[value_col]] < bl[[value_col]] && # value decreased from baseline
           all(sapply((change_idx + 1):conf_idx[[1]], function(x) data_id[x,][[value_col]] < bl[[value_col]])) &&  # decrease is confirmed
-          baseline %in% c('roving', 'roving_impr') && sub_threshold &&
+          baseline %in% c('roving', 'roving_impr') #_r_#
+          && sub_threshold &&
           phase == 0) { # skip if re-checking for PIRA after post-relapse re-baseline
 
         if (conf_idx[[1]]==nvisits) {
@@ -541,7 +548,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
            ) &&
           all(sapply((change_idx + 1):conf_idx[[1]],
               function(x) data_id[x,][[value_col]] >= min_value)) # confirmation above min_value too
-          ) || (prog_last_visit && change_idx == nvisits))
+          ) || (data_id[change_idx,][[date_col]]<prog_last_visit && change_idx == nvisits))
 
          ) {
 
@@ -572,6 +579,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                  #                   - bl[[value_col]] < delta(bl[[value_col]]))[1] + conf_idx[[length(conf_idx)]]
                  # } else {next_nonsust <- NA}
 
+                 #_r_#
                  # next...
                  next_change <- NA
                  if (conf_idx[[1]]<nvisits) {
@@ -732,7 +740,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                       search_idx <- bl_idx + 1
                     } else if ((event_type[length(event_type)]!='PIRA' & event=='firstPIRA') ||
                                (event_type[length(event_type)]!='RAW' & event=='firstRAW')) {
-                      search_idx <- ifelse(is.na(next_change_ev), nvisits, next_change_ev)
+                      search_idx <- ifelse(is.na(next_change_ev), nvisits, next_change_ev) #_r_#
                     } else {
                       search_idx <- ifelse(is.na(next_change), nvisits, next_change)
                       }

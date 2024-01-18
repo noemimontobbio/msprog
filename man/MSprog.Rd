@@ -55,34 +55,35 @@ MSprog(
  \item{\code{NULL}}{ (only accepted when specifying a custom \code{delta_fun})}
  }}
 
-\item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included. [default is \code{NULL}].}
+\item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included. [default is \code{NULL}]}
 
 \item{relapse}{\code{data.frame} containing longitudinal data, including: subject ID and relapse date. [default is \code{NULL}]}
 
-\item{rsubj_col}{Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].}
+\item{rsubj_col}{Name of subject ID column for relapse data, if different from outcome data. [default is \code{NULL}]}
 
-\item{rdate_col}{Name of subject ID column for relapse data, if different from outcome data [default is \code{NULL}].}
+\item{rdate_col}{Name of subject ID column for relapse data, if different from outcome data. [default is \code{NULL}]}
 
 \item{delta_fun}{Custom function specifying the minimum delta corresponding
 to a valid change from the provided baseline value. If none is specified [default], \code{compute_delta} for the specified outcome is used.}
 
-\item{conf_weeks}{Period before confirmation (weeks) [default is 12].}
+\item{conf_weeks}{Period before confirmation (weeks). [default is 12]}
 
 \item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 or list-like of length 2 (different tolerance on left and right).
 In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}. [default is 30]}
 
-\item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right [default is \code{FALSE}].}
+\item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right. [default is \code{FALSE}]}
 
-\item{require_sust_weeks}{Minimum number of weeks for which a confirmed change must be sustained to be retained as an event [default is 0].}
+\item{require_sust_weeks}{Minimum number of weeks for which a confirmed change must be sustained to be retained as an event. [default is 0]}
 
-\item{relapse_to_bl}{Minimum distance from last relapse (days) for a visit to be used as baseline (otherwise the next available visit is used as baseline) [default is 30].}
+\item{relapse_to_bl}{Minimum distance from last relapse (days) for a visit to be used as baseline
+(otherwise the next available visit is used as baseline). [default is 30]}
 
-\item{relapse_to_event}{Minimum distance from last relapse (days) for an event to be considered as such [default is 0].}
+\item{relapse_to_event}{Minimum distance from last relapse (days) for an event to be considered as such. [default is 0]}
 
-\item{relapse_to_conf}{Minimum distance from last relapse (days) for a visit to be a valid confirmation visit [default is 30].}
+\item{relapse_to_conf}{Minimum distance from last relapse (days) for a visit to be a valid confirmation visit. [default is 30]}
 
-\item{relapse_assoc}{Maximum distance from last relapse (days) for a progression event to be considered as RAW [default is 90].}
+\item{relapse_assoc}{Maximum distance from last relapse (days) for a progression event to be considered as RAW. [default is 90]}
 
 \item{event}{Specifies which events to detect. Must be one of the following:
 \itemize{
@@ -115,20 +116,21 @@ event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For
 }}
 
 \item{sub_threshold}{If \code{TRUE} - and only if \code{baseline} is \code{'roving'} or \code{'roving_impr'} - move roving baseline
-at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of \code{delta_fun}) [default is \code{FALSE}].}
+at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of \code{delta_fun}). [default is \code{FALSE}]}
 
-\item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse to search for PIRA events [default is \code{FALSE}].}
+\item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse to search for PIRA events. [default is \code{FALSE}]}
 
-\item{min_value}{Only consider progressions events where the outcome is >= value [default is 0].}
+\item{min_value}{Only consider progressions events where the outcome is >= value. [default is 0]}
 
-\item{prog_last_visit}{If \code{TRUE}, include progressions occurring at last visit (i.e. with no confirmation) [default is \code{FALSE}].}
+\item{prog_last_visit}{If \code{TRUE}, include progressions occurring at last visit (i.e. with no confirmation).
+If a numeric value N is passed, unconfirmed events are includes only if occurring within N days of follow up. [default is \code{FALSE}]}
 
-\item{include_dates}{If \code{TRUE}, report dates of events [default is \code{FALSE}].}
+\item{include_dates}{If \code{TRUE}, report dates of events. [default is \code{FALSE}]}
 
-\item{include_value}{If \code{TRUE}, report value of outcome at event [default is \code{FALSE}].}
+\item{include_value}{If \code{TRUE}, report value of outcome at event. [default is \code{FALSE}]}
 
 \item{include_stable}{If \code{TRUE}, subjects with no events are included in extended output \code{data.frame},
-with time2event = total follow up [default is \code{TRUE}].}
+with time2event = total follow up. [default is \code{TRUE}]}
 
 \item{verbose}{One of:
 \itemize{
