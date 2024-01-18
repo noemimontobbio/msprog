@@ -123,7 +123,7 @@ at any sub-threshold confirmed event (i.e. any confirmed change in outcome measu
 \item{min_value}{Only consider progressions events where the outcome is >= value. [default is 0]}
 
 \item{prog_last_visit}{If \code{TRUE}, include progressions occurring at last visit (i.e. with no confirmation).
-If a numeric value N is passed, unconfirmed events are includes only if occurring within N days of follow up. [default is \code{FALSE}]}
+If a numeric value N is passed, unconfirmed events are includes only if occurring within N weeks of follow up. [default is \code{FALSE}]}
 
 \item{include_dates}{If \code{TRUE}, report dates of events. [default is \code{FALSE}]}
 

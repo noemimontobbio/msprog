@@ -76,7 +76,7 @@
 #' @param relapse_rebl If \code{TRUE}, re-baseline after every relapse to search for PIRA events. [default is \code{FALSE}]
 #' @param min_value Only consider progressions events where the outcome is >= value. [default is 0]
 #' @param prog_last_visit If \code{TRUE}, include progressions occurring at last visit (i.e. with no confirmation).
-#' If a numeric value N is passed, unconfirmed events are includes only if occurring within N days of follow up. [default is \code{FALSE}]
+#' If a numeric value N is passed, unconfirmed events are includes only if occurring within N weeks of follow up. [default is \code{FALSE}]
 #' @param include_dates If \code{TRUE}, report dates of events. [default is \code{FALSE}]
 #' @param include_value If \code{TRUE}, report value of outcome at event. [default is \code{FALSE}]
 #' @param include_stable If \code{TRUE}, subjects with no events are included in extended output \code{data.frame},
@@ -548,7 +548,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
            ) &&
           all(sapply((change_idx + 1):conf_idx[[1]],
               function(x) data_id[x,][[value_col]] >= min_value)) # confirmation above min_value too
-          ) || (data_id[change_idx,][[date_col]]<prog_last_visit && change_idx == nvisits))
+          ) || (data_id[change_idx,][[date_col]]<prog_last_visit*7 && change_idx == nvisits))
 
          ) {
 
