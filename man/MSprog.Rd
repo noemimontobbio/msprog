@@ -142,7 +142,7 @@ with \code{time2event} = total follow up.}
 \item{2}{ (print extended info).}
 }}
 
-\item{devtest_conf}{\link{to be removed soon} Temporary test - for developer's use only.}
+\item{devtest_conf}{(to be removed soon) Temporary test - for developer's use only.}
 }
 \value{
 An object of class \code{'MSprogOutput'}.

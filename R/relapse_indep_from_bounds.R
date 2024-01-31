@@ -17,9 +17,10 @@
 #' @return A named list to be given as argument `relapse_indep` to function [MSprog()]
 #' @export relapse_indep_from_bounds
 #' @examples
-#' # [Muller JAMA Neurol 2023](high-specificity def) No relapses between baseline and confirmation:
+#' # [Muller JAMA Neurol 2023](high-specificity definition) No relapses between baseline and confirmation:
 #' relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)
-#' # [Muller JAMA Neurol 2023] No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd:
+#' # [Muller JAMA Neurol 2023] No relapses within event-90dd->event+30dd
+#' # and within confirmation-90dd->confirmation+30dd:
 #' relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)
 #' # [Kappos JAMA Neurol 2020] No relapses within baseline->event+30dd and within confirmation+-30dd:
 #' relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)
