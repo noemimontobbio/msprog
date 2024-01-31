@@ -28,7 +28,7 @@ MSprog(
   relapse_indep = NULL,
   sub_threshold = FALSE,
   relapse_rebl = FALSE,
-  min_value = 0,
+  min_value = NULL,
   prog_last_visit = FALSE,
   include_dates = FALSE,
   include_value = FALSE,
@@ -49,45 +49,45 @@ MSprog(
 \item{outcome}{Specifies the outcome type. Must be one of the following:
 \itemize{
 \item{\code{'edss'}}{ (Expanded Disability Status Scale);}
- \item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
- \item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
- \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test);}
- \item{\code{NULL}}{ (only accepted when specifying a custom \code{delta_fun})}
- }}
+\item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
+\item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
+\item{\code{'sdmt'}}{ (Symbol Digit Modalities Test);}
+\item{\code{NULL}}{ (only accepted when specifying a custom \code{delta_fun})}
+}}
 
-\item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included. [default is \code{NULL}]}
+\item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included.}
 
-\item{relapse}{\code{data.frame} containing longitudinal data, including: subject ID and relapse date. [default is \code{NULL}]}
+\item{relapse}{\code{data.frame} containing longitudinal data, including: subject ID and relapse date.}
 
-\item{rsubj_col}{Name of subject ID column for relapse data, if different from outcome data. [default is \code{NULL}]}
+\item{rsubj_col}{Name of subject ID column for relapse data, if different from outcome data.}
 
-\item{rdate_col}{Name of subject ID column for relapse data, if different from outcome data. [default is \code{NULL}]}
+\item{rdate_col}{Name of date column for relapse data, if different from outcome data.}
 
 \item{delta_fun}{Custom function specifying the minimum delta corresponding
-to a valid change from the provided baseline value. If none is specified [default], \code{compute_delta} for the specified outcome is used.}
+to a valid change from the provided baseline value. If none is specified (default), \code{\link[=compute_delta]{compute_delta()}} for the specified outcome is used.}
 
-\item{conf_weeks}{Period before confirmation (weeks). [default is 12]}
+\item{conf_weeks}{Period before confirmation (weeks).}
 
 \item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 or list-like of length 2 (different tolerance on left and right).
-In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}. [default is 30]}
+In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}.}
 
-\item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right. [default is \code{FALSE}]}
+\item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right.}
 
-\item{require_sust_weeks}{Minimum number of weeks for which a confirmed change must be sustained to be retained as an event. [default is 0]}
+\item{require_sust_weeks}{Minimum number of weeks for which a confirmed change must be sustained to be retained as an event.}
 
 \item{relapse_to_bl}{Minimum distance from last relapse (days) for a visit to be used as baseline
-(otherwise the next available visit is used as baseline). [default is 30]}
+(otherwise the next available visit is used as baseline).}
 
-\item{relapse_to_event}{Minimum distance from last relapse (days) for an event to be considered as such. [default is 0]}
+\item{relapse_to_event}{Minimum distance from last relapse (days) for an event to be considered as such.}
 
-\item{relapse_to_conf}{Minimum distance from last relapse (days) for a visit to be a valid confirmation visit. [default is 30]}
+\item{relapse_to_conf}{Minimum distance from last relapse (days) for a visit to be a valid confirmation visit.}
 
-\item{relapse_assoc}{Maximum distance from last relapse (days) for a progression event to be considered as RAW. [default is 90]}
+\item{relapse_assoc}{Maximum distance from last relapse (days) for a progression event to be considered as RAW.}
 
 \item{event}{Specifies which events to detect. Must be one of the following:
 \itemize{
-\item{\code{'firstprog'}}{ (first progression) [default];}
+\item{\code{'firstprog'}}{ (first progression, default);}
 \item{\code{'first'}}{ (only the very first event - improvement or progression);}
 \item{\code{'firsteach'}}{ (first improvement and first progression - in chronological order);}
 \item{\code{'firstprogtype'}}{ (first progression of each kind - PIRA, RAW, and undefined, in chronological order);}
@@ -98,58 +98,57 @@ In all cases, the right end of the interval is ignored if \code{conf_unbounded_r
 
 \item{baseline}{Specifies the baseline scheme. Must be one of the following:
 \itemize{
-\item{\code{'fixed'}}{ (first valid outcome value) [default];}
+\item{\code{'fixed'}}{ (first valid outcome value, default);}
 \item{\code{'roving_impr'}}{ (updated every time the value is lower than the previous measure and confirmed at the following visit;
 suitable for a first-progression setting to discard fluctuations around baseline);}
-\item{\code{'roving'}}{ (updated after each event to last valid confirmed outcome value;
-suitable for a multiple-event setting).}
+\item{\verb{'roving'``\}\{ (updated after each event to last valid confirmed outcome value; suitable for a multiple-event setting - i.e., when }event\verb{is set to}'multiple'\verb{, }'firsteach'\verb{, or }'firstprogtype'`).}
 }}
 
 \item{relapse_indep}{Specifies relapse-free intervals for PIRA definition.
-Must be given in the form produced by function \code{relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1)},
-by specifying the intervals around baseline (\code{b0} and \code{b1}),
+Must be given in the form produced by function \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}} by calling
+\code{relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1)}
+to specify the intervals around baseline (\code{b0} and \code{b1}),
 event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For instance:
 \itemize{
-\item{[Muller JAMA Neurol 2023]}{ No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)} [default];}
-\item{[Muller JAMA Neurol 2023](high-specificity def)}{ No relapses between baseline and confirmation: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)};}
-\item{[Kappos JAMA Neurol 2020]}{ No relapses within baseline->event+30dd and within confirmation+-30dd: \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
+\item{[Muller JAMA Neurol 2023]}{ No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd:
+\cr\code{relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)} (default);}
+\item{[Muller JAMA Neurol 2023](high-specificity definition)}{ No relapses between baseline and confirmation:
+\cr\\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)};}
+\item{[Kappos JAMA Neurol 2020]}{ No relapses within baseline->event+30dd and within confirmation+-30dd:
+\cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
 }}
 
 \item{sub_threshold}{If \code{TRUE} - and only if \code{baseline} is \code{'roving'} or \code{'roving_impr'} - move roving baseline
-at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of \code{delta_fun}). [default is \code{FALSE}]}
+at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of \code{delta_fun}).}
 
-\item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse to search for PIRA events. [default is \code{FALSE}]}
+\item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse to search for PIRA events.}
 
-\item{min_value}{Only consider progressions events where the outcome is >= value. [default is 0]}
+\item{min_value}{Only consider progressions events where the outcome is >= value.}
 
 \item{prog_last_visit}{If \code{TRUE}, include progressions occurring at last visit (i.e. with no confirmation).
-If a numeric value N is passed, unconfirmed events are includes only if occurring within N weeks of follow up. [default is \code{FALSE}]}
+If a numeric value N is passed, unconfirmed events are included only if occurring within N weeks of follow up.}
 
-\item{include_dates}{If \code{TRUE}, report dates of events. [default is \code{FALSE}]}
+\item{include_dates}{If \code{TRUE}, report dates of events.}
 
-\item{include_value}{If \code{TRUE}, report value of outcome at event. [default is \code{FALSE}]}
+\item{include_value}{If \code{TRUE}, report value of outcome at event.}
 
 \item{include_stable}{If \code{TRUE}, subjects with no events are included in extended output \code{data.frame},
-with time2event = total follow up. [default is \code{TRUE}]}
+with \code{time2event} = total follow up.}
 
 \item{verbose}{One of:
 \itemize{
- \item{0}{ (print no info);}
- \item{1}{ (print concise info) [default];}
- \item{2}{ (print extended info).}
- }}
+\item{0}{ (print no info);}
+\item{1}{ (print concise info, default);}
+\item{2}{ (print extended info).}
+}}
 
-\item{devtest_conf}{[to be removed soon] Temporary test - for developer's use only.}
+\item{devtest_conf}{\link{to be removed soon} Temporary test - for developer's use only.}
 }
 \value{
-Two \code{data.frame} objects:
-\itemize{
-\item{summary of event sequence detected for each subject;}
-\item{extended info on each event for all subjects.}
-}
+An object of class \code{'MSprogOutput'}.
 }
 \description{
-\code{MSprog} detects and characterises the progression (or improvement) events of an outcome measure
+\code{MSprog()} detects and characterises the progression (or improvement) events of an outcome measure
 (EDSS, NHPT, T25FW, or SDMT) for one or more subjects, based on repeated assessments
 through time and on the dates of acute episodes.
 Several qualitative and quantitative options are given as arguments that can be set
@@ -164,18 +163,16 @@ while progression independent of relapse activity (PIRA) is established when the
 event occurs out of relapse influence, and with no relapses between baseline and confirmation.
 }
 \examples{
-data(toydata_visits)
-data(toydata_relapses)
 # EDSS progression
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
+output_edss <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
     relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
-    event='multiple', baseline='roving', verbose=2)
-summary_EDSS = output[[1]] # summary of event sequence for each subject
-results_EDSS = output[[2]] # extended info on each event for all subjects
+    event='multiple', baseline='roving', verbose=1)
+print(results(output_edss)) # extended info on each event for all subjects
+print(event_count(output_edss)) # summary of event sequence for each subject
 # SDMT progression
-output <- MSprog(toydata_visits, 'id', 'SDMT', 'date', 'sdmt',
+output_sdmt <- MSprog(toydata_visits, 'id', 'SDMT', 'date', 'sdmt',
     relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
-    event='multiple', baseline='roving', verbose=2)
-summary_SDMT <- output[[1]] # summary of event sequence for each subject
-results_SDMT <- output[[2]] # extended info on each event for all subjects
+    event='multiple', baseline='roving', verbose=1)
+print(results(output_sdmt)) # extended info on each event for all subjects
+print(event_count(output_sdmt)) # summary of event sequence for each subject
 }

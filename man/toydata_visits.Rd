@@ -7,10 +7,10 @@
 \format{
 An object of class \code{data.frame}
 \describe{
- \item{id}{Subject ID}
- \item{date}{The visit date}
- \item{EDSS}{A value between 0 and 10}
- \item{SDMT}{A value between 0 and 110}
+\item{id}{Subject ID}
+\item{date}{The visit date}
+\item{EDSS}{A value between 0 and 10}
+\item{SDMT}{A value between 0 and 110}
 }
 }
 \usage{

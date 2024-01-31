@@ -7,24 +7,24 @@
 relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1)
 }
 \arguments{
-\item{b0}{Days before baseline (\code{>=0}).}
+\item{b0}{Days before baseline (\verb{>=0}).}
 
-\item{b1}{Days after baseline (\code{>=0}), or \code{NULL}.}
+\item{b1}{Days after baseline (\verb{>=0}), or \code{NULL}.}
 
-\item{e0}{Days before event (\code{>=0}), or \code{NULL}.}
+\item{e0}{Days before event (\verb{>=0}), or \code{NULL}.}
 
-\item{e1}{Days after event (\code{>=0}), or \code{NULL}.}
+\item{e1}{Days after event (\verb{>=0}), or \code{NULL}.}
 
-\item{c0}{Days before confirmation (\code{>=0}), or \code{NULL}.}
+\item{c0}{Days before confirmation (\verb{>=0}), or \code{NULL}.}
 
-\item{c1}{Days after confirmation (\code{>=0}).}
+\item{c1}{Days after confirmation (\verb{>=0}).}
 }
 \value{
-A named list to be given as argument \code{relapse_indep} to function \code{MSprog}
+A named list to be given as argument \code{relapse_indep} to function \code{\link[=MSprog]{MSprog()}}
 }
 \description{
-\code{relapse_indep_from_bounds} organises the given interval bounds around baseline, event, and confirmation
-into a named list to be given as argument \code{relapse_indep} to function \code{MSprog}.
+\code{relapse_indep_from_bounds()} organises the given interval bounds around baseline, event, and confirmation
+into a named list to be given as argument \code{relapse_indep} to function \code{\link[=MSprog]{MSprog()}}.
 }
 \details{
 If the right end is \code{NULL}, the interval is assumed to extend up to the left end of the next interval.
@@ -33,7 +33,7 @@ If the left end is \code{NULL}, the interval is assumed to extend up to the righ
 \examples{
 # [Muller JAMA Neurol 2023](high-specificity def) No relapses between baseline and confirmation:
 relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)
-# [, ]Muller JAMA Neurol 2023] No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd:
+# [Muller JAMA Neurol 2023] No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd:
 relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)
 # [Kappos JAMA Neurol 2020] No relapses within baseline->event+30dd and within confirmation+-30dd:
 relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)

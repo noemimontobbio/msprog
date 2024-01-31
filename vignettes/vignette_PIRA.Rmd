@@ -12,10 +12,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+  collapse=TRUE,
+  comment="#>"
 )
 ```
 
@@ -27,7 +27,7 @@ library(msprog)
 
 ## Defining PIRA
 
-Recent studies [@kappos2018; @silent2019; @kuhlmann2023] have highlighted the contribution of PIRA to overall progression, generating growing interest in PIRA as a relevant endpoint. Classifying a progression event as relapse-independent requires careful observation of its relative timing with respect to relapses. Established definitions of PIRA require the absence of relapses within appropriate intervals based on the dates of the reference visit, the disability progression event, and the confirmation visit [@kappos2020; @cagol2022; @muller2023]. Such an approach is easily integrated into the `msprog::MSprog` function through its argument `relapse_indep`, allowing to specify custom relapse-free intervals. The argument must be provided in the form produced by function `msprog::relapse_indep_from_bounds`, as follows:
+Recent studies [@kappos2018; @silent2019; @kuhlmann2023] have highlighted the contribution of PIRA to overall progression, generating growing interest in PIRA as a relevant endpoint. Classifying a progression event as relapse-independent requires careful observation of its relative timing with respect to relapses. Established definitions of PIRA require the absence of relapses within appropriate intervals based on the dates of the reference visit, the disability progression event, and the confirmation visit [@kappos2020; @cagol2022; @muller2023]. Such an approach is easily integrated into the `msprog::MSprog` function through its argument `relapse_indep`, allowing to specify custom relapse-free intervals. The argument must be provided in the form produced by function `msprog::relapse_indep_from_bounds()`, as follows:
 ``` {r, eval=FALSE}
 output <- MSprog(...
                  relapse_indep=relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1),
@@ -37,30 +37,30 @@ where: `b0` and `b1` specify the interval around the baseline visit; `e0` and `e
 
 * In @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation visit for a progression event to be considered as PIRA. This translates to:
   ``` {r}
-  relapse_indep = relapse_indep_from_bounds(0,0,   # baseline
+  relapse_indep <- relapse_indep_from_bounds(0,0,   # baseline
                                             90,30, # event
                                             90,30) # confirmation
   ```
 * When a high specificity is desired, they recommend an absence of relapses in the whole period between the reference visit and the confirmation visit, which is implemented as:
   ``` {r}
-  relapse_indep = relapse_indep_from_bounds(0,NULL,    # baseline
+  relapse_indep <- relapse_indep_from_bounds(0,NULL,    # baseline
                                             NULL,NULL, # event
                                             NULL,0)    # confirmation
   ```
 * In @kappos2020, an absence of relapses was required between the reference visit and 30 days after the event, and during the 30 days before and 30 days after the confirmation visit:
   ``` {r}
-  relapse_indep = relapse_indep_from_bounds(0,NULL,  # baseline
+  relapse_indep <- relapse_indep_from_bounds(0,NULL,  # baseline
                                             NULL,30, # event
                                             30,30)   # confirmation
   ```
 * In @cagol2022, the authors required an absence of relapses during the 90 days before the progression event and between the progression event and the confirmation visit:
   ``` {r}
-  relapse_indep = relapse_indep_from_bounds(0,0,     # baseline
+  relapse_indep <- relapse_indep_from_bounds(0,0,     # baseline
                                             90,NULL, # event
                                             NULL,0)  # confirmation
   ```
 
-The requirement of relapse-free periods is often coupled with a non-fixed baseline scheme. This can be a roving baseline, where the reference value is updated after every confirmed improvement or progression event, as in @muller2023 (`baseline='roving'` in `MSprog`); or a re-baseline after the onset of each relapse, as in @kappos2020 (`relapse_rebl=TRUE` in `MSprog`).
+The requirement of relapse-free periods is often coupled with a non-fixed baseline scheme. This can be a roving baseline, where the reference value is updated after every confirmed improvement or progression event, as in @muller2023 (`baseline='roving'` in `MSprog()`); or a re-baseline after the onset of each relapse, as in @kappos2020 (`relapse_rebl=TRUE` in `MSprog()`).
 
 ## Detecting PIRA
 
@@ -84,7 +84,7 @@ The following code detects, for each subject in the toy dataset, the first EDSS 
                  event='firstPIRA', baseline='roving',
                  relapse_indep=relapse_indep_from_bounds(0,0,90,30,90,30),
                  verbose=2)
-  print(output[[2]], row.names = FALSE) # results
+  print(results(output), row.names=FALSE) # results
   ```
 
 * Post-relapse re-baseline, and absence of relapses between the reference visit and 30 days after the event, and during the 30 days before and 30 days after the confirmation @kappos2020:
@@ -95,7 +95,7 @@ The following code detects, for each subject in the toy dataset, the first EDSS 
                  event='firstPIRA', baseline='fixed', relapse_rebl=TRUE,
                  relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,30,30,30),
                  verbose=2)
-  print(output[[2]], row.names = FALSE) # results
+  print(results(output), row.names=FALSE) # results
   ```
 
 Here, `nevent` is the cumulative event count for each subject, and `event_type` characterises the event (since `event` is set to `firstPIRA`, the count is either 0 or 1 and the event type, when present, is always `PIRA`); `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf12` and `conf24` report whether the event was confirmed at 12 or 24 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.

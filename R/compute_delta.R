@@ -1,27 +1,26 @@
 
 #' Definition of progression deltas for different tests.
 #'
-#' \code{compute_delta} returns the minimum delta to be considered as a valid change
+#' `compute_delta()` returns the minimum delta to be considered as a valid change
 #' from baseline of an outcome measure (EDSS, NHPT, T25FW, or SDMT).
 #'
 #' @param baseline Outcome value at baseline.
 #' @param outcome One of: \cr
 #' \itemize{
-##' \item{\code{'edss'}}{ (Extended Disability Status Scale ) [default];}
-#'  \item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
-#'  \item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
-#'  \item{\code{'sdmt'}}{ (Symbol Digit Modalities Test).}
+##' \item{`'edss'`}{ (Extended Disability Status Scale, default);}
+#'  \item{`'nhpt'`}{ (Nine-Hole Peg Test);}
+#'  \item{`'t25fw'`}{ (Timed 25-Foot Walk);}
+#'  \item{`'sdmt'`}{ (Symbol Digit Modalities Test).}
 #'  }
-#'
 #' @return Minimum delta corresponding to valid change from the provided baseline value. Specifically:
 #' \itemize{
-#'  \item{EDSS: }{1.5 if \code{baseline==0}, 1 if \code{0<baseline<=5}, 0.5 if \code{baseline>=5.5};}
-#'  \item{NHPT and T25FW: }{20\% of \code{baseline};}
-#'  \item{SDMT: }{either 3 points or 10\% of \code{baseline}.}
+#'  \item{EDSS: }{1.5 if `baseline==0`, 1 if `0<baseline<=5`, 0.5 if `baseline>=5.5`;}
+#'  \item{NHPT and T25FW: }{20`%` of `baseline`;}
+#'  \item{SDMT: }{either 3 points or 10`%` of `baseline`.}
 #'  }
 #' @export compute_delta
 #' @examples
-#' compute_delta(4.5)
+#' compute_delta(4.5) # default outcome is 'edss'
 #' compute_delta(55, outcome='sdmt')
 compute_delta <- function(baseline, outcome='edss') {
 

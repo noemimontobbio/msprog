@@ -9,6 +9,7 @@ Authors@R: c(
 Description: msprog provides tools for exhaustive and reproducible analysis of disability progression in multiple sclerosis (MS) from longitudinal data.
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: stats, dplyr
 Depends: R (>= 3.5.0)

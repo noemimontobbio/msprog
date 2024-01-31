@@ -7,8 +7,8 @@
 \format{
 An object of class \code{data.frame}
 \describe{
- \item{id}{Subject ID}
- \item{date}{The relapse date}
+\item{id}{Subject ID}
+\item{date}{The relapse date}
 }
 }
 \usage{

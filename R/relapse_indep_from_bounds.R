@@ -1,25 +1,25 @@
 
 #' Define relapse-free intervals for PIRA definition.
 #'
-#' \code{relapse_indep_from_bounds} organises the given interval bounds around baseline, event, and confirmation
-#' into a named list to be given as argument \code{relapse_indep} to function \code{MSprog}.
+#' `relapse_indep_from_bounds()` organises the given interval bounds around baseline, event, and confirmation
+#' into a named list to be given as argument `relapse_indep` to function [MSprog()].
 #'
-#' If the right end is \code{NULL}, the interval is assumed to extend up to the left end of the next interval.
-#' If the left end is \code{NULL}, the interval is assumed to extend up to the right end of the previous interval.
+#' If the right end is `NULL`, the interval is assumed to extend up to the left end of the next interval.
+#' If the left end is `NULL`, the interval is assumed to extend up to the right end of the previous interval.
 #'
-#' @param b0 Days before baseline (\code{>=0}).
-#' @param b1 Days after baseline (\code{>=0}), or \code{NULL}.
-#' @param e0 Days before event (\code{>=0}), or \code{NULL}.
-#' @param e1 Days after event (\code{>=0}), or \code{NULL}.
-#' @param c0 Days before confirmation (\code{>=0}), or \code{NULL}.
-#' @param c1 Days after confirmation (\code{>=0}).
+#' @param b0 Days before baseline (`>=0`).
+#' @param b1 Days after baseline (`>=0`), or `NULL`.
+#' @param e0 Days before event (`>=0`), or `NULL`.
+#' @param e1 Days after event (`>=0`), or `NULL`.
+#' @param c0 Days before confirmation (`>=0`), or `NULL`.
+#' @param c1 Days after confirmation (`>=0`).
 #'
-#' @return A named list to be given as argument \code{relapse_indep} to function \code{MSprog}
+#' @return A named list to be given as argument `relapse_indep` to function [MSprog()]
 #' @export relapse_indep_from_bounds
 #' @examples
 #' # [Muller JAMA Neurol 2023](high-specificity def) No relapses between baseline and confirmation:
 #' relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)
-#' # [, ]Muller JAMA Neurol 2023] No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd:
+#' # [Muller JAMA Neurol 2023] No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd:
 #' relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)
 #' # [Kappos JAMA Neurol 2020] No relapses within baseline->event+30dd and within confirmation+-30dd:
 #' relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)
