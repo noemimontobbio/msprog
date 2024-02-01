@@ -80,7 +80,7 @@ output_sdmt <- MSprog(toydata_visits, # data on visits
 ```
 The function prints concise info (the argument `verbose` can be used to control the amount of printed info), and outputs an object of class `MSprogOutput`. The following methods are available for extracting info from the output.
 
-1. The `event_count()` method generates a `data.frame` containing the event sequence detected for each subject, and the counts for each event type:
+1. The `event_count()` method generates a `data.frame` containing the event counts for each subject, and the event sequence (where relevant):
 ```{r, indent="     "}
 print(event_count(output_edss))
 ```

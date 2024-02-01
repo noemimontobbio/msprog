@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 `msprog` provides tools for exhaustive and reproducible analysis of disability progression in multiple sclerosis (MS) from longitudinal data.
 
-Its core function, `MSprog()`, detects and characterises the progression events of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes.
+Its core function, `MSprog()`, detects and characterises the progression events of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes. 
 
 The package also provides two toy datasets for function testing:
 
