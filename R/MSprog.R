@@ -125,12 +125,6 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
 
   warnings <- list()
 
-  if (is.null(min_value)) {
-    min_value_ifany <- min(data[[value_col]]) - 1
-  } else {
-    min_value_ifany <- min_value
-  }
-
   if (length(conf_tol_days)==1) {
     conf_tol_days <- c(conf_tol_days, conf_tol_days)
   }
@@ -193,6 +187,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     else if (outcome=='t25fw' & any(data[[value_col]]>180)) {
       warnings <- c(warnings, 'T25FW scores >180')
     }
+  }
+
+  if (is.null(min_value)) {
+    min_value_ifany <- min(data[[value_col]]) - 1
+  } else {
+    min_value_ifany <- min_value
   }
 
   if (prog_last_visit==T) {
