@@ -80,7 +80,7 @@ output_sdmt <- MSprog(toydata_visits, # data on visits
 ```
 The function prints concise info (the argument `verbose` can be used to control the amount of printed info), and outputs an object of class `MSprogOutput`. The following methods are available for extracting info from the output.
 
-1. The `event_count()` method generates a `data.frame` containing the event counts for each subject, and the event sequence (where relevant):
+1. The `event_count` method generates a `data.frame` containing the event counts for each subject, and the event sequence (where relevant):
 ```{r, indent="     "}
 print(event_count(output_edss))
 ```
@@ -90,7 +90,7 @@ print(event_count(output_edss))
 ```{r, indent="     "}
 print(results(output_edss), row.names=FALSE)
 ```
-    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from start of follow-up to event[^2]; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed at 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
+    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^2]; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed at 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
 3. The `criteria_text` method prints out a short paragraph describing the complete set of criteria used to obtain the output, to be reported to ensure complete reproducibility:
 ```{r, indent="     "}

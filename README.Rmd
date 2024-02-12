@@ -33,6 +33,8 @@ The package also provides two toy datasets for function testing:
 
 Please refer to the documentation for function usage (e.g. `?MSprog`) and data structure (e.g. `?toydata_visits`). A detailed tutorial is available as a package vignette: ***Computing MS progression from longitudinal data***.
 
+The package can be run locally on any computer with R version $\geq$ 3.5.0 (see installation instructions below), or online via a [web application](https://msprog.shinyapps.io/msprog/) with a user-friendly graphical interface.
+
 
 ## Installation
 

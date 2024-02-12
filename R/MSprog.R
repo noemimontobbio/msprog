@@ -242,11 +242,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
   all_subj <- unique(data[[subj_col]])
   nsub <- length(all_subj)
   max_nevents <- round(max(table(data[[subj_col]]))/2)
-  results_df <- data.frame(matrix(nrow=nsub*max_nevents, ncol=9+length(conf_weeks)*2+2)) #length(conf_weeks) + (length(conf_weeks)-1)
-  allcol <- c(subj_col, 'nevent', 'event_type', 'bldate', 'blvalue', 'date', 'value', 'time2event', 'bl2event',
-             paste0('conf', conf_weeks), paste0('PIRA_conf', conf_weeks), 'sust_days', 'sust_last')
+  results_df <- data.frame(matrix(nrow=nsub*max_nevents, ncol=10+length(conf_weeks)*2+2)) #length(conf_weeks) + (length(conf_weeks)-1)
+  allcol <- c(subj_col, 'nevent', 'event_type', 'bldate', 'blvalue', 'date', 'value', 'total_fu', 'time2event',
+              'bl2event', paste0('conf', conf_weeks), paste0('PIRA_conf', conf_weeks), 'sust_days', 'sust_last')
   # if (length(conf_weeks)>1) {
-  #   allcol <- c(allcol[1:(9+length(conf_weeks))],  paste0('PIRA_conf',
+  #   allcol <- c(allcol[1:(10+length(conf_weeks))],  paste0('PIRA_conf',
   #                     conf_weeks[2:length(conf_weeks)]), 'sust_days', 'sust_last')
   #   }
   colnames(results_df) <- allcol
@@ -922,6 +922,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
       results_df <- results_df[-subj_index[2:length(subj_index)], ]
       rownames(results_df) <- NULL # reset column names
       results_df[results_df[[subj_col]]==subjid, 'nevent'] <- 0
+      results_df[results_df[[subj_col]]==subjid, 'total_fu'] <- total_fu[subjid]
       results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
       results_df[results_df[[subj_col]] == subjid, 'date'] <- global_start + as.difftime(data_id[nvisits,][[date_col]], units='days')
       results_df[results_df[[subj_col]]==subjid, 'event_type'] <- ''
@@ -938,6 +939,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     results_df[results_df[[subj_col]] == subjid, "blvalue"] <- blvalue[event_order]
     results_df[results_df[[subj_col]] == subjid, "date"] <- edate[event_order]
     results_df[results_df[[subj_col]] == subjid, "value"] <- evalue[event_order]
+    results_df[results_df[[subj_col]] == subjid, 'total_fu'] <- total_fu[subjid]
     results_df[results_df[[subj_col]] == subjid, "time2event"] <- time2event[event_order]
     results_df[results_df[[subj_col]] == subjid, "bl2event"] <- bl2event[event_order]
     for (m in conf_weeks) {
@@ -954,6 +956,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     results_df <- results_df[-subj_index[2:length(subj_index)], ]
     rownames(results_df) <- NULL # reset column names
     results_df[results_df[[subj_col]]==subjid, 'nevent'] <- 0
+    results_df[results_df[[subj_col]]==subjid, 'total_fu'] <- total_fu[subjid]
     results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
     results_df[results_df[[subj_col]] == subjid, 'date'] <- global_start + as.difftime(data_id[nvisits,][[date_col]], units='days')
     results_df[results_df[[subj_col]]==subjid, 'event_type'] <- ''

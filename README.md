@@ -29,6 +29,11 @@ and data structure (e.g. `?toydata_visits`). A detailed tutorial is
 available as a package vignette: ***Computing MS progression from
 longitudinal data***.
 
+The package can be run locally on any computer with R version $\geq$
+3.5.0 (see installation instructions below), or online via a [web
+application](https://msprog.shinyapps.io/msprog/) with a user-friendly
+graphical interface.
+
 ## Installation
 
 You can install the development version of `msprog` from
@@ -116,13 +121,13 @@ are available for extracting info from the output.
 
     ``` r
     print(results(output), row.names=FALSE)
-    #>  id nevent event_type time2event bl2event conf12 PIRA_conf12 sust_days
-    #>   1      1       PIRA        443      443      1           1        91
-    #>   2      1        RAW        198      198      1          NA        84
-    #>   2      2       PIRA        539      257      1           1       191
-    #>   3      0                   491       NA     NA          NA        NA
-    #>   4      1       impr         77       77      1          NA        98
-    #>   4      2       PIRA        304      129      1           1       282
+    #>  id nevent event_type total_fu time2event bl2event conf12 PIRA_conf12 sust_days
+    #>   1      1       PIRA      534        443      443      1           1        91
+    #>   2      1        RAW      730        198      198      1          NA        84
+    #>   2      2       PIRA      730        539      257      1           1       191
+    #>   3      0                 491        491       NA     NA          NA        NA
+    #>   4      1       impr      586         77       77      1          NA        98
+    #>   4      2       PIRA      586        304      129      1           1       282
     #>  sust_last
     #>          1
     #>          0
