@@ -151,14 +151,29 @@ criteria_text.MSprogOutput <- function(object) {
   text <- paste0(
     'For each subject, we detected ', event_text, ' confirmed at ', paste0(s$conf_weeks, collapse=" or "),
         ' weeks', ifelse(s$conf_unbounded_right, ' or more', ''),
-        ifelse(s$conf_tol_days[1]>0, paste0(', with a tolerance of ', s$conf_tol_days[1],
+    ifelse(s$conf_tol_days[1]>0, paste0(', with a tolerance of ', s$conf_tol_days[1],
         ifelse(s$conf_tol_days[1]==s$conf_tol_days[2], ' days on both sides', paste0(' days on the left',
-               ifelse(s$conf_unbounded_right, '', paste0(' and ', s$conf_tol_days[2], ' on the right')),
-                                                                                      sep=''))),
+               ifelse(s$conf_unbounded_right, '', paste0(' and ', s$conf_tol_days[2], ' on the right'))))),
               ifelse(s$conf_unbounded_right, '', paste0(', with a tolerance of ',
                                               s$conf_tol_days[2], ' days on the right'))), '. ',
     ifelse(s$relapse_to_conf>0, paste0('A visit could only be used as confirmation if occurring at least ',
                         s$relapse_to_conf, ' days from a relapse. '), ''),
+    ifelse(s$baseline=='fixed',
+           paste0('The baseline was kept fixed at the first visit',
+                  ifelse(s$relapse_to_bl>0, paste0(' occurring at least ', s$relapse_to_bl, ' days from a relapse. '), '. ')),
+           paste0('A roving baseline scheme was applied where the reference value was ',
+                  ifelse(s$baseline=='roving_impr',
+                         'updated every time the value was lower than the previous measure and confirmed. ',
+                         'updated after each confirmed progression or improvement event. '),
+                  'The new reference value was set as the ', outcome, ' value at the confirmation visit. ',
+                  ifelse(s$sub_threshold,
+                         paste0('The baseline was also moved when the (confirmed) shift in the ', outcome,
+                                ' value was too small to define a valid event. ' # (e.g., a confirmed change from
+                                #outcome, '=', s$bl_value, ' to ', outcome, '=', s$bl_value + round(delta(s$bl_value)/2), '). '
+                         ),
+                         ''), ifelse(s$relapse_to_bl>0, paste0('Whenever the baseline fell within ', s$relapse_to_bl,
+                                                               ' days from a relapse, it was moved to the next available visit. '), ''))
+    ),
     ifelse(s$prog_last_visit>0, paste0('Progressions ',
               ifelse(s$prog_last_visit<Inf, paste0('of patients terminating follow-up before week ',
                                                    s$prog_last_visit, ' '), ''),
@@ -175,28 +190,9 @@ criteria_text.MSprogOutput <- function(object) {
     ifelse(s$event!='firstRAW', paste0('A confirmed ', outcome,
            ' progression event was labelled as PIRA if no relapses occurred in the interval ',
            pira_text, '. '), ''),
-    sep='')
-  text <- paste0(text,
-    ifelse(s$baseline=='fixed',
-      paste0('The baseline was kept fixed at the first visit',
-          ifelse(s$relapse_to_bl>0, paste0(' occurring at least ', s$relapse_to_bl, ' days from a relapse. '), '. ')),
-      paste0('A roving baseline scheme was applied where the reference value was ',
-          ifelse(s$baseline=='roving_impr',
-                 'updated every time the value was lower than the previous measure and confirmed. ',
-                 'updated after each confirmed progression or improvement event. '),
-          'The new reference value was set as the ', outcome, ' value at the confirmation visit. ',
-          ifelse(s$sub_threshold,
-             paste0('The baseline was also moved when the (confirmed) shift in the ', outcome,
-                 ' value was too small to define a valid event. ' # (e.g., a confirmed change from
-                 #outcome, '=', s$bl_value, ' to ', outcome, '=', s$bl_value + round(delta(s$bl_value)/2), '). '
-                 ),
-             ''), ifelse(s$relapse_to_bl>0, paste0('Whenever the baseline fell within ', s$relapse_to_bl,
-                              ' days from a relapse, it was moved to the next available visit. '), ''),
-        sep='')
-    ),
     ifelse(s$relapse_rebl, 'A further search for PIRA events was performed by resetting the baseline to the virst valid visit after each relapse. ',
-           ''),
-  sep='')
+           '')
+    )
 
   cat(text)
 

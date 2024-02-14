@@ -5,7 +5,7 @@ csl: vignettes/aaps-pharmscitech.csl
 link-citations: true
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- README.md is generated from README.Rmd. Please only edit README.Rmd -->
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-`msprog` provides tools for exhaustive and reproducible analysis of disability progression in multiple sclerosis (MS) from longitudinal data.
+`msprog` provides tools for exhaustive and reproducible analysis of disability progression in multiple sclerosis (MS) from longitudinal data. 
 
 Its core function, `MSprog()`, detects and characterises the progression events of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes. 
 
