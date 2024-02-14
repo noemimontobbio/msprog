@@ -1,5 +1,5 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- README.md is generated from README.Rmd. Please only edit README.Rmd -->
 
 # msprog: reproducible assessment of disability progression in MS
 
@@ -29,10 +29,10 @@ and data structure (e.g. `?toydata_visits`). A detailed tutorial is
 available as a package vignette: ***Computing MS progression from
 longitudinal data***.
 
-The package can be run locally on any computer with R version $\geq$
-3.5.0 (see installation instructions below), or online via a [web
-application](https://msprog.shinyapps.io/msprog/) with a user-friendly
-graphical interface.
+The outcome computation can be run locally on any computer with R
+version $\geq$ 3.5.0 (see installation instructions below), or online
+via our user-friendly [web
+application](https://msprog.shinyapps.io/msprog/).
 
 ## Installation
 

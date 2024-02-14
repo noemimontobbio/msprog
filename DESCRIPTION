@@ -5,7 +5,8 @@ Version: 0.1.0
 Authors@R: c(
     person("Noemi", "Montobbio", , "noemi.montobbio@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0302-393X")),
-    person("Francesca", "Bovis", role = c("rev")))
+    person("Francesca", "Bovis", role = c("rev")),
+    person("Luca", "Carmisciano", role = c("rev")))
 Description: msprog provides tools for exhaustive and reproducible analysis of disability progression in multiple sclerosis (MS) from longitudinal data.
 Encoding: UTF-8
 LazyData: true
