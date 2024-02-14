@@ -92,7 +92,7 @@ compute_delta <- function(baseline, outcome='edss') {
 #' @param sub_threshold If `TRUE`, any confirmed progression, or improvement, or change in outcome measure is valid,
 #'  regardless of `delta_fun`.
 #' @return A boolean value specifying if a valid event was found.
-#' @export compute_delta
+#' @export is_event
 #' @examples
 #' is_event(x=4.5, baseline=4, type='prog', outcome='edss')
 #' is_event(x=50, baseline=57, type='prog', outcome='sdmt')
