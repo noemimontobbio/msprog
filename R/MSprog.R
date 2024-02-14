@@ -21,7 +21,7 @@
 #' @param date_col Name of data column with date of visit.
 #' @param outcome Specifies the outcome type. Must be one of the following:
 #' \itemize{
-##' \item{`'edss'`}{ (Expanded Disability Status Scale);}
+#'  \item{`'edss'`}{ (Expanded Disability Status Scale);}
 #'  \item{`'nhpt'`}{ (Nine-Hole Peg Test);}
 #'  \item{`'t25fw'`}{ (Timed 25-Foot Walk);}
 #'  \item{`'sdmt'`}{ (Symbol Digit Modalities Test);}
@@ -31,8 +31,13 @@
 #' @param relapse `data.frame` containing longitudinal data, including: subject ID and relapse date.
 #' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data.
 #' @param rdate_col Name of date column for relapse data, if different from outcome data.
-#' @param delta_fun Custom function specifying the minimum delta corresponding
-#' to a valid change from the provided baseline value. If none is specified (default), [compute_delta()] for the specified outcome is used.
+#' @param delta_fun Custom function specifying the minimum shift corresponding to a valid change from the provided reference value.
+#' It must take a numeric value (reference) as input, and return a numeric value corresponding to the minimum shift from baseline.
+#' If none is specified (default), function [compute_delta()] for the specified outcome is used.
+#' @param worsening The direction of worsening (`'increase'` if higher values correspond to worse disease course, `'decrease'` otherwise).
+#' This argument is only used when `outcome` is set to `NULL`. Otherwise, `worsening` is automatically set to
+#' `'increase'` if `outcome` is set to `'edss`, `'nhpt`, `'t25fw`,
+#'  and to `'decrease'` if `outcome` is set to `'sdmt`.
 #' @param conf_weeks Period before confirmation (weeks).
 #' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 #' or list-like of length 2 (different tolerance on left and right).
@@ -112,7 +117,7 @@
 #' print(results(output_sdmt)) # extended info on each event for all subjects
 #' print(event_count(output_sdmt)) # summary of event sequence for each subject
 MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
-                   relapse=NULL, rsubj_col=NULL, rdate_col=NULL, delta_fun=NULL,
+                   relapse=NULL, rsubj_col=NULL, rdate_col=NULL, delta_fun=NULL, worsening=NULL,
                    conf_weeks=12, conf_tol_days=30, conf_unbounded_right=FALSE, require_sust_weeks=0,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30, relapse_assoc=90,
                    event='firstprog', baseline='fixed', relapse_indep=NULL, sub_threshold=FALSE, relapse_rebl=FALSE,
@@ -173,10 +178,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
   # Check if values are in correct range
   if (outcome!='outcome') {
     if (any(data[[value_col]]<0)) {
-      stop('invalid ', outcome,' scores')
+      stop('negative ', outcome,' scores')
     }
     else if (outcome=='edss' & any(data[[value_col]]>10)) {
-      stop('invalid ', outcome,' scores')
+      stop('EDSS scores >10')
     }
     else if (outcome=='sdmt' & any(data[[value_col]]>110)) {
       stop('SDMT scores >110')
@@ -200,17 +205,29 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
   }
 
 
-  # Define progression delta
-  if (is.null(delta_fun) & outcome=='outcome') {
-    stop('Either specify a valid outcome type (`outcome` argument) or provide a custom `delta_fun`')
-  } else {
-    delta <- function(value) {
-      if (is.null(delta_fun)) {
-        return(compute_delta(value, outcome))
-      } else {
-        return(delta_fun(value))
-      }
-    }
+  # # Define progression delta
+  # if (is.null(delta_fun) & outcome=='outcome') {
+  #   stop('Either specify a valid outcome type (`outcome` argument) or provide a custom `delta_fun`')
+  # } else {
+  #   delta <- function(value) {
+  #     if (is.null(delta_fun)) {
+  #       return(compute_delta(value, outcome))
+  #     } else {
+  #       return(delta_fun(value))
+  #     }
+  #   }
+  # }
+  if (outcome %in% c('edss', 'nhpt', 't25fw')) {
+    worsening <- 'increase'
+  } else if (outcome=='sdmt') {
+    worsening <- 'decrease'
+  } else if (is.null(worsening)) {
+    stop('Either specify an outcome type, or specify the direction of worsening (\'increase\' or \'decrease\')')
+  }
+
+  isevent_loc <- function(x, baseline, type='prog', st=F) {
+    is_event(x, baseline, type=type, outcome=outcome, worsening=worsening,
+             sub_threshold=st, delta_fun=delta_fun)
   }
 
 
@@ -373,7 +390,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
       change_idx <- NA
       if (search_idx<=nvisits) {
       for (x in search_idx:nvisits) {
-          if ((data_id[x,][[value_col]] != bl[[value_col]]) &
+          if (isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='change', st=sub_threshold) &
               (data_id[x,][['closest_rel_minus']] >= relapse_to_event)) {
             change_idx <- x
             break
@@ -430,16 +447,16 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
 
         # CONFIRMED IMPROVEMENT:
         # --------------------
-        if (length(conf_idx) > 0 &&
-            data_id[change_idx,][[value_col]] - bl[[value_col]] <= - delta(bl[[value_col]]) &&
-            all(sapply((change_idx + 1):conf_idx[[1]], function(x) data_id[x,][[value_col]] - bl[[value_col]]
-                       <= -delta(bl[[value_col]]))) &&
-            phase == 0 &&
-            !((event %in% c('firstprog', 'firstprogtype', 'firstPIRA', 'firstRAW')) && baseline=='fixed')
+        if (length(conf_idx) > 0 # confirmation visits available
+            && isevent_loc(data_id[change_idx,][[value_col]], bl[[value_col]], type='impr') # value decreased (>delta) from baseline
+            && all(sapply((change_idx + 1):conf_idx[[1]], function(x) isevent_loc(data_id[x,][[value_col]], bl[[value_col]],
+                       type='impr')))  # decrease is confirmed at all visits between event and confirmation visit
+            && phase == 0 # skip if re-checking for PIRA after post-relapse re-baseline
+            && !((event %in% c('firstprog', 'firstprogtype', 'firstPIRA', 'firstRAW')) && baseline=='fixed')
             ) {
           if (conf_idx[[1]]==nvisits) {next_change <- NA} else {
-          next_change <- which(data_id[(conf_idx[[1]] + 1):nvisits, value_col] - bl[[value_col]]
-                               > -delta(bl[[value_col]]))[1] + conf_idx[[1]]
+          next_change <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col], bl[[value_col]],
+                               type='impr'))[1] + conf_idx[[1]]
           }
           if (!is.na(next_change)) {
             conf_idx <- conf_idx[conf_idx < next_change]
@@ -465,15 +482,15 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
           next_change <- NA
           if (conf_idx[[1]]<nvisits) {
             for (x in (conf_idx[[1]] + 1):nvisits) {
-              if ((data_id[x,][[value_col]] - bl[[value_col]]) > -delta(bl[[value_col]]) ||
-                  abs(data_id[x,][[value_col]] - data_id[conf_idx[[1]],][[value_col]])
-                  >= delta(data_id[conf_idx[[1]],][[value_col]])) {
+              if (!isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='impr') # either decrease not sustained
+                  || isevent_loc(data_id[x,][[value_col]], data_id[conf_idx[[1]],][[value_col]],
+                  type='change')) { # or further valid change from confirmation
                 next_change <- x
                 break
               }
             }
-            next_nonsust <- which(data_id[(conf_idx[[1]] + 1):nvisits, value_col]
-                                  - bl[[value_col]] > -delta(bl[[value_col]]))[1] + conf_idx[[1]]
+            next_nonsust <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col],
+                                  bl[[value_col]], type='impr'))[1] + conf_idx[[1]] # decrease not sustained
           } else {next_nonsust <- NA}
 
 
@@ -536,8 +553,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
 
         if (conf_idx[[1]]==nvisits) {
           next_change <- NA} else {
-            next_change <- which(data_id[(conf_idx[[1]] + 1):nvisits, value_col]
-                                 >= bl[[value_col]])[1] + conf_idx[[1]] }
+            next_change <- which(isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col],
+                                 bl[[value_col]], type='change'))[1] + conf_idx[[1]] }
         bl_idx <- ifelse(is.na(next_change), nvisits, next_change - 1) # set new baseline at last consecutive decreased value
         search_idx <- bl_idx + 1 #next_change
         if (verbose == 2) {
@@ -549,14 +566,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
 
       # CONFIRMED PROGRESSION:
       # ---------------------
-      else if (data_id[change_idx,][[value_col]] >= min_value_ifany &&
-         data_id[change_idx,][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]) && # value increased (>delta) from baseline
+      else if (data_id[change_idx,][[value_col]] >= min_value_ifany
+         && isevent_loc(data_id[change_idx,][[value_col]], bl[[value_col]], type='prog')  # value worsened (>delta) from baseline
 
-         ((length(conf_idx) > 0 && # confirmation visits available
+         && ((length(conf_idx) > 0 && # confirmation visits available
            ifelse(devtest_conf,
-              data_id[conf_idx[[1]],][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]), # [to remove after testing] increase is confirmed at first valid date
+              isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl[[value_col]], type='prog'), # [to remove after testing] increase is confirmed at first valid date
               all(sapply((change_idx + 1):conf_idx[[1]],
-               function(x) data_id[x,][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]])))  # increase is confirmed at (all visits up to) first valid date
+               function(x) isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='prog')))  # increase is confirmed at (all visits up to) first valid date
            ) &&
           all(sapply((change_idx + 1):conf_idx[[1]],
               function(x) data_id[x,][[value_col]] >= min_value_ifany)) # confirmation above min_value too
@@ -569,8 +586,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                  }
                 if (conf_idx[[1]]==nvisits) {
                   next_change <- NA} else {
-                 next_change <- which(data_id[(conf_idx[[1]] + 1):nvisits, value_col] - bl[[value_col]]
-                                          < delta(bl[[value_col]]))[1] + conf_idx[[1]] }
+                 next_change <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col], bl[[value_col]],
+                                          type='prog'))[1] + conf_idx[[1]] }
                  if (!is.na(next_change)) {
                     conf_idx <- conf_idx[conf_idx < next_change] } # confirmed dates
                  conf_t <- conf_t[seq_along(conf_idx)]
@@ -597,28 +614,28 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                  if (conf_idx[[1]]<nvisits) {
                    # ...valid change from first confirmation visit:
                    for (x in (conf_idx[[1]] + 1):nvisits) {
-                     if (data_id[x,][[value_col]] - bl[[value_col]] < delta(bl[[value_col]]) || # either not sustained
-                         abs(data_id[x,][[value_col]] - data_id[conf_idx[[1]],][[value_col]])
-                         >= delta(data_id[conf_idx[[1]],][[value_col]])) {  # or further change from *first* confirmation
+                     if (!isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='prog') # either not sustained
+                         || isevent_loc(data_id[x,][[value_col]],  data_id[conf_idx[[1]],][[value_col]],
+                         type='change')) {  # or further change from *first* confirmation
                        next_change <- x
                        break
                      }
                    }
                    # ...non-sustained value:
-                   next_nonsust <- which(data_id[(conf_idx[[1]] + 1):nvisits, value_col]
-                                         - bl[[value_col]] < delta(bl[[value_col]]))[1] + conf_idx[[1]]
+                   next_nonsust <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col],
+                                         bl[[value_col]], type='prog'))[1] + conf_idx[[1]]
                  } else {
                    next_nonsust <- NA
                  }
                  # ...valid change from event:
-                 next_change_ev <- which(abs(data_id[(change_idx + 1):nvisits, value_col]
-                                             - bl[[value_col]]) >= delta(bl[[value_col]]))[1] + change_idx
+                 next_change_ev <- which(isevent_loc(data_id[(change_idx + 1):nvisits, value_col],
+                                             bl[[value_col]], type='change'))[1] + change_idx
 
 
                 valid_prog <- 1
                 if (require_sust_weeks) {
                   valid_prog <- ifelse(devtest_conf,
-                    data_id[nvisits,][[value_col]] - bl[[value_col]] >= delta(bl[[value_col]]), # [to remove after testing] progression confirmed at last visit
+                    isevent_loc(data_id[nvisits,][[value_col]], bl[[value_col]], type='prog'), # [to remove after testing] progression confirmed at last visit
                     is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
                                 data_id[change_idx,][[date_col]]) > require_sust_weeks * 7 # progression sustained up to end of follow-up, or for `require_sust_weeks` weeks
                   )
@@ -924,7 +941,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
       results_df[results_df[[subj_col]]==subjid, 'nevent'] <- 0
       results_df[results_df[[subj_col]]==subjid, 'total_fu'] <- total_fu[subjid]
       results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
-      results_df[results_df[[subj_col]] == subjid, 'date'] <- global_start + as.difftime(data_id[nvisits,][[date_col]], units='days')
+      results_df[results_df[[subj_col]] == subjid, 'date'] <- as.character(global_start + as.difftime(data_id[nvisits,][[date_col]], units='days'))
       results_df[results_df[[subj_col]]==subjid, 'event_type'] <- ''
     }
     else if (length(event_type)==0) {
@@ -958,7 +975,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     results_df[results_df[[subj_col]]==subjid, 'nevent'] <- 0
     results_df[results_df[[subj_col]]==subjid, 'total_fu'] <- total_fu[subjid]
     results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
-    results_df[results_df[[subj_col]] == subjid, 'date'] <- global_start + as.difftime(data_id[nvisits,][[date_col]], units='days')
+    results_df[results_df[[subj_col]] == subjid, 'date'] <- as.character(global_start + as.difftime(data_id[nvisits,][[date_col]], units='days'))
     results_df[results_df[[subj_col]]==subjid, 'event_type'] <- ''
   } else {
     results_df <- results_df[-subj_index, ]
@@ -989,6 +1006,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
   } #for (subjid in all_subj)
 
   #################################################################
+
 
     if (verbose >= 1) {
       message(paste("\n---\nOutcome: ", outcome, "\nConfirmation at: ",
@@ -1039,8 +1057,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
       columns <- columns[!startsWith(columns, "PIRA")]
     }
 
-    summary <- summary[, scolumns]
-    results_df <- results_df[, columns]
+    summary <- summary[scolumns]
+    results_df <- results_df[columns]
+
 
 
     for (w in warnings) {

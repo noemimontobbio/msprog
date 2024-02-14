@@ -60,7 +60,7 @@ multiple, progression and/or improvement), the length of the relapse
 influence window and of the event confirmation period(s) with the
 relative tolerance.
 
-The example below illustrates the function’s usage and outputs:
+The example below illustrates the function’s usage and output:
 
 ``` r
 library(msprog)

@@ -15,6 +15,7 @@ MSprog(
   rsubj_col = NULL,
   rdate_col = NULL,
   delta_fun = NULL,
+  worsening = NULL,
   conf_weeks = 12,
   conf_tol_days = 30,
   conf_unbounded_right = FALSE,
@@ -63,8 +64,14 @@ MSprog(
 
 \item{rdate_col}{Name of date column for relapse data, if different from outcome data.}
 
-\item{delta_fun}{Custom function specifying the minimum delta corresponding
-to a valid change from the provided baseline value. If none is specified (default), \code{\link[=compute_delta]{compute_delta()}} for the specified outcome is used.}
+\item{delta_fun}{Custom function specifying the minimum shift corresponding to a valid change from the provided reference value.
+It must take a numeric value (reference) as input, and return a numeric value corresponding to the minimum shift from baseline.
+If none is specified (default), function \code{\link[=compute_delta]{compute_delta()}} for the specified outcome is used.}
+
+\item{worsening}{The direction of worsening (\code{'increase'} if higher values correspond to worse disease course, \code{'decrease'} otherwise).
+This argument is only used when \code{outcome} is set to \code{NULL}. Otherwise, \code{worsening} is automatically set to
+\code{'increase'} if \code{outcome} is set to \verb{'edss}, \verb{'nhpt}, \verb{'t25fw},
+and to \code{'decrease'} if \code{outcome} is set to \verb{'sdmt}.}
 
 \item{conf_weeks}{Period before confirmation (weeks).}
 

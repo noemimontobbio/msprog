@@ -24,14 +24,14 @@ knitr::opts_chunk$set(
 
 `msprog` provides tools for exhaustive and reproducible analysis of disability progression in multiple sclerosis (MS) from longitudinal data. 
 
-Its core function, `MSprog()`, detects and characterises the progression events of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes. 
+Its core function, `MSprog()`, detects and characterises the progression events of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes.
 
 The package also provides two toy datasets for function testing:
 
 * `toydata_visits`: artificially generated EDSS and SDMT assessments for four patients;
 * `toydata_relapses`: artificially generated relapse dates associated with the patients in `toydata_visits`.
 
-Please refer to the documentation for function usage (e.g. `?MSprog`) and data structure (e.g. `?toydata_visits`). A detailed tutorial is available as a package vignette: ***Computing MS progression from longitudinal data***.
+Please refer to the documentation for function usage (e.g. `?MSprog`) and data structure (e.g. `?toydata_visits`). A detailed tutorial is available as a package vignette: ***Computing MS progression from longitudinal data***. 
 
 The outcome computation can be run locally on any computer with R version $\geq$ 3.5.0 (see installation instructions below), or online via our user-friendly [web application](https://msprog.shinyapps.io/msprog/).
 
@@ -51,7 +51,7 @@ devtools::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
 
 Several qualitative and quantitative options for event detection are given as arguments that can be set by the user and reported as a complement to the results to ensure reproducibility. These include the baseline scheme (fixed or roving), the events to be detected (first or multiple, progression and/or improvement), the length of the relapse influence window and of the event confirmation period(s) with the relative tolerance.
 
-The example below illustrates the function's usage and outputs:
+The example below illustrates the function's usage and output:
 
 ```{r}
 library(msprog)
