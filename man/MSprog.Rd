@@ -11,6 +11,7 @@ MSprog(
   date_col,
   outcome,
   subjects = NULL,
+  date_format = NULL,
   relapse = NULL,
   rsubj_col = NULL,
   rdate_col = NULL,
@@ -57,6 +58,8 @@ MSprog(
 }}
 
 \item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included.}
+
+\item{date_format}{Format of dates in the input data. If not specified, it will be inferred by function \link{as.Date}.}
 
 \item{relapse}{\code{data.frame} containing longitudinal data, including: subject ID and relapse date.}
 
@@ -108,7 +111,10 @@ In all cases, the right end of the interval is ignored if \code{conf_unbounded_r
 \item{\code{'fixed'}}{ (first valid outcome value, default);}
 \item{\code{'roving_impr'}}{ (updated every time the value is lower than the previous measure and confirmed at the following visit;
 suitable for a first-progression setting to discard fluctuations around baseline);}
-\item{\verb{'roving'``\}\{ (updated after each event to last valid confirmed outcome value; suitable for a multiple-event setting - i.e., when }event\verb{is set to}'multiple'\verb{, }'firsteach'\verb{, or }'firstprogtype'`).}
+\item{\verb{'roving'``\}\{ (updated after each event to last valid confirmed outcome value; suitable for a multiple-event setting - i.e., when }event\verb{is set to}'multiple'\verb{, }'firsteach'\verb{, or }'firstprogtype'` - or when searching for a specific type of progression
+\itemize{
+\item i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}).}
+}
 }}
 
 \item{relapse_indep}{Specifies relapse-free intervals for PIRA definition.

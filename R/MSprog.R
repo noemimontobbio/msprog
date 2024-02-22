@@ -28,6 +28,7 @@
 #'  \item{`NULL`}{ (only accepted when specifying a custom `delta_fun`)}
 #'  }
 #' @param subjects Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included.
+#' @param date_format Format of dates in the input data. If not specified, it will be inferred by function [as.Date].
 #' @param relapse `data.frame` containing longitudinal data, including: subject ID and relapse date.
 #' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data.
 #' @param rdate_col Name of date column for relapse data, if different from outcome data.
@@ -66,7 +67,8 @@
 #' suitable for a first-progression setting to discard fluctuations around baseline);}
 #' \item{`'roving'``}{ (updated after each event to last valid confirmed outcome value;
 #' suitable for a multiple-event setting - i.e., when `event` is set to `'multiple'`,
-#' `'firsteach'`, or `'firstprogtype'`).}
+#' `'firsteach'`, or `'firstprogtype'` - or when searching for a specific type of progression
+#' - i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`).}
 #' }
 #' @param relapse_indep Specifies relapse-free intervals for PIRA definition.
 #' Must be given in the form produced by function [relapse_indep_from_bounds()] by calling
@@ -116,7 +118,7 @@
 #'     event='multiple', baseline='roving', verbose=1)
 #' print(results(output_sdmt)) # extended info on each event for all subjects
 #' print(event_count(output_sdmt)) # summary of event sequence for each subject
-MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
+MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL, date_format=NULL,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, delta_fun=NULL, worsening=NULL,
                    conf_weeks=12, conf_tol_days=30, conf_unbounded_right=FALSE, require_sust_weeks=0,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30, relapse_assoc=90,
@@ -158,15 +160,24 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
     names(relapse) <- c(rsubj_col, rdate_col)
   }
 
+
   # Remove missing values from columns of interest
   data <- data[complete.cases(data[ , c(subj_col, value_col, date_col)]), ]
   relapse <- relapse[complete.cases(relapse[ , c(rsubj_col, rdate_col)]), ]
 
   # Convert dates to datetime format
-  data[[date_col]] <- as.Date(data[[date_col]])
-  relapse[[rdate_col]] <- as.Date(relapse[[rdate_col]])
+  if (is.null(date_format)) {
+    data[[date_col]] <- as.Date(data[[date_col]])
+    relapse[[rdate_col]] <- as.Date(relapse[[rdate_col]])
+  } else {
+  data[[date_col]] <- as.Date(data[[date_col]], format=date_format)
+  relapse[[rdate_col]] <- as.Date(relapse[[rdate_col]], format=date_format)
+  }
   # Convert dates to days from minimum
-  global_start <- min(min(data[[date_col]]), min(relapse[[rdate_col]]))
+  if (nrow(relapse)>0) {
+    global_start <- min(min(data[[date_col]]), min(relapse[[rdate_col]]))
+  } else {global_start <- min(data[[date_col]])}
+
   data[[date_col]] <- as.numeric(difftime(data[[date_col]], global_start), units='days')
   relapse[[rdate_col]] <- as.numeric(difftime(relapse[[rdate_col]], global_start), units='days')
 
@@ -642,6 +653,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                 }
 
                 if (valid_prog) {
+
+                  nev <- length(event_type)
+
                   sust_idx <- ifelse(is.na(next_nonsust), nvisits, next_nonsust - 1)
 
                   if (phase == 0 && data_id[change_idx,][['closest_rel_minus']] <= relapse_assoc) { # event is relapse-associated
@@ -767,10 +781,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
                         ) {
                       bl_idx <- ifelse(is.na(next_change), nvisits, next_change - 1) # set new baseline at first confirmation time
                       search_idx <- bl_idx + 1
-                    } else if ((event_type[length(event_type)]!='PIRA' & event=='firstPIRA') ||
-                               (event_type[length(event_type)]!='RAW' & event=='firstRAW')) {
+                    } else if (phase==0 && ((event_type[length(event_type)]!='PIRA' & event=='firstPIRA') ||
+                               (event_type[length(event_type)]!='RAW' & event=='firstRAW'))) {
                       search_idx <- ifelse(is.na(next_change_ev), nvisits, next_change_ev) #_r_#
-                    } else {
+                    } else if (phase==1 && length(event_type)==nev) {
+                      search_idx <- change_idx + 1
+                    }
+                      else {
                       search_idx <- ifelse(is.na(next_change), nvisits+1, next_change)
                       }
 
@@ -876,11 +893,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL,
               message("Not enough visits after current baseline: end process")
             }
           }
-        } else if (proceed && search_idx <= nvisits && relapse_rebl && phase == 1 &&
-                   !any((data_id[bl_idx,][[date_col]]<=relapse_dates) & (relapse_dates<=data_id[search_idx,][[date_col]])) # if search_idx is still
-                   && verbose==2) {
-          message("[post-relapse rebaseline] Baseline at visit no.", bl_idx, ", searching for events from visit no.",
-                  ifelse(search_idx > nvisits, "-", search_idx), " on")
+    } else if (proceed && search_idx <= nvisits && relapse_rebl && phase == 1 &&
+               !any((data_id[bl_idx,][[date_col]]<=relapse_dates)
+                    & (relapse_dates<=data_id[search_idx,][[date_col]])) # if search_idx is still
+               && verbose==2) {
+      message("[post-relapse rebaseline] Baseline at visit no.", bl_idx, ", searching for events from visit no.",
+              ifelse(search_idx > nvisits, "-", search_idx), " on")
         }
 
 
