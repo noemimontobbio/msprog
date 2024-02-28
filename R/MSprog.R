@@ -88,7 +88,8 @@
 #' @param relapse_rebl If `TRUE`, re-baseline after every relapse to search for PIRA events.
 #' @param min_value Only consider progressions events where the outcome is >= value.
 #' @param prog_last_visit If `TRUE`, include progressions occurring at last visit (i.e. with no confirmation).
-#' If a numeric value N is passed, unconfirmed events are included only if occurring within N weeks of follow up.
+#' If a numeric value N is passed, unconfirmed events are included only if occurring within N weeks of follow up
+#' (e.g., in case of early discontinuation).
 #' @param include_dates If `TRUE`, report dates of events.
 #' @param include_value If `TRUE`, report value of outcome at event.
 #' @param include_stable If `TRUE`, subjects with no events are included in extended output `data.frame`,
@@ -429,6 +430,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL, 
       } else {
         if (change_idx==nvisits) {
           conf_idx=list()
+          conf_t <- list() #plv
           } else {
         conf_idx <- lapply(conf_window, function(t) {
           match_idx <- NULL
@@ -452,6 +454,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL, 
                   global_start + as.difftime(data_id[change_idx,][[date_col]], units="days"),
                        "); potential confirmation visits available: no.", paste(conf_idx, collapse=", "))
         }
+
 
         # Confirmation
         # ============
@@ -588,7 +591,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL, 
            ) &&
           all(sapply((change_idx + 1):conf_idx[[1]],
               function(x) data_id[x,][[value_col]] >= min_value_ifany)) # confirmation above min_value too
-          ) || (data_id[change_idx,][[date_col]]<prog_last_visit*7 && change_idx == nvisits))
+          ) || (data_id[change_idx,][[date_col]] - data_id[1,][[date_col]] <= prog_last_visit*7 && change_idx == nvisits))
 
          ) {
 
