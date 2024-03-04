@@ -5,3 +5,5 @@
 ^LICENSE\.md$
 ^README\.Rmd$
 ^\.github$
+^msprog.pdf$
+^\.Rd2pdf.*$
