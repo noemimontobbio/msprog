@@ -37,14 +37,16 @@
 #' If none is specified (default), function [compute_delta()] for the specified outcome is used.
 #' @param worsening The direction of worsening (`'increase'` if higher values correspond to worse disease course, `'decrease'` otherwise).
 #' This argument is only used when `outcome` is set to `NULL`. Otherwise, `worsening` is automatically set to
-#' `'increase'` if `outcome` is set to `'edss`, `'nhpt`, `'t25fw`,
-#'  and to `'decrease'` if `outcome` is set to `'sdmt`.
+#' `'increase'` if `outcome` is set to `'edss'`, `'nhpt'`, `'t25fw'`,
+#'  and to `'decrease'` if `outcome` is set to `'sdmt'`.
 #' @param conf_weeks Period before confirmation (weeks).
 #' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 #' or list-like of length 2 (different tolerance on left and right).
 #' In all cases, the right end of the interval is ignored if `conf_unbounded_right` is set to `TRUE`.
 #' @param conf_unbounded_right If `TRUE`, confirmation window is unbounded on the right.
-#' @param require_sust_weeks Minimum number of weeks for which a confirmed change must be sustained to be retained as an event.
+#' @param require_sust_weeks Minimum number of weeks over which a confirmed change must be sustained to be retained as an event.
+#' Events sustained for the entire follow-up are retained regardless of follow-up duration. Setting `require_sust_weeks=Inf`,
+#' events are only retained if sustained for the entire follow-up duration.
 #' @param relapse_to_bl Minimum distance from last relapse (days) for a visit to be used as baseline
 #' (otherwise the next available visit is used as baseline).
 #' @param relapse_to_event Minimum distance from last relapse (days) for an event to be considered as such.
@@ -509,7 +511,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL, 
 
 
           valid_impr <- 1
-          if (require_sust_weeks) {
+          if (require_sust_weeks>0) {
             valid_impr <- is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]]
                                  - data_id[change_idx, date_col]) > require_sust_weeks * 7
           }
@@ -550,8 +552,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL, 
           } else {
             search_idx <- change_idx + 1
             if (verbose == 2) {
-              message("Change confirmed but not sustained for >=", require_sust_weeks,
-                      " weeks: proceed with search")
+              message("Change confirmed but not sustained over ",
+                      ifelse(require_sust_weeks<Inf, paste(">=", require_sust_weeks, "weeks"),
+                             "entire follow-up"),
+                      ": proceed with search")
             }
           }
         }
@@ -647,7 +651,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL, 
 
 
                 valid_prog <- 1
-                if (require_sust_weeks) {
+                if (require_sust_weeks>0) {
                   valid_prog <- ifelse(devtest_conf,
                     isevent_loc(data_id[nvisits,][[value_col]], bl[[value_col]], type='prog'), # [to remove after testing] progression confirmed at last visit
                     is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
@@ -801,8 +805,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL, 
                   } else {
                     search_idx <- change_idx + 1 # skip the change and look for other patterns after it
                     if (verbose == 2) {
-                      message("Change confirmed but not sustained for >=", require_sust_weeks,
-                                   " weeks: proceed with search")
+                      message("Change confirmed but not sustained over ",
+                              ifelse(require_sust_weeks<Inf, paste(">=", require_sust_weeks, "weeks"),
+                                     "entire follow-up"),
+                              ": proceed with search")
                     }
                   }
                 }
@@ -1031,12 +1037,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL, 
 
     if (verbose >= 1) {
       message(paste("\n---\nOutcome: ", outcome, "\nConfirmation at: ",
-            paste(conf_weeks, collapse=", "), "mm (-", conf_tol_days[1], "dd, +",
-            ifelse(conf_unbounded_right, "inf", conf_tol_days[2]), "dd)\nBaseline: ", baseline,
+            paste(conf_weeks, collapse=", "), "weeks (-", conf_tol_days[1], "days, +",
+            ifelse(conf_unbounded_right, "Inf", conf_tol_days[2]), "days)\nBaseline: ", baseline,
             ifelse(sub_threshold, " (sub-threshold)", ""),
             ifelse(relapse_rebl, " (and post-relapse re-baseline)", ""),
-            "\nRelapse influence (baseline): ", relapse_to_bl, "dd\nRelapse influence (event): ",
-            relapse_to_event, "dd\nRelapse influence (confirmation): ", relapse_to_conf, "dd\nEvents detected: ", event))
+            "\nRelapse influence (baseline): ", relapse_to_bl, "days\nRelapse influence (event): ",
+            relapse_to_event, "days\nRelapse influence (confirmation): ", relapse_to_conf, "days\nEvents detected: ", event))
       if (is.null(subjects) | length(subjects)>1) {
           message("\n---\nTotal subjects: ", nsub,
               "\n---\nProgressed subjects: ", sum(summary$progression > 0), " (PIRA: ", sum(summary$PIRA > 0),

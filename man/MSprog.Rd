@@ -73,8 +73,8 @@ If none is specified (default), function \code{\link[=compute_delta]{compute_del
 
 \item{worsening}{The direction of worsening (\code{'increase'} if higher values correspond to worse disease course, \code{'decrease'} otherwise).
 This argument is only used when \code{outcome} is set to \code{NULL}. Otherwise, \code{worsening} is automatically set to
-\code{'increase'} if \code{outcome} is set to \verb{'edss}, \verb{'nhpt}, \verb{'t25fw},
-and to \code{'decrease'} if \code{outcome} is set to \verb{'sdmt}.}
+\code{'increase'} if \code{outcome} is set to \code{'edss'}, \code{'nhpt'}, \code{'t25fw'},
+and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 
 \item{conf_weeks}{Period before confirmation (weeks).}
 
@@ -84,7 +84,9 @@ In all cases, the right end of the interval is ignored if \code{conf_unbounded_r
 
 \item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right.}
 
-\item{require_sust_weeks}{Minimum number of weeks for which a confirmed change must be sustained to be retained as an event.}
+\item{require_sust_weeks}{Minimum number of weeks over which a confirmed change must be sustained to be retained as an event.
+Events sustained for the entire follow-up are retained regardless of follow-up duration. Setting \code{require_sust_weeks=Inf},
+events are only retained if sustained for the entire follow-up duration.}
 
 \item{relapse_to_bl}{Minimum distance from last relapse (days) for a visit to be used as baseline
 (otherwise the next available visit is used as baseline).}

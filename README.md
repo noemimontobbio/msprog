@@ -25,9 +25,11 @@ The package also provides two toy datasets for function testing:
   with the patients in `toydata_visits`.
 
 Please refer to the documentation for function usage (e.g. `?MSprog`)
-and data structure (e.g. `?toydata_visits`). A detailed tutorial is
-available as a package vignette: ***Computing MS progression from
-longitudinal data***.
+and data structure (e.g. `?toydata_visits`). The whole documentation is
+contained in the [reference manual](msprog.pdf). Additionally, a
+detailed tutorial providing examples and best-practice tips is available
+as a package vignette: ***Computing MS progression from longitudinal
+data***.
 
 The outcome computation can be run locally on any computer with R
 version $\geq$ 3.5.0 (see installation instructions below), or online
@@ -78,11 +80,11 @@ output <- MSprog(toydata_visits,                                   # provide dat
 #> 
 #> ---
 #> Outcome:  edss 
-#> Confirmation at:  12 mm (- 30 dd, + 30 dd)
+#> Confirmation at:  12 weeks (- 30 days, + 30 days)
 #> Baseline:  roving   
-#> Relapse influence (baseline):  30 dd
-#> Relapse influence (event):  0 dd
-#> Relapse influence (confirmation):  30 dd
+#> Relapse influence (baseline):  30 days
+#> Relapse influence (event):  0 days
+#> Relapse influence (confirmation):  30 days
 #> Events detected:  multiple
 #> 
 #> ---
