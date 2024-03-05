@@ -15,7 +15,7 @@ An object of class \code{data.frame}
 data(toydata_relapses)
 }
 \description{
-Artificially generated relapse dates for some example patients in \code{toydata_visits} to illustrate the use of the package.
+Artificially generated relapse dates for some example patients in \link{toydata_visits} to illustrate the use of the package.
 }
 \examples{
 

@@ -22,18 +22,22 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-`msprog` provides tools for exhaustive and reproducible analysis of disability progression in multiple sclerosis (MS) from longitudinal data. 
+`msprog` is an R package providing tools for exhaustive and reproducible analysis of disability progression in multiple sclerosis (MS) from longitudinal data [@msprog2024-preprint]. 
 
-Its core function, `MSprog()`, detects and characterises the progression events of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes.
+Its core function, `MSprog()`, detects and characterises the progression events of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes (if any).
 
 The package also provides two toy datasets for function testing:
 
 * `toydata_visits`: artificially generated EDSS and SDMT assessments for four patients;
 * `toydata_relapses`: artificially generated relapse dates associated with the patients in `toydata_visits`.
 
-Please refer to the documentation for function usage (e.g. `?MSprog`) and data structure (e.g. `?toydata_visits`). The whole documentation is contained in the [reference manual](msprog.pdf). Additionally, a detailed tutorial providing examples and best-practice tips is available as a package vignette: ***Computing MS progression from longitudinal data***. 
+Please refer to the documentation for function usage (e.g. `?MSprog`) and data structure (e.g. `?toydata_visits`). The whole documentation is contained into the [reference manual](msprog.pdf). Additionally, a detailed tutorial providing examples and best-practice tips is available as a [package vignette](#vignette): *Computing MS progression from longitudinal data*. 
 
 The outcome computation can be run locally on any computer with R version $\geq$ 3.5.0 (see installation instructions below), or online via our user-friendly [web application](https://msprog.shinyapps.io/msprog/).
+
+**If you use this package in your work, please cite it [as below](#citation)**.
+
+For any questions, requests for new features, or bug reporting, please contact: noemi.montobbio\@edu.unige.it.<br /> Any feedback is highly appreciated!
 
 
 ## Installation
@@ -61,11 +65,12 @@ data(toydata_visits)
 data(toydata_relapses)
 
 # Compute progression
-output <- MSprog(toydata_visits,                                   # provide data on visits
-                 subj_col='id', value_col='EDSS', date_col='date', # specify column names
-                 outcome='edss',                                   # specify outcome type
-                 event='multiple', baseline='roving',              # modify default options on event detection
-                 relapse=toydata_relapses)                         # provide data on relapses
+output <- MSprog(toydata_visits,                                      # provide data on visits
+                 subj_col='id', value_col='EDSS', date_col='date',    # specify column names
+                 outcome='edss',                                      # specify outcome type
+                 event='multiple', baseline='roving',                 # modify default options
+                 conf_tol_days=0, conf_unbounded_right=T,             # modify default options
+                 relapse=toydata_relapses)                            # provide data on relapses
 ```
 The function prints out a concise report of the results, as well as **the specific set of options used to obtain them**. Complete results are stored in an object of class `MSprogOutput`. The following methods are available for extracting info from the output.
 
@@ -88,9 +93,21 @@ criteria_text(output)
 
 <br />
 
+<a id="vignette"></a>
+
+### Vignettes
 For detailed indications on usage and best practices, please refer to the package vignettes.
 ```{r, message=FALSE}
 browseVignettes('msprog')
+```
+
+<a id="citation"></a>
+
+### Citation
+
+If you use the `msprog` package, please use the `citation()` function to obtain the correct reference:
+```{r}
+citation('msprog')
 ```
     
 ## References

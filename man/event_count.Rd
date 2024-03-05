@@ -16,3 +16,4 @@ See the documentation of the particular methods for details of what is produced 
 \description{
 Event count from object.
 }
+\keyword{internal}

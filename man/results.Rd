@@ -16,3 +16,4 @@ See the documentation of the particular methods for details of what is produced 
 \description{
 Extended result report from object.
 }
+\keyword{internal}

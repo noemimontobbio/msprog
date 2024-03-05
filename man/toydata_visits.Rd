@@ -23,7 +23,6 @@ to illustrate the use of the package.
 }
 \examples{
 
-data(toydata_visits)
 head(toydata_visits)
 
 }

@@ -1036,13 +1036,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome, subjects=NULL, 
 
 
     if (verbose >= 1) {
-      message(paste("\n---\nOutcome: ", outcome, "\nConfirmation at: ",
-            paste(conf_weeks, collapse=", "), "weeks (-", conf_tol_days[1], "days, +",
-            ifelse(conf_unbounded_right, "Inf", conf_tol_days[2]), "days)\nBaseline: ", baseline,
+      message(paste0("\n---\nOutcome: ", outcome, "\nConfirmation over: ",
+            paste(conf_weeks, collapse=", "), "weeks (-", conf_tol_days[1], " days, +",
+            ifelse(conf_unbounded_right, "Inf", conf_tol_days[2]), " days)\nBaseline: ", baseline,
             ifelse(sub_threshold, " (sub-threshold)", ""),
-            ifelse(relapse_rebl, " (and post-relapse re-baseline)", ""),
-            "\nRelapse influence (baseline): ", relapse_to_bl, "days\nRelapse influence (event): ",
-            relapse_to_event, "days\nRelapse influence (confirmation): ", relapse_to_conf, "days\nEvents detected: ", event))
+            ifelse(relapse_rebl, ", and post-relapse re-baseline", ""),
+            "\nRelapse influence (baseline): ", relapse_to_bl, " days\nRelapse influence (event): ",
+            relapse_to_event, " days\nRelapse influence (confirmation): ", relapse_to_conf, " days\nEvents detected: ", event))
       if (is.null(subjects) | length(subjects)>1) {
           message("\n---\nTotal subjects: ", nsub,
               "\n---\nProgressed subjects: ", sum(summary$progression > 0), " (PIRA: ", sum(summary$PIRA > 0),

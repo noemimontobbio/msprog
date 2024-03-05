@@ -1,0 +1,17 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "Creating an automated tool for a consistent and repeatable evaluation of disability progression in clinical studies for Multiple Sclerosis",
+  author   = c(person("Noemi", "Montobbio"), 
+		person("Luca", "Carmisciano"),
+		person("Alessio", "Signori"),
+		person("Marta", "Ponzano"),
+		person("Irene", "Schiavetti"),
+		person("Francesca", "Bovis"),
+		person(c("Maria", "Pia"), "Sormani")),
+  journal  = "medRxiv",
+  year     = "2024",
+  #volume   = ,
+  #number   = ,
+  #pages    = ,
+  doi      = "10.1101/2024.01.30.24302013"
+)

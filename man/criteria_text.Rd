@@ -16,3 +16,4 @@ See the documentation of the particular methods for details of what is produced 
 \description{
 Textual description of criteria used to obtain object.
 }
+\keyword{internal}

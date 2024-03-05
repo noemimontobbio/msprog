@@ -6,6 +6,7 @@
 #' @return The form of the value returned by `event_count` depends on the class of its argument.
 #' See the documentation of the particular methods for details of what is produced by that method.
 #' @export
+#' @keywords internal
 event_count <- function (object) {
   UseMethod("event_count")
 }
@@ -43,6 +44,7 @@ event_count.MSprogOutput <- function(object) {
 #' @return The form of the value returned by `results` depends on the class of its argument.
 #' See the documentation of the particular methods for details of what is produced by that method.
 #' @export
+#' @keywords internal
 results <- function (object) {
   UseMethod("results")
 }
@@ -80,6 +82,7 @@ results.MSprogOutput <- function(object) {
 #' @return The form of the value returned by `criteria_text` depends on the class of its argument.
 #' See the documentation of the particular methods for details of what is produced by that method.
 #' @export
+#' @keywords internal
 criteria_text <- function (object) {
   UseMethod("criteria_text")
 }
@@ -149,7 +152,7 @@ criteria_text.MSprogOutput <- function(object) {
   pira_text <- gsub('.{5}$', '', pira_text)
 
   text <- paste0(
-    'For each subject, we detected ', event_text, ' confirmed at ', paste0(s$conf_weeks, collapse=" or "),
+    'For each subject, we detected ', event_text, ' confirmed over ', paste0(s$conf_weeks, collapse=" or "),
         ' weeks', ifelse(s$conf_unbounded_right, ' or more', ''),
     ifelse(s$conf_tol_days[1]>0, paste0(', with a tolerance of ', s$conf_tol_days[1],
         ifelse(s$conf_tol_days[1]==s$conf_tol_days[2], ' days on both sides', paste0(' days on the left',
@@ -165,9 +168,9 @@ criteria_text.MSprogOutput <- function(object) {
                   ifelse(s$baseline=='roving_impr',
                          'updated every time the value was lower than the previous measure and confirmed. ',
                          'updated after each confirmed progression or improvement event. '),
-                  'The new reference value was set as the ', outcome, ' value at the confirmation visit. ',
+                  'The new reference value was set as the ', outcome, ' value at the first available confirmation visit. ',
                   ifelse(s$sub_threshold,
-                         paste0('The baseline was also moved when the (confirmed) shift in the ', outcome,
+                         paste0('Rebaseline was also triggered by (confirmed) \"sub-threshold\" events, i.e., when the shift in the ', outcome,
                                 ' value was too small to define a valid event. ' # (e.g., a confirmed change from
                                 #outcome, '=', s$bl_value, ' to ', outcome, '=', s$bl_value + round(delta(s$bl_value)/2), '). '
                          ),
@@ -178,8 +181,9 @@ criteria_text.MSprogOutput <- function(object) {
               ifelse(s$prog_last_visit<Inf, paste0('of patients terminating follow-up before week ',
                                                    s$prog_last_visit, ' '), ''),
                               'were included if occurring at the last available visit without confirmation. '), ''),
-    ifelse(s$require_sust_weeks>0, paste0('Events were only retained if sustained for either ',
-                s$require_sust_weeks, ' weeks, or until the end of follow-up. '), ''),
+    ifelse(s$require_sust_weeks>0, paste0('Events were only retained if sustained',
+                ifelse(s$require_sust_weeks<Inf, paste0(' either over ', s$require_sust_weeks, ' weeks, or'), ''),
+                ' until the end of follow-up. '), ''),
     ifelse(s$relapse_to_event>0, paste0('Events occurring within ', s$relapse_to_event,
                                      ' days from a relapse were discarded. '), ''),
     ifelse(!is.null(s$min_value), paste0('Only progressions to ', outcome,
@@ -190,7 +194,7 @@ criteria_text.MSprogOutput <- function(object) {
     ifelse(s$event!='firstRAW', paste0('A confirmed ', outcome,
            ' progression event was labelled as PIRA if no relapses occurred in the interval ',
            pira_text, '. '), ''),
-    ifelse(s$relapse_rebl, 'A further search for PIRA events was performed by resetting the baseline to the virst valid visit after each relapse. ',
+    ifelse(s$relapse_rebl, 'A further search for PIRA events was performed by resetting the baseline to the first valid visit after each relapse. ',
            '')
     )
 

@@ -8,14 +8,14 @@
 [![R-CMD-check](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-`msprog` provides tools for exhaustive and reproducible analysis of
-disability progression in multiple sclerosis (MS) from longitudinal
-data.
+`msprog` is an R package providing tools for exhaustive and reproducible
+analysis of disability progression in multiple sclerosis (MS) from
+longitudinal data \[[1](#ref-msprog2024-preprint)\].
 
 Its core function, `MSprog()`, detects and characterises the progression
 events of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom
 outcome measure) for one or more subjects, based on repeated assessments
-through time and on the dates of acute episodes.
+through time and on the dates of acute episodes (if any).
 
 The package also provides two toy datasets for function testing:
 
@@ -26,15 +26,22 @@ The package also provides two toy datasets for function testing:
 
 Please refer to the documentation for function usage (e.g. `?MSprog`)
 and data structure (e.g. `?toydata_visits`). The whole documentation is
-contained in the [reference manual](msprog.pdf). Additionally, a
+contained into the [reference manual](msprog.pdf). Additionally, a
 detailed tutorial providing examples and best-practice tips is available
-as a package vignette: ***Computing MS progression from longitudinal
-data***.
+as a [package vignette](#vignette): *Computing MS progression from
+longitudinal data*.
 
 The outcome computation can be run locally on any computer with R
 version $\geq$ 3.5.0 (see installation instructions below), or online
 via our user-friendly [web
 application](https://msprog.shinyapps.io/msprog/).
+
+**If you use this package in your work, please cite it [as
+below](#citation)**.
+
+For any questions, requests for new features, or bug reporting, please
+contact: noemi.montobbio@edu.unige.it.<br /> Any feedback is highly
+appreciated!
 
 ## Installation
 
@@ -52,7 +59,7 @@ devtools::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
 values in chronological order, and classifies progression events as
 relapse-associated or relapse-independent based on their relative timing
 with respect to the relapses
-\[[1](#ref-lublin2014)–[3](#ref-silent2019)\].
+\[[2](#ref-lublin2014)–[4](#ref-silent2019)\].
 
 Several qualitative and quantitative options for event detection are
 given as arguments that can be set by the user and reported as a
@@ -72,20 +79,21 @@ data(toydata_visits)
 data(toydata_relapses)
 
 # Compute progression
-output <- MSprog(toydata_visits,                                   # provide data on visits
-                 subj_col='id', value_col='EDSS', date_col='date', # specify column names
-                 outcome='edss',                                   # specify outcome type
-                 event='multiple', baseline='roving',              # modify default options on event detection
-                 relapse=toydata_relapses)                         # provide data on relapses
+output <- MSprog(toydata_visits,                                      # provide data on visits
+                 subj_col='id', value_col='EDSS', date_col='date',    # specify column names
+                 outcome='edss',                                      # specify outcome type
+                 event='multiple', baseline='roving',                 # modify default options
+                 conf_tol_days=0, conf_unbounded_right=T,             # modify default options
+                 relapse=toydata_relapses)                            # provide data on relapses
 #> 
 #> ---
-#> Outcome:  edss 
-#> Confirmation at:  12 weeks (- 30 days, + 30 days)
-#> Baseline:  roving   
-#> Relapse influence (baseline):  30 days
-#> Relapse influence (event):  0 days
-#> Relapse influence (confirmation):  30 days
-#> Events detected:  multiple
+#> Outcome: edss
+#> Confirmation over: 12weeks (-0 days, +Inf days)
+#> Baseline: roving
+#> Relapse influence (baseline): 30 days
+#> Relapse influence (event): 0 days
+#> Relapse influence (confirmation): 30 days
+#> Events detected: multiple
 #> 
 #> ---
 #> Total subjects: 4
@@ -124,7 +132,7 @@ are available for extracting info from the output.
     ``` r
     print(results(output), row.names=FALSE)
     #>  id nevent event_type total_fu time2event bl2event conf12 PIRA_conf12 sust_days
-    #>   1      1       PIRA      534        443      443      1           1        91
+    #>   1      1       PIRA      534        292      292      1           1       242
     #>   2      1        RAW      730        198      198      1          NA        84
     #>   2      2       PIRA      730        539      257      1           1       191
     #>   3      0                 491        491       NA     NA          NA        NA
@@ -153,10 +161,14 @@ are available for extracting info from the output.
 
     ``` r
     criteria_text(output)
-    #> For each subject, we detected all EDSS changes (in chronological order) confirmed at 12 weeks, with a tolerance of 30 days on both sides. A visit could only be used as confirmation if occurring at least 30 days from a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed progression or improvement event. The new reference value was set as the EDSS value at the confirmation visit. Whenever the baseline fell within 30 days from a relapse, it was moved to the next available visit. A confirmed EDSS progression event was labelled as RAW if occurring within 90 days from a relapse. A confirmed EDSS progression event was labelled as PIRA if no relapses occurred in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
+    #> For each subject, we detected all EDSS changes (in chronological order) confirmed over 12 weeks or more. A visit could only be used as confirmation if occurring at least 30 days from a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed progression or improvement event. The new reference value was set as the EDSS value at the first available confirmation visit. Whenever the baseline fell within 30 days from a relapse, it was moved to the next available visit. A confirmed EDSS progression event was labelled as RAW if occurring within 90 days from a relapse. A confirmed EDSS progression event was labelled as PIRA if no relapses occurred in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
     ```
 
 <br />
+
+<a id="vignette"></a>
+
+### Vignettes
 
 For detailed indications on usage and best practices, please refer to
 the package vignettes.
@@ -165,13 +177,53 @@ the package vignettes.
 browseVignettes('msprog')
 ```
 
+<a id="citation"></a>
+
+### Citation
+
+If you use the `msprog` package, please use the `citation()` function to
+obtain the correct reference:
+
+``` r
+citation('msprog')
+#> 
+#> To cite package 'msprog' in publications use:
+#> 
+#>   Montobbio N, Carmisciano L, Signori A, Ponzano M, Schiavetti I, Bovis
+#>   F, Sormani MP (2024). "Creating an automated tool for a consistent
+#>   and repeatable evaluation of disability progression in clinical
+#>   studies for Multiple Sclerosis." _medRxiv_.
+#>   doi:10.1101/2024.01.30.24302013
+#>   <https://doi.org/10.1101/2024.01.30.24302013>.
+#> 
+#> A BibTeX entry for LaTeX users is
+#> 
+#>   @Article{,
+#>     title = {Creating an automated tool for a consistent and repeatable evaluation of disability progression in clinical studies for Multiple Sclerosis},
+#>     author = {Noemi Montobbio and Luca Carmisciano and Alessio Signori and Marta Ponzano and Irene Schiavetti and Francesca Bovis and Maria Pia Sormani},
+#>     journal = {medRxiv},
+#>     year = {2024},
+#>     doi = {10.1101/2024.01.30.24302013},
+#>   }
+```
+
 ## References
 
 <div id="refs" class="references csl-bib-body">
 
+<div id="ref-msprog2024-preprint" class="csl-entry">
+
+1\. Montobbio N, Carmisciano L, Signori A, Ponzano M, Schiavetti I,
+Bovis F, et al. Creating an automated tool for a consistent and
+repeatable evaluation of disability progression in clinical studies for
+multiple sclerosis. medRxiv \[Internet\]. 2024; Available from:
+<https://www.medrxiv.org/content/early/2024/01/31/2024.01.30.24302013>
+
+</div>
+
 <div id="ref-lublin2014" class="csl-entry">
 
-1\. Lublin FD, Reingold SC, Cohen JA, Cutter GR, Sørensen PS, Thompson
+2\. Lublin FD, Reingold SC, Cohen JA, Cutter GR, Sørensen PS, Thompson
 AJ, et al. Defining the clinical course of multiple sclerosis. Neurology
 \[Internet\]. 2014;83:278–86. Available from:
 <https://n.neurology.org/content/83/3/278>
@@ -180,7 +232,7 @@ AJ, et al. Defining the clinical course of multiple sclerosis. Neurology
 
 <div id="ref-kappos2018" class="csl-entry">
 
-2\. Kappos L, Butzkueven H, Wiendl H, Spelman T, Pellegrini F, Chen Y,
+3\. Kappos L, Butzkueven H, Wiendl H, Spelman T, Pellegrini F, Chen Y,
 et al. Greater sensitivity to multiple sclerosis disability worsening
 and progression events using a roving versus a fixed reference value in
 a prospective cohort study. Multiple Sclerosis Journal \[Internet\].
@@ -191,7 +243,7 @@ a prospective cohort study. Multiple Sclerosis Journal \[Internet\].
 
 <div id="ref-silent2019" class="csl-entry">
 
-3\. University of California SFM-ET, Cree BAC, Hollenbach JA, Bove R,
+4\. University of California SFM-ET, Cree BAC, Hollenbach JA, Bove R,
 Kirkish G, Sacco S, et al. Silent progression in disease activity–free
 relapsing multiple sclerosis. Annals of Neurology \[Internet\].
 2019;85:653–66. Available from:
