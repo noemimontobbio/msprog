@@ -31,7 +31,7 @@ The package also provides two toy datasets for function testing:
 * `toydata_visits`: artificially generated EDSS and SDMT assessments for four patients;
 * `toydata_relapses`: artificially generated relapse dates associated with the patients in `toydata_visits`.
 
-Please refer to the documentation for function usage (e.g. `?MSprog`) and data structure (e.g. `?toydata_visits`). The whole documentation is contained into the [reference manual](msprog.pdf). Additionally, a detailed tutorial providing examples and best-practice tips is available as a [package vignette](#vignette): *Computing MS progression from longitudinal data*. 
+Please refer to the documentation for function usage (e.g. `?MSprog`) and data structure (e.g. `?toydata_visits`). The whole documentation is contained into the [reference manual (PDF)](msprog.pdf). Additionally, a detailed tutorial providing examples and best-practice tips is available as a [package vignette](#vignette): *Computing MS progression from longitudinal data*. 
 
 The outcome computation can be run locally on any computer with R version $\geq$ 3.5.0 (see installation instructions below), or online via our user-friendly [web application](https://msprog.shinyapps.io/msprog/).
 
@@ -39,10 +39,11 @@ The outcome computation can be run locally on any computer with R version $\geq$
 
 For any questions, requests for new features, or bug reporting, please contact: noemi.montobbio\@edu.unige.it.<br /> Any feedback is highly appreciated!
 
+<a id="install"></a>
 
 ## Installation
 
-You can install the development version of `msprog` from [GitHub](https://github.com/noemimontobbio/msprog) with:
+You can install the development version of `msprog` from GitHub with:
 
 ``` r
 # install.packages("devtools")
@@ -84,7 +85,7 @@ print(event_count(output))
 ```{r, indent="     "}
 print(results(output), row.names=FALSE)
 ```
-    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed at 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit. 
+    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed over 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit. 
     
 3. The `criteria_text` method prints out a short paragraph describing the complete set of criteria used to obtain the output, to be reported to ensure complete reproducibility:
 ```{r, indent="     "}
@@ -96,7 +97,7 @@ criteria_text(output)
 <a id="vignette"></a>
 
 ### Vignettes
-For detailed indications on usage and best practices, please refer to the package vignettes.
+For detailed indications on usage and best practices, please refer to the package vignettes (make sure to enable `build_vignettes` during [installation](#install)).
 ```{r, message=FALSE}
 browseVignettes('msprog')
 ```

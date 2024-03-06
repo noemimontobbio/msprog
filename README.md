@@ -26,7 +26,7 @@ The package also provides two toy datasets for function testing:
 
 Please refer to the documentation for function usage (e.g. `?MSprog`)
 and data structure (e.g. `?toydata_visits`). The whole documentation is
-contained into the [reference manual](msprog.pdf). Additionally, a
+contained into the [reference manual (PDF)](msprog.pdf). Additionally, a
 detailed tutorial providing examples and best-practice tips is available
 as a [package vignette](#vignette): *Computing MS progression from
 longitudinal data*.
@@ -43,10 +43,11 @@ For any questions, requests for new features, or bug reporting, please
 contact: noemi.montobbio@edu.unige.it.<br /> Any feedback is highly
 appreciated!
 
+<a id="install"></a>
+
 ## Installation
 
-You can install the development version of `msprog` from
-[GitHub](https://github.com/noemimontobbio/msprog) with:
+You can install the development version of `msprog` from GitHub with:
 
 ``` r
 # install.packages("devtools")
@@ -136,7 +137,7 @@ are available for extracting info from the output.
     #>   2      1        RAW      730        198      198      1          NA        84
     #>   2      2       PIRA      730        539      257      1           1       191
     #>   3      0                 491        491       NA     NA          NA        NA
-    #>   4      1       impr      586         77       77      1          NA        98
+    #>   4      1       impr      586         77       77      0          NA        98
     #>   4      2       PIRA      586        304      129      1           1       282
     #>  sust_last
     #>          1
@@ -151,7 +152,7 @@ are available for extracting info from the output.
     `event_type` characterises the event; `time2event` is the number of
     days from start of follow-up to event; `bl2event` is the number of
     days from current baseline to event; `conf12` reports whether the
-    event was confirmed at 12 weeks; `sust_days` is the number of days
+    event was confirmed over 12 weeks; `sust_days` is the number of days
     for which the event was sustained; `sust_last` reports whether the
     event was sustained until the last visit.
 
@@ -171,7 +172,8 @@ are available for extracting info from the output.
 ### Vignettes
 
 For detailed indications on usage and best practices, please refer to
-the package vignettes.
+the package vignettes (make sure to enable `build_vignettes` during
+[installation](#install)).
 
 ``` r
 browseVignettes('msprog')
