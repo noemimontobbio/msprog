@@ -2,7 +2,7 @@
 % Please edit documentation in R/MSprog.R
 \name{MSprog}
 \alias{MSprog}
-\title{Compute multiple sclerosis progression from longitudinal data.}
+\title{Compute multiple sclerosis disability progression from longitudinal data.}
 \usage{
 MSprog(
   data,
@@ -10,33 +10,33 @@ MSprog(
   value_col,
   date_col,
   outcome,
-  subjects = NULL,
-  date_format = NULL,
   relapse = NULL,
   rsubj_col = NULL,
   rdate_col = NULL,
+  subjects = NULL,
   delta_fun = NULL,
   worsening = NULL,
+  event = "firstprog",
+  baseline = "fixed",
+  sub_threshold = F,
+  relapse_rebl = F,
   conf_weeks = 12,
   conf_tol_days = 30,
-  conf_unbounded_right = FALSE,
+  conf_unbounded_right = F,
   require_sust_weeks = 0,
+  check_intermediate = T,
   relapse_to_bl = 30,
   relapse_to_event = 0,
   relapse_to_conf = 30,
   relapse_assoc = 90,
-  event = "firstprog",
-  baseline = "fixed",
   relapse_indep = NULL,
-  sub_threshold = FALSE,
-  relapse_rebl = FALSE,
   min_value = NULL,
-  prog_last_visit = FALSE,
-  include_dates = FALSE,
-  include_value = FALSE,
-  include_stable = TRUE,
-  verbose = 1,
-  devtest_conf = FALSE
+  prog_last_visit = F,
+  date_format = NULL,
+  include_dates = F,
+  include_value = F,
+  include_stable = T,
+  verbose = 1
 )
 }
 \arguments{
@@ -57,45 +57,22 @@ MSprog(
 \item{\code{NULL}}{ (only accepted when specifying a custom \code{delta_fun})}
 }}
 
-\item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included.}
-
-\item{date_format}{Format of dates in the input data. If not specified, it will be inferred by function \link{as.Date}.}
-
 \item{relapse}{\code{data.frame} containing longitudinal data, including: subject ID and relapse date.}
 
 \item{rsubj_col}{Name of subject ID column for relapse data, if different from outcome data.}
 
 \item{rdate_col}{Name of date column for relapse data, if different from outcome data.}
 
+\item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included.}
+
 \item{delta_fun}{Custom function specifying the minimum shift corresponding to a valid change from the provided reference value.
 It must take a numeric value (reference) as input, and return a numeric value corresponding to the minimum shift from baseline.
 If none is specified (default), function \code{\link[=compute_delta]{compute_delta()}} for the specified outcome is used.}
 
-\item{worsening}{The direction of worsening (\code{'increase'} if higher values correspond to worse disease course, \code{'decrease'} otherwise).
+\item{worsening}{The direction of worsening (\code{'increase'} if higher values correspond to worse disease course, \code{'decrease'} otherwise).\if{html}{\out{<br />}}
 This argument is only used when \code{outcome} is set to \code{NULL}. Otherwise, \code{worsening} is automatically set to
 \code{'increase'} if \code{outcome} is set to \code{'edss'}, \code{'nhpt'}, \code{'t25fw'},
 and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
-
-\item{conf_weeks}{Period before confirmation (weeks).}
-
-\item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
-or list-like of length 2 (different tolerance on left and right).
-In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}.}
-
-\item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right.}
-
-\item{require_sust_weeks}{Minimum number of weeks over which a confirmed change must be sustained to be retained as an event.
-Events sustained for the entire follow-up are retained regardless of follow-up duration. Setting \code{require_sust_weeks=Inf},
-events are only retained if sustained for the entire follow-up duration.}
-
-\item{relapse_to_bl}{Minimum distance from last relapse (days) for a visit to be used as baseline
-(otherwise the next available visit is used as baseline).}
-
-\item{relapse_to_event}{Minimum distance from last relapse (days) for an event to be considered as such.}
-
-\item{relapse_to_conf}{Minimum distance from last relapse (days) for a visit to be a valid confirmation visit.}
-
-\item{relapse_assoc}{Maximum distance from last relapse (days) for a progression event to be considered as RAW.}
 
 \item{event}{Specifies which events to detect. Must be one of the following:
 \itemize{
@@ -119,6 +96,40 @@ suitable for a first-progression setting to discard fluctuations around baseline
 }
 }}
 
+\item{sub_threshold}{If \code{TRUE} - and only if \code{baseline} is \code{'roving'} or \code{'roving_impr'} - move roving baseline
+at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of \code{delta_fun}).}
+
+\item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse to search for PIRA events.}
+
+\item{conf_weeks}{Period before confirmation (weeks).}
+
+\item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
+or list-like of length 2 (different tolerance on left and right).
+In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}.}
+
+\item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right.}
+
+\item{require_sust_weeks}{Minimum number of weeks over which a confirmed change must be sustained
+(i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
+Events sustained for the entire follow-up are retained regardless of follow-up duration.
+Setting \code{require_sust_weeks=Inf}, events are retained only when sustained for the entire follow-up duration.\if{html}{\out{<br />}}
+(Warning: if \code{check_intermediate} is set to \code{FALSE}, \emph{only the end} of the specified period will be checked for confirmation.)}
+
+\item{check_intermediate}{If \code{TRUE} (default), events are confirmed \emph{over all intermediate visits}
+up to the confirmation visit. \if{html}{\out{<br />}}
+If set to \code{FALSE} (not recommended in most cases, as it may discard meaningful fluctuations),
+events will be confirmed \emph{only at} the specified confirmation visit
+(and \emph{only at the end} of the period defined by \code{require_sust_weeks}, if any).}
+
+\item{relapse_to_bl}{Minimum distance from last relapse (days) for a visit to be used as baseline
+(otherwise the next available visit is used as baseline).}
+
+\item{relapse_to_event}{Minimum distance from last relapse (days) for an event to be considered as such.}
+
+\item{relapse_to_conf}{Minimum distance from last relapse (days) for a visit to be a valid confirmation visit.}
+
+\item{relapse_assoc}{Maximum distance from last relapse (days) for a progression event to be considered as RAW.}
+
 \item{relapse_indep}{Specifies relapse-free intervals for PIRA definition.
 Must be given in the form produced by function \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}} by calling
 \code{relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1)}
@@ -128,21 +139,18 @@ event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For
 \item{[Muller JAMA Neurol 2023]}{ No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd:
 \cr\code{relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)} (default);}
 \item{[Muller JAMA Neurol 2023](high-specificity definition)}{ No relapses between baseline and confirmation:
-\cr\\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)};}
+\cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)};}
 \item{[Kappos JAMA Neurol 2020]}{ No relapses within baseline->event+30dd and within confirmation+-30dd:
 \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
 }}
 
-\item{sub_threshold}{If \code{TRUE} - and only if \code{baseline} is \code{'roving'} or \code{'roving_impr'} - move roving baseline
-at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of \code{delta_fun}).}
-
-\item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse to search for PIRA events.}
-
-\item{min_value}{Only consider progressions events where the outcome is >= value.}
+\item{min_value}{Only include progression events where the outcome is >= value.}
 
 \item{prog_last_visit}{If \code{TRUE}, include progressions occurring at last visit (i.e. with no confirmation).
 If a numeric value N is passed, unconfirmed events are included only if occurring within N weeks of follow up
 (e.g., in case of early discontinuation).}
+
+\item{date_format}{Format of dates in the input data. If not specified, it will be inferred by function \code{\link[=as.Date]{as.Date()}}.}
 
 \item{include_dates}{If \code{TRUE}, report dates of events.}
 
@@ -157,8 +165,6 @@ with \code{time2event} = total follow up.}
 \item{1}{ (print concise info, default);}
 \item{2}{ (print extended info).}
 }}
-
-\item{devtest_conf}{(to be removed soon) Temporary test - for developer's use only.}
 }
 \value{
 An object of class \code{'MSprogOutput'}.
@@ -166,7 +172,7 @@ An object of class \code{'MSprogOutput'}.
 \description{
 \code{MSprog()} detects and characterises the progression (or improvement) events of an outcome measure
 (EDSS, NHPT, T25FW, or SDMT) for one or more subjects, based on repeated assessments
-through time and on the dates of acute episodes.
+through time and on the dates of acute episodes (if any).
 Several qualitative and quantitative options are given as arguments that can be set
 by the user and reported as a complement to the results to ensure reproducibility.
 }

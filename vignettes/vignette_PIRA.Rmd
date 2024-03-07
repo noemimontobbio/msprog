@@ -74,7 +74,7 @@ head(toydata_relapses)
 
 <br />
 
-The following code detects, for each subject in the toy dataset, the first EDSS PIRA event (`event=firstPIRA`) confirmed at $\geq$ 12 or $\geq$ 24 weeks (`conf_weeks=c(12,24)`, `conf_tol_days=0`, `conf_unbounded_right=TRUE`), for two different definitions of PIRA. We set `verbose=2` to print an extended log of the computations performed.
+The following code detects, for each subject in the toy dataset, the first EDSS PIRA event (`event=firstPIRA`) confirmed over $\geq$ 12 or $\geq$ 24 weeks (`conf_weeks=c(12,24)`, `conf_tol_days=0`, `conf_unbounded_right=TRUE`), for two different definitions of PIRA. We set `verbose=2` to print an extended log of the computations performed.
 
 * Roving baseline, and absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation @muller2023:
   ```{r}
@@ -98,7 +98,7 @@ The following code detects, for each subject in the toy dataset, the first EDSS 
   print(results(output), row.names=FALSE) # results
   ```
 
-Here, `nevent` is the cumulative event count for each subject, and `event_type` characterises the event (since `event` is set to `firstPIRA`, the count is either 0 or 1 and the event type, when present, is always `PIRA`); `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf12` and `conf24` report whether the event was confirmed at 12 or 24 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
+Here, `nevent` is the cumulative event count for each subject, and `event_type` characterises the event (since `event` is set to `firstPIRA`, the count is either 0 or 1 and the event type, when present, is always `PIRA`); `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf12` and `conf24` report whether the event was confirmed over 12 or 24 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
 ## References
 

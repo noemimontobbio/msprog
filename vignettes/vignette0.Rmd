@@ -90,7 +90,7 @@ print(event_count(output_edss))
 ```{r, indent="     "}
 print(results(output_edss), row.names=FALSE)
 ```
-    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^2]; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed at 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
+    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^2]; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed over 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
 3. The `criteria_text` method prints out a short paragraph describing the complete set of criteria used to obtain the output, to be reported to ensure complete reproducibility:
 ```{r, indent="     "}
@@ -176,7 +176,7 @@ Finally, on top of the chosen baseline scheme, *post-relapse re-baseline* @kappo
 
 An event is only validated if it is *confirmed*, that is, if the value change from baseline is maintained **up to** a subsequent visit falling within a pre-specified confirmation period [@ontaneda2017]. The chosen confirmation period depends on the type of study and on the frequency of visits, and can be set in `MSprog()` by using the argument `conf_weeks`. If multiple values are specified (e.g., `conf_weeks=c(12,24)`), events are retained if confirmed by at least a visit falling within one of the specified periods (here, 12 or 24 weeks $\pm$ `conf_tol_days`)[^3]. The results table will report whether an event was confirmed in each of the specified periods.
 
-[^3]: An event is only confirmed if the value change from baseline is maintained **at all visits up to the confirmation visit**. So an event can only be confirmed at 24 weeks and *not* confirmed at 12 weeks if there are no valid confirmation visits falling within the 12-week window.
+[^3]: An event is only confirmed if the value change from baseline is maintained **at all visits up to the confirmation visit**. So an event can only be "confirmed over 24 weeks" and *not* "confirmed over 12 weeks" if there are no valid confirmation visits falling within the 12-week window.
 
 
 Let's look at subject `2` from `toydata_visits`:
@@ -194,7 +194,7 @@ output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
                  conf_weeks=c(12,24), verbose=0)
 print(results(output), row.names=FALSE) # results
 ```
-The `relapse_indep` argument specifies the relapse-free intervals for a progression event to be classified as PIRA[^4]. In this case, a high-specificity definition of PIRA is used [@muller2023] that requires an absence of relapses between baseline and confirmation. The resulting events are a 12-week-confirmed RAW and a 12-week-confirmed PIRA. The RAW event was not confirmed at 24 weeks (`conf24` is `0`). The PIRA event was also confirmed at 24 weeks (`conf24` is `1`). However, since a relapse occurred before the 24-week confirmation, the event cannot be classified as a 24-week-confirmed PIRA (`PIRA_conf24` is `0`) but only as a 24-week-confirmed progression.
+The `relapse_indep` argument specifies the relapse-free intervals for a progression event to be classified as PIRA[^4]. In this case, a high-specificity definition of PIRA is used [@muller2023] that requires an absence of relapses between baseline and confirmation. The resulting events are a 12-week-confirmed RAW and a 12-week-confirmed PIRA. The RAW event was not confirmed over 24 weeks (`conf24` is `0`). The PIRA event was also confirmed over 24 weeks (`conf24` is `1`). However, since a relapse occurred before the 24-week confirmation, the event cannot be classified as a 24-week-confirmed PIRA (`PIRA_conf24` is `0`) but only as a 24-week-confirmed progression.
 
 [^4]: See `relapse_indep_from_bounds()` function documentation, and the vignette *Assessing progression independent of relapse activity (PIRA) in MS*.
 

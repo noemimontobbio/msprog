@@ -73,7 +73,7 @@ output <- MSprog(toydata_visits,                                      # provide 
                  conf_tol_days=0, conf_unbounded_right=T,             # modify default options
                  relapse=toydata_relapses)                            # provide data on relapses
 ```
-The function prints out a concise report of the results, as well as **the specific set of options used to obtain them**. Complete results are stored in an object of class `MSprogOutput`. The following methods are available for extracting info from the output.
+The function prints out a concise report of the results, and of the options used to obtain them. Complete results are stored in an object of class `MSprogOutput`. The following methods are available for extracting info from the output.
 
 1. The `event_count()` method generates a `data.frame` containing the event sequence detected for each subject, and the counts for each event type:
 ```{r, indent = "     "}
@@ -87,7 +87,7 @@ print(results(output), row.names=FALSE)
 ```
     where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed over 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit. 
     
-3. The `criteria_text` method prints out a short paragraph describing the complete set of criteria used to obtain the output, to be reported to ensure complete reproducibility:
+3. The `criteria_text` method prints out a short paragraph describing the complete set of criteria used to obtain the output, **to be reported to ensure complete reproducibility**:
 ```{r, indent="     "}
 criteria_text(output)
 ```

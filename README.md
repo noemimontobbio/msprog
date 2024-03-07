@@ -106,10 +106,10 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> Improvement events: 1
 ```
 
-The function prints out a concise report of the results, as well as
-**the specific set of options used to obtain them**. Complete results
-are stored in an object of class `MSprogOutput`. The following methods
-are available for extracting info from the output.
+The function prints out a concise report of the results, and of the
+options used to obtain them. Complete results are stored in an object of
+class `MSprogOutput`. The following methods are available for extracting
+info from the output.
 
 1.  The `event_count()` method generates a `data.frame` containing the
     event sequence detected for each subject, and the counts for each
@@ -157,12 +157,12 @@ are available for extracting info from the output.
     event was sustained until the last visit.
 
 3.  The `criteria_text` method prints out a short paragraph describing
-    the complete set of criteria used to obtain the output, to be
-    reported to ensure complete reproducibility:
+    the complete set of criteria used to obtain the output, **to be
+    reported to ensure complete reproducibility**:
 
     ``` r
     criteria_text(output)
-    #> For each subject, we detected all EDSS changes (in chronological order) confirmed over 12 weeks or more. A visit could only be used as confirmation if occurring at least 30 days from a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed progression or improvement event. The new reference value was set as the EDSS value at the first available confirmation visit. Whenever the baseline fell within 30 days from a relapse, it was moved to the next available visit. A confirmed EDSS progression event was labelled as RAW if occurring within 90 days from a relapse. A confirmed EDSS progression event was labelled as PIRA if no relapses occurred in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
+    #> For each subject, we detected all EDSS changes (in chronological order) confirmed over 12 weeks or more. A visit could only be used as confirmation if occurring at least 30 days after a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed progression or improvement event. The new reference value was set as the EDSS value at the first available confirmation visit. Whenever the baseline fell within 30 days from a relapse, it was moved to the next available visit. A confirmed EDSS progression event was labelled as RAW if occurring within 90 days from a relapse. A confirmed EDSS progression event was labelled as PIRA if no relapses occurred in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
     ```
 
 <br />
