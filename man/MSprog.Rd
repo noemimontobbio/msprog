@@ -136,11 +136,11 @@ Must be given in the form produced by function \code{\link[=relapse_indep_from_b
 to specify the intervals around baseline (\code{b0} and \code{b1}),
 event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For instance:
 \itemize{
-\item{[Muller JAMA Neurol 2023]}{ No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd:
+\item{No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd [1]:
 \cr\code{relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)} (default);}
-\item{[Muller JAMA Neurol 2023](high-specificity definition)}{ No relapses between baseline and confirmation:
+\item{No relapses between baseline and confirmation (high-specificity definition from [1]):
 \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)};}
-\item{[Kappos JAMA Neurol 2020]}{ No relapses within baseline->event+30dd and within confirmation+-30dd:
+\item{No relapses within baseline->event+30dd and within confirmation+-30dd [2]:
 \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
 }}
 
@@ -167,7 +167,13 @@ with \code{time2event} = total follow up.}
 }}
 }
 \value{
-An object of class \code{'MSprogOutput'}.
+An object of class \code{'MSprogOutput'}, for which the following methods are available:
+\itemize{
+\item{\code{event_count} }{generates a \code{data.frame} containing the event sequence detected for each subject, and the counts for each event type}
+\item{\code{results} }{generates a \code{data.frame} with extended info on each event for all subjects}
+\item{\code{criteria_text} }{prints out a short paragraph describing the complete set of criteria used to obtain the output,
+\strong{to be reported to ensure complete reproducibility}}
+}
 }
 \description{
 \code{MSprog()} detects and characterises the progression (or improvement) events of an outcome measure
@@ -179,10 +185,10 @@ by the user and reported as a complement to the results to ensure reproducibilit
 \details{
 The events are detected sequentially by scanning the outcome values in chronological order.
 Progression events are classified as relapse-associated or relapse-independent based on their relative timing
-with respect to the relapses. Specifically, relapse-associated worsening (RAW) events
-are defined as confirmed progression events occurring within the influence of a relapse,
-while progression independent of relapse activity (PIRA) is established when the progression
-event occurs out of relapse influence, and with no relapses between baseline and confirmation.
+with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
+confirmed progression events occurring within a specified interval (\code{relapse_assoc} argument) from a relapse;
+the definition of progression independent of relapse activity (PIRA) is established by specifying relapse-free intervals
+around the baseline, event, and confirmation visits (\code{relapse_indep} argument).
 }
 \examples{
 # EDSS progression
@@ -197,4 +203,13 @@ output_sdmt <- MSprog(toydata_visits, 'id', 'SDMT', 'date', 'sdmt',
     event='multiple', baseline='roving', verbose=1)
 print(results(output_sdmt)) # extended info on each event for all subjects
 print(event_count(output_sdmt)) # summary of event sequence for each subject
+}
+\references{
+[1] Müller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli Ö, et al.
+Harmonizing definitions for progression independent of relapse activity in multiple sclerosis: A systematic review.
+JAMA Neurol. 2023;80:1232–45. \cr\cr
+[2] Kappos L, Wolinsky JS, Giovannoni G, Arnold DL, Wang Q, Bernasconi C, et al.
+Contribution of relapse-independent progression vs relapse-associated worsening to overall confirmed disability
+accumulation in typical relapsing multiple sclerosis in a pooled analysis of 2 randomized clinical trials.
+JAMA Neurol. 2020;77:1132–40.
 }

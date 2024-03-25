@@ -9,10 +9,10 @@
 #'
 #' The events are detected sequentially by scanning the outcome values in chronological order.
 #' Progression events are classified as relapse-associated or relapse-independent based on their relative timing
-#' with respect to the relapses. Specifically, relapse-associated worsening (RAW) events
-#' are defined as confirmed progression events occurring within the influence of a relapse,
-#' while progression independent of relapse activity (PIRA) is established when the progression
-#' event occurs out of relapse influence, and with no relapses between baseline and confirmation.
+#' with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
+#' confirmed progression events occurring within a specified interval (`relapse_assoc` argument) from a relapse;
+#' the definition of progression independent of relapse activity (PIRA) is established by specifying relapse-free intervals
+#' around the baseline, event, and confirmation visits (`relapse_indep` argument).
 #'
 #'
 #' @param data `data.frame` containing longitudinal data, including: subject ID, outcome value, date of visit.
@@ -87,11 +87,11 @@
 #' to specify the intervals around baseline (`b0` and `b1`),
 #' event (`e0` and `e1`), and confirmation (`c0` and `c1`). For instance:
 #' \itemize{
-#' \item{\[Muller JAMA Neurol 2023\]}{ No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd:
+#' \item{No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd \[1\]:
 #' \cr`relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)` (default);}
-#' \item{\[Muller JAMA Neurol 2023\](high-specificity definition)}{ No relapses between baseline and confirmation:
+#' \item{No relapses between baseline and confirmation (high-specificity definition from \[1\]):
 #' \cr`relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)`;}
-#' \item{\[Kappos JAMA Neurol 2020\]}{ No relapses within baseline->event+30dd and within confirmation+-30dd:
+#' \item{No relapses within baseline->event+30dd and within confirmation+-30dd \[2\]:
 #' \cr`relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)`}
 #' }
 #' @param min_value Only include progression events where the outcome is >= value.
@@ -110,7 +110,24 @@
 #'  \item{2}{ (print extended info).}
 #'  }
 #'
-#' @return An object of class `'MSprogOutput'`.
+#' @references
+#' \[1\] Müller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli Ö, et al.
+#' Harmonizing definitions for progression independent of relapse activity in multiple sclerosis: A systematic review.
+#' JAMA Neurol. 2023;80:1232–45. \cr\cr
+#' \[2\] Kappos L, Wolinsky JS, Giovannoni G, Arnold DL, Wang Q, Bernasconi C, et al.
+#' Contribution of relapse-independent progression vs relapse-associated worsening to overall confirmed disability
+#' accumulation in typical relapsing multiple sclerosis in a pooled analysis of 2 randomized clinical trials.
+#' JAMA Neurol. 2020;77:1132–40.
+#'
+#'
+#' @return An object of class `'MSprogOutput'`, for which the following methods are available:
+#' \itemize{
+#' \item{`event_count` }{generates a `data.frame` containing the event sequence detected for each subject, and the counts for each event type}
+#' \item{`results` }{generates a `data.frame` with extended info on each event for all subjects}
+#' \item{`criteria_text` }{prints out a short paragraph describing the complete set of criteria used to obtain the output,
+#' **to be reported to ensure complete reproducibility**}
+#' }
+#'
 #' @importFrom stats na.omit setNames complete.cases
 #' @importFrom dplyr %>% group_by_at vars slice n mutate across
 #' @export
@@ -793,10 +810,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     if (verbose == 2) {
                       message(outcome, " progression[", event_type[length(event_type)],
                                    "] (visit no.", change_idx, ", ",
-                                  global_start + as.difftime(data_id[change_idx,][[date_col]], units='days'), ") confirmed at ",
+                                  global_start + as.difftime(data_id[change_idx,][[date_col]], units='days'),
+                              ifelse(length(conf_t)>0, paste0(") confirmed at ",
                               paste(ifelse(event_type[length(event_type)]=='PIRA', names(pconf_t), names(conf_t)), collapse=", "),
                                   " weeks, sustained up to visit no.", sust_idx,
-                                   " (", global_start + as.difftime(data_id[sust_idx,][[date_col]], units='days'), ")")
+                                   " (", global_start + as.difftime(data_id[sust_idx,][[date_col]], units='days'), ")"),
+                              ") occurring at last assessment (no confirmation)")
+                              )
                     }
                   }
 
@@ -811,64 +831,67 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
 
 
-                # For each m in conf_weeks, only keep the earliest available confirmation visit
-                conf_idx <- unname(sapply(names(conf_t), function(m) {
-                  min(intersect(conf_t[[m]], conf_idx))
-                })) #_conf_#
+                if (length(conf_t)>0) {
+
+                  # For each m in conf_weeks, only keep the earliest available confirmation visit
+                  conf_idx <- unname(sapply(names(conf_t), function(m) {
+                    min(intersect(conf_t[[m]], conf_idx))
+                  })) #_conf_#
 
 
-                # # next event from last confirmation
-                # next_change <- NA
-                # if (conf_idx[[length(conf_idx)]]<nvisits) {
-                #   for (x in (conf_idx[[length(conf_idx)]] + 1):nvisits) {
-                #     if (data_id[x,][[value_col]] - bl[[value_col]] < delta(bl[[value_col]]) || # either not sustained
-                #         abs(data_id[x,][[value_col]] - data_id[conf_idx[[length(conf_idx)]],][[value_col]])
-                #         >= delta(data_id[conf_idx[[length(conf_idx)]],][[value_col]])) {  # or further change from *last* confirmation
-                #       next_change <- x
-                #       break
-                #     }
-                #   }
-                # }
+                  # # next event from last confirmation
+                  # next_change <- NA
+                  # if (conf_idx[[length(conf_idx)]]<nvisits) {
+                  #   for (x in (conf_idx[[length(conf_idx)]] + 1):nvisits) {
+                  #     if (data_id[x,][[value_col]] - bl[[value_col]] < delta(bl[[value_col]]) || # either not sustained
+                  #         abs(data_id[x,][[value_col]] - data_id[conf_idx[[length(conf_idx)]],][[value_col]])
+                  #         >= delta(data_id[conf_idx[[length(conf_idx)]],][[value_col]])) {  # or further change from *last* confirmation
+                  #       next_change <- x
+                  #       break
+                  #     }
+                  #   }
+                  # }
 
-                #_r_#
-                # next...
-                next_change <- NA
-                if (conf_idx[[1]]<nvisits) {
-                  # ...valid change from first confirmation visit:
-                  for (x in (conf_idx[[1]] + 1):nvisits) {
-                    if (!isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='prog') # either not sustained
-                        || isevent_loc(data_id[x,][[value_col]],  data_id[conf_idx[[1]],][[value_col]],
-                                       type='change')) {  # or further change from *first* confirmation
-                      next_change <- x
-                      break
+                  #_r_#
+                  # next valid change from first confirmation visit:
+                  next_change <- NA
+                  if (conf_idx[[1]]<nvisits) {
+                    for (x in (conf_idx[[1]] + 1):nvisits) {
+                      if (!isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='prog') # either not sustained
+                          || isevent_loc(data_id[x,][[value_col]],  data_id[conf_idx[[1]],][[value_col]],
+                                         type='change')) {  # or further change from *first* confirmation
+                        next_change <- x
+                        break
+                      }
                     }
                   }
+                  # next valid change from event:
+                  next_change_ev <- which(isevent_loc(data_id[(change_idx + 1):nvisits, value_col],
+                                                      bl[[value_col]], type='change'))[1] + change_idx
+
                 }
-                # ...valid change from event:
-                next_change_ev <- which(isevent_loc(data_id[(change_idx + 1):nvisits, value_col],
-                                                    bl[[value_col]], type='change'))[1] + change_idx
 
 
-                # Move the search index, and optionally the baseline
-                if ((baseline == 'roving' && phase == 0)
-                ) {
-                  bl_idx <- ifelse(is.na(next_change), nvisits, next_change - 1) # set new baseline at first confirmation time
-                  search_idx <- bl_idx + 1
-                } else if (phase==0 && ((event_type[length(event_type)]!='PIRA' & event=='firstPIRA')
-                                        || (event_type[length(event_type)]!='RAW' & event=='firstRAW')
-                                        || !valid_prog)) {
-                  search_idx <- ifelse(is.na(next_change_ev), nvisits, next_change_ev) #_r_#
-                } else if (phase==1 && length(event_type)==nev) { # ongoing relapse-based rebaseline, and the progression found is not PIRA
-                  search_idx <- change_idx + 1
-                }
-                else {
-                  search_idx <- ifelse(is.na(next_change), nvisits+1, next_change)
-                }
+              # Move the search index, and optionally the baseline
+              if (length(conf_t) == 0 # progression occurring at last visit
+                || (phase==1 && length(event_type)==nev)) { # ongoing relapse-based rebaseline, and the progression found is not PIRA
+                search_idx <- change_idx + 1
+              } else if (baseline == 'roving' && phase == 0) {
+                bl_idx <- ifelse(is.na(next_change), nvisits, next_change - 1) # set new baseline at first confirmation time
+                search_idx <- bl_idx + 1
+              } else if (phase==0 && ((event_type[length(event_type)]!='PIRA' & event=='firstPIRA')
+                                      || (event_type[length(event_type)]!='RAW' & event=='firstRAW')
+                                      || !valid_prog)) {
+                search_idx <- ifelse(is.na(next_change_ev), nvisits, next_change_ev) #_r_#
+              } else {
+                search_idx <- ifelse(is.na(next_change), nvisits+1, next_change)
+              }
 
-                if (verbose == 2 && phase == 0) {
-                  message("Baseline at visit no.", bl_idx, ", searching for events from visit no.",
-                          ifelse(search_idx > nvisits, "-", search_idx), " on")
-                }
+              if (verbose == 2 && phase == 0) {
+                message("Baseline at visit no.", bl_idx, ", searching for events from visit no.",
+                        ifelse(search_idx > nvisits, "-", search_idx), " on")
+              }
+
 
           }
 

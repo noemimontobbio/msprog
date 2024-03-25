@@ -12,7 +12,7 @@
 #'  \item{`'t25fw'`}{ (Timed 25-Foot Walk);}
 #'  \item{`'sdmt'`}{ (Symbol Digit Modalities Test).}
 #'  }
-#' @return Minimum delta corresponding to valid change from the provided baseline value. Specifically:
+#' @return Minimum shift corresponding to a valid change from the provided baseline value. Specifically:
 #' \itemize{
 #'  \item{EDSS: }{1.5 if `baseline==0`, 1 if `0<baseline<=5`, 0.5 if `baseline>=5.5`;}
 #'  \item{NHPT and T25FW: }{20`%` of `baseline`;}
@@ -89,7 +89,7 @@ compute_delta <- function(baseline, outcome='edss') {
 #' @param delta_fun Custom function specifying the minimum shift corresponding
 #' to a valid change from the provided baseline value. If none is specified (default),
 #' [compute_delta()] for the specified outcome is used.
-#' @param sub_threshold If `TRUE`, any confirmed progression, or improvement, or change in outcome measure is valid,
+#' @param sub_threshold If `TRUE`, any confirmed progression, or improvement, or change in the outcome measure is valid,
 #'  regardless of `delta_fun`.
 #' @return A boolean value specifying if a valid event was found.
 #' @export is_event

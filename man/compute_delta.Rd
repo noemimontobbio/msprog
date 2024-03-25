@@ -18,7 +18,7 @@ compute_delta(baseline, outcome = "edss")
 }}
 }
 \value{
-Minimum delta corresponding to valid change from the provided baseline value. Specifically:
+Minimum shift corresponding to a valid change from the provided baseline value. Specifically:
 \itemize{
 \item{EDSS: }{1.5 if \code{baseline==0}, 1 if \verb{0<baseline<=5}, 0.5 if \code{baseline>=5.5};}
 \item{NHPT and T25FW: }{20\verb{\%} of \code{baseline};}

@@ -44,7 +44,7 @@ and to \code{'decrease'} for SDMT.}
 to a valid change from the provided baseline value. If none is specified (default),
 \code{\link[=compute_delta]{compute_delta()}} for the specified outcome is used.}
 
-\item{sub_threshold}{If \code{TRUE}, any confirmed progression, or improvement, or change in outcome measure is valid,
+\item{sub_threshold}{If \code{TRUE}, any confirmed progression, or improvement, or change in the outcome measure is valid,
 regardless of \code{delta_fun}.}
 }
 \value{

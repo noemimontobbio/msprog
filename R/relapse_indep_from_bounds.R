@@ -14,18 +14,24 @@
 #' @param c0 Days before confirmation (`>=0`), or `NULL`.
 #' @param c1 Days after confirmation (`>=0`).
 #'
+#' @references
+#' \[1\] Müller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli Ö, et al.
+#' Harmonizing definitions for progression independent of relapse activity in multiple sclerosis: A systematic review.
+#' JAMA Neurol. 2023;80:1232–45. \cr\cr
+#' \[2\] Kappos L, Wolinsky JS, Giovannoni G, Arnold DL, Wang Q, Bernasconi C, et al.
+#' Contribution of relapse-independent progression vs relapse-associated worsening to overall confirmed disability
+#' accumulation in typical relapsing multiple sclerosis in a pooled analysis of 2 randomized clinical trials.
+#' JAMA Neurol. 2020;77:1132–40.
+#'
 #' @return A named list to be given as argument `relapse_indep` to function [MSprog()]
 #' @export relapse_indep_from_bounds
 #' @examples
-#' # [Muller JAMA Neurol 2023](high-specificity definition)
-#' # No relapses between baseline and confirmation:
+#' # No relapses between baseline and confirmation (high-specificity definition from [1]):
 #' relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)
-#' # [Muller JAMA Neurol 2023]
 #' # No relapses within event-90dd->event+30dd
-#' # and within confirmation-90dd->confirmation+30dd:
+#' # and within confirmation-90dd->confirmation+30dd [1]:
 #' relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)
-#' # [Kappos JAMA Neurol 2020]
-#' # No relapses within baseline->event+30dd and within confirmation+-30dd:
+#' # No relapses within baseline->event+30dd and within confirmation+-30dd [2]:
 #' relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)
 relapse_indep_from_bounds <- function(b0, b1, e0, e1, c0, c1) {
   for (p in c(b0, b1, e0, e1, c0, c1)) {
