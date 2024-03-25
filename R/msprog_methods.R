@@ -7,7 +7,8 @@
 #' The method prints out a short paragraph describing the set of criteria used to
 #' obtain the output.
 #'
-#' @param object An object of class `'MSprogOutput'` (result of a call to [MSprog()]).
+#' @param x An object of class `'MSprogOutput'` (result of a call to [MSprog()]).
+#' @param ... Optional arguments for `print` methods. They are ignored in this function.
 #'
 #' @export
 #' @examples
@@ -16,9 +17,9 @@
 #'     relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=2)
 #' print(output) # textual description of parameters used to obtain output
-print.MSprogOutput <- function(object, ...) {
+print.MSprogOutput <- function(x, ...) {
 
-  s <- object$prog_settings
+  s <- x$prog_settings
   outcome <- ifelse(s$outcome=='outcome', 'outcome', toupper(s$outcome))
   delta <- function(value) {
     if (is.null(s$delta_fun)) {
