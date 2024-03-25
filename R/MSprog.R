@@ -120,12 +120,11 @@
 #' JAMA Neurol. 2020;77:1132–40.
 #'
 #'
-#' @return An object of class `'MSprogOutput'`, for which the following methods are available:
+#' @return An object of class `'MSprogOutput'` with the following attributes:
 #' \itemize{
-#' \item{`event_count` }{generates a `data.frame` containing the event sequence detected for each subject, and the counts for each event type}
-#' \item{`results` }{generates a `data.frame` with extended info on each event for all subjects}
-#' \item{`criteria_text` }{prints out a short paragraph describing the complete set of criteria used to obtain the output,
-#' **to be reported to ensure complete reproducibility**}
+#' \item{`event_count`: }{a `data.frame` containing the event sequence detected for each subject, and the counts for each event type}
+#' \item{`results`: }{a `data.frame` with extended info on each event for all subjects}
+#' \item{`prog_settings`: }{a list containing all the arguments used to compute the output.}
 #' }
 #'
 #' @importFrom stats na.omit setNames complete.cases
@@ -1188,7 +1187,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   sub_threshold=sub_threshold, relapse_rebl=relapse_rebl, min_value=min_value,
                   prog_last_visit=prog_last_visit, delta_fun=delta_fun)
 
-    output <- list(summary=summary, results_df=results_df, prog_settings=prog_settings)
+    output <- list(event_count=summary, results=results_df, prog_settings=prog_settings)
     class(output) <- 'MSprogOutput'
 
 

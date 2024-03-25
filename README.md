@@ -108,15 +108,13 @@ output <- MSprog(toydata_visits,                                      # provide 
 
 The function prints out a concise report of the results, and of the
 options used to obtain them. Complete results are stored in an object of
-class `MSprogOutput`. The following methods are available for extracting
-info from the output.
+class `MSprogOutput` with the following attributes.
 
-1.  The `event_count()` method generates a `data.frame` containing the
-    event sequence detected for each subject, and the counts for each
-    event type:
+1.  `event_count`: a `data.frame` containing the event sequence detected
+    for each subject, and the counts for each event type.
 
     ``` r
-    print(event_count(output))
+    print(output$event_count)
     #>   event_sequence improvement progression RAW PIRA undefined_prog
     #> 1           PIRA           0           1   0    1              0
     #> 2      RAW, PIRA           0           2   1    1              0
@@ -127,11 +125,10 @@ info from the output.
     where: `event_sequence` specifies the order of the events; the other
     columns count the events of each type.
 
-2.  The `results` method generates extended info on each event for all
-    subjects:
+2.  `results`: extended info on each event for all subjects.
 
     ``` r
-    print(results(output), row.names=FALSE)
+    print(output$results, row.names=FALSE)
     #>  id nevent event_type total_fu time2event bl2event conf12 PIRA_conf12 sust_days
     #>   1      1       PIRA      534        292      292      1           1       242
     #>   2      1        RAW      730        198      198      1          NA        84
@@ -156,14 +153,15 @@ info from the output.
     for which the event was sustained; `sust_last` reports whether the
     event was sustained until the last visit.
 
-3.  The `criteria_text` method prints out a short paragraph describing
-    the complete set of criteria used to obtain the output, **to be
-    reported to ensure complete reproducibility**:
+Additionally, applying the `print` method to an object of class
+`MSprogOutput` prints out a short paragraph describing the complete set
+of criteria used to obtain the output, **to be reported to ensure
+complete reproducibility**:
 
-    ``` r
-    criteria_text(output)
-    #> For each subject, we detected all EDSS changes (in chronological order) confirmed over 12 weeks or more. A visit could only be used as confirmation if occurring at least 30 days after a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed progression or improvement event. The new reference value was set as the EDSS value at the first available confirmation visit. Whenever the baseline fell within 30 days from a relapse, it was moved to the next available visit. A confirmed EDSS progression event was labelled as RAW if occurring within 90 days from a relapse. A confirmed EDSS progression event was labelled as PIRA if no relapses occurred in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
-    ```
+``` r
+print(output)
+#> For each subject, we detected all EDSS changes (in chronological order) confirmed over 12 weeks or more. A visit could only be used as confirmation if occurring at least 30 days after a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed progression or improvement event. The new reference value was set as the EDSS value at the first available confirmation visit. Whenever the baseline fell within 30 days from a relapse, it was moved to the next available visit. A confirmed EDSS progression event was labelled as RAW if occurring within 90 days from a relapse. A confirmed EDSS progression event was labelled as PIRA if no relapses occurred in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
+```
 
 <br />
 

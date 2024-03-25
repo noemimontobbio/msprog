@@ -78,27 +78,28 @@ output_sdmt <- MSprog(toydata_visits, # data on visits
                  outcome='sdmt', # specify outcome type
                  relapse=toydata_relapses) # data on relapses
 ```
-The function prints concise info (the argument `verbose` can be used to control the amount of printed info), and outputs an object of class `MSprogOutput`. The following methods are available for extracting info from the output.
+The function prints concise info (the argument `verbose` can be used to control the amount of printed info), and outputs an object of class `MSprogOutput` with the following attributes.
 
-1. The `event_count` method generates a `data.frame` containing the event counts for each subject, and the event sequence (where relevant):
+1. `event_count`: a `data.frame` containing the event counts for each subject, and the event sequence (where relevant).
 ```{r, indent="     "}
-print(event_count(output_edss))
+print(output_edss$event_count)
 ```
     where: `event_sequence`[^1] specifies the order of the events; the other columns count the events of each kind (improvement; progression; relapse-associated worsening, RAW; progression independent of relapse activity, PIRA; and progression that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent2019].
 
-2. The `results` method generates extended info on each event for all subjects:
+2. `results`: extended info on each event for all subjects:
 ```{r, indent="     "}
-print(results(output_edss), row.names=FALSE)
+print(output_edss$results, row.names=FALSE)
 ```
     where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^2]; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed over 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
-3. The `criteria_text` method prints out a short paragraph describing the complete set of criteria used to obtain the output, to be reported to ensure complete reproducibility:
-```{r, indent="     "}
-criteria_text(output_edss)
+
+Additionally, applying the `print` method to an object of class `MSprogOutput` prints out a short paragraph describing the complete set of criteria used to obtain the output, to be reported to ensure complete reproducibility:
+```{r}
+print(output_edss)
 ```
 
 
-[^1]: In this example, `event_sequence` can contain a maximum of one event, as we are not specifying the argument `event` - which defaults to `firstprog` (only detect the first progression event). For the same reason, `nevent` in `results(output)` can only be 0 or 1 in this example. In a multiple-event setting (`event=multiple`), more than one event per subject can be detected. See [the relevant section](#multiple).
+[^1]: In this example, `event_sequence` can contain a maximum of one event, as we are not specifying the argument `event` - which defaults to `firstprog` (only detect the first progression event). For the same reason, `nevent` in `output$results` can only be 0 or 1 in this example. In a multiple-event setting (`event=multiple`), more than one event per subject can be detected. See [the relevant section](#multiple).
 [^2]: For subjects with no events, `time2event` is the total follow-up length. To omit these subjects, set `include_stable=FALSE` in `MSprog()`.
 
 
@@ -156,7 +157,7 @@ print(toydata_visits[toydata_visits$id==4, c('date', 'EDSS')], row.names=FALSE) 
 output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', subjects=4,
                 relapse=toydata_relapses, conf_weeks=12, event='multiple', baseline='fixed', 
                 include_dates=TRUE, verbose=0)
-print(results(output), row.names=FALSE) # results
+print(output$results, row.names=FALSE) # results
 ```
 
 Since the reference value was kept fixed at the first visit (EDSS=4.5), the EDSS progression at visit 4 (EDSS=5) was not detected. On the other hand, with a roving baseline scheme, the baseline is moved to visit 3 after the confirmed improvement and the progression event is correctly detected:
@@ -164,7 +165,7 @@ Since the reference value was kept fixed at the first visit (EDSS=4.5), the EDSS
 output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', relapse=toydata_relapses, subjects=4,
                 conf_weeks=12, event='multiple', baseline='roving', 
                 include_dates=TRUE, verbose=0)
-print(results(output), row.names=FALSE) # results
+print(output$results, row.names=FALSE) # results
 ```
 
 <br />
@@ -192,7 +193,7 @@ output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
                  event='multiple', baseline='roving', 
                  relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0),
                  conf_weeks=c(12,24), verbose=0)
-print(results(output), row.names=FALSE) # results
+print(output$results, row.names=FALSE) # results
 ```
 The `relapse_indep` argument specifies the relapse-free intervals for a progression event to be classified as PIRA[^4]. In this case, a high-specificity definition of PIRA is used [@muller2023] that requires an absence of relapses between baseline and confirmation. The resulting events are a 12-week-confirmed RAW and a 12-week-confirmed PIRA. The RAW event was not confirmed over 24 weeks (`conf24` is `0`). The PIRA event was also confirmed over 24 weeks (`conf24` is `1`). However, since a relapse occurred before the 24-week confirmation, the event cannot be classified as a 24-week-confirmed PIRA (`PIRA_conf24` is `0`) but only as a 24-week-confirmed progression.
 
@@ -205,7 +206,7 @@ output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
                 event='multiple', baseline='roving', 
                 relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0),
                 conf_weeks=c(12,24), require_sust_weeks=48, verbose=0)
-print(results(output), row.names=FALSE) # results
+print(output$results, row.names=FALSE) # results
 ```
 
 In this context, as the transient EDSS accumulation was not classified as an event, it did not trigger a re-baseline according to the roving baseline scheme. As a consequence, the PIRA event is classified as an undefined progression due to the presence of a relapse between baseline and confirmation. This can be handled by enabling *post-relapse re-baseline* (`relapse_rebl=TRUE`) to force a re-baseline after each relapse:
@@ -216,7 +217,7 @@ output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
                 relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0),
                 relapse_rebl=TRUE,
                 conf_weeks=c(12,24), require_sust_weeks=48, verbose=0)
-print(results(output), row.names=FALSE) # results
+print(output$results, row.names=FALSE) # results
 ```
 The event is now correctly classified as PIRA.
 

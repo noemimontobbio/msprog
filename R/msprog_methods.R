@@ -1,97 +1,8 @@
 
-#' Event count from object.
-#'
-#' @param object An object for which an event count is desired.
-#'
-#' @return The form of the value returned by `event_count` depends on the class of its argument.
-#' See the documentation of the particular methods for details of what is produced by that method.
-#' @export
-#' @keywords internal
-event_count <- function (object) {
-  UseMethod("event_count")
-}
-
-
-
-#' Event count for disability progression results.
-#'
-#' `event_count` method for class `'MSprogOutput'`.
-#'
-#' @param object An object of class `'MSprogOutput'` (result of a call to [MSprog()]).
-#'
-#' @return A `data.frame` object containing the sequence of events for each subject,
-#' as well as the event count separated by event type
-#' (improvement, progression, RAW, PIRA, undefined progression).
-#' @export
-#' @examples
-#' # EDSS progression
-#' output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
-#'     relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
-#'     event='multiple', baseline='roving', verbose=2)
-#' print(event_count(output)) # event sequence and count for each subject
-event_count.MSprogOutput <- function(object) {
-  object$summary
-}
-
-
-###############################################################################################
-
-
-#' Extended result report from object.
-#'
-#' @param object An object for which an extended result report is desired.
-#'
-#' @return The form of the value returned by `results` depends on the class of its argument.
-#' See the documentation of the particular methods for details of what is produced by that method.
-#' @export
-#' @keywords internal
-results <- function (object) {
-  UseMethod("results")
-}
-
-
-
-#' Extended disability progression results.
-#'
-#' `results` method for class `'MSprogOutput'`.
-#'
-#'
-#' @param object An object of class `'MSprogOutput'` (result of a call to [MSprog()]).
-#'
-#' @return A `data.frame` object containing an extended report of all events
-#' detected by function [MSprog()] for each subject.
-#' @export
-#' @examples
-#' # EDSS progression
-#' output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
-#'     relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
-#'     event='multiple', baseline='roving', verbose=2)
-#' print(results(output)) # extended event info for each subject
-results.MSprogOutput <- function(object) {
-  object$results_df
-}
-
-
-###############################################################################################
-
-
-#' Textual description of criteria used to obtain object.
-#'
-#' @param object An object for which a textual description of criteria is desired.
-#'
-#' @return The form of the value returned by `criteria_text` depends on the class of its argument.
-#' See the documentation of the particular methods for details of what is produced by that method.
-#' @export
-#' @keywords internal
-criteria_text <- function (object) {
-  UseMethod("criteria_text")
-}
-
-
 
 #' Textual description of criteria used to compute disability progression.
 #'
-#' `criteria_text` method for class `'MSprogOutput'`.
+#' `print` method for class `'MSprogOutput'`.
 #'
 #' The method prints out a short paragraph describing the set of criteria used to
 #' obtain the output.
@@ -104,8 +15,8 @@ criteria_text <- function (object) {
 #' output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
 #'     relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=2)
-#' criteria_text(output) # textual description of parameters used to obtain output
-criteria_text.MSprogOutput <- function(object) {
+#' print(output) # textual description of parameters used to obtain output
+print.MSprogOutput <- function(object) {
 
   s <- object$prog_settings
   outcome <- ifelse(s$outcome=='outcome', 'outcome', toupper(s$outcome))
@@ -203,10 +114,5 @@ criteria_text.MSprogOutput <- function(object) {
   cat(text)
 
 }
-
-
-###############################################################################################
-
-
 
 

@@ -167,12 +167,11 @@ with \code{time2event} = total follow up.}
 }}
 }
 \value{
-An object of class \code{'MSprogOutput'}, for which the following methods are available:
+An object of class \code{'MSprogOutput'} with the following attributes:
 \itemize{
-\item{\code{event_count} }{generates a \code{data.frame} containing the event sequence detected for each subject, and the counts for each event type}
-\item{\code{results} }{generates a \code{data.frame} with extended info on each event for all subjects}
-\item{\code{criteria_text} }{prints out a short paragraph describing the complete set of criteria used to obtain the output,
-\strong{to be reported to ensure complete reproducibility}}
+\item{\code{event_count}: }{a \code{data.frame} containing the event sequence detected for each subject, and the counts for each event type}
+\item{\code{results}: }{a \code{data.frame} with extended info on each event for all subjects}
+\item{\code{prog_settings}: }{a list containing all the arguments used to compute the output.}
 }
 }
 \description{
