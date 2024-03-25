@@ -16,7 +16,7 @@
 #'     relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=2)
 #' print(output) # textual description of parameters used to obtain output
-print.MSprogOutput <- function(object) {
+print.MSprogOutput <- function(object, ...) {
 
   s <- object$prog_settings
   outcome <- ifelse(s$outcome=='outcome', 'outcome', toupper(s$outcome))

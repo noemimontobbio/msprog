@@ -135,14 +135,14 @@
 #' output_edss <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
 #'     relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=1)
-#' print(results(output_edss)) # extended info on each event for all subjects
-#' print(event_count(output_edss)) # summary of event sequence for each subject
+#' print(output_edss$results) # extended info on each event for all subjects
+#' print(output_edss$event_count) # summary of event sequence for each subject
 #' # SDMT progression
 #' output_sdmt <- MSprog(toydata_visits, 'id', 'SDMT', 'date', 'sdmt',
 #'     relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=1)
-#' print(results(output_sdmt)) # extended info on each event for all subjects
-#' print(event_count(output_sdmt)) # summary of event sequence for each subject
+#' print(output_sdmt$results) # extended info on each event for all subjects
+#' print(output_sdmt$event_count) # summary of event sequence for each subject
 MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, subjects=NULL,
                    delta_fun=NULL, worsening=NULL, event='firstprog', baseline='fixed', sub_threshold=F, relapse_rebl=F,

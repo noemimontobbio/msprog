@@ -4,7 +4,7 @@
 \alias{print.MSprogOutput}
 \title{Textual description of criteria used to compute disability progression.}
 \usage{
-\method{print}{MSprogOutput}(object)
+\method{print}{MSprogOutput}(object, ...)
 }
 \arguments{
 \item{object}{An object of class \code{'MSprogOutput'} (result of a call to \code{\link[=MSprog]{MSprog()}}).}
