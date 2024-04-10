@@ -214,6 +214,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   relapse <- relapse[relapse[[rsubj_col]] %in% subjects,]
   }
 
+  if (nrow(data)==0) {
+    stop('Empty data. Did you pass an empty/invalid `subjects` argument?')
+  }
+
   # Check if values are in correct range
   if (outcome!='outcome') {
     if (any(data[[value_col]]<0)) {
@@ -235,7 +239,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
   # Set minimum value
   if (is.null(min_value)) {
-    min_value_ifany <- min(data[[value_col]]) - 1
+    min_value_ifany <- -Inf
   } else {
     min_value_ifany <- min_value
   }
@@ -511,7 +515,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   && data_id[nvisits, date_col] - data_id[change_idx, date_col] >= require_sust_weeks * 7) { # follow-up lasts at least require_sust_weeks
                 sust_vis <- which(data_id[(change_idx + 1):nvisits, date_col]
                       - data_id[change_idx,][[date_col]] >= require_sust_weeks * 7)[1] + change_idx
-              } else {sust_vis <- nvisits}
+              } else {
+                sust_vis <- nvisits
+                }
             valid_impr <- ifelse(check_intermediate,
                 is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]]
                                  - data_id[change_idx, date_col]) >= require_sust_weeks * 7, # improvement sustained up to end of follow-up, or for `require_sust_weeks` weeks

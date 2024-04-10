@@ -33,7 +33,15 @@ output <- MSprog(...
                  relapse_indep=relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1),
                  ...)
 ```
-where: `b0` and `b1` specify the interval around the baseline visit; `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit. If the right end (`b1` or `e1`) is `NULL`, the interval is assumed to extend up to the left end of the next interval. If the left end is `NULL`  (`e0` or `c0`), the interval is assumed to extend up to the right end of the previous interval. Some examples are provided below.
+where: `b0` and `b1` specify the interval around the baseline visit; `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If the right end (`b1` or `e1`) is `NULL`, the interval is assumed to extend up to the left end of the next interval. If the left end is `NULL`  (`e0` or `c0`), the interval is assumed to extend up to the right end of the previous interval. 
+
+```{r echo=FALSE, dpi=250, fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `b0`, `b1`, `e0`, `e1`, `c0`, `c1`.*"}
+knitr::include_graphics(paste0(getwd(), 'relapse_indep_def.png'))
+```
+
+<br/ >
+Some examples are provided below.
+<br/ >
 
 * In @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation visit for a progression event to be considered as PIRA. This translates to:
   ``` {r}
@@ -41,24 +49,48 @@ where: `b0` and `b1` specify the interval around the baseline visit; `e0` and `e
                                             90,30, # event
                                             90,30) # confirmation
   ```
+  
+  ```{r echo=FALSE, dpi=250, fig.cap = "*Figure 2. Relapse-free intervals as recommended in @muller2023.*"}
+  knitr::include_graphics('./relapse_indep_rev1.png')
+  ```
+  <br/ >
+  
 * When a high specificity is desired, they recommend an absence of relapses in the whole period between the reference visit and the confirmation visit, which is implemented as:
   ``` {r}
   relapse_indep <- relapse_indep_from_bounds(0,NULL,    # baseline
                                             NULL,NULL, # event
                                             NULL,0)    # confirmation
   ```
+  
+  ```{r echo=FALSE, dpi=250, fig.cap = "*Figure 3. Relapse-free intervals as recommended in @muller2023 for high specificity.*"}
+  knitr::include_graphics('./relapse_indep_rev0.png')
+  ```
+  <br/ >
+  
 * In @kappos2020, an absence of relapses was required between the reference visit and 30 days after the event, and during the 30 days before and 30 days after the confirmation visit:
   ``` {r}
   relapse_indep <- relapse_indep_from_bounds(0,NULL,  # baseline
                                             NULL,30, # event
                                             30,30)   # confirmation
   ```
+  
+  ```{r echo=FALSE, dpi=250, fig.cap = "*Figure 4. Relapse-free intervals as used in @kappos2020.*"}
+  knitr::include_graphics('./relapse_indep_kappos.png')
+  ```
+  <br/ >
+  
 * In @cagol2022, the authors required an absence of relapses during the 90 days before the progression event and between the progression event and the confirmation visit:
   ``` {r}
   relapse_indep <- relapse_indep_from_bounds(0,0,     # baseline
                                             90,NULL, # event
                                             NULL,0)  # confirmation
   ```
+  
+  ```{r echo=FALSE, dpi=250, fig.cap = "*Figure 5. Relapse-free intervals as used in @cagol2022.*"}
+  knitr::include_graphics('./relapse_indep_cagol.png')
+  ```
+  <br/ >
+  
 
 The requirement of relapse-free periods is often coupled with a non-fixed baseline scheme. This can be a roving baseline, where the reference value is updated after every confirmed improvement or progression event, as in @muller2023 (`baseline='roving'` in `MSprog()`); or a re-baseline after the onset of each relapse, as in @kappos2020 (`relapse_rebl=TRUE` in `MSprog()`).
 
