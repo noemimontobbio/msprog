@@ -186,24 +186,26 @@ obtain the correct reference:
 
 ``` r
 citation('msprog')
-#> 
 #> To cite package 'msprog' in publications use:
 #> 
 #>   Montobbio N, Carmisciano L, Signori A, Ponzano M, Schiavetti I, Bovis
 #>   F, Sormani MP (2024). "Creating an automated tool for a consistent
 #>   and repeatable evaluation of disability progression in clinical
-#>   studies for Multiple Sclerosis." _medRxiv_.
-#>   doi:10.1101/2024.01.30.24302013
-#>   <https://doi.org/10.1101/2024.01.30.24302013>.
+#>   studies for Multiple Sclerosis." _Mult Scler._, *30*(9), 1185-1192.
+#>   doi:10.1177/13524585241243157
+#>   <https://doi.org/10.1177/13524585241243157>.
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
 #>   @Article{,
 #>     title = {Creating an automated tool for a consistent and repeatable evaluation of disability progression in clinical studies for Multiple Sclerosis},
 #>     author = {Noemi Montobbio and Luca Carmisciano and Alessio Signori and Marta Ponzano and Irene Schiavetti and Francesca Bovis and Maria Pia Sormani},
-#>     journal = {medRxiv},
+#>     journal = {Mult Scler.},
 #>     year = {2024},
-#>     doi = {10.1101/2024.01.30.24302013},
+#>     volume = {30},
+#>     number = {9},
+#>     pages = {1185-1192},
+#>     doi = {10.1177/13524585241243157},
 #>   }
 ```
 

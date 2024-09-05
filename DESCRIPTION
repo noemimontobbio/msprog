@@ -11,7 +11,7 @@ Description: msprog provides tools for exhaustive and reproducible analysis of d
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Imports: stats, dplyr
 Depends: R (>= 3.5.0)
 VignetteBuilder: knitr

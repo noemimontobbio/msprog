@@ -98,7 +98,7 @@ print(output)
 <a id="vignette"></a>
 
 ### Vignettes
-For detailed indications on usage and best practices, please refer to the package vignettes (make sure to enable `build_vignettes` during [installation](#install)).
+For detailed indications on usage and best practices, please refer to the package vignettes (make sure to enable `build_vignettes` during [installation](#install)). 
 ```{r, message=FALSE}
 browseVignettes('msprog')
 ```
