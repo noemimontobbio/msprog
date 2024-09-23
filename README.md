@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please only edit README.Rmd -->
 
-# msprog: reproducible assessment of disability progression in MS
+# msprog: reproducible assessment of disability course in MS
 
 <!-- badges: start -->
 
@@ -10,12 +10,12 @@
 
 `msprog` is an R package providing tools for exhaustive and reproducible
 analysis of disability progression in multiple sclerosis (MS) from
-longitudinal data \[[1](#ref-msprog2024-preprint)\].
+longitudinal data \[[1](#ref-msprog2024)\].
 
-Its core function, `MSprog()`, detects and characterises the progression
-events of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom
-outcome measure) for one or more subjects, based on repeated assessments
-through time and on the dates of acute episodes (if any).
+Its core function, `MSprog()`, detects and characterises the evolution
+of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome
+measure) for one or more subjects, based on repeated assessments through
+time and on the dates of acute episodes (if any).
 
 The package also provides two toy datasets for function testing:
 
@@ -28,8 +28,7 @@ Please refer to the documentation for function usage (e.g. `?MSprog`)
 and data structure (e.g. `?toydata_visits`). The whole documentation is
 contained into the [reference manual (PDF)](msprog.pdf). Additionally, a
 detailed tutorial providing examples and best-practice tips is available
-as a [package vignette](#vignette): *Computing MS progression from
-longitudinal data*.
+as a [package vignette](#vignette): *Analysing disability course in MS*.
 
 The outcome computation can be run locally on any computer with R
 version $\geq$ 3.5.0 (see installation instructions below), or online
@@ -130,12 +129,12 @@ class `MSprogOutput` with the following attributes.
     ``` r
     print(output$results, row.names=FALSE)
     #>  id nevent event_type total_fu time2event bl2event conf12 PIRA_conf12 sust_days
-    #>   1      1       PIRA      534        292      292      1           1       242
-    #>   2      1        RAW      730        198      198      1          NA        84
-    #>   2      2       PIRA      730        539      257      1           1       191
+    #>   1      1       PIRA      534        292      292      0           0       242
+    #>   2      1        RAW      730        198      198      0          NA        84
+    #>   2      2       PIRA      730        539      257      0           0       191
     #>   3      0                 491        491       NA     NA          NA        NA
-    #>   4      1       impr      586         77       77      0          NA        98
-    #>   4      2       PIRA      586        304      129      1           1       282
+    #>   4      1       impr      586         77       77      1          NA        98
+    #>   4      2       PIRA      586        304      129      0           0       282
     #>  sust_last
     #>          1
     #>          0
@@ -160,7 +159,7 @@ complete reproducibility**:
 
 ``` r
 print(output)
-#> For each subject, we detected all EDSS changes (in chronological order) confirmed over 12 weeks or more. A visit could only be used as confirmation if occurring at least 30 days after a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed progression or improvement event. The new reference value was set as the EDSS value at the first available confirmation visit. Whenever the baseline fell within 30 days from a relapse, it was moved to the next available visit. A confirmed EDSS progression event was labelled as RAW if occurring within 90 days from a relapse. A confirmed EDSS progression event was labelled as PIRA if no relapses occurred in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
+#> For each subject, we detected all EDSS changes (in chronological order) confirmed over 12 weeks or more. A visit could not be used as confirmation if occurring within 30 days from the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed progression or improvement event. The new baseline was set as the first available confirmation visit. Whenever the current baseline fell within 30 days from the onset of a relapse, it was moved to the next available visit. A confirmed EDSS progression event was labelled as RAW if occurring within 90 days from the onset of a relapse. A confirmed EDSS progression event was labelled as PIRA if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
 ```
 
 <br />
@@ -186,6 +185,7 @@ obtain the correct reference:
 
 ``` r
 citation('msprog')
+#> 
 #> To cite package 'msprog' in publications use:
 #> 
 #>   Montobbio N, Carmisciano L, Signori A, Ponzano M, Schiavetti I, Bovis
@@ -213,13 +213,13 @@ citation('msprog')
 
 <div id="refs" class="references csl-bib-body">
 
-<div id="ref-msprog2024-preprint" class="csl-entry">
+<div id="ref-msprog2024" class="csl-entry">
 
 1\. Montobbio N, Carmisciano L, Signori A, Ponzano M, Schiavetti I,
-Bovis F, et al. Creating an automated tool for a consistent and
+Bovis F, et al. [Creating an automated tool for a consistent and
 repeatable evaluation of disability progression in clinical studies for
-multiple sclerosis. medRxiv \[Internet\]. 2024; Available from:
-<https://www.medrxiv.org/content/early/2024/01/31/2024.01.30.24302013>
+multiple sclerosis.](https://doi.org/10.1177/13524585241243157) Mult
+Scler. 2024;30:1185–92.
 
 </div>
 

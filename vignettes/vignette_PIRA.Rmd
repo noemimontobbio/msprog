@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette illustrates how to use the `msprog` package to study disability progression independent of relapse activity (PIRA) in multiple sclerosis (MS). For a more general introduction on `msprog` package usage for disability progression assessment, please refer to the vignette *Computing MS progression from longitudinal data*. 
+This vignette illustrates how to use the `msprog` package to study disability progression independent of relapse activity (PIRA) in multiple sclerosis (MS). For a more general introduction on `msprog` package usage for disability progression assessment, please refer to the vignette *Analysing disability course in MS*. 
 
 ```{r, echo=FALSE}
 library(msprog)
@@ -35,9 +35,7 @@ output <- MSprog(...
 ```
 where: `b0` and `b1` specify the interval around the baseline visit; `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If the right end (`b1` or `e1`) is `NULL`, the interval is assumed to extend up to the left end of the next interval. If the left end is `NULL`  (`e0` or `c0`), the interval is assumed to extend up to the right end of the previous interval. 
 
- 
-```{r echo=FALSE, out.width = "400px", fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `b0`, `b1`, `e0`, `e1`, `c0`, `c1`.*"}
-#dpi=250
+```{r echo=FALSE, dpi=250, fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `b0`, `b1`, `e0`, `e1`, `c0`, `c1`.*"}
 knitr::include_graphics(paste0(getwd(), 'relapse_indep_def.png'))
 ```
 
@@ -45,14 +43,14 @@ knitr::include_graphics(paste0(getwd(), 'relapse_indep_def.png'))
 Some examples are provided below.
 <br/ >
 
-* In @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation visit for a progression event to be considered as PIRA. This translates to:
+* In @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation visit for a progression event to be considered as PIRA. This translates into:
   ``` {r}
   relapse_indep <- relapse_indep_from_bounds(0,0,   # baseline
                                             90,30, # event
                                             90,30) # confirmation
   ```
   
-  ```{r echo=FALSE, out.width = "400px", fig.cap = "*Figure 2. Relapse-free intervals as recommended in @muller2023.*"}
+  ```{r echo=FALSE, dpi=250, fig.cap = "*Figure 2. Relapse-free intervals as recommended in @muller2023.*"}
   knitr::include_graphics('./relapse_indep_rev1.png')
   ```
   <br/ >
@@ -64,7 +62,7 @@ Some examples are provided below.
                                             NULL,0)    # confirmation
   ```
   
-  ```{r echo=FALSE, out.width = "400px", fig.cap = "*Figure 3. Relapse-free intervals as recommended in @muller2023 for high specificity.*"}
+  ```{r echo=FALSE, dpi=250, fig.cap = "*Figure 3. Relapse-free intervals as recommended in @muller2023 for high specificity.*"}
   knitr::include_graphics('./relapse_indep_rev0.png')
   ```
   <br/ >
@@ -76,7 +74,7 @@ Some examples are provided below.
                                             30,30)   # confirmation
   ```
   
-  ```{r echo=FALSE, out.width = "400px", fig.cap = "*Figure 4. Relapse-free intervals as used in @kappos2020.*"}
+  ```{r echo=FALSE, dpi=250, fig.cap = "*Figure 4. Relapse-free intervals as used in @kappos2020.*"}
   knitr::include_graphics('./relapse_indep_kappos.png')
   ```
   <br/ >
@@ -88,7 +86,7 @@ Some examples are provided below.
                                             NULL,0)  # confirmation
   ```
   
-  ```{r echo=FALSE, out.width = "400px", fig.cap = "*Figure 5. Relapse-free intervals as used in @cagol2022.*"}
+  ```{r echo=FALSE, dpi=250, fig.cap = "*Figure 5. Relapse-free intervals as used in @cagol2022.*"}
   knitr::include_graphics('./relapse_indep_cagol.png')
   ```
   <br/ >

@@ -20,6 +20,7 @@ MSprog(
   baseline = "fixed",
   sub_threshold = F,
   relapse_rebl = F,
+  validconf_col = NULL,
   conf_weeks = 12,
   conf_tol_days = 30,
   conf_unbounded_right = F,
@@ -101,6 +102,10 @@ at any sub-threshold confirmed event (i.e. any confirmed change in outcome measu
 
 \item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse to search for PIRA events.}
 
+\item{validconf_col}{Name of data column specifying which visits can (\code{T}) or cannot (\code{F}) be used as confirmation visits.
+The input data does not necessarily have to include such a column.
+If \code{validconf_col=NULL}, all visits are potentially used as confirmation visits.}
+
 \item{conf_weeks}{Period before confirmation (weeks).}
 
 \item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
@@ -175,9 +180,9 @@ An object of class \code{'MSprogOutput'} with the following attributes:
 }
 }
 \description{
-\code{MSprog()} detects and characterises the progression (or improvement) events of an outcome measure
-(EDSS, NHPT, T25FW, or SDMT) for one or more subjects, based on repeated assessments
-through time and on the dates of acute episodes (if any).
+\code{MSprog()} detects and characterises the worsening (or improvement) events of an outcome measure
+(EDSS, NHPT, T25FW, or SDMT; or any custom outcome) for one or more subjects, based on repeated assessments
+through time (and on the dates of acute episodes, if any).
 Several qualitative and quantitative options are given as arguments that can be set
 by the user and reported as a complement to the results to ensure reproducibility.
 }

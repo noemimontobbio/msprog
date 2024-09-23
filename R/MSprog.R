@@ -1,9 +1,9 @@
 
 #' Compute multiple sclerosis disability progression from longitudinal data.
 #'
-#' `MSprog()` detects and characterises the progression (or improvement) events of an outcome measure
-#' (EDSS, NHPT, T25FW, or SDMT) for one or more subjects, based on repeated assessments
-#' through time and on the dates of acute episodes (if any).
+#' `MSprog()` detects and characterises the worsening (or improvement) events of an outcome measure
+#' (EDSS, NHPT, T25FW, or SDMT; or any custom outcome) for one or more subjects, based on repeated assessments
+#' through time (and on the dates of acute episodes, if any).
 #' Several qualitative and quantitative options are given as arguments that can be set
 #' by the user and reported as a complement to the results to ensure reproducibility.
 #'
@@ -61,6 +61,9 @@
 #' @param sub_threshold If `TRUE` - and only if `baseline` is `'roving'` or `'roving_impr'` - move roving baseline
 #' at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of `delta_fun`).
 #' @param relapse_rebl If `TRUE`, re-baseline after every relapse to search for PIRA events.
+#' @param validconf_col Name of data column specifying which visits can (`T`) or cannot (`F`) be used as confirmation visits.
+#' The input data does not necessarily have to include such a column.
+#' If `validconf_col=NULL`, all visits are potentially used as confirmation visits.
 #' @param conf_weeks Period before confirmation (weeks).
 #' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 #' or list-like of length 2 (different tolerance on left and right).
@@ -146,7 +149,7 @@
 MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, subjects=NULL,
                    delta_fun=NULL, worsening=NULL, event='firstprog', baseline='fixed', sub_threshold=F, relapse_rebl=F,
-                   conf_weeks=12, conf_tol_days=30, conf_unbounded_right=F, require_sust_weeks=0, check_intermediate=T,
+                   validconf_col=NULL, conf_weeks=12, conf_tol_days=30, conf_unbounded_right=F, require_sust_weeks=0, check_intermediate=T,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30, relapse_assoc=90, relapse_indep=NULL,
                    min_value=NULL, prog_last_visit=F,
                    date_format=NULL, include_dates=F, include_value=F, include_stable=T, verbose=1
@@ -181,6 +184,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   if (is.null(rdate_col)) {
     rdate_col <- date_col
   }
+  if (is.null(validconf_col)) {
+    validconf_col <- 'validconf'
+    data$validconf <- T
+  } else {
+    data[[validconf_col]] <- as.logical(data[[validconf_col]])
+  }
 
   # Create empty relapse file if none is provided
   if (is.null(relapse)) {
@@ -189,7 +198,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
 
   # Remove missing values from columns of interest
-  data <- data[complete.cases(data[ , c(subj_col, value_col, date_col)]), ]
+  data <- data[complete.cases(data[ , c(subj_col, value_col, date_col, validconf_col)]), ]
   relapse <- relapse[complete.cases(relapse[ , c(rsubj_col, rdate_col)]), ]
 
   # Convert dates to datetime format
@@ -430,7 +439,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         }
       } else {
         if (change_idx==nvisits) {
-          conf_idx=list()
+          conf_idx <- list()
           conf_t <- list() #plv
           } else {
         ####### #_conf_#
@@ -455,7 +464,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           for (x in (change_idx + 1):nvisits) {
             if (data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] >= t[1] && #difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]])
                 data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] <= t[2] && #difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]]) #_d_#
-                data_id[x,][['closest_rel_before']] >= relapse_to_conf) {
+                data_id[x,][['closest_rel_before']] >= relapse_to_conf &&
+                data_id[x,][[validconf_col]]
+                ) {
               match_idx <- append(match_idx, x)
             }
           }
@@ -534,17 +545,17 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             evalue <- c(evalue, data_id[change_idx,][[value_col]])
             bl2event <- c(bl2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
             time2event <- c(time2event, data_id[change_idx,][[date_col]] - data_id[1,][[date_col]])
-            for (m in names(conf_t)) {
+            for (cm in names(conf_t)) {
               #### #_conf_#
               # conf[[as.character(m)]] <- c(conf[[as.character(m)]], as.integer(m %in% conf_t))
               #### #_conf_#
-              confirmed_at <- intersect(conf_t[[m]], conf_idx)
+              confirmed_at <- intersect(conf_t[[cm]], conf_idx)
               if (length(confirmed_at)==0) {
-                within(conf_t, rm(list=m))
+                within(conf_t, rm(list=cm))
               }
-              conf[[as.character(m)]] <- c(conf[[m]], as.integer(length(confirmed_at)==0))
+              conf[[cm]] <- c(conf[[cm]], as.integer(length(confirmed_at)>0))
               #### #_conf_#
-              pira_conf[[m]] <- c(pira_conf[[m]], NA)}
+              pira_conf[[cm]] <- c(pira_conf[[cm]], NA)}
             sustd <- c(sustd, data_id[sust_idx,][[date_col]] - data_id[change_idx,][[date_col]])
             sustl <- c(sustl, as.integer(sust_idx == nvisits))
 
@@ -567,8 +578,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
 
           # For each m in conf_weeks, only keep the earliest available confirmation visit
-          conf_idx <- unname(sapply(names(conf_t), function(m) {
-            min(intersect(conf_t[[m]], conf_idx))
+          conf_idx <- unname(sapply(names(conf_t), function(cm) {
+            min(intersect(conf_t[[cm]], conf_idx))
           })) #_conf_#
 
           # # next change from last confirmation
@@ -767,12 +778,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                       #     pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], as.integer(m %in% pconf_t))}
                       ######### #_conf_#
                       pconf_t <- conf_t
-                      for (m in names(conf_t)) {
-                        confirmed_at <- intersect(pconf_t[m], pconf_idx)
+                      for (cm in names(conf_t)) {
+                        confirmed_at <- intersect(pconf_t[cm], pconf_idx)
                         if (length(confirmed_at)==0) {
-                          within(pconf_t, rm(list=m))
+                          within(pconf_t, rm(list=cm))
                         }
-                        pira_conf[[m]] <- c(pira_conf[[m]], as.integer(length(confirmed_at)==0))
+                        pira_conf[[cm]] <- c(pira_conf[[cm]], as.integer(length(confirmed_at)>0))
                       }
                       ######### #_conf_#
                       event_type <- c(event_type, 'PIRA')
@@ -800,12 +811,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     #   conf[[as.character(m)]] <- c(conf[[as.character(m)]], as.integer(m %in% conf_t))
                     # }
                     ######### #_conf_#
-                    for (m in names(conf_t)) {
-                      confirmed_at <- intersect(conf_t[m], conf_idx)
+                    for (cm in names(conf_t)) {
+                      confirmed_at <- intersect(conf_t[cm], conf_idx)
                       if (length(confirmed_at)==0) {
-                        within(conf_t, rm(list=m))
+                        within(conf_t, rm(list=cm))
                       }
-                      conf[[m]] <- c(conf[[m]], as.integer(length(confirmed_at)==0))
+                      conf[[cm]] <- c(conf[[cm]], as.integer(length(confirmed_at)>0))
                     }
                     ######### #_conf_#
                     sustd <- c(sustd, data_id[sust_idx,][[date_col]] - data_id[change_idx,][[date_col]])
@@ -839,8 +850,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                 if (length(conf_t)>0) {
 
                   # For each m in conf_weeks, only keep the earliest available confirmation visit
-                  conf_idx <- unname(sapply(names(conf_t), function(m) {
-                    min(intersect(conf_t[[m]], conf_idx))
+                  conf_idx <- unname(sapply(names(conf_t), function(cm) {
+                    min(intersect(conf_t[[cm]], conf_idx))
                   })) #_conf_#
 
 

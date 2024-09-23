@@ -16,22 +16,22 @@ knitr::opts_chunk$set(
 )
 ```
 
-# msprog: reproducible assessment of disability progression in MS
+# msprog: reproducible assessment of disability course in MS
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-`msprog` is an R package providing tools for exhaustive and reproducible analysis of disability progression in multiple sclerosis (MS) from longitudinal data [@msprog2024-preprint]. 
+`msprog` is an R package providing tools for exhaustive and reproducible analysis of disability progression in multiple sclerosis (MS) from longitudinal data [@msprog2024]. 
 
-Its core function, `MSprog()`, detects and characterises the progression events of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes (if any).
+Its core function, `MSprog()`, detects and characterises the evolution of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes (if any).
 
 The package also provides two toy datasets for function testing:
 
 * `toydata_visits`: artificially generated EDSS and SDMT assessments for four patients;
 * `toydata_relapses`: artificially generated relapse dates associated with the patients in `toydata_visits`.
 
-Please refer to the documentation for function usage (e.g. `?MSprog`) and data structure (e.g. `?toydata_visits`). The whole documentation is contained into the [reference manual (PDF)](msprog.pdf). Additionally, a detailed tutorial providing examples and best-practice tips is available as a [package vignette](#vignette): *Computing MS progression from longitudinal data*. 
+Please refer to the documentation for function usage (e.g. `?MSprog`) and data structure (e.g. `?toydata_visits`). The whole documentation is contained into the [reference manual (PDF)](msprog.pdf). Additionally, a detailed tutorial providing examples and best-practice tips is available as a [package vignette](#vignette): *Analysing disability course in MS*. 
 
 The outcome computation can be run locally on any computer with R version $\geq$ 3.5.0 (see installation instructions below), or online via our user-friendly [web application](https://msprog.shinyapps.io/msprog/).
 
