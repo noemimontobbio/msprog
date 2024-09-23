@@ -9,7 +9,7 @@
 <!-- badges: end -->
 
 `msprog` is an R package providing tools for exhaustive and reproducible
-analysis of disability progression in multiple sclerosis (MS) from
+analysis of disability course in multiple sclerosis (MS) from
 longitudinal data \[[1](#ref-msprog2024)\].
 
 Its core function, `MSprog()`, detects and characterises the evolution
@@ -21,8 +21,8 @@ The package also provides two toy datasets for function testing:
 
 - `toydata_visits`: artificially generated EDSS and SDMT assessments for
   four patients;
-- `toydata_relapses`: artificially generated relapse dates associated
-  with the patients in `toydata_visits`.
+- `toydata_relapses`: artificially generated relapse onset dates
+  associated with the patients in `toydata_visits`.
 
 Please refer to the documentation for function usage (e.g. `?MSprog`)
 and data structure (e.g. `?toydata_visits`). The whole documentation is
@@ -56,7 +56,7 @@ devtools::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
 ## Usage
 
 `MSprog()` detects the events sequentially by scanning the outcome
-values in chronological order, and classifies progression events as
+values in chronological order, and classifies worsening events as
 relapse-associated or relapse-independent based on their relative timing
 with respect to the relapses
 \[[2](#ref-lublin2014)–[4](#ref-silent2019)\].
@@ -65,7 +65,7 @@ Several qualitative and quantitative options for event detection are
 given as arguments that can be set by the user and reported as a
 complement to the results to ensure reproducibility. These include the
 baseline scheme (fixed or roving), the events to be detected (first or
-multiple, progression and/or improvement), the length of the relapse
+multiple, worsening and/or improvement), the length of the relapse
 influence window and of the event confirmation period(s) with the
 relative tolerance.
 
@@ -78,7 +78,7 @@ library(msprog)
 data(toydata_visits)
 data(toydata_relapses)
 
-# Compute progression
+# Compute disability course
 output <- MSprog(toydata_visits,                                      # provide data on visits
                  subj_col='id', value_col='EDSS', date_col='date',    # specify column names
                  outcome='edss',                                      # specify outcome type

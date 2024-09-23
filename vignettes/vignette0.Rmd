@@ -4,9 +4,10 @@ author: "Noemi Montobbio"
 date: "`r Sys.Date()`"
 # output: rmarkdown::html_vignette
 output:
-  html_document:
+  rmarkdown::html_vignette: #html_document: #
     toc: true
-    #theme: united
+  # pdf_document:
+  #   highlight: null
 bibliography: MSbiblio.bib
 csl: aaps-pharmscitech.csl
 link-citations: true
@@ -29,17 +30,16 @@ This vignette illustrates how to use the `msprog` package to study the evolution
 library(msprog)
 ```
 
-# ```{r}
-# source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R')
-# source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R')
-# source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R')
-# source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R')
-# load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData')
-# load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData')
-# library(dplyr)
-# ```
+<!-- ```{r} -->
+<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R') -->
+<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R') -->
+<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R') -->
+<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R') -->
+<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData') -->
+<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData') -->
+<!-- library(dplyr) -->
+<!-- ``` -->
 
----
 
 ## Input data {#input}
 
@@ -68,7 +68,6 @@ The package provides a toy dataset with artificially generated relapse onset dat
 head(toydata_relapses)
 ```
 
----
 
 ## Minimal example {#example}
 
@@ -93,7 +92,7 @@ The function prints out concise info (the `verbose` argument can be used to cont
 ```{r, indent="     "}
 print(output_edss$event_count)
 ```
-    where: `event_sequence`[^seq] specifies the order of the events; the other columns count the events of each kind (improvement; progression; relapse-associated worsening, [RAW](#raw); progression independent of relapse activity, [PIRA](#pira); and progression that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent2019].
+    where: `event_sequence`[^seq] specifies the order of the events; the other columns count the events of each kind (improvement; progression; relapse-associated worsening, [RAW](#raw); progression independent of relapse activity, [PIRA](#pira); and worsening that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent2019].
 
 2. `results`: extended info on each event for all subjects. In our example:
 ```{r, indent="     "}
@@ -116,7 +115,7 @@ print(output_edss)
 
 Several qualitative and quantitative options for analysing disability evolution are given as optional arguments of `MSprog()` that can be set by the user. In order to ensure reproducibility, the results should always be complemented by the set of criteria used to obtain them (e.g., using the `print` method mentioned above). In the following sections we will go into more detail about usage and best practices for the different options. Please refer to the documentation (by typing `?MSprog`) for a complete illustration of each of the function arguments and their default values.
 
----
+
 
 ## Outcome {#outcome}
 
@@ -162,13 +161,13 @@ The user can provide their own function to customise the computation of the thre
 
 2. The outcome of interest is not among the ones listed above. In this case, we set `outcome=NULL`, and `delta_fun` as our desired custom-defined function. By default, higher values of a custom outcome are interpreted as a worsening. If the opposite direction of worsening is desired, set the `worsening` argument to `'decrease'`. Note that the `worsening` argument is only used by `MSprog()` when `outcome` is set to `NULL`. Otherwise, `worsening` is automatically set to `'increase'` if `outcome` is set to `'edss'`, `'nhpt'`, `'t25fw'`, and to `'decrease'` if `outcome` is set to `'sdmt'`.
 
----
+
 
 ## Baseline scheme
 
 The baseline scheme can be set by using the `baseline` argument in `MSprog()`. The following three alternative baseline schemes can be adopted.
 
-* Fixed baseline (`baseline='fixed'`, default): the baseline visit is set to be the first available assessment. If the baseline data is stored in a separate file, the user should merge it with the main `data.frame` containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the top of the `data.frame` (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). <span style="color: red;">The possibility to directly input a separate file for baseline data may be added in the future.</span>
+* Fixed baseline (`baseline='fixed'`, default): the baseline visit is set to be the first available assessment. If the baseline data is stored in a separate file, the user should merge it with the main `data.frame` containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the top of the `data.frame` (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). The possibility to directly input a separate file for baseline data may be added in the future. <!-- <span style="color: red;">TEXT</span> -->
 
 * Improvement-based roving baseline (`baseline='roving_impr'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed improvement to the first available confirmation visit. **This scheme is suitable for a first-progression setting to discard fluctuations around the baseline** [@muller2023]. The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog()`: this moves the reference value after *any* confirmed improvement, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold improvement events are used to move the baseline, but not listed in the event sequence.
 
@@ -218,7 +217,7 @@ Other valid values for the `event` argument are:
 
 Note: if, for example, `'event=firstPIRA'`, all non-PIRA events *preceding* the first PIRA are actually detected -- although not reported. This allows to combine this scenario with a roving baseline scheme, where the baseline is moved after every confirmed non-PIRA event. For instance, if a RAW event occurs first, the subsequent progression would be counted from the re-baselined outcome value after the RAW.
 
----
+
 
 ## Event confirmation
 
@@ -318,7 +317,7 @@ The event is now correctly classified as PIRA.
 
 A more detailed report of the event detection process in each of the three cases examined may be visualized by re-running the above code snippets with `verbose=2`, see ["Printing progress info"](#progressinfo).
 
----
+
 
 ## Relapse-based classification of disability worsening events
 
@@ -350,7 +349,7 @@ For example, in @muller2023, the authors recommend an absence of relapses during
 
 For more details and examples on PIRA computation, please refer to the dedicated package vignette *Assessing progression independent of relapse activity (PIRA) in MS*.
 
----
+
 
 ## Outputs
 
