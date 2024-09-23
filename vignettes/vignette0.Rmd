@@ -1,13 +1,17 @@
 ---
-title: "Computing MS progression from longitudinal data"
+title: "Analysing disability course in MS"
 author: "Noemi Montobbio"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+# output: rmarkdown::html_vignette
+output:
+  html_document:
+    toc: true
+    #theme: united
 bibliography: MSbiblio.bib
 csl: aaps-pharmscitech.csl
 link-citations: true
 vignette: >
-  %\VignetteIndexEntry{Computing MS progression from longitudinal data}
+  %\VignetteIndexEntry{Analysing disability course in MS}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,23 +23,25 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette illustrates how to use the `msprog` package to study the progression of disability in multiple sclerosis (MS) based on repeated assessments of an outcome measure (EDSS, NHPT, T25FW, or SDMT) through time, and on the dates of acute episodes (if present).
+This vignette illustrates how to use the `msprog` package to study the evolution of disability in multiple sclerosis (MS) based on repeated assessments through time of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure). We'll start by illustrating the type of [input data](#input) needed, and by giving a [minimal working example](#example) to introduce the main function and facilitate the reading of the document. We'll then move on to a more detailed description of the different parameter configurations.
 
 ```{r}
 library(msprog)
 ```
 
-<!-- ```{r} -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R') -->
-<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData') -->
-<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData') -->
-<!-- library(dplyr) -->
-<!-- ``` -->
+# ```{r}
+# source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R')
+# source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R')
+# source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R')
+# source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R')
+# load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData')
+# load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData')
+# library(dplyr)
+# ```
 
-## Input data
+---
+
+## Input data {#input}
 
 The data must be organised in a `data.frame` object containing (at least) the following columns:
 
@@ -43,7 +49,7 @@ The data must be organised in a `data.frame` object containing (at least) the fo
 * Visit dates;
 * Outcome values.
 
-The visits should be listed in chronological order (if they are not, `msprog::MSprog()` will sort them).
+The visits should be listed in chronological order (if they are not, `msprog::MSprog()` will sort them automatically before analysing them).
 
 The `msprog` package provides a toy dataset `toydata_visits` with artificially generated EDSS and SDMT assessments for four patients.
 ```{r}
@@ -52,117 +58,149 @@ head(toydata_visits)
 
 <br />
 
-For relapsing-remitting MS patients, an additional `data.frame` object with the dates of relapses is needed to correctly assess progression and characterise progression events as relapse-associated or relapse-independent. The dataset should contain (at least) the following columns:
+For relapsing MS patients, an additional `data.frame` object with the onset dates of relapses is needed to correctly assess disease course, and to characterise disability worsening events as relapse-associated or relapse-independent. The dataset should contain (at least) the following columns:
 
 * Subject IDs;
-* Visit dates.
+* Relapse onset dates.
 
-A toy dataset with artificially generated relapse dates associated with the patients in `toydata_visits` is provided:
+The package provides a toy dataset with artificially generated relapse onset dates associated with the patients in `toydata_visits`:
 ```{r}
 head(toydata_relapses)
 ```
 
-## Minimal example
+---
 
-Given data on visits and relapses in the form specified above, the `MSprog()` function analyses the disability progression for each subject for the outcome of interest. We can test it on the EDSS toy data:
+## Minimal example {#example}
+
+The core block of `msprog` is the `MSprog()` function. Given data on visits and relapses in the form specified above, `MSprog()` analyses the disability evolution for each subject for the outcome of interest. We can test it on the EDSS toy data:
 ```{r}
-output_edss <- MSprog(toydata_visits, # data on visits
+output_edss <- MSprog(data=toydata_visits, # data on visits
                  subj_col='id', value_col='EDSS', date_col='date', # specify column names
                  outcome='edss', # specify outcome type
                  relapse=toydata_relapses) # data on relapses
 ```
-or on the SDMT toy data:
+...or on the SDMT toy data:
 ```{r}
-output_sdmt <- MSprog(toydata_visits, # data on visits
+output_sdmt <- MSprog(data=toydata_visits, # data on visits
                  subj_col='id', value_col='SDMT', date_col='date', # specify column names
                  outcome='sdmt', # specify outcome type
                  relapse=toydata_relapses) # data on relapses
 ```
-The function prints concise info (the argument `verbose` can be used to control the amount of printed info), and outputs an object of class `MSprogOutput` with the following attributes.
 
-1. `event_count`: a `data.frame` containing the event counts for each subject, and the event sequence (where relevant).
+The function prints out concise info (the `verbose` argument can be used to control the amount of info printed out -- see [the relevant section](#progressinfo)). The function output is an object of class `MSprogOutput`, from which the following attributes can be extracted.
+
+1. `event_count`: a `data.frame` containing the event counts for each subject, and the event sequence (where relevant). Here's what it looks like for the EDSS-based computation above:
 ```{r, indent="     "}
 print(output_edss$event_count)
 ```
-    where: `event_sequence`[^1] specifies the order of the events; the other columns count the events of each kind (improvement; progression; relapse-associated worsening, RAW; progression independent of relapse activity, PIRA; and progression that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent2019].
+    where: `event_sequence`[^seq] specifies the order of the events; the other columns count the events of each kind (improvement; progression; relapse-associated worsening, [RAW](#raw); progression independent of relapse activity, [PIRA](#pira); and progression that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent2019].
 
-2. `results`: extended info on each event for all subjects:
+2. `results`: extended info on each event for all subjects. In our example:
 ```{r, indent="     "}
 print(output_edss$results, row.names=FALSE)
 ```
-    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^2]; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed over 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
+    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^timeto]; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed over 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
 
-Additionally, applying the `print` method to an object of class `MSprogOutput` prints out a short paragraph describing the complete set of criteria used to obtain the output, to be reported to ensure complete reproducibility:
+Additionally, applying the `print` method to the `MSprog()` output prints out a short paragraph describing the complete set of criteria used to obtain the results, to be reported along with the results to ensure complete reproducibility. In our example:
 ```{r}
 print(output_edss)
 ```
 
 
-[^1]: In this example, `event_sequence` can contain a maximum of one event, as we are not specifying the argument `event` - which defaults to `firstprog` (only detect the first progression event). For the same reason, `nevent` in `output$results` can only be 0 or 1 in this example. In a multiple-event setting (`event=multiple`), more than one event per subject can be detected. See [the relevant section](#multiple).
-[^2]: For subjects with no events, `time2event` is the total follow-up length. To omit these subjects, set `include_stable=FALSE` in `MSprog()`.
+[^seq]: In this example, `event_sequence` can contain a maximum of one event, as we are not specifying the argument `event` - which defaults to `firstprog` (only detect the first progression event). For the same reason, `nevent` in `output$results` can only be 0 or 1 in this example. In a multiple-event setting (`event=multiple`), more than one event per subject can be detected. See [the relevant section](#multiple).
+[^timeto]: For subjects with no events, `time2event` is the total follow-up length. To omit these subjects, set `include_stable=FALSE` in `MSprog()`.
 
 
 <br />
 
-Several qualitative and quantitative options for computing the progression are given as optional arguments of `MSprog()` that can be set by the user. In order to ensure reproducibility, the results should always be complemented by the set of criteria used to obtain them. In the following sections we will go into more detail about usage and best practices for the different options. Please refer to the documentation (by typing `?MSprog`) for a complete illustration of all function arguments.
+Several qualitative and quantitative options for analysing disability evolution are given as optional arguments of `MSprog()` that can be set by the user. In order to ensure reproducibility, the results should always be complemented by the set of criteria used to obtain them (e.g., using the `print` method mentioned above). In the following sections we will go into more detail about usage and best practices for the different options. Please refer to the documentation (by typing `?MSprog`) for a complete illustration of each of the function arguments and their default values.
 
-## Valid changes in the outcome measure
+---
 
-The `MSprog()` function detects the events sequentially by scanning the outcome values in chronological order, and each value is tested for its difference from the current reference value. The `compute_delta()` function returns the minimum difference $\delta$ in the chosen outcome measure that is accepted as a valid change from a given reference value $x$ (value at baseline). The threshold $\delta$ is computed differently based on the test under analysis (see [@lorscheider2016; @bosma2010; @kalinowski2022; @strober2019]):
+## Outcome {#outcome}
 
-* Expanded Disability Status Scale (EDSS): $\delta(x)=\begin{cases} 1.5 \quad \text{ if } x=0\\1 \quad\;\;\; \text{ if } 0 < x \leq 5\\0.5 \quad \text{ if } 5<x\leq 10\end{cases}$;
+The `MSprog()` function detects the events sequentially by scanning the outcome values in chronological order, and each value is tested for its difference from the current reference value. Such difference is typically required to be larger than a threshold $\delta$, depending on outcome type and on the reference value $x$. If the `outcome` argument in `MSprog()` is set to `edss`, `nhpt`, `t25fw`, or `sdmt`, the following default settings are implemented (see [@lorscheider2016; @bosma2010; @kalinowski2022; @strober2019]):
 
-* Nine-Hole Peg Test (NHPT), for either the dominant or the non-dominant hand: 20% of reference $x$;
+* `outcome='edss'`: Expanded Disability Status Scale (EDSS). $\delta(x)=\begin{cases} 1.5 \quad \text{ if } x=0\\1 \quad\;\;\; \text{ if } 0 < x \leq 5\\0.5 \quad \text{ if } 5<x\leq 10\end{cases}$;
 
-* Timed 25-Foot Walk (T25FW): 20% of reference $x$;
+* `outcome='nhpt'`: Nine-Hole Peg Test (NHPT), for either the dominant or the non-dominant hand. $\delta=$ 20% of reference score;
 
-* Symbol Digit Modalities Test (SDMT): either 3 points or 10% of reference $x$.
+* `outcome='t25fw'`: Timed 25-Foot Walk (T25FW). $\delta=$ 20% of reference score;
 
+* `outcome='sdmt'`: Symbol Digit Modalities Test (SDMT). $\delta=$ either 3 points or 10% of reference score.
 
-For example:
+These default options are internally implemented by the `compute_delta()` function. For example, if the baseline EDSS score is 4, a valid worsening will correspond to an increase by (at least):
 ```{r}
 print(compute_delta(4)) # default outcome measure is 'edss'
+```
+If the baseline T25FW score is 10, the minimum shift that is considered as a valid change will be:
+```{r}
 print(compute_delta(10, outcome='t25fw'))
 ```
 
-The `compute_delta()` function is used as default `delta_fun` in the `MSprog()` function to assess progression. In this case, the threshold $\delta$ used to assess progression is computed based on the argument `outcome` given to `MSprog()`. For instance, calling:
-```{r}
-output <- MSprog(toydata_visits,
-                 subj_col='id', value_col='SDMT', date_col='date',
-                 outcome='sdmt', # ---> outcome type influences delta computation <---
-                 relapse=toydata_relapses, verbose=0) 
-```
-disability progression will be defined as a worsening of either 3 SDMT points or 10% of the reference SDMT value. Alternatively, a custom `delta_fun` can be provided by the user to support different outcome measures, or to specify different rules for the supported ones. To change the minimum $\delta$ for SDMT to, say, "either 4 points or 20% of the reference value", we would define:
-```{r}
-my_sdmt_delta <- function(x) {min(unlist(c(x/5, 4)))}
-print(my_sdmt_delta(50)) # my delta
-print(compute_delta(50, outcome='sdmt')) # default delta
-```
-and set `delta_fun=my_sdmt_delta` in `MSprog()` when computing the progression.
+### Custom threshold values
 
-## Baseline scheme and multiple events {#multiple}
+The user can provide their own function to customise the computation of the threshold values, using the `delta_fun` argument of `MSprog()`. The provided function must take the baseline value as argument, and return the corresponding threshold. This applies to two scenarios.
 
-The baseline scheme can be set by using the `baseline` argument in `MSprog()`. The following alternative baseline schemes can be adopted:
+1. The outcome of interest is among the ones listed above, but we want to define the thresholds differently. For example, we want to change the minimum $\delta$ for SDMT to, say, "either 4 points or 20% of the reference value". In this case, we would define:
+    ```{r}
+    my_sdmt_delta <- function(x) {min(unlist(c(x/5, 4)))}
+    ```
+    Comparing it with the default function, we get:
+    ```{r}
+    print(my_sdmt_delta(50)) # my delta
+    print(compute_delta(50, outcome='sdmt')) # default delta
+    ```
+    We then compute:
+    ``` {r, eval=FALSE}
+    output <- MSprog(...
+                    outcome='sdmt', delta_fun=my_sdmt_delta,
+                     ...)
+    ```
+    Specifying `outcome='sdmt'`, the outcomes values will be checked internally to verify that they are in the correct range for SDMT.
 
-* Fixed baseline (`baseline='fixed'`, default): the reference value is set to be the first valid outcome value.
-* Improvement-based roving baseline (`baseline='roving_impr'`): the reference value is initially set as the first valid outcome value, then updated after each confirmed improvement to the next valid outcome value. This scheme is suitable for a first-progression setting to discard fluctuations around the baseline [@muller2023]. The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog()`: this moves the reference value after *any* confirmed improvement, even if the difference from the current reference is smaller than the minimum $\delta$.
-* Roving baseline (`baseline='roving'`): the reference value is initially set as the first valid outcome value, then updated after each event to the last confirmed outcome value (out of relapse influence). **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below). The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog()`: this moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$.
+2. The outcome of interest is not among the ones listed above. In this case, we set `outcome=NULL`, and `delta_fun` as our desired custom-defined function. By default, higher values of a custom outcome are interpreted as a worsening. If the opposite direction of worsening is desired, set the `worsening` argument to `'decrease'`. Note that the `worsening` argument is only used by `MSprog()` when `outcome` is set to `NULL`. Otherwise, `worsening` is automatically set to `'increase'` if `outcome` is set to `'edss'`, `'nhpt'`, `'t25fw'`, and to `'decrease'` if `outcome` is set to `'sdmt'`.
 
-The argument `event` allows to specify which events to detect. By default, it is set to `firstprog` (only detect the first progression event). It can be set to `multiple` to sequentially detect all progression (or improvement) events.
+---
 
-For example, extracting multiple EDSS events for subject `4` from `toydata_visits` with a fixed baseline would result in the following.
+## Baseline scheme
+
+The baseline scheme can be set by using the `baseline` argument in `MSprog()`. The following three alternative baseline schemes can be adopted.
+
+* Fixed baseline (`baseline='fixed'`, default): the baseline visit is set to be the first available assessment. If the baseline data is stored in a separate file, the user should merge it with the main `data.frame` containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the top of the `data.frame` (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). <span style="color: red;">The possibility to directly input a separate file for baseline data may be added in the future.</span>
+
+* Improvement-based roving baseline (`baseline='roving_impr'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed improvement to the first available confirmation visit. **This scheme is suitable for a first-progression setting to discard fluctuations around the baseline** [@muller2023]. The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog()`: this moves the reference value after *any* confirmed improvement, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold improvement events are used to move the baseline, but not listed in the event sequence.
+
+* Roving baseline (`baseline='roving'`): the baseline visit is initially set as the first available assessment, then updated after each event to the first available confirmation visit. **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below). The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog()`: this moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold events are used to move the baseline, but not listed in the event sequence.
+
+<br />
+
+If the baseline visit occurs in the vicinity of a clinical relapse, the reference value may be overestimated. The `relapse_to_bl` argument allows to specify the minimum accepted distance (in days) of the baseline visit from the onset of a previous relapse. For instance, if `baseline='fixed'` and `relapse_to_bl=30`, the baseline visit is chosen as the first available visit satisfying the requirement of "not occurring less than 30 days after the onset of a relapse". If the `baseline` argument is set to a roving scheme, the above applies to every baseline change as well.
+
+Finally, on top of the chosen baseline scheme, *post-relapse re-baseline* @kappos2020 can be applied by setting `relapse_rebl=TRUE` in `MSprog()`. If this is enabled, outcome values are scanned once more from the beginning by resetting the baseline after the onset of each relapse (first visit available occurring at least `relapse_to_bl` days after the relapse onset) to classify potential events left undefined as PIRA.
+
+### Multiple events {#multiple}
+
+The `event` argument allows to specify which events to detect. By default, it is set to `'firstprog'` (only detect the first progression event). It can be set to `'multiple'` to sequentially detect all disability worsening or improvement events.
+
+For example, extracting multiple EDSS events for subject `4` from `toydata_visits` with a **fixed** baseline would result in the following.
 ```{r}
 print(toydata_visits[toydata_visits$id==4, c('date', 'EDSS')], row.names=FALSE) # EDSS visits
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', subjects=4,
-                relapse=toydata_relapses, conf_weeks=12, event='multiple', baseline='fixed', 
-                include_dates=TRUE, verbose=0)
+
+output <- MSprog(data=toydata_visits, 
+                 subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
+                 subjects=4,
+                 relapse=toydata_relapses, conf_weeks=12, event='multiple', baseline='fixed', 
+                 include_dates=TRUE, verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
 
-Since the reference value was kept fixed at the first visit (EDSS=4.5), the EDSS progression at visit 4 (EDSS=5) was not detected. On the other hand, with a roving baseline scheme, the baseline is moved to visit 3 after the confirmed improvement and the progression event is correctly detected:
+Since the reference value was kept fixed at the first visit (EDSS=4.5), the EDSS worsening at visit 4 (EDSS=5) was not detected. On the other hand, with a **roving** baseline scheme, the baseline is moved to visit 3 after the confirmed improvement and the progression event is correctly detected:
 ```{r}
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', relapse=toydata_relapses, subjects=4,
+output <- MSprog(data=toydata_visits, 
+                 subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
+                 relapse=toydata_relapses, subjects=4,
                 conf_weeks=12, event='multiple', baseline='roving', 
                 include_dates=TRUE, verbose=0)
 print(output$results, row.names=FALSE) # results
@@ -170,15 +208,69 @@ print(output$results, row.names=FALSE) # results
 
 <br />
 
-Finally, on top of the chosen baseline scheme, *post-relapse re-baseline* @kappos2020 can be applied by setting `relapse_rebl=TRUE` in `MSprog()`. If this is enabled, outcome values are scanned once more from the beginning by resetting the baseline after each relapse (first visit out of relapse influence) to classify potential events left undefined as PIRA.
+Other valid values for the `event` argument are:
+
+* `'first'`: only the very first event -- improvement or worsening;
+* `'firsteach'`: first improvement *and* first worsening, in chronological order;
+* `'firstprogtype'`: first progression of each kind -- PIRA, RAW, and undefined, in chronological order;
+* `'firstPIRA'`: first PIRA event;
+* `'firstRAW'`: first RAW event.
+
+Note: if, for example, `'event=firstPIRA'`, all non-PIRA events *preceding* the first PIRA are actually detected -- although not reported. This allows to combine this scenario with a roving baseline scheme, where the baseline is moved after every confirmed non-PIRA event. For instance, if a RAW event occurs first, the subsequent progression would be counted from the re-baselined outcome value after the RAW.
+
+---
+
+## Event confirmation
+
+An event is only validated if the change in the outcome value from the current baseline is maintained **up to**[^upto] a subsequent *confirmation visit* at a pre-specified distance from the event [@ontaneda2017]. The event is confirmed if the difference in the outcome value from the baseline score remains above-threshold (see [above](#outcome)) at all assessments up to the confirmation visit. For example, with the default EDSS thresholds, an increase in EDSS from 4 points to 6 points is confirmed if EDSS=5 at all subsequent visits; it is not confirmed if EDSS=4.5 at all subsequent visits.
+
+[^upto]: The value change from baseline must also be maintained at all intermediate visits between the event and the confirmation visit. This behaviour may be changed by setting the `check_intermediate` argument to `FALSE` (in this case, the change only needs to be confirmed **at** the designated confirmation visit). We do not recommend this, as it may lead to including random fluctuations as events. We included this option to provide the possibility of replicating the results from previous studies that used this rationale.
+
+The chosen confirmation period depends on the type of study and on the frequency of visits, and can be set in `MSprog()` by using the `conf_weeks` argument. A tolerance interval around `conf_weeks` can be specified using the `conf_tol_days` argument, given as a sequence of two integers (left and right tolerance)[^lrtol]. Further, the `conf_unbounded_right` argument allows event confirmation to occur at any visit *after* `conf_weeks` (i.e., right tolerance set to infinity). Let's see two examples.
+
+i. A common setting for clinical trial data would be: `conf_weeks=12`, `conf_tol_days=0`, `conf_unbounded_right=T`, i.e., "confirmation at 12 or more weeks".
+
+ii. A common setting for observational data would be: `conf_weeks=24`, `conf_tol_days=c(0,7*12)`, `conf_unbounded_right=F`, i.e., the confirmation visit must lie between 24 weeks after the event, and 36 weeks after the event.
+
+[^lrtol]: `conf_tol_days` can also be specified as a single integer if the same tolerance on left and right is desired.
+
+### Additional options
+
+* If `conf_weeks` is specified as a sequence of values (e.g., `conf_weeks=c(12,24)`), events are retained if confirmed by *at least one visit* falling within any of the specified periods (here, 12 **or** 24 weeks with their relative tolerance interval)[^1224]. The results table will report whether an event was confirmed in each of the specified periods, see example [below](#confexample).
+
+[^1224]: An event is only confirmed if the value change from baseline is maintained **at all visits up to the confirmation visit**. So an event can only be "confirmed over 24 weeks" and *not* "confirmed over 12 weeks" if there are no valid confirmation visits falling within the 12-week window (unless `check_intermediate=FALSE`).
+
+* If the confirmation visit occurs in the vicinity of a clinical relapse, it is typically considered invalid. The `relapse_to_conf` argument allows to specify the minimum accepted distance (in days) of a confirmation visit from the onset of a previous relapse.
+
+* By default, a disability worsening occurring at the last available assessment is ignored by `MSprog()`. This behaviour can be changed using the `prog_last_visit` argument. If set to `TRUE`, any disability worsening occurring at the last visit is retained even though unconfirmed. If set to a numeric value N, unconfirmed worsening events are included only if occurring within N weeks of follow up (e.g., in case of early discontinuation).
+
+* In scenarios (e.g., a clinical trial) where disability course is compared between two cohorts with different relapse rates, there may be an imbalance in visit frequency between the two groups, due to unscheduled visits after relapses. This implies a higher probability of detecting outcome changes in the group with more assessments. Such issue is sometimes addressed by only using scheduled visits as confirmation visits [@hauser2017]. It is possible to implement this with `MSprog()` by including an additional column in the longitudinal data, specifying which visits can (`TRUE`) or cannot (`FALSE`) be used as confirmation visits. The name of such column must be specified using the `validconf_col` argument.
+
+    ```{r echo=FALSE, dpi=150, fig.cap = "*Figure 2. Example of data with unscheduled visits.*"}
+    knitr::include_graphics(paste0(getwd(), 'unscheduled.png'))
+    ```
+
+    In the example depicted in Figure 2, unscheduled visits can be excluded from consideration as confirmation visits by setting:
+    ``` {r, eval=FALSE}
+    output <- MSprog(...
+                     validconf_col='scheduled',
+                     ...)
+    ```
+
+### Sustained progression {#sustained}
+
+In addition to event confirmation, some studies require events to be *sustained* for a specified period of time. The `require_sust_weeks` argument allows to specify, if desired, the length of such period. For example, if `require_sust_weeks=48`, an event is only retained if the change in the outcome measure from the current baseline is confirmed at *all* visits falling within the following 48 weeks. If the event is sustained for the entire follow-up, it is retained even if the follow-up period ends <48 weeks after the event. Setting `require_sust_weeks=Inf`, events are retained only when sustained for the entire follow-up duration.
+
+The `require_sust_weeks` argument may be of use in the following scenarios.
+
+* Suppose the maximum follow-up in the population is 96 weeks excluding the baseline visit. If one wants to detect progressions sustained over the whole follow-up, coding it as "progression confirmed over 96 weeks or more" (`conf_weeks=96`, `conf_tol_days=0`, `conf_unbounded_right=T`) would discard progressions of patients whose follow-up is shorter than 96 weeks. In a scenario where patients have different follow-up lengths, the `require_sust_weeks` argument offers a more reliable way of implementing this, e.g., as "progression confirmed over 12 weeks or more and sustained for the whole follow-up period" (`conf_weeks=12`, `conf_tol_days=0`, `conf_unbounded_right=T`, `require_sust_weeks=Inf`). 
+
+* In observational data with coarsely- and unevenly-spaced visits, the `require_sust_weeks` argument may be used to detect sustained progression (e.g., `require_sust_weeks=96`) while still requiring the presence of a confirmation visit within a specified interval from the event (e.g., `conf_weeks=12`, `conf_tol_days=c(0,12*7)`). 
+
+* Sustained disability worsening can be required to exclude transient RAW events (see example below).
 
 
-## Confirmation period
-
-An event is only validated if it is *confirmed*, that is, if the value change from baseline is maintained **up to** a subsequent visit falling within a pre-specified confirmation period [@ontaneda2017]. The chosen confirmation period depends on the type of study and on the frequency of visits, and can be set in `MSprog()` by using the argument `conf_weeks`. If multiple values are specified (e.g., `conf_weeks=c(12,24)`), events are retained if confirmed by at least a visit falling within one of the specified periods (here, 12 or 24 weeks $\pm$ `conf_tol_days`)[^3]. The results table will report whether an event was confirmed in each of the specified periods.
-
-[^3]: An event is only confirmed if the value change from baseline is maintained **at all visits up to the confirmation visit**. So an event can only be "confirmed over 24 weeks" and *not* "confirmed over 12 weeks" if there are no valid confirmation visits falling within the 12-week window.
-
+### Example {#confexample}
 
 Let's look at subject `2` from `toydata_visits`:
 ```{r}
@@ -186,32 +278,35 @@ print(toydata_visits[toydata_visits$id==2,c('date', 'EDSS')], row.names=FALSE) #
 print(toydata_relapses[toydata_relapses$id==2,], row.names=FALSE) # relapses
 ```
 
-The following code detects 12- or 24-week confirmed events for subject `2`.
+The following code detects 12- or 24-week confirmed events for subject `2`. 
 ```{r}
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', 
+output <- MSprog(data=toydata_visits, 
+                 subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
                  relapse=toydata_relapses, subjects=2,
                  event='multiple', baseline='roving', 
                  relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0),
                  conf_weeks=c(12,24), verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
-The `relapse_indep` argument specifies the relapse-free intervals for a progression event to be classified as PIRA[^4]. In this case, a high-specificity definition of PIRA is used [@muller2023] that requires an absence of relapses between baseline and confirmation. The resulting events are a 12-week-confirmed RAW and a 12-week-confirmed PIRA. The RAW event was not confirmed over 24 weeks (`conf24` is `0`). The PIRA event was also confirmed over 24 weeks (`conf24` is `1`). However, since a relapse occurred before the 24-week confirmation, the event cannot be classified as a 24-week-confirmed PIRA (`PIRA_conf24` is `0`) but only as a 24-week-confirmed progression.
+The `relapse_indep` argument specifies the relapse-free intervals for a progression event to be classified as PIRA, see [the relevant section](#pira)[^pira]. In this case, a high-specificity definition of PIRA is used [@muller2023] that requires an absence of relapses between baseline and confirmation. The resulting events are a 12-week-confirmed RAW and a 12-week-confirmed PIRA. The RAW event was not confirmed over 24 weeks (`conf24` is `0`). The PIRA event was also confirmed over 24 weeks (`conf24` is `1`). However, since a relapse occurred before the 24-week confirmation, the event cannot be classified as a 24-week-confirmed PIRA (`PIRA_conf24` is `0`) but only as a 24-week-confirmed *progression*.
 
-[^4]: See `relapse_indep_from_bounds()` function documentation, and the vignette *Assessing progression independent of relapse activity (PIRA) in MS*.
+[^pira]: See also `relapse_indep_from_bounds()` function documentation, and the dedicated package vignette *Assessing progression independent of relapse activity (PIRA) in MS*.
 
-The RAW event found for subject `2` constitutes a *transient* accumulation of disability. Such events can be excluded from the `MSprog()` output by requiring that each event be sustained for at least a certain amount of time, specified by argument `require_sust_weeks`. For instance:
+The RAW event found for subject `2` constitutes a *transient* accumulation of disability. Such events can be excluded from the `MSprog()` output by requiring that each event be sustained for at least a certain amount of time (specified by argument `require_sust_weeks`). For instance:
 ```{r}
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', 
-                relapse=toydata_relapses, subjects=2,
-                event='multiple', baseline='roving', 
-                relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0),
-                conf_weeks=c(12,24), require_sust_weeks=48, verbose=0)
+output <- MSprog(data=toydata_visits, 
+                 subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
+                 relapse=toydata_relapses, subjects=2,
+                 event='multiple', baseline='roving', 
+                 relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0),
+                 conf_weeks=c(12,24), require_sust_weeks=48, verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
 
-In this context, as the transient EDSS accumulation was not classified as an event, it did not trigger a re-baseline according to the roving baseline scheme. As a consequence, the PIRA event is classified as an undefined progression due to the presence of a relapse between baseline and confirmation. This can be handled by enabling *post-relapse re-baseline* (`relapse_rebl=TRUE`) to force a re-baseline after each relapse:
+In this context, as the transient EDSS accumulation was not classified as an event, it did not trigger a re-baseline according to the roving baseline scheme. As a consequence, the PIRA event is classified as an undefined progression due to the onset of a relapse between baseline and confirmation. This can be handled by enabling *post-relapse re-baseline* @kappos2020 (`relapse_rebl=TRUE`) to force a re-baseline after each relapse:
 ```{r}
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', 
+output <- MSprog(data=toydata_visits,
+                 subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
                 relapse=toydata_relapses, subjects=2,
                 event='multiple', baseline='roving', 
                 relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0),
@@ -221,25 +316,76 @@ print(output$results, row.names=FALSE) # results
 ```
 The event is now correctly classified as PIRA.
 
-A more detailed report of the event detection process in each of the three cases examined can be visualized by re-running the above code snippets with `verbose=2`, see next section.  
+A more detailed report of the event detection process in each of the three cases examined may be visualized by re-running the above code snippets with `verbose=2`, see ["Printing progress info"](#progressinfo).
+
+---
+
+## Relapse-based classification of disability worsening events
+
+When relevant, relapse data is to be provided using the optional `relapse` argument in `MSprog()`. It should be given as a `data.frame` containing subject IDs and relapse onset dates (see ["Input data"](#input))[^rnames].
+
+[^rnames]: If the names of "subject ID" and "date" columns in the relapse database are different from the main database, they must be specified using arguments `rsubj_col` and `rdate_col`.
+
+### Relapse-associated worsening (RAW) {#raw}
+
+RAW events are typically defined as confirmed disability worsening events occurring within a specified interval from the onset of a relapse. The length (in days) of such interval can be specified using the `relapse_assoc` argument in `MSprog()`. Common values are 30 or 90 days.
+
+### Progression independent of relapse activity (PIRA) {#pira}
+
+In the literature, PIRA is typically defined by requiring an absence of relapses within appropriate intervals based on the dates of the baseline visit, the disability progression event, and the confirmation visit [@kappos2020; @cagol2022; @muller2023]. The `relapse_indep` argument in `MSprog()` allows to specify custom relapse-free intervals. The argument must be provided in the form produced by the auxiliary function `relapse_indep_from_bounds()`, as follows:
+``` {r, eval=FALSE}
+output <- MSprog(...
+                 relapse_indep=relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1),
+                 ...)
+```
+where: `b0` and `b1` specify the interval around the baseline visit; `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If the right end (`b1` or `e1`) is `NULL`, the interval is assumed to extend up to the left end of the next interval. If the left end is `NULL`  (`e0` or `c0`), the interval is assumed to extend up to the right end of the previous interval. 
+
+```{r echo=FALSE, dpi=100, fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `b0`, `b1`, `e0`, `e1`, `c0`, `c1`.*"}
+knitr::include_graphics(paste0(getwd(), 'relapse_indep_def.png'))
+```
+
+For example, in @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation visit for a progression event to be considered as PIRA. This translates into: `b0<-0`, `b1<-0`, `e0<-90`, `e1<-30`, `c0<-90`, `c1<-30`. When a high specificity is desired, they recommend an absence of relapses in the whole period between the reference visit and the confirmation visit, which is implemented by setting: `b0<-0`, `b1<-NULL`, `e0<-NULL`, `e1<-NULL`, `c0<-NULL`, `c1<-0`. 
 
 <br />
 
-Finally, the tolerance for the confirmation visit date can be set using the argument `conf_tol_days`. If a single number is specified (e.g., `conf_tol_days=45`), a symmetric tolerance interval is used: if the confirmation period is, say, 12 weeks, any visit within $[12\text{weeks} - 45\text{days}, 12\text{weeks} + 45\text{days}]$ will be a valid confirmation visit. Different tolerance on the left and on the right can be set by specifying two values (e.g., `conf_tol_days=c(30, 365)` will generate a window $[12\text{weeks} - 30\text{days}, 12\text{weeks} + 365\text{days}]$). Further, the argument `conf_unbounded_right` allows to consider as valid any visit *after* a certain amount of time (e.g., `conf_tol_days=45` with `conf_unbounded_right=TRUE` will result in the window $[12\text{weeks} - 30\text{days}, +\inf]$).
+For more details and examples on PIRA computation, please refer to the dedicated package vignette *Assessing progression independent of relapse activity (PIRA) in MS*.
+
+---
+
+## Outputs
+
+### What to include in results
+
+The `results` attribute provides extended info on each event for all subjects. The following arguments can be used to control the information included.
+
+* `include_dates`: if `TRUE`, the results will include the dates of baseline and event;
+* `include_value`: if `TRUE`, the results will include the outcome value at baseline and event;
+* `include_stable`: if `TRUE`, subjects with no confirmed events are included in the results, with `time2event` = total follow up.
 
 
+For example:
+```{r}
+output_edss <- MSprog(data=toydata_visits, 
+                      subj_col='id', value_col='EDSS', date_col='date', 
+                      outcome='edss', relapse=toydata_relapses, verbose=0,
+                      include_dates=T, include_value=T, include_stable=F) # <---- !
 
-## Printing progress info
+print(output_edss$results, row.names=FALSE)
+```
 
-The `MSprog()` function scans the outcome values of each subject in chronological order to detect the events. It is possible to visualize an extended log of the ongoing computations by setting `verbose=2`. See the example below.
+
+### Printing progress info {#progressinfo}
+
+The `verbose` argument controls the amount of info printed out by the `MSprog()` function. When setting `verbose=0`, the function prints no info. When setting `verbose=1` (default), the function only prints out concise info. When setting `verbose=2`, the function prints out an extended log of the ongoing computations. See the example below.
 
 ```{r}
-output <- MSprog(toydata_visits, 
-                 subj_col='id', value_col='EDSS', date_col='date',
-                 outcome='edss',
+output <- MSprog(data=toydata_visits, 
+                 subj_col='id', value_col='EDSS', date_col='date', outcome='edss',
                  event='multiple', baseline='roving', 
                  relapse=toydata_relapses, verbose=2)
 ```
+
+
 
 ## References
 
