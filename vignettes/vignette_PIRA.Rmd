@@ -3,9 +3,7 @@ title: "Assessing progression independent of relapse activity (PIRA) in MS"
 author: "Noemi Montobbio"
 date: "`r Sys.Date()`"
 output: 
-  rmarkdown::html_vignette #html_document: #
-    # theme:
-    #     version: 4 # to preserve colours in pdf file
+  rmarkdown::html_vignette
 bibliography: MSbiblio.bib
 csl: aaps-pharmscitech.csl
 link-citations: true

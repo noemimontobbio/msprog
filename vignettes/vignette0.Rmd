@@ -3,9 +3,7 @@ title: "Analysing disability course in MS"
 author: "Noemi Montobbio"
 date: "`r Sys.Date()`"
 output:
-  rmarkdown::html_vignette: #html_document: #
-    # theme:
-    #     version: 4 # to preserve colours in pdf file
+  rmarkdown::html_vignette:
     toc: true
     number_sections: true
   # pdf_document:
@@ -19,11 +17,28 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   collapse=TRUE,
-  comment="#>"
+  comment="#>",
+  tidy=TRUE,tidy.opts=list(width.cutoff=60)
 )
+```
+
+```{r wrap-hook, include=FALSE}
+library(knitr)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = xfun::split_lines(x) #substring(x, 4, nchar(x)))
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste0(paste(x, collapse = '\n#> '), '\n')
+  }
+  hook_output(x, options)
+})
 ```
 
 This vignette illustrates how to use the `msprog` package to study the evolution of disability in multiple sclerosis (MS) based on repeated assessments through time of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure). We'll start by illustrating the type of [input data](#input) needed, and by giving a [minimal working example](#example) to introduce the main function and facilitate the reading of the document. We'll then move on to a more detailed description of the different parameter configurations.
@@ -104,7 +119,7 @@ print(output_edss$results, row.names=FALSE)
 
 
 Additionally, by applying the `print` method to the `MSprog()` output, the user can print out a short paragraph describing the complete set of criteria used to obtain the results, to be reported along with the results to ensure complete reproducibility. In our example:
-```{r}
+```{r, linewidth=100}
 print(output_edss)
 ```
 
