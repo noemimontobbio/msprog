@@ -54,11 +54,11 @@ print.MSprogOutput <- function(x, ...) {
             & (!is.null(s$relapse_indep[[point]][[2]]) && (s$relapse_indep[[point]][[2]]==0)))) {
       pp <- ifelse(point=='bl', 'baseline', ifelse(point=='event', 'the event', 'confirmation'))
       pira_text <- paste0(pira_text, ifelse(!is.null(s$relapse_indep[[point]][[1]]), paste0('from ',
-                                                                                            ifelse(s$relapse_indep[[point]][[1]]>0, paste0(s$relapse_indep[[point]][[1]], ' days before '), ''),
-                                                                                            pp), ''))
+                  ifelse(s$relapse_indep[[point]][[1]]>0, paste0(s$relapse_indep[[point]][[1]],
+                                                                 ' days before '), ''), pp), ''))
       pira_text <-  paste0(pira_text, ifelse(!is.null(s$relapse_indep[[point]][[2]]), paste0(' to ',
-                                                                                             ifelse(s$relapse_indep[[point]][[2]]>0, paste0(s$relapse_indep[[point]][[2]], ' days after '), ''),
-                                                                                             pp, ', or '), ''))
+                     ifelse(s$relapse_indep[[point]][[2]]>0, paste0(s$relapse_indep[[point]][[2]],
+                                                               ' days after '), ''), pp, ', or '), ''))
     }
   }
   pira_text <- gsub('.{5}$', '', pira_text)
@@ -104,10 +104,10 @@ print.MSprogOutput <- function(x, ...) {
     ifelse(!is.null(s$min_value), paste0('Only progressions to ', outcome,
                                          ' values of at least ', s$min_value,
                                          ' were retained. '), ''),
-    ifelse(s$event!='firstPIRA', paste0('A confirmed ', outcome, ' progression event was labelled as RAW if occurring within ',
+    ifelse(s$event!='firstPIRA', paste0('A confirmed ', outcome, ' worsening event was labelled as RAW if occurring within ',
                                         s$relapse_assoc, ' days from the onset of a relapse. '), ''),
     ifelse(s$event!='firstRAW', paste0('A confirmed ', outcome,
-                                       ' progression event was labelled as PIRA if no relapses started in the interval ',
+                                       ' worsening event was labelled as PIRA if no relapses started in the interval ',
                                        pira_text, '. '), ''),
     ifelse(s$relapse_rebl, paste0('A further search for PIRA events was performed by resetting the baseline to the first available visit after ',
                                   ifelse(s$relapse_to_bl>0, paste0(s$relapse_to_bl, ' days from the onset of each relapse. '), 'each relapse. ')),

@@ -161,7 +161,7 @@ If a numeric value N is passed, unconfirmed events are included only if occurrin
 
 \item{include_value}{If \code{TRUE}, report value of outcome at event.}
 
-\item{include_stable}{If \code{TRUE}, subjects with no events are included in extended output \code{data.frame},
+\item{include_stable}{If \code{TRUE}, subjects with no confirmed events are included in extended output \code{data.frame},
 with \code{time2event} = total follow up.}
 
 \item{verbose}{One of:

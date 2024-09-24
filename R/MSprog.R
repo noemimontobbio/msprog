@@ -104,7 +104,7 @@
 #' @param date_format Format of dates in the input data. If not specified, it will be inferred by function [as.Date()].
 #' @param include_dates If `TRUE`, report dates of events.
 #' @param include_value If `TRUE`, report value of outcome at event.
-#' @param include_stable If `TRUE`, subjects with no events are included in extended output `data.frame`,
+#' @param include_stable If `TRUE`, subjects with no confirmed events are included in extended output `data.frame`,
 #' with `time2event` = total follow up.
 #' @param verbose One of:
 #' \itemize{
@@ -1139,7 +1139,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
     if (verbose >= 1) {
       message(paste0("\n---\nOutcome: ", outcome, "\nConfirmation", ifelse(check_intermediate, " over: ", " at: "),
-            paste(conf_weeks, collapse=", "), "weeks (-", conf_tol_days[1], " days, +",
+            paste(conf_weeks, collapse=", "), " weeks (-", conf_tol_days[1], " days, +",
             ifelse(conf_unbounded_right, "Inf", conf_tol_days[2]), " days)\nBaseline: ", baseline,
             ifelse(sub_threshold, " (sub-threshold)", ""),
             ifelse(relapse_rebl, ", and post-relapse re-baseline", ""),

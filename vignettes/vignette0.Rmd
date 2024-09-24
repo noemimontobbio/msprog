@@ -2,10 +2,12 @@
 title: "Analysing disability course in MS"
 author: "Noemi Montobbio"
 date: "`r Sys.Date()`"
-# output: rmarkdown::html_vignette
 output:
   rmarkdown::html_vignette: #html_document: #
+    # theme:
+    #     version: 4 # to preserve colours in pdf file
     toc: true
+    number_sections: true
   # pdf_document:
   #   highlight: null
 bibliography: MSbiblio.bib
@@ -92,7 +94,7 @@ The function prints out concise info (the `verbose` argument can be used to cont
 ```{r, indent="     "}
 print(output_edss$event_count)
 ```
-    where: `event_sequence`[^seq] specifies the order of the events; the other columns count the events of each kind (improvement; progression; relapse-associated worsening, [RAW](#raw); progression independent of relapse activity, [PIRA](#pira); and worsening that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent2019].
+    where: `event_sequence`[^seq] specifies the order of the events; the other columns count the events of each kind (improvement; relapse-associated worsening, [RAW](#raw); progression independent of relapse activity, [PIRA](#pira); and worsening that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent2019].
 
 2. `results`: extended info on each event for all subjects. In our example:
 ```{r, indent="     "}
@@ -101,14 +103,14 @@ print(output_edss$results, row.names=FALSE)
     where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^timeto]; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed over 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
 
-Additionally, applying the `print` method to the `MSprog()` output prints out a short paragraph describing the complete set of criteria used to obtain the results, to be reported along with the results to ensure complete reproducibility. In our example:
+Additionally, by applying the `print` method to the `MSprog()` output, the user can print out a short paragraph describing the complete set of criteria used to obtain the results, to be reported along with the results to ensure complete reproducibility. In our example:
 ```{r}
 print(output_edss)
 ```
 
 
 [^seq]: In this example, `event_sequence` can contain a maximum of one event, as we are not specifying the argument `event` - which defaults to `firstprog` (only detect the first progression event). For the same reason, `nevent` in `output$results` can only be 0 or 1 in this example. In a multiple-event setting (`event=multiple`), more than one event per subject can be detected. See [the relevant section](#multiple).
-[^timeto]: For subjects with no events, `time2event` is the total follow-up length. To omit these subjects, set `include_stable=FALSE` in `MSprog()`.
+[^timeto]: For subjects with no confirmed events, `time2event` is the total follow-up length. To omit these subjects, set `include_stable=FALSE` in `MSprog()`.
 
 
 <br />
@@ -142,9 +144,9 @@ print(compute_delta(10, outcome='t25fw'))
 
 The user can provide their own function to customise the computation of the threshold values, using the `delta_fun` argument of `MSprog()`. The provided function must take the baseline value as argument, and return the corresponding threshold. This applies to two scenarios.
 
-1. The outcome of interest is among the ones listed above, but we want to define the thresholds differently. For example, we want to change the minimum $\delta$ for SDMT to, say, "either 4 points or 20% of the reference value". In this case, we would define:
+1. **The outcome of interest is among the ones listed above, but we want to define the thresholds differently.** For example, we want to change the minimum $\delta$ for SDMT to, say, "either 4 points or 20% of the reference value". In this case, we would define:
     ```{r}
-    my_sdmt_delta <- function(x) {min(unlist(c(x/5, 4)))}
+    my_sdmt_delta <- function(x) {min(c(x/5, 4))}
     ```
     Comparing it with the default function, we get:
     ```{r}
@@ -159,19 +161,21 @@ The user can provide their own function to customise the computation of the thre
     ```
     Specifying `outcome='sdmt'`, the outcomes values will be checked internally to verify that they are in the correct range for SDMT.
 
-2. The outcome of interest is not among the ones listed above. In this case, we set `outcome=NULL`, and `delta_fun` as our desired custom-defined function. By default, higher values of a custom outcome are interpreted as a worsening. If the opposite direction of worsening is desired, set the `worsening` argument to `'decrease'`. Note that the `worsening` argument is only used by `MSprog()` when `outcome` is set to `NULL`. Otherwise, `worsening` is automatically set to `'increase'` if `outcome` is set to `'edss'`, `'nhpt'`, `'t25fw'`, and to `'decrease'` if `outcome` is set to `'sdmt'`.
+2. **The outcome of interest is not among the ones listed above.** In this case, we set `outcome=NULL`, and `delta_fun` as our desired custom-defined function. By default, higher values of a custom outcome are interpreted as a worsening. If the opposite direction of worsening is desired, set the `worsening` argument to `'decrease'`. Note that the `worsening` argument is only used by `MSprog()` when `outcome` is set to `NULL`. Otherwise, `worsening` is automatically set to `'increase'` if `outcome` is set to `'edss'`, `'nhpt'`, `'t25fw'`, and to `'decrease'` if `outcome` is set to `'sdmt'`.
 
 
 
 ## Baseline scheme
 
-The baseline scheme can be set by using the `baseline` argument in `MSprog()`. The following three alternative baseline schemes can be adopted.
+The assessment of the disability evolution strongly depends on the choices made in defining the starting point, i.e., the baseline. Different behaviours are appropriate in different contexts. This aspect is controlled by the `baseline` argument in `MSprog()`. The following three alternative baseline schemes can be adopted.
 
-* Fixed baseline (`baseline='fixed'`, default): the baseline visit is set to be the first available assessment. If the baseline data is stored in a separate file, the user should merge it with the main `data.frame` containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the top of the `data.frame` (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). The possibility to directly input a separate file for baseline data may be added in the future. <!-- <span style="color: red;">TEXT</span> -->
+* **Fixed baseline** (`baseline='fixed'`, default): the baseline visit is set to be the first available assessment.
 
-* Improvement-based roving baseline (`baseline='roving_impr'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed improvement to the first available confirmation visit. **This scheme is suitable for a first-progression setting to discard fluctuations around the baseline** [@muller2023]. The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog()`: this moves the reference value after *any* confirmed improvement, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold improvement events are used to move the baseline, but not listed in the event sequence.
+* **Improvement-based roving baseline** (`baseline='roving_impr'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed improvement to the first available confirmation visit. **This scheme is suitable for a first-progression setting to discard fluctuations around the baseline** [@muller2023]. The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog()`: this moves the reference value after *any* confirmed improvement, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold improvement events are used to move the baseline, but not listed in the event sequence.
 
-* Roving baseline (`baseline='roving'`): the baseline visit is initially set as the first available assessment, then updated after each event to the first available confirmation visit. **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below). The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog()`: this moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold events are used to move the baseline, but not listed in the event sequence.
+* **Roving baseline** (`baseline='roving'`): the baseline visit is initially set as the first available assessment, then updated after each event to the first available confirmation visit. **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below). The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog()`: this moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold events are used to move the baseline, but not listed in the event sequence.
+
+**NOTE.** If the baseline data is stored in a separate file, the user should merge it with the main `data.frame` containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the beginning of the `data.frame` (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). <span style="color: red;">The possibility to directly input a separate file for baseline data may be added in the future.</span>
 
 <br />
 
@@ -221,7 +225,7 @@ Note: if, for example, `'event=firstPIRA'`, all non-PIRA events *preceding* the 
 
 ## Event confirmation
 
-An event is only validated if the change in the outcome value from the current baseline is maintained **up to**[^upto] a subsequent *confirmation visit* at a pre-specified distance from the event [@ontaneda2017]. The event is confirmed if the difference in the outcome value from the baseline score remains above-threshold (see [above](#outcome)) at all assessments up to the confirmation visit. For example, with the default EDSS thresholds, an increase in EDSS from 4 points to 6 points is confirmed if EDSS=5 at all subsequent visits; it is not confirmed if EDSS=4.5 at all subsequent visits.
+An event is only validated if the change in the outcome value from the current baseline is maintained **up to**[^upto] a subsequent *confirmation visit* at a pre-specified distance from the event [@ontaneda2017]. The event is confirmed if the difference in the outcome value from the baseline score remains above-[threshold](#outcome) at all assessments up to the confirmation visit. For example, with the default EDSS thresholds, an increase in EDSS from 4 points to 6 points is confirmed if EDSS=5 at all subsequent visits; it is not confirmed if EDSS=4.5 at all subsequent visits.
 
 [^upto]: The value change from baseline must also be maintained at all intermediate visits between the event and the confirmation visit. This behaviour may be changed by setting the `check_intermediate` argument to `FALSE` (in this case, the change only needs to be confirmed **at** the designated confirmation visit). We do not recommend this, as it may lead to including random fluctuations as events. We included this option to provide the possibility of replicating the results from previous studies that used this rationale.
 
@@ -245,7 +249,7 @@ ii. A common setting for observational data would be: `conf_weeks=24`, `conf_tol
 
 * In scenarios (e.g., a clinical trial) where disability course is compared between two cohorts with different relapse rates, there may be an imbalance in visit frequency between the two groups, due to unscheduled visits after relapses. This implies a higher probability of detecting outcome changes in the group with more assessments. Such issue is sometimes addressed by only using scheduled visits as confirmation visits [@hauser2017]. It is possible to implement this with `MSprog()` by including an additional column in the longitudinal data, specifying which visits can (`TRUE`) or cannot (`FALSE`) be used as confirmation visits. The name of such column must be specified using the `validconf_col` argument.
 
-    ```{r echo=FALSE, dpi=150, fig.cap = "*Figure 2. Example of data with unscheduled visits.*"}
+    ```{r echo=FALSE, dpi=250, fig.cap = "*Figure 2. Example of data with unscheduled visits.*"}
     knitr::include_graphics(paste0(getwd(), 'unscheduled.png'))
     ```
 
@@ -339,7 +343,7 @@ output <- MSprog(...
 ```
 where: `b0` and `b1` specify the interval around the baseline visit; `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If the right end (`b1` or `e1`) is `NULL`, the interval is assumed to extend up to the left end of the next interval. If the left end is `NULL`  (`e0` or `c0`), the interval is assumed to extend up to the right end of the previous interval. 
 
-```{r echo=FALSE, dpi=100, fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `b0`, `b1`, `e0`, `e1`, `c0`, `c1`.*"}
+```{r echo=FALSE, dpi=250, fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `b0`, `b1`, `e0`, `e1`, `c0`, `c1`.*"}
 knitr::include_graphics(paste0(getwd(), 'relapse_indep_def.png'))
 ```
 
