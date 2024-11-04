@@ -51,7 +51,6 @@
 #' }
 #' @importFrom stats complete.cases
 #' @importFrom dplyr %>% group_by_at vars slice n mutate across
-
 #' @export
 
 value_milestone <- function(data, milestone, value_col, date_col, subj_col, outcome,
