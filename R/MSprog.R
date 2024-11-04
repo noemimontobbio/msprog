@@ -8,6 +8,8 @@
 #' by the user and reported as a complement to the results to ensure reproducibility.
 #'
 #' The events are detected sequentially by scanning the outcome values in chronological order.
+#' Valid time windows for confirmation visits are determined by arguments
+#' `conf_weeks`, `conf_tol_days`, `conf_unbounded_right`, `relapse_to_conf`.
 #' Progression events are classified as relapse-associated or relapse-independent based on their relative timing
 #' with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
 #' confirmed progression events occurring within a specified interval (`relapse_assoc` argument) from a relapse;

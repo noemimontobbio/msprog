@@ -185,7 +185,6 @@ obtain the correct reference:
 
 ``` r
 citation('msprog')
-#> 
 #> To cite package 'msprog' in publications use:
 #> 
 #>   Montobbio N, Carmisciano L, Signori A, Ponzano M, Schiavetti I, Bovis
