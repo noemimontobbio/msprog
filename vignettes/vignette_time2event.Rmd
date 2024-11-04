@@ -75,10 +75,10 @@ survfit2(Surv(time2event, nevent) ~ 1, data=survival_data) %>%
 
 ## Time to disability milestone
 
-```{r}
-source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/value_milestone.R')
-library(dplyr)
-```
+<!-- ```{r} -->
+<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/value_milestone.R') -->
+<!-- library(dplyr) -->
+<!-- ``` -->
 
 Instead of studying general disability worsening, one can focus on the time taken to reach a specific disability milestone (e.g., EDSS $\geq$ 6). This can be computed using another function from the `msprog` package, `value_milestone()`.
 

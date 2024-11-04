@@ -49,7 +49,7 @@
 #' \item{`'time2event'`: }{the time to reach a value >= milestone (or total follow-up length if milestone is not reached);}
 #' \item{`'observed'`: }{whether the milestone was reached (1) or not (0).}
 #' }
-#' @importFrom stats na.omit setNames complete.cases
+#' @importFrom stats complete.cases
 #' @importFrom dplyr %>% group_by_at vars slice n mutate across
 
 #' @export
