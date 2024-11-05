@@ -118,5 +118,5 @@ output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', relapse=toydata_r
 survival_data <- output$results[c('id', 'nevent', 'time2event')]
 print(survival_data, row.names=FALSE)
 ```
-Note that the `event` argument is set to `multiple`, and that the results can contain more that one row for the same subject, with the `'nevent'` column keeping track of event count.
+Note that the `event` argument is set to `multiple`, and that the results can contain more than one row for the same subject, with the `'nevent'` column keeping track of event count.
 

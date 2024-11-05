@@ -444,28 +444,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           conf_idx <- list()
           conf_t <- list() #plv
           } else {
-        ####### #_conf_#
-        # conf_idx <- lapply(conf_window, function(t) {
-        #   match_idx <- NULL
-        #   for (x in (change_idx + 1):nvisits) {
-        #     if (data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] >= t[1] && #difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]])
-        #         data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] <= t[2] && #difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]]) #_d_#
-        #         data_id[x,][['closest_rel_before']] >= relapse_to_conf) {
-        #       match_idx <- x
-        #       break
-        #     }
-        #   }
-        #   match_idx
-        # })
-        # conf_t <- list()
-        # for (m in 1:length(conf_weeks)) {if (!is.null(conf_idx[[m]])) {conf_t <- c(conf_t, conf_weeks[m])}}
-        # conf_idx <- Filter(Negate(is.null), conf_idx)
-        ####### #_conf_#
         conf_idx <- lapply(conf_window, function(t) {
           match_idx <- numeric(0)
           for (x in (change_idx + 1):nvisits) {
-            if (data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] >= t[1] && #difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]])
-                data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] <= t[2] && #difftime(data_id[x,][[date_col]], data_id[change_idx,][[date_col]]) #_d_#
+            if (data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] >= t[1] &&
+                data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] <= t[2] &&
                 data_id[x,][['closest_rel_before']] >= relapse_to_conf &&
                 data_id[x,][[validconf_col]]
                 ) {
@@ -502,41 +485,39 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             && phase == 0 # skip if re-checking for PIRA with post-relapse re-baseline
             && !((event %in% c('firstprog', 'firstprogtype', 'firstPIRA', 'firstRAW')) && baseline=='fixed')
             ) {
+
+          # First visit at which improvement is not sustained:
           if (conf_idx[[1]]==nvisits) {
-            next_change <- NA
+            next_nonsust <- NA
             } else {
-            next_change <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col], bl[[value_col]],
-                               type='impr'))[1] + conf_idx[[1]]
+              next_nonsust <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col],
+                                  bl[[value_col]], type='impr'))[1] + conf_idx[[1]]
           }
-          if (!is.na(next_change)) {
-            conf_idx <- conf_idx[conf_idx < next_change]
+          # Discard potential confirmation visits if these occur out of sustained interval:
+          if (!is.na(next_nonsust)) {
+            conf_idx <- conf_idx[conf_idx < next_nonsust]
           }
-          #_conf_# conf_t <- conf_t[seq_along(conf_idx)]
 
-
-          if (conf_idx[[1]]<nvisits) { #conf_idx[[length(conf_idx)]]
-            next_nonsust <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col],
-                                               bl[[value_col]], type='impr'))[1] + conf_idx[[1]] # improvement not sustained
-            # next_nonsust <- which(!isevent_loc(data_id[(conf_idx[[length(conf_idx)]] + 1):nvisits, value_col],
-            #                                    bl[[value_col]], type='impr'))[1] + conf_idx[[1]] # improvement not sustained
-          } else {next_nonsust <- NA}
-
-
+          # The confirmed improvement can still be rejected if `require_sust_weeks>0`.
+          # The `valid_impr` flag indicates whether the event can (1) or cannot (0) be retained:
           valid_impr <- 1
           if (require_sust_weeks>0) {
               if ((!check_intermediate)
-                  && data_id[nvisits, date_col] - data_id[change_idx, date_col] >= require_sust_weeks * 7) { # follow-up lasts at least require_sust_weeks
+                  && data_id[nvisits, date_col] - data_id[change_idx, date_col] >= require_sust_weeks*7 # if follow-up lasts at least require_sust_weeks
+                  ) {
                 sust_vis <- which(data_id[(change_idx + 1):nvisits, date_col]
-                      - data_id[change_idx,][[date_col]] >= require_sust_weeks * 7)[1] + change_idx
+                      - data_id[change_idx,][[date_col]] >= require_sust_weeks * 7)[1] + change_idx  # first visit occurring at least require_sust_weeks from event
               } else {
-                sust_vis <- nvisits
+                sust_vis <- nvisits  # if follow-up lasts before `require_sust_weeks`, check at last visit
                 }
             valid_impr <- ifelse(check_intermediate,
                 is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]]
-                                 - data_id[change_idx, date_col]) >= require_sust_weeks * 7, # improvement sustained up to end of follow-up, or for `require_sust_weeks` weeks
-                isevent_loc(data_id[sust_vis,][[value_col]], bl[[value_col]], type='impr') # improvement confirmed at last visit, or first visit after `require_sust_weeks` weeks
+                          - data_id[change_idx, date_col]) >= require_sust_weeks * 7,  # improvement sustained up to end of follow-up, or for `require_sust_weeks` weeks
+                isevent_loc(data_id[sust_vis,][[value_col]], bl[[value_col]], type='impr')  # improvement confirmed at sust_vis (last visit, or first visit after `require_sust_weeks` weeks)
             )
           }
+
+          # If the event is retained (as per `require_sust_weeks`), we store the info:
           if (valid_impr) {
             sust_idx <- ifelse(is.na(next_nonsust), nvisits, next_nonsust - 1)
             event_type <- c(event_type, "impr")
@@ -548,21 +529,15 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             bl2event <- c(bl2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
             time2event <- c(time2event, data_id[change_idx,][[date_col]] - data_id[1,][[date_col]])
             for (cm in names(conf_t)) {
-              #### #_conf_#
-              # conf[[as.character(m)]] <- c(conf[[as.character(m)]], as.integer(m %in% conf_t))
-              #### #_conf_#
               confirmed_at <- intersect(conf_t[[cm]], conf_idx)
               if (length(confirmed_at)==0) {
                 within(conf_t, rm(list=cm))
               }
               conf[[cm]] <- c(conf[[cm]], as.integer(length(confirmed_at)>0))
-              #### #_conf_#
               pira_conf[[cm]] <- c(pira_conf[[cm]], NA)}
             sustd <- c(sustd, data_id[sust_idx,][[date_col]] - data_id[change_idx,][[date_col]])
             sustl <- c(sustl, as.integer(sust_idx == nvisits))
-
-
-            # Print info
+            # Print progress info
             if (verbose == 2) {
               message(outcome, " improvement (visit no.", change_idx, ", ",
                       global_start + as.difftime(data_id[change_idx,][[date_col]], units='days'),
@@ -570,7 +545,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                            " (", global_start + as.difftime(data_id[sust_idx,][[date_col]], units='days'), ")")
             }
           } else {
-            # Not sustained
+            # If the event is NOT retained (as per `require_sust_weeks`), we proceed.
             if (verbose == 2) {
               message("Change confirmed but not sustained over ",
                       ifelse(require_sust_weeks<Inf, paste(">=", require_sust_weeks, "weeks"),
@@ -578,47 +553,36 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             }
           }
 
-
-          # For each m in conf_weeks, only keep the earliest available confirmation visit
+          # For each m in `conf_weeks`, only keep the earliest available confirmation visit:
           conf_idx <- unname(sapply(names(conf_t), function(cm) {
             min(intersect(conf_t[[cm]], conf_idx))
-          })) #_conf_#
+          }))
 
-          # # next change from last confirmation
-          # next_change <- NA
-          # if (conf_idx[[length(conf_idx)]]<nvisits) {
-          #   for (x in (conf_idx[[length(conf_idx)]] + 1):nvisits) {
-          #     if ((data_id[x,][[value_col]] - bl[[value_col]]) > -delta(bl[[value_col]]) ||
-          #         abs(data_id[x,][[value_col]] - data_id[conf_idx[[length(conf_idx)]],][[value_col]])
-          #         >= delta(data_id[conf_idx[[length(conf_idx)]],][[value_col]])) {
-          #       next_change <- x
-          #       break
-          #     }
-          #   }
-          # }
-          # next change from first confirmation #_r_#
+          # Next change (in any direction!) from first confirmation:
           next_change <- NA
           if (conf_idx[[1]]<nvisits) {
             for (x in (conf_idx[[1]] + 1):nvisits) {
               if (!isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='impr') # either improvement not sustained
                   || isevent_loc(data_id[x,][[value_col]], data_id[conf_idx[[1]],][[value_col]],
-                                 type='change')) { # or further valid change from confirmation
+                                                            type='change')) { # or further valid change from confirmation
                 next_change <- x
                 break
               }
             }
           }
 
-          # Move the search index, and optionally the baseline
+          # Move the search index, and optionally the baseline.
           if (baseline %in% c('roving', 'roving_impr')) { #_r_#
-            bl_idx <- ifelse(is.na(next_change), nvisits, next_change - 1)
-            search_idx <- bl_idx + 1
+            # In a roving baseline setting, the baseline is moved after the confirmed event (even if it is not sustained):
+            bl_idx <- conf_idx[[1]] #ifelse(is.na(next_change), nvisits, next_change - 1)
+            search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
           } else if (valid_impr) {
-            search_idx <- ifelse(is.na(next_change), nvisits, next_change)
+            # If the event is retained (as per `require_sust_weeks`), proceed with search starting from `next_change`:
+            search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
           } else {
+            # If the event is not retained (as per `require_sust_weeks`), proceed with search starting from next visit:
             search_idx <- change_idx + 1
           }
-
           if (verbose==2) {
           message("Baseline at visit no.", bl_idx, ", searching for events from visit no.",
                   ifelse(search_idx > nvisits, "-", search_idx), " on")
@@ -636,20 +600,23 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl[[value_col]], type='impr', st=T)) # (sub-threshold) improvement is confirmed at first valid date
           && baseline %in% c('roving', 'roving_impr') #_r_#
           && sub_threshold
-          && phase == 0) { # skip if re-checking for PIRA after post-relapse re-baseline
-
-        if (conf_idx[[1]]==nvisits) {
-          next_change <- NA} else {
-            next_change <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col],
-                                 bl[[value_col]], type='impr', st=T))[1] + conf_idx[[1]] }
-        bl_idx <- ifelse(is.na(next_change), nvisits, next_change - 1) # set new baseline at last consecutive improved value
-        search_idx <- bl_idx + 1 #next_change
-        if (verbose == 2) {
-          message("Confirmed sub-threshold ", outcome, " improvement (visit no.", change_idx, ")")
-          message("Baseline at visit no.", bl_idx, ", searching for events from visit no.",
-                       ifelse(search_idx<=nvisits, search_idx, "-"), " on")
-        }
-      }
+          && phase == 0 # skip if re-checking for PIRA after post-relapse re-baseline
+              ) {
+              if (conf_idx[[1]]==nvisits) {
+                  next_change <- NA
+                  } else {
+                  next_change <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col],
+                                       bl[[value_col]], type='impr', st=T))[1] + conf_idx[[1]]
+                  }
+              # Set new baseline at first confirmation visit:
+              bl_idx <- conf_idx[[1]] #ifelse(is.na(next_change), nvisits, next_change - 1) # (or last consecutive improved value?)
+              search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
+              if (verbose == 2) {
+                message("Confirmed sub-threshold ", outcome, " improvement (visit no.", change_idx, ")")
+                message("Baseline at visit no.", bl_idx, ", searching for events from visit no.",
+                             ifelse(search_idx<=nvisits, search_idx, "-"), " on")
+              }
+            }
 
       # CONFIRMED PROGRESSION:
       # ---------------------
@@ -668,35 +635,25 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
          ) {
 
-                 if (change_idx == nvisits) {
+                 if (change_idx == nvisits) { # i.e., when imputing event at last visit
                    conf_idx <- c(nvisits)
                  }
+                # First visit at which worsening is not sustained:
                 if (conf_idx[[1]]==nvisits) {
-                  next_change <- NA
-                  } else {
-                  next_change <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col], bl[[value_col]],
-                                          type='prog'))[1] + conf_idx[[1]] }
-                 if (!is.na(next_change)) {
-                    conf_idx <- conf_idx[conf_idx < next_change] } # confirmed dates
-                 #_conf_# conf_t <- conf_t[seq_along(conf_idx)]
-
-
-
-                if (conf_idx[[1]]<nvisits) { #conf_idx[[length(conf_idx)]]
-                  # next non-sustained value:
-                  next_nonsust <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col],
-                                                     bl[[value_col]], type='prog'))[1] + conf_idx[[1]]
-                  # next_nonsust <- which(!isevent_loc(data_id[(conf_idx[[length(conf_idx)]] + 1):nvisits, value_col],
-                  #                                    bl[[value_col]], type='prog'))[1] + conf_idx[[1]]
-                } else {
                   next_nonsust <- NA
-                }
+                  } else {
+                    next_nonsust <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col], bl[[value_col]],
+                                          type='prog'))[1] + conf_idx[[1]] }
+                # Discard potential confirmation visits if these occur out of sustained interval:
+                if (!is.na(next_nonsust)) {
+                  conf_idx <- conf_idx[conf_idx < next_nonsust] } # confirmed dates
 
-
+                # The confirmed worsening can still be rejected if `require_sust_weeks>0`.
+                # The `valid_prog` flag indicates whether the event can (1) or cannot (0) be retained:
                 valid_prog <- 1
                 if (require_sust_weeks>0) {
                   if ((!check_intermediate)
-                      && data_id[nvisits, date_col] - data_id[change_idx, date_col] >= require_sust_weeks * 7) { # follow-up lasts at least require_sust_weeks
+                      && data_id[nvisits, date_col] - data_id[change_idx, date_col] >= require_sust_weeks * 7) { # follow-up lasts at least `require_sust_weeks`
                     sust_vis <- which(data_id[(change_idx + 1):nvisits, date_col]
                                       - data_id[change_idx,][[date_col]] >= require_sust_weeks * 7)[1] + change_idx
                     } else {sust_vis <- nvisits}
@@ -707,6 +664,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   )
                 }
 
+                # If the event is retained (as per `require_sust_weeks`),
+                # 1. we check if it's PIRA/RAW;
+                # 2. we store the info.
                 if (valid_prog) {
 
                   nev <- length(event_type)
@@ -726,19 +686,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                       next
                     }
 
-                    # rel_inbetween <- sapply(conf_idx,
-                    #           function(ic) any(is_rel[date_dict[[as.character(bl_idx)]]:date_dict[[as.character(ic)]]]))
-
 
                     # Compute intervals that must be relapse-free for PIRA definition
-                    left <- right <- list()
+                    left <- right <- list() # left/right borders of relapse-free intervals
                     for (iic in 1:length(conf_idx)) {
-
-                      left[[iic]] <- list()
-                      right[[iic]] <- list()
-
+                      left[[iic]] <- list() # left borders of relapse-free intervals for current confirmation visit
+                      right[[iic]] <- list() # right borders of relapse-free intervals for current confirmation visit
                       ic <- conf_idx[[iic]]
-
                       for (point in c('bl', 'event', 'conf')) {
                         t <- ifelse(point == 'bl', bl[[date_col]],
                                     ifelse(point == 'event', data_id[change_idx,][[date_col]],
@@ -766,19 +720,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                       }))
                     })
 
-
-                    pconf_idx <- conf_idx[!rel_inbetween]
+                    # Store info if PIRA:
+                    pconf_idx <- conf_idx[!rel_inbetween] # PIRA confirmation visits (a subset of original confirmation visits)
                     if (length(pconf_idx) > 0) {
-                      ######### #_conf_#
-                      # if (length(pconf_idx) > 0
-                      #   && data_id[pconf_idx[[length(pconf_idx)]], 'closest_rel_after'] < relapse_to_conf) {
-                      #   pconf_idx <- pconf_idx[-length(pconf_idx)]
-                      # }
-                      # pconf_t <- conf_t[seq_along(pconf_idx)]
-                      # if (length(pconf_idx) > 0) {
-                      #   for (m in conf_weeks) {
-                      #     pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], as.integer(m %in% pconf_t))}
-                      ######### #_conf_#
                       pconf_t <- conf_t
                       for (cm in names(conf_t)) {
                         confirmed_at <- intersect(pconf_t[cm], pconf_idx)
@@ -787,7 +731,6 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                         }
                         pira_conf[[cm]] <- c(pira_conf[[cm]], as.integer(length(confirmed_at)>0))
                       }
-                      ######### #_conf_#
                       event_type <- c(event_type, 'PIRA')
                       event_index <- c(event_index, change_idx)
                     } else if (phase == 0) {
@@ -796,11 +739,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     }
                   }
 
+                  # Store info if not PIRA:
                   if (phase==0 & event_type[length(event_type)] != 'PIRA') {
                     for (m in conf_weeks) {
                         pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], NA)}
                   }
-
                   if (event_type[length(event_type)] == 'PIRA' || phase == 0) {
                     bldate <- c(bldate, as.character(global_start + as.difftime(bl[[date_col]], units='days')))
                     blvalue <- c(blvalue, bl[[value_col]])
@@ -808,11 +751,6 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     evalue <- c(evalue, data_id[change_idx,][[value_col]])
                     bl2event <- c(bl2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
                     time2event <- c(time2event, data_id[change_idx,][[date_col]] - data_id[1,][[date_col]])
-                    ######### #_conf_#
-                    # for (m in conf_weeks) {
-                    #   conf[[as.character(m)]] <- c(conf[[as.character(m)]], as.integer(m %in% conf_t))
-                    # }
-                    ######### #_conf_#
                     for (cm in names(conf_t)) {
                       confirmed_at <- intersect(conf_t[cm], conf_idx)
                       if (length(confirmed_at)==0) {
@@ -820,7 +758,6 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                       }
                       conf[[cm]] <- c(conf[[cm]], as.integer(length(confirmed_at)>0))
                     }
-                    ######### #_conf_#
                     sustd <- c(sustd, data_id[sust_idx,][[date_col]] - data_id[change_idx,][[date_col]])
                     sustl <- c(sustl, as.integer(sust_idx == nvisits))
 
@@ -839,7 +776,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   }
 
                   } else {
-                    # Not sustained
+                    # If the event is NOT retained (as per `require_sust_weeks`), we proceed.
                     if (verbose == 2) {
                       message("Change confirmed but not sustained over ",
                               ifelse(require_sust_weeks<Inf, paste(">=", require_sust_weeks, "weeks"),
@@ -848,30 +785,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   }
 
 
-
                 if (length(conf_t)>0) {
 
-                  # For each m in conf_weeks, only keep the earliest available confirmation visit
+                  # For each m in conf_weeks, only keep the earliest available confirmation visit:
                   conf_idx <- unname(sapply(names(conf_t), function(cm) {
                     min(intersect(conf_t[[cm]], conf_idx))
-                  })) #_conf_#
+                  }))
 
-
-                  # # next event from last confirmation
-                  # next_change <- NA
-                  # if (conf_idx[[length(conf_idx)]]<nvisits) {
-                  #   for (x in (conf_idx[[length(conf_idx)]] + 1):nvisits) {
-                  #     if (data_id[x,][[value_col]] - bl[[value_col]] < delta(bl[[value_col]]) || # either not sustained
-                  #         abs(data_id[x,][[value_col]] - data_id[conf_idx[[length(conf_idx)]],][[value_col]])
-                  #         >= delta(data_id[conf_idx[[length(conf_idx)]],][[value_col]])) {  # or further change from *last* confirmation
-                  #       next_change <- x
-                  #       break
-                  #     }
-                  #   }
-                  # }
-
-                  #_r_#
-                  # next valid change from first confirmation visit:
+                  # Next valid change (in any direction!) from first confirmation visit:
                   next_change <- NA
                   if (conf_idx[[1]]<nvisits) {
                     for (x in (conf_idx[[1]] + 1):nvisits) {
@@ -883,26 +804,30 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                       }
                     }
                   }
-                  # next valid change from event:
+                  # Next valid change (in any direction!) from *event*:
                   next_change_ev <- which(isevent_loc(data_id[(change_idx + 1):nvisits, value_col],
                                                       bl[[value_col]], type='change'))[1] + change_idx
 
                 }
 
 
-              # Move the search index, and optionally the baseline
+              # Move the search index, and optionally the baseline.
               if (length(conf_t) == 0 # progression occurring at last visit
                 || (phase==1 && length(event_type)==nev)) { # ongoing relapse-based rebaseline, and the progression found is not PIRA
                 search_idx <- change_idx + 1
               } else if (baseline == 'roving' && phase == 0) {
-                bl_idx <- ifelse(is.na(next_change), nvisits, next_change - 1) # set new baseline at first confirmation time
-                search_idx <- bl_idx + 1
+                # In a roving baseline setting, the baseline is moved after the confirmed event (even if it is not sustained):
+                bl_idx <- conf_idx[[1]] #ifelse(is.na(next_change), nvisits, next_change - 1)
+                search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
               } else if (phase==0 && ((event_type[length(event_type)]!='PIRA' & event=='firstPIRA')
                                       || (event_type[length(event_type)]!='RAW' & event=='firstRAW')
                                       || !valid_prog)) {
+                # If the event is NOT retained (as per `require_sust_weeks`, or not required event type),
+                # proceed with search starting from the next change *from the event*:
                 search_idx <- ifelse(is.na(next_change_ev), nvisits, next_change_ev) #_r_#
               } else {
-                search_idx <- ifelse(is.na(next_change), nvisits+1, next_change)
+                # If the event is retained, proceed with search starting from `next_change`:
+                search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
               }
 
               if (verbose == 2 && phase == 0) {
@@ -922,20 +847,24 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                       isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='prog', st=T))), # (sub-threshold) progression confirmed over (all visits up to) first valid date
                     isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl[[value_col]], type='prog', st=T))  # (sub-threshold) progression confirmed at first valid date
                && baseline == 'roving'
-               && sub_threshold && phase == 0) {
-        if (conf_idx[[1]]==nvisits) {
-          next_change <- NA
-          } else {
-          next_change <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col],
-                              bl[[value_col]], type='prog', st=T))[1] + conf_idx[[1]] }
-        bl_idx <- ifelse(is.na(next_change), nvisits, next_change - 1)
-        search_idx <- bl_idx + 1
-        if (verbose == 2) {
-          message("Confirmed sub-threshold", outcome, "progression (visit no.", change_idx, ")")
-          message("Baseline at visit no.", bl_idx, ", searching for events from visit no.",
-                  ifelse(search_idx > nvisits, "-", search_idx), " on")
-        }
-      }
+               && sub_threshold
+               && phase == 0 # skip if re-checking for PIRA after post-relapse re-baseline
+               ) {
+                  if (conf_idx[[1]]==nvisits) {
+                    next_change <- NA
+                    } else {
+                    next_change <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col],
+                                        bl[[value_col]], type='prog', st=T))[1] + conf_idx[[1]]
+                    }
+                  # Set new baseline at first confirmation visit:
+                  bl_idx <- conf_idx[[1]]  #ifelse(is.na(next_change), nvisits, next_change - 1)
+                  search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
+                  if (verbose == 2) {
+                    message("Confirmed sub-threshold", outcome, "progression (visit no.", change_idx, ")")
+                    message("Baseline at visit no.", bl_idx, ", searching for events from visit no.",
+                            ifelse(search_idx > nvisits, "-", search_idx), " on")
+                  }
+                }
 
       # NO confirmation:
       # ----------------
@@ -949,16 +878,22 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       }
 
 
-        if (relapse_rebl && length(relapse_dates)>0 && phase == 0 && !proceed) {
-          phase <- 1
-          proceed <- 1
+        if (relapse_rebl # relapse-based rebaseline
+            && length(relapse_dates)>0 # at least one relapse
+            && phase == 0 && !proceed # primary event-detection phase stopped
+            ) {
+          phase <- 1 # switch phase
+          proceed <- 1 # resume search
           bl_idx <- 1
           search_idx <- 2
           if (verbose == 2) {
-            message("Completed search with fixed baseline, re-search for PIRA events with post-relapse rebaseline")
+            message("Completed primary search with", baseline,
+                    "baseline, re-search for PIRA events with post-relapse rebaseline")
           }
         }
 
+
+        # In a first-event setting, stop search if specified event was already found:
         if (proceed && ((event == "first" && length(event_type) > 1) ||
                         (event == "firsteach" && ("impr" %in% event_type) && ("prog" %in% event_type)) ||
                         (event == "firstprog" && (("RAW" %in% event_type) || ("PIRA" %in% event_type) || ("prog" %in% event_type))) ||
@@ -972,47 +907,55 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                           }
                         }
 
-        if (proceed && search_idx <= nvisits &&
-            # any(is_rel[date_dict[[as.character(bl_idx)]]:date_dict[[as.character(search_idx)]]])
-            any((data_id[bl_idx,][[date_col]]<=relapse_dates) & (relapse_dates<=data_id[search_idx,][[date_col]])) # if search_idx has been moved after another relapse
-            && relapse_rebl && phase == 1) {
-          if (bl_idx < nvisits) {
-            bl_idx <- sapply(bl_idx, function (ib) {
-            out <- NA
-            for (x in (ib + 1):nvisits) { # visits after current baseline (or after last confirmed PIRA)
-              if (#any(is_rel[date_dict[[as.character(ib)]]:date_dict[[as.character(x)]]])
-                 any((data_id[ib,][[date_col]]<=relapse_dates) & (relapse_dates<=data_id[x,][[date_col]])) # after a relapse
-                  & (data_id[x,][['closest_rel_before']] >= relapse_to_bl) # out of relapse influence
-                  ){
-                out <- x
-                break
-              }
-            }
-            out
-            })
-          } else {bl_idx <- NA}
+        # Relapse-based rebaseline:
+        if (proceed
+            && relapse_rebl && phase == 1
+            && search_idx <= nvisits
+            && any((data_id[bl_idx,][[date_col]]<=relapse_dates)
+                   & (relapse_dates<=data_id[search_idx,][[date_col]]))
+                # if `search_idx` has been moved after another relapse (i.e., if there is a relapse between `bl_idx` and `search_idx`)
+            ) {
+              if (bl_idx < nvisits) {
+                bl_idx <- sapply(bl_idx, function (ib) {
+                out <- NA
+                for (x in (ib + 1):nvisits) { # visits after current baseline (or after last confirmed PIRA)
+                  if (any((data_id[ib,][[date_col]]<=relapse_dates) & (relapse_dates<=data_id[x,][[date_col]])) # after a relapse
+                      & (data_id[x,][['closest_rel_before']] >= relapse_to_bl) # out of relapse influence
+                      ){
+                    out <- x
+                    break
+                  }
+                }
+                out
+                })
+              } else {bl_idx <- NA}
 
-          if (!is.na(bl_idx)) {
-            search_idx <- bl_idx + 1
-            if (verbose == 2) {
-              message("[post-relapse rebaseline] Baseline at visit no.", bl_idx,
-                          ", searching for events from visit no.",
-                      ifelse(search_idx > nvisits, "-", search_idx), " on")
+              if (!is.na(bl_idx)) {
+                search_idx <- bl_idx + 1
+                if (verbose == 2) {
+                  message("[post-relapse rebaseline] Baseline at visit no.", bl_idx,
+                              ", searching for events from visit no.",
+                          ifelse(search_idx > nvisits, "-", search_idx), " on")
+                }
+              }
+
+              # If no more post-relapse rebaseline is possible, terminate search:
+              if (proceed && (is.na(bl_idx) || bl_idx > nvisits - 1)) {
+                proceed <- 0
+                if (verbose == 2) {
+                  message("Not enough visits after current baseline: end process")
+                }
+              }
+        } else if (proceed
+                   && relapse_rebl && phase == 1
+                   && search_idx <= nvisits
+                   && !any((data_id[bl_idx,][[date_col]]<=relapse_dates)
+                          & (relapse_dates<=data_id[search_idx,][[date_col]])) # if there are no relapses between `bl_idx` and `search_idx`
+                   && verbose==2) {
+          message("[post-relapse rebaseline] Baseline at visit no.", bl_idx,
+                  ", searching for events from visit no.",
+                  ifelse(search_idx > nvisits, "-", search_idx), " on")
             }
-          }
-          if (proceed && (is.na(bl_idx) || bl_idx > nvisits - 1)) {
-            proceed <- 0
-            if (verbose == 2) {
-              message("Not enough visits after current baseline: end process")
-            }
-          }
-    } else if (proceed && search_idx <= nvisits && relapse_rebl && phase == 1 &&
-               !any((data_id[bl_idx,][[date_col]]<=relapse_dates)
-                    & (relapse_dates<=data_id[search_idx,][[date_col]])) # if search_idx is still
-               && verbose==2) {
-      message("[post-relapse rebaseline] Baseline at visit no.", bl_idx, ", searching for events from visit no.",
-              ifelse(search_idx > nvisits, "-", search_idx), " on")
-        }
 
 
     } #while (proceed)
