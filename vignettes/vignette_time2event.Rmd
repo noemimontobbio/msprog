@@ -2,7 +2,10 @@
 title: "Time to event"
 author: "Noemi Montobbio"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
 bibliography: MSbiblio.bib
 csl: aaps-pharmscitech.csl
 link-citations: true
