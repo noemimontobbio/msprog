@@ -60,7 +60,7 @@
 #' `'firsteach'`, or `'firstprogtype'` - or when searching for a specific type of progression
 #' - i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`).}
 #' }
-#' @param sub_threshold If `TRUE` - and only if `baseline` is `'roving'` or `'roving_impr'` - move roving baseline
+#' @param sub_threshold This argument is only used if `baseline='roving'` or `baseline='roving_impr'`. If `TRUE`, move roving baseline
 #' at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of `delta_fun`).
 #' @param relapse_rebl If `TRUE`, re-baseline after every relapse to search for PIRA events.
 #' @param validconf_col Name of data column specifying which visits can (`T`) or cannot (`F`) be used as confirmation visits.

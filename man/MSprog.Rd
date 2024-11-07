@@ -97,7 +97,7 @@ suitable for a first-progression setting to discard fluctuations around baseline
 }
 }}
 
-\item{sub_threshold}{If \code{TRUE} - and only if \code{baseline} is \code{'roving'} or \code{'roving_impr'} - move roving baseline
+\item{sub_threshold}{This argument is only used if \code{baseline='roving'} or \code{baseline='roving_impr'}. If \code{TRUE}, move roving baseline
 at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of \code{delta_fun}).}
 
 \item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse to search for PIRA events.}
