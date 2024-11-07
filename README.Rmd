@@ -85,7 +85,7 @@ print(output$event_count)
 ```{r, indent="     "}
 print(output$results, row.names=FALSE)
 ```
-    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed over 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit. 
+    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf84` reports whether the event was confirmed over 84 days (12 weeks); `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit. 
 
 
 Additionally, applying the `print` method to an object of class `MSprogOutput` prints out a short paragraph describing the complete set of criteria used to obtain the output, **to be reported to ensure complete reproducibility**:

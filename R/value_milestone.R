@@ -9,7 +9,7 @@
 #' An event is only retained if **confirmed**, i.e., if all values *up to* the
 #' confirmation visit exceed the milestone.
 #' Valid time windows for confirmation visits are determined by arguments
-#' `conf_weeks`, `conf_tol_days`, `conf_unbounded_right`, `relapse_to_conf`.
+#' `conf_days`, `conf_tol_days`, `conf_unbounded_right`, `relapse_to_conf`.
 #'
 #' @param data a `data.frame` containing longitudinal data containing subject ID, outcome value, date of visit.
 #' @param milestone Disability milestone (outcome value to check data against).
@@ -31,7 +31,7 @@
 #' @param relapse `data.frame` containing longitudinal data, including: subject ID and relapse date.
 #' @param rsubj_col Name of subject column for relapse data, if different from outcome data.
 #' @param rdate_col Name of date column for relapse data, if different from outcome data.
-#' @param conf_weeks Period before confirmation (weeks).
+#' @param conf_days Period before confirmation (days).
 #' @param conf_tol_days Tolerance window for confirmation visit (days).
 #' @param conf_unbounded_right If `TRUE`, confirmation window is unbounded on the right.
 #' @param relapse_to_event Minimum distance from a relapse (days) for an outcome value to be valid.
@@ -55,7 +55,7 @@
 
 value_milestone <- function(data, milestone, value_col, date_col, subj_col, outcome,
                             worsening=NULL, relapse=NULL, rsubj_col=NULL, rdate_col=NULL,
-                            conf_weeks=24, conf_tol_days=30, conf_unbounded_right=FALSE,
+                            conf_days=24*7, conf_tol_days=30, conf_unbounded_right=FALSE,
                             relapse_to_event=0, relapse_to_conf=30,
                             verbose=0) {
 
@@ -102,17 +102,13 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
     stop('Either specify an outcome type, or specify the direction of worsening (\'increase\' or \'decrease\')')
   }
 
-  # Define a confirmation window for each value of conf_weeks
+  # Define a confirmation window for each value of conf_days
   if (conf_unbounded_right) {
     conf_tol_days[2] <- Inf
   }
-  conf_window <- lapply(conf_weeks, function(t) {
-    lower <- as.integer(t * 7) - conf_tol_days[1]
-    # if (conf_unbounded_right) {
-    #   upper <- Inf
-    # } else {
-    upper <- as.integer(t * 7) + conf_tol_days[2]
-    # }
+  conf_window <- lapply(conf_days, function(t) {
+    lower <- as.integer(t) - conf_tol_days[1]
+    upper <- as.integer(t) + conf_tol_days[2]
     return(c(lower, upper))
   })
 

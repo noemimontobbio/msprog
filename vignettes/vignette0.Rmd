@@ -114,7 +114,7 @@ print(output_edss$event_count)
 ```{r, indent="     "}
 print(output_edss$results, row.names=FALSE)
 ```
-    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^timeto]; `bl2event` is the number of days from current baseline to event; `conf12` reports whether the event was confirmed over 12 weeks; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
+    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^timeto]; `bl2event` is the number of days from current baseline to event; `conf84` reports whether the event was confirmed over 84 days (12 weeks); `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
 
 Additionally, by applying the `print` method to the `MSprog()` output, the user can print out a short paragraph describing the complete set of criteria used to obtain the results, to be reported along with the results to ensure complete reproducibility. In our example:
@@ -208,7 +208,7 @@ print(toydata_visits[toydata_visits$id==4, c('date', 'EDSS')], row.names=FALSE) 
 output <- MSprog(data=toydata_visits, 
                  subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
                  subjects=4,
-                 relapse=toydata_relapses, conf_weeks=12, event='multiple', baseline='fixed', 
+                 relapse=toydata_relapses, conf_days=7*12, event='multiple', baseline='fixed', 
                  include_dates=TRUE, verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
@@ -218,7 +218,7 @@ Since the reference value was kept fixed at the first visit (EDSS=4.5), the EDSS
 output <- MSprog(data=toydata_visits, 
                  subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
                  relapse=toydata_relapses, subjects=4,
-                conf_weeks=12, event='multiple', baseline='roving', 
+                conf_days=7*12, event='multiple', baseline='roving', 
                 include_dates=TRUE, verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
@@ -243,23 +243,23 @@ An event is only validated if the change in the outcome value from the current b
 
 [^upto]: The value change from baseline must also be maintained at all intermediate visits between the event and the confirmation visit. This behaviour may be changed by setting the `check_intermediate` argument to `FALSE` (in this case, the change only needs to be confirmed **at** the designated confirmation visit). We do not recommend this, as it may lead to including random fluctuations as events. We included this option to provide the possibility of replicating the results from previous studies that used this rationale.
 
-The chosen confirmation period depends on the type of study and on the frequency of visits, and can be set in `MSprog()` by using the `conf_weeks` argument. A tolerance interval around `conf_weeks` can be specified using the `conf_tol_days` argument, given as a sequence of two integers (left and right tolerance)[^lrtol]. Further, the `conf_unbounded_right` argument allows event confirmation to occur at any visit *after* `conf_weeks` (i.e., right tolerance set to infinity). Let's see two examples.
+The chosen confirmation period depends on the type of study and on the frequency of visits, and can be set in `MSprog()` by using the `conf_days` argument. A tolerance interval around `conf_days` can be specified using the `conf_tol_days` argument, given as a sequence of two integers (left and right tolerance)[^lrtol]. Further, the `conf_unbounded_right` argument allows event confirmation to occur at any visit *after* `conf_days` (i.e., right tolerance set to infinity). Let's see two examples.
 
-i. A common setting for clinical trial data would be: `conf_weeks=12`, `conf_tol_days=0`, `conf_unbounded_right=T`, i.e., "confirmation at 12 or more weeks".
+i. A common setting for clinical trial data would be: `conf_days=7*12`, `conf_tol_days=0`, `conf_unbounded_right=T`, i.e., "confirmation over 12 or more weeks".
 
-ii. A common setting for observational data would be: `conf_weeks=24`, `conf_tol_days=c(0,7*12)`, `conf_unbounded_right=F`, i.e., the confirmation visit must lie between 24 weeks after the event, and 36 weeks after the event.
+ii. A common setting for observational data would be: `conf_days=7*24`, `conf_tol_days=c(0,7*12)`, `conf_unbounded_right=F`, i.e., the confirmation visit must lie between 24 weeks after the event, and 36 weeks after the event.
 
 [^lrtol]: `conf_tol_days` can also be specified as a single integer if the same tolerance on left and right is desired.
 
 ## Additional options
 
-* If `conf_weeks` is specified as a sequence of values (e.g., `conf_weeks=c(12,24)`), events are retained if confirmed by *at least one visit* falling within any of the specified periods (here, 12 **or** 24 weeks with their relative tolerance interval)[^1224]. The results table will report whether an event was confirmed in each of the specified periods, see example [below](#confexample).
+* If `conf_days` is specified as a sequence of values (e.g., `conf_days=c(7*12,7*24)`), events are retained if confirmed by *at least one visit* falling within any of the specified periods (here, 12 **or** 24 weeks with their relative tolerance interval)[^1224]. The results table will report whether an event was confirmed in each of the specified periods, see example [below](#confexample).
 
 [^1224]: An event is only confirmed if the value change from baseline is maintained **at all visits up to the confirmation visit**. So an event can only be "confirmed over 24 weeks" and *not* "confirmed over 12 weeks" if there are no valid confirmation visits falling within the 12-week window (unless `check_intermediate=FALSE`).
 
 * If the confirmation visit occurs in the vicinity of a clinical relapse, it is typically considered invalid. The `relapse_to_conf` argument allows to specify the minimum accepted distance (in days) of a confirmation visit from the onset of a previous relapse.
 
-* By default, a disability worsening occurring at the last available assessment is ignored by `MSprog()`. This behaviour can be changed using the `prog_last_visit` argument. If set to `TRUE`, any disability worsening occurring at the last visit is retained even though unconfirmed. If set to a numeric value N, unconfirmed worsening events are included only if occurring within N weeks of follow up (e.g., in case of early discontinuation).
+* By default, a disability worsening occurring at the last available assessment is ignored by `MSprog()`. This behaviour can be changed using the `prog_last_visit` argument. If set to `TRUE`, any disability worsening occurring at the last visit is retained even though unconfirmed. If set to a numeric value N, unconfirmed worsening events are included only if occurring within N days of follow up (e.g., in case of early discontinuation).
 
 * In scenarios (e.g., a clinical trial) where disability course is compared between two cohorts with different relapse rates, there may be an imbalance in visit frequency between the two groups, due to unscheduled visits after relapses. This implies a higher probability of detecting outcome changes in the group with more assessments. Such issue is sometimes addressed by only using scheduled visits as confirmation visits [@hauser2017]. It is possible to implement this with `MSprog()` by including an additional column in the longitudinal data, specifying which visits can (`TRUE`) or cannot (`FALSE`) be used as confirmation visits. The name of such column must be specified using the `validconf_col` argument.
 
@@ -276,13 +276,13 @@ ii. A common setting for observational data would be: `conf_weeks=24`, `conf_tol
 
 ## Sustained progression {#sustained}
 
-In addition to event confirmation, some studies require events to be *sustained* for a specified period of time. The `require_sust_weeks` argument allows to specify, if desired, the length of such period. For example, if `require_sust_weeks=48`, an event is only retained if the change in the outcome measure from the current baseline is confirmed at *all* visits falling within the following 48 weeks. If the event is sustained for the entire follow-up, it is retained even if the follow-up period ends <48 weeks after the event. Setting `require_sust_weeks=Inf`, events are retained only when sustained for the entire follow-up duration.
+In addition to event confirmation, some studies require events to be *sustained* for a specified period of time. The `require_sust_days` argument allows to specify, if desired, the length of such period. For example, if `require_sust_days=7*48`, an event is only retained if the change in the outcome measure from the current baseline is confirmed at *all* visits falling within the following 48 weeks. If the event is sustained for the entire follow-up, it is retained even if the follow-up period ends <48 weeks after the event. Setting `require_sust_days=Inf`, events are retained only when sustained for the entire follow-up duration.
 
-The `require_sust_weeks` argument may be of use in the following scenarios.
+The `require_sust_days` argument may be of use in the following scenarios.
 
-* Suppose the maximum follow-up in the population is 96 weeks excluding the baseline visit. If one wants to detect progressions sustained over the whole follow-up, coding it as "progression confirmed over 96 weeks or more" (`conf_weeks=96`, `conf_tol_days=0`, `conf_unbounded_right=T`) would discard progressions of patients whose follow-up is shorter than 96 weeks. In a scenario where patients have different follow-up lengths, the `require_sust_weeks` argument offers a more reliable way of implementing this, e.g., as "progression confirmed over 12 weeks or more and sustained for the whole follow-up period" (`conf_weeks=12`, `conf_tol_days=0`, `conf_unbounded_right=T`, `require_sust_weeks=Inf`). 
+* Suppose the maximum follow-up in the population is 96 weeks excluding the baseline visit. If one wants to detect progressions sustained over the whole follow-up, coding it as "progression confirmed over 96 weeks or more" (`conf_days=7*96`, `conf_tol_days=0`, `conf_unbounded_right=T`) would discard progressions of patients whose follow-up is shorter than 96 weeks. In a scenario where patients have different follow-up lengths, the `require_sust_days` argument offers a more reliable way of implementing this, e.g., as "progression confirmed over 12 weeks or more and sustained for the whole follow-up period" (`conf_days=7*12`, `conf_tol_days=0`, `conf_unbounded_right=T`, `require_sust_days=Inf`). 
 
-* In observational data with coarsely- and unevenly-spaced visits, the `require_sust_weeks` argument may be used to detect sustained progression (e.g., `require_sust_weeks=96`) while still requiring the presence of a confirmation visit within a specified interval from the event (e.g., `conf_weeks=12`, `conf_tol_days=c(0,12*7)`). 
+* In observational data with coarsely- and unevenly-spaced visits, the `require_sust_days` argument may be used to detect sustained progression (e.g., `require_sust_days=7*96`) while still requiring the presence of a confirmation visit within a specified interval from the event (e.g., `conf_days=7*12`, `conf_tol_days=c(0,7*12)`). 
 
 * Sustained disability worsening can be required to exclude transient RAW events (see example below).
 
@@ -295,28 +295,28 @@ print(toydata_visits[toydata_visits$id==2,c('date', 'EDSS')], row.names=FALSE) #
 print(toydata_relapses[toydata_relapses$id==2,], row.names=FALSE) # relapses
 ```
 
-The following code detects 12- or 24-week confirmed events for subject `2`. 
+The following code detects 12- or 24-week (84- or 168-day) confirmed events for subject `2`. 
 ```{r}
 output <- MSprog(data=toydata_visits, 
                  subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
                  relapse=toydata_relapses, subjects=2,
                  event='multiple', baseline='roving', 
                  relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0),
-                 conf_weeks=c(12,24), verbose=0)
+                 conf_days=c(7*12,7*24), verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
-The `relapse_indep` argument specifies the relapse-free intervals for a progression event to be classified as PIRA, see [the relevant section](#pira)[^pira]. In this case, a high-specificity definition of PIRA is used [@muller2023] that requires an absence of relapses between baseline and confirmation. The resulting events are a 12-week-confirmed RAW and a 12-week-confirmed PIRA. The RAW event was not confirmed over 24 weeks (`conf24` is `0`). The PIRA event was also confirmed over 24 weeks (`conf24` is `1`). However, since a relapse occurred before the 24-week confirmation, the event cannot be classified as a 24-week-confirmed PIRA (`PIRA_conf24` is `0`) but only as a 24-week-confirmed *progression*.
+The `relapse_indep` argument specifies the relapse-free intervals for a progression event to be classified as PIRA, see [the relevant section](#pira)[^pira]. In this case, a high-specificity definition of PIRA is used [@muller2023] that requires an absence of relapses between baseline and confirmation. The resulting events are a 12-week-confirmed RAW and a 12-week-confirmed PIRA. The RAW event was not confirmed over 24 weeks, i.e., 168 days (`conf168` is `0`). The PIRA event was also confirmed over 24 weeks (`conf168` is `1`). However, since a relapse occurred before the 24-week confirmation, the event cannot be classified as a 24-week-confirmed PIRA (`PIRA_conf168` is `0`) but only as a 24-week-confirmed *progression*.
 
 [^pira]: See also `relapse_indep_from_bounds()` function documentation, and the dedicated package vignette *Assessing progression independent of relapse activity (PIRA) in MS*.
 
-The RAW event found for subject `2` constitutes a *transient* accumulation of disability. Such events can be excluded from the `MSprog()` output by requiring that each event be sustained for at least a certain amount of time (specified by argument `require_sust_weeks`). For instance:
+The RAW event found for subject `2` constitutes a *transient* accumulation of disability. Such events can be excluded from the `MSprog()` output by requiring that each event be sustained for at least a certain amount of time (specified by argument `require_sust_days`). For instance:
 ```{r}
 output <- MSprog(data=toydata_visits, 
                  subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
                  relapse=toydata_relapses, subjects=2,
                  event='multiple', baseline='roving', 
                  relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0),
-                 conf_weeks=c(12,24), require_sust_weeks=48, verbose=0)
+                 conf_days=c(7*12,7*24), require_sust_days=7*48, verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
 
@@ -328,7 +328,7 @@ output <- MSprog(data=toydata_visits,
                 event='multiple', baseline='roving', 
                 relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0),
                 relapse_rebl=TRUE,
-                conf_weeks=c(12,24), require_sust_weeks=48, verbose=0)
+                conf_days=c(7*12,7*24), require_sust_days=7*48, verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
 The event is now correctly classified as PIRA.

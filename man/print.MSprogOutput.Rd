@@ -21,7 +21,7 @@ obtain the output.
 \examples{
 # EDSS progression
 output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
-    relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
+    relapse=toydata_relapses, conf_days=7*12, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=2)
 print(output) # textual description of parameters used to obtain output
 }

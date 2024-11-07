@@ -88,7 +88,7 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> 
 #> ---
 #> Outcome: edss
-#> Confirmation over: 12 weeks (-0 days, +Inf days)
+#> Confirmation over: 84 days (-0 days, +Inf days)
 #> Baseline: roving
 #> Relapse influence (baseline): 30 days
 #> Relapse influence (event): 0 days
@@ -128,7 +128,7 @@ class `MSprogOutput` with the following attributes.
 
     ``` r
     print(output$results, row.names=FALSE)
-    #>  id nevent event_type total_fu time2event bl2event conf12 PIRA_conf12 sust_days
+    #>  id nevent event_type total_fu time2event bl2event conf84 PIRA_conf84 sust_days
     #>   1      1       PIRA      534        292      292      0           0       242
     #>   2      1        RAW      730        198      198      0          NA        84
     #>   2      2       PIRA      730        539      257      0           0       191
@@ -147,10 +147,10 @@ class `MSprogOutput` with the following attributes.
     where: `nevent` is the cumulative event count for each subject;
     `event_type` characterises the event; `time2event` is the number of
     days from start of follow-up to event; `bl2event` is the number of
-    days from current baseline to event; `conf12` reports whether the
-    event was confirmed over 12 weeks; `sust_days` is the number of days
-    for which the event was sustained; `sust_last` reports whether the
-    event was sustained until the last visit.
+    days from current baseline to event; `conf84` reports whether the
+    event was confirmed over 84 days (12 weeks); `sust_days` is the
+    number of days for which the event was sustained; `sust_last`
+    reports whether the event was sustained until the last visit.
 
 Additionally, applying the `print` method to an object of class
 `MSprogOutput` prints out a short paragraph describing the complete set
@@ -159,7 +159,7 @@ complete reproducibility**:
 
 ``` r
 print(output)
-#> For each subject, we detected all EDSS changes (in chronological order) confirmed over 12 weeks or more. A visit could not be used as confirmation if occurring within 30 days from the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed progression or improvement event. The new baseline was set as the first available confirmation visit. Whenever the current baseline fell within 30 days from the onset of a relapse, it was moved to the next available visit. A confirmed EDSS worsening event was labelled as RAW if occurring within 90 days from the onset of a relapse. A confirmed EDSS worsening event was labelled as PIRA if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
+#> For each subject, we detected all EDSS changes (in chronological order) confirmed over 84 days or more. A visit could not be used as confirmation if occurring within 30 days from the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed progression or improvement event. The new baseline was set as the first available confirmation visit. Whenever the current baseline fell within 30 days from the onset of a relapse, it was moved to the next available visit. A confirmed EDSS worsening event was labelled as RAW if occurring within 90 days from the onset of a relapse. A confirmed EDSS worsening event was labelled as PIRA if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
 ```
 
 <br />

@@ -14,7 +14,7 @@
 #' @examples
 #' # EDSS progression
 #' output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
-#'     relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
+#'     relapse=toydata_relapses, conf_days=7*12, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=2)
 #' print(output) # textual description of parameters used to obtain output
 print.MSprogOutput <- function(x, ...) {
@@ -65,8 +65,8 @@ print.MSprogOutput <- function(x, ...) {
 
   text <- paste0(
     'For each subject, we detected ', event_text, ' confirmed', ifelse(s$check_intermediate, ' over ', ' at '),
-    paste0(s$conf_weeks, collapse=" or "),
-    ' weeks', ifelse(s$conf_unbounded_right, ' or more', ''),
+    paste0(s$conf_days, collapse=" or "),
+    ' days', ifelse(s$conf_unbounded_right, ' or more', ''),
     ifelse(s$conf_tol_days[1]>0, paste0(' (with a tolerance of ', s$conf_tol_days[1],
                                         ifelse(s$conf_tol_days[1]==s$conf_tol_days[2], ' days on both sides)', paste0(' days on the left',
                                                                                                                       ifelse(s$conf_unbounded_right || s$conf_tol_days[2]==0, ')', paste0(' and ', s$conf_tol_days[2], ' on the right)'))))),
@@ -93,11 +93,11 @@ print.MSprogOutput <- function(x, ...) {
                                                                ' days from the onset of a relapse, it was moved to the next available visit. '), ''))
     ),
     ifelse(s$prog_last_visit>0, paste0('Progressions ',
-                                       ifelse(s$prog_last_visit<Inf, paste0('of patients terminating follow-up before week ',
+                                       ifelse(s$prog_last_visit<Inf, paste0('of patients terminating follow-up before day ',
                                                                             s$prog_last_visit, ' '), ''),
                                        'were included if occurring at the last available visit without confirmation. '), ''),
-    ifelse(s$require_sust_weeks>0, paste0('Events were only retained if sustained',
-                                          ifelse(s$require_sust_weeks<Inf, paste0(' either over ', s$require_sust_weeks, ' weeks, or'), ''),
+    ifelse(s$require_sust_days>0, paste0('Events were only retained if sustained',
+                                          ifelse(s$require_sust_days<Inf, paste0(' either over ', s$require_sust_days, ' days, or'), ''),
                                           ' until the end of follow-up. '), ''),
     ifelse(s$relapse_to_event>0, paste0('Events occurring within ', s$relapse_to_event,
                                         ' days after the onset of a relapse were discarded. '), ''),

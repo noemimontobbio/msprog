@@ -21,10 +21,10 @@ MSprog(
   sub_threshold = F,
   relapse_rebl = F,
   validconf_col = NULL,
-  conf_weeks = 12,
+  conf_days = 12 * 7,
   conf_tol_days = 30,
   conf_unbounded_right = F,
-  require_sust_weeks = 0,
+  require_sust_days = 0,
   check_intermediate = T,
   relapse_to_bl = 30,
   relapse_to_event = 0,
@@ -106,7 +106,7 @@ at any sub-threshold confirmed event (i.e. any confirmed change in outcome measu
 The input data does not necessarily have to include such a column.
 If \code{validconf_col=NULL}, all visits are potentially used as confirmation visits.}
 
-\item{conf_weeks}{Period before confirmation (weeks).}
+\item{conf_days}{Period before confirmation (days).}
 
 \item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 or list-like of length 2 (different tolerance on left and right).
@@ -114,17 +114,17 @@ In all cases, the right end of the interval is ignored if \code{conf_unbounded_r
 
 \item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right.}
 
-\item{require_sust_weeks}{Minimum number of weeks over which a confirmed change must be sustained
+\item{require_sust_days}{Minimum number of days over which a confirmed change must be sustained
 (i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
 Events sustained for the entire follow-up are retained regardless of follow-up duration.
-Setting \code{require_sust_weeks=Inf}, events are retained only when sustained for the entire follow-up duration.\if{html}{\out{<br />}}
+Setting \code{require_sust_days=Inf}, events are retained only when sustained for the entire follow-up duration.\if{html}{\out{<br />}}
 (Warning: if \code{check_intermediate} is set to \code{FALSE}, \emph{only the end} of the specified period will be checked for confirmation.)}
 
 \item{check_intermediate}{If \code{TRUE} (default), events are confirmed \emph{over all intermediate visits}
 up to the confirmation visit. \if{html}{\out{<br />}}
 If set to \code{FALSE} (not recommended in most cases, as it may discard meaningful fluctuations),
 events will be confirmed \emph{only at} the specified confirmation visit
-(and \emph{only at the end} of the period defined by \code{require_sust_weeks}, if any).}
+(and \emph{only at the end} of the period defined by \code{require_sust_days}, if any).}
 
 \item{relapse_to_bl}{Minimum distance from last relapse (days) for a visit to be used as baseline
 (otherwise the next available visit is used as baseline).}
@@ -152,7 +152,7 @@ event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For
 \item{min_value}{Only include progression events where the outcome is >= value.}
 
 \item{prog_last_visit}{If \code{TRUE}, include progressions occurring at last visit (i.e. with no confirmation).
-If a numeric value N is passed, unconfirmed events are included only if occurring within N weeks of follow up
+If a numeric value N is passed, unconfirmed events are included only if occurring within N days of follow up
 (e.g., in case of early discontinuation).}
 
 \item{date_format}{Format of dates in the input data. If not specified, it will be inferred by function \code{\link[=as.Date]{as.Date()}}.}
@@ -189,7 +189,7 @@ by the user and reported as a complement to the results to ensure reproducibilit
 \details{
 The events are detected sequentially by scanning the outcome values in chronological order.
 Valid time windows for confirmation visits are determined by arguments
-\code{conf_weeks}, \code{conf_tol_days}, \code{conf_unbounded_right}, \code{relapse_to_conf}.
+\code{conf_days}, \code{conf_tol_days}, \code{conf_unbounded_right}, \code{relapse_to_conf}.
 Progression events are classified as relapse-associated or relapse-independent based on their relative timing
 with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
 confirmed progression events occurring within a specified interval (\code{relapse_assoc} argument) from a relapse;
@@ -199,13 +199,13 @@ around the baseline, event, and confirmation visits (\code{relapse_indep} argume
 \examples{
 # EDSS progression
 output_edss <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
-    relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
+    relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=1)
 print(output_edss$results) # extended info on each event for all subjects
 print(output_edss$event_count) # summary of event sequence for each subject
 # SDMT progression
 output_sdmt <- MSprog(toydata_visits, 'id', 'SDMT', 'date', 'sdmt',
-    relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
+    relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=1)
 print(output_sdmt$results) # extended info on each event for all subjects
 print(output_sdmt$event_count) # summary of event sequence for each subject

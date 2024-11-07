@@ -9,7 +9,7 @@
 #'
 #' The events are detected sequentially by scanning the outcome values in chronological order.
 #' Valid time windows for confirmation visits are determined by arguments
-#' `conf_weeks`, `conf_tol_days`, `conf_unbounded_right`, `relapse_to_conf`.
+#' `conf_days`, `conf_tol_days`, `conf_unbounded_right`, `relapse_to_conf`.
 #' Progression events are classified as relapse-associated or relapse-independent based on their relative timing
 #' with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
 #' confirmed progression events occurring within a specified interval (`relapse_assoc` argument) from a relapse;
@@ -66,21 +66,21 @@
 #' @param validconf_col Name of data column specifying which visits can (`T`) or cannot (`F`) be used as confirmation visits.
 #' The input data does not necessarily have to include such a column.
 #' If `validconf_col=NULL`, all visits are potentially used as confirmation visits.
-#' @param conf_weeks Period before confirmation (weeks).
+#' @param conf_days Period before confirmation (days).
 #' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 #' or list-like of length 2 (different tolerance on left and right).
 #' In all cases, the right end of the interval is ignored if `conf_unbounded_right` is set to `TRUE`.
 #' @param conf_unbounded_right If `TRUE`, confirmation window is unbounded on the right.
-#' @param require_sust_weeks Minimum number of weeks over which a confirmed change must be sustained
+#' @param require_sust_days Minimum number of days over which a confirmed change must be sustained
 #' (i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
 #' Events sustained for the entire follow-up are retained regardless of follow-up duration.
-#' Setting `require_sust_weeks=Inf`, events are retained only when sustained for the entire follow-up duration.<br />
+#' Setting `require_sust_days=Inf`, events are retained only when sustained for the entire follow-up duration.<br />
 #' (Warning: if `check_intermediate` is set to `FALSE`, \emph{only the end} of the specified period will be checked for confirmation.)
 #' @param check_intermediate If `TRUE` (default), events are confirmed \emph{over all intermediate visits}
 #' up to the confirmation visit. <br />
 #' If set to `FALSE` (not recommended in most cases, as it may discard meaningful fluctuations),
 #' events will be confirmed \emph{only at} the specified confirmation visit
-#' (and \emph{only at the end} of the period defined by `require_sust_weeks`, if any).
+#' (and \emph{only at the end} of the period defined by `require_sust_days`, if any).
 #' @param relapse_to_bl Minimum distance from last relapse (days) for a visit to be used as baseline
 #' (otherwise the next available visit is used as baseline).
 #' @param relapse_to_event Minimum distance from last relapse (days) for an event to be considered as such.
@@ -101,7 +101,7 @@
 #' }
 #' @param min_value Only include progression events where the outcome is >= value.
 #' @param prog_last_visit If `TRUE`, include progressions occurring at last visit (i.e. with no confirmation).
-#' If a numeric value N is passed, unconfirmed events are included only if occurring within N weeks of follow up
+#' If a numeric value N is passed, unconfirmed events are included only if occurring within N days of follow up
 #' (e.g., in case of early discontinuation).
 #' @param date_format Format of dates in the input data. If not specified, it will be inferred by function [as.Date()].
 #' @param include_dates If `TRUE`, report dates of events.
@@ -138,20 +138,20 @@
 #' @examples
 #' # EDSS progression
 #' output_edss <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
-#'     relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
+#'     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=1)
 #' print(output_edss$results) # extended info on each event for all subjects
 #' print(output_edss$event_count) # summary of event sequence for each subject
 #' # SDMT progression
 #' output_sdmt <- MSprog(toydata_visits, 'id', 'SDMT', 'date', 'sdmt',
-#'     relapse=toydata_relapses, conf_weeks=12, conf_tol_days=30,
+#'     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=1)
 #' print(output_sdmt$results) # extended info on each event for all subjects
 #' print(output_sdmt$event_count) # summary of event sequence for each subject
 MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, subjects=NULL,
                    delta_fun=NULL, worsening=NULL, event='firstprog', baseline='fixed', sub_threshold=F, relapse_rebl=F,
-                   validconf_col=NULL, conf_weeks=12, conf_tol_days=30, conf_unbounded_right=F, require_sust_weeks=0, check_intermediate=T,
+                   validconf_col=NULL, conf_days=12*7, conf_tol_days=30, conf_unbounded_right=F, require_sust_days=0, check_intermediate=T,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30, relapse_assoc=90, relapse_indep=NULL,
                    min_value=NULL, prog_last_visit=F,
                    date_format=NULL, include_dates=F, include_value=F, include_stable=T, verbose=1
@@ -203,7 +203,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   data <- data[complete.cases(data[ , c(subj_col, value_col, date_col, validconf_col)]), ]
   relapse <- relapse[complete.cases(relapse[ , c(rsubj_col, rdate_col)]), ]
 
-  # Convert dates to datetime format
+  # Convert dates to Date format
   if (is.null(date_format)) {
     data[[date_col]] <- as.Date(data[[date_col]])
     relapse[[rdate_col]] <- as.Date(relapse[[rdate_col]])
@@ -276,17 +276,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
              sub_threshold=st, delta_fun=delta_fun)
   }
 
-  # Define a confirmation window for each value of conf_weeks
+  # Define a confirmation window for each value of conf_days
   if (conf_unbounded_right) {
     conf_tol_days[2] <- Inf
   }
-  conf_window <- lapply(conf_weeks, function(t) {
-    lower <- as.integer(t * 7) - conf_tol_days[1]
-    # if (conf_unbounded_right) {
-    #   upper <- Inf
-    # } else {
-      upper <- as.integer(t * 7) + conf_tol_days[2]
-    # }
+  conf_window <- lapply(conf_days, function(t) {
+    lower <- as.integer(t) - conf_tol_days[1]
+      upper <- as.integer(t) + conf_tol_days[2]
     return(c(lower, upper))
   })
 
@@ -302,12 +298,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   all_subj <- unique(data[[subj_col]])
   nsub <- length(all_subj)
   max_nevents <- round(max(table(data[[subj_col]]))/2)
-  results_df <- data.frame(matrix(nrow=nsub*max_nevents, ncol=10+length(conf_weeks)*2+2)) #length(conf_weeks) + (length(conf_weeks)-1)
+  results_df <- data.frame(matrix(nrow=nsub*max_nevents, ncol=10+length(conf_days)*2+2)) #length(conf_days) + (length(conf_days)-1)
   allcol <- c(subj_col, 'nevent', 'event_type', 'bldate', 'blvalue', 'date', 'value', 'total_fu', 'time2event',
-              'bl2event', paste0('conf', conf_weeks), paste0('PIRA_conf', conf_weeks), 'sust_days', 'sust_last')
-  # if (length(conf_weeks)>1) {
-  #   allcol <- c(allcol[1:(10+length(conf_weeks))],  paste0('PIRA_conf',
-  #                     conf_weeks[2:length(conf_weeks)]), 'sust_days', 'sust_last')
+              'bl2event', paste0('conf', conf_days), paste0('PIRA_conf', conf_days), 'sust_days', 'sust_last')
+  # if (length(conf_days)>1) {
+  #   allcol <- c(allcol[1:(10+length(conf_days))],  paste0('PIRA_conf',
+  #                     conf_days[2:length(conf_days)]), 'sust_days', 'sust_last')
   #   }
   colnames(results_df) <- allcol
   results_df[[subj_col]] <- rep(all_subj, each=max_nevents)
@@ -383,7 +379,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     event_index <- NULL
     bldate <- edate <- blvalue <- evalue <- time2event <- bl2event <- sustd <- sustl <- vector()
     conf <- pira_conf <- list()
-    for (m in conf_weeks) {
+    for (m in conf_days) {
       conf[[as.character(m)]] <- vector()
       pira_conf[[as.character(m)]] <- vector()}
 
@@ -458,8 +454,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           match_idx
         })
         conf_t <- list()
-        for (i in seq_along(conf_weeks)) {
-          conf_t[[as.character(conf_weeks[i])]] <- conf_idx[[i]]
+        for (i in seq_along(conf_days)) {
+          conf_t[[as.character(conf_days[i])]] <- conf_idx[[i]]
         }
         conf_idx <- unique(unlist(conf_idx))
         ####### #_conf_#
@@ -498,26 +494,26 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             conf_idx <- conf_idx[conf_idx < next_nonsust]
           }
 
-          # The confirmed improvement can still be rejected if `require_sust_weeks>0`.
+          # The confirmed improvement can still be rejected if `require_sust_days>0`.
           # The `valid_impr` flag indicates whether the event can (1) or cannot (0) be retained:
           valid_impr <- 1
-          if (require_sust_weeks>0) {
+          if (require_sust_days>0) {
               if ((!check_intermediate)
-                  && data_id[nvisits, date_col] - data_id[change_idx, date_col] >= require_sust_weeks*7 # if follow-up lasts at least require_sust_weeks
+                  && data_id[nvisits, date_col] - data_id[change_idx, date_col] >= require_sust_days # if follow-up lasts at least require_sust_days
                   ) {
                 sust_vis <- which(data_id[(change_idx + 1):nvisits, date_col]
-                      - data_id[change_idx,][[date_col]] >= require_sust_weeks * 7)[1] + change_idx  # first visit occurring at least require_sust_weeks from event
+                      - data_id[change_idx,][[date_col]] >= require_sust_days)[1] + change_idx  # first visit occurring at least `require_sust_days` from event
               } else {
-                sust_vis <- nvisits  # if follow-up lasts before `require_sust_weeks`, check at last visit
+                sust_vis <- nvisits  # if follow-up lasts before `require_sust_days`, check at last visit
                 }
             valid_impr <- ifelse(check_intermediate,
                 is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]]
-                          - data_id[change_idx, date_col]) >= require_sust_weeks * 7,  # improvement sustained up to end of follow-up, or for `require_sust_weeks` weeks
-                isevent_loc(data_id[sust_vis,][[value_col]], bl[[value_col]], type='impr')  # improvement confirmed at sust_vis (last visit, or first visit after `require_sust_weeks` weeks)
+                          - data_id[change_idx, date_col]) >= require_sust_days,  # improvement sustained up to end of follow-up, or for `require_sust_days`
+                isevent_loc(data_id[sust_vis,][[value_col]], bl[[value_col]], type='impr')  # improvement confirmed at `sust_vis` (last visit, or first visit after `require_sust_days`)
             )
           }
 
-          # If the event is retained (as per `require_sust_weeks`), we store the info:
+          # If the event is retained (as per `require_sust_days`), we store the info:
           if (valid_impr) {
             sust_idx <- ifelse(is.na(next_nonsust), nvisits, next_nonsust - 1)
             event_type <- c(event_type, "impr")
@@ -541,19 +537,19 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             if (verbose == 2) {
               message(outcome, " improvement (visit no.", change_idx, ", ",
                       global_start + as.difftime(data_id[change_idx,][[date_col]], units='days'),
-                           ") confirmed at ", paste(names(conf_t), collapse=", "), " weeks, sustained up to visit no.", sust_idx,
+                           ") confirmed at ", paste(names(conf_t), collapse=", "), " days, sustained up to visit no.", sust_idx,
                            " (", global_start + as.difftime(data_id[sust_idx,][[date_col]], units='days'), ")")
             }
           } else {
-            # If the event is NOT retained (as per `require_sust_weeks`), we proceed.
+            # If the event is NOT retained (as per `require_sust_days`), we proceed.
             if (verbose == 2) {
               message("Change confirmed but not sustained over ",
-                      ifelse(require_sust_weeks<Inf, paste(">=", require_sust_weeks, "weeks"),
+                      ifelse(require_sust_days<Inf, paste(">=", require_sust_days, "days"),
                              "entire follow-up"), ": proceed with search")
             }
           }
 
-          # For each m in `conf_weeks`, only keep the earliest available confirmation visit:
+          # For each m in `conf_days`, only keep the earliest available confirmation visit:
           conf_idx <- unname(sapply(names(conf_t), function(cm) {
             min(intersect(conf_t[[cm]], conf_idx))
           }))
@@ -577,10 +573,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             bl_idx <- conf_idx[[1]] #ifelse(is.na(next_change), nvisits, next_change - 1)
             search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
           } else if (valid_impr) {
-            # If the event is retained (as per `require_sust_weeks`), proceed with search starting from `next_change`:
+            # If the event is retained (as per `require_sust_days`), proceed with search starting from `next_change`:
             search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
           } else {
-            # If the event is not retained (as per `require_sust_weeks`), proceed with search starting from next visit:
+            # If the event is not retained (as per `require_sust_days`), proceed with search starting from next visit:
             search_idx <- change_idx + 1
           }
           if (verbose==2) {
@@ -631,7 +627,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
            ) &&
           all(sapply((change_idx + 1):conf_idx[[1]],
               function(x) data_id[x,][[value_col]] >= min_value_ifany)) # confirmation above min_value too
-          ) || (data_id[change_idx,][[date_col]] - data_id[1,][[date_col]] <= prog_last_visit*7 && change_idx == nvisits))
+          ) || (data_id[change_idx,][[date_col]] - data_id[1,][[date_col]] <= prog_last_visit && change_idx == nvisits))
 
          ) {
 
@@ -648,23 +644,23 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                 if (!is.na(next_nonsust)) {
                   conf_idx <- conf_idx[conf_idx < next_nonsust] } # confirmed dates
 
-                # The confirmed worsening can still be rejected if `require_sust_weeks>0`.
+                # The confirmed worsening can still be rejected if `require_sust_days>0`.
                 # The `valid_prog` flag indicates whether the event can (1) or cannot (0) be retained:
                 valid_prog <- 1
-                if (require_sust_weeks>0) {
+                if (require_sust_days>0) {
                   if ((!check_intermediate)
-                      && data_id[nvisits, date_col] - data_id[change_idx, date_col] >= require_sust_weeks * 7) { # follow-up lasts at least `require_sust_weeks`
+                      && data_id[nvisits, date_col] - data_id[change_idx, date_col] >= require_sust_days) { # follow-up lasts at least `require_sust_days`
                     sust_vis <- which(data_id[(change_idx + 1):nvisits, date_col]
-                                      - data_id[change_idx,][[date_col]] >= require_sust_weeks * 7)[1] + change_idx
+                                      - data_id[change_idx,][[date_col]] >= require_sust_days)[1] + change_idx
                     } else {sust_vis <- nvisits}
                   valid_prog <- ifelse(check_intermediate,
                     is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
-                                data_id[change_idx,][[date_col]]) > require_sust_weeks * 7, # progression sustained up to end of follow-up, or for `require_sust_weeks` weeks
-                    isevent_loc(data_id[sust_vis,][[value_col]], bl[[value_col]], type='prog') # progression confirmed at last visit, or first visit after `require_sust_weeks` weeks
+                                data_id[change_idx,][[date_col]]) > require_sust_days, # progression sustained up to end of follow-up, or for `require_sust_days`
+                    isevent_loc(data_id[sust_vis,][[value_col]], bl[[value_col]], type='prog') # progression confirmed at last visit, or first visit after `require_sust_days`
                   )
                 }
 
-                # If the event is retained (as per `require_sust_weeks`),
+                # If the event is retained (as per `require_sust_days`),
                 # 1. we check if it's PIRA/RAW;
                 # 2. we store the info.
                 if (valid_prog) {
@@ -741,7 +737,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
                   # Store info if not PIRA:
                   if (phase==0 & event_type[length(event_type)] != 'PIRA') {
-                    for (m in conf_weeks) {
+                    for (m in conf_days) {
                         pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], NA)}
                   }
                   if (event_type[length(event_type)] == 'PIRA' || phase == 0) {
@@ -768,7 +764,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                                   global_start + as.difftime(data_id[change_idx,][[date_col]], units='days'),
                               ifelse(length(conf_t)>0, paste0(") confirmed at ",
                               paste(ifelse(event_type[length(event_type)]=='PIRA', names(pconf_t), names(conf_t)), collapse=", "),
-                                  " weeks, sustained up to visit no.", sust_idx,
+                                  " days, sustained up to visit no.", sust_idx,
                                    " (", global_start + as.difftime(data_id[sust_idx,][[date_col]], units='days'), ")"),
                               ") occurring at last assessment (no confirmation)")
                               )
@@ -776,10 +772,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   }
 
                   } else {
-                    # If the event is NOT retained (as per `require_sust_weeks`), we proceed.
+                    # If the event is NOT retained (as per `require_sust_days`), we proceed.
                     if (verbose == 2) {
                       message("Change confirmed but not sustained over ",
-                              ifelse(require_sust_weeks<Inf, paste(">=", require_sust_weeks, "weeks"),
+                              ifelse(require_sust_days<Inf, paste(">=", require_sust_days, "days"),
                                      "entire follow-up"), ": proceed with search")
                     }
                   }
@@ -787,7 +783,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
                 if (length(conf_t)>0) {
 
-                  # For each m in conf_weeks, only keep the earliest available confirmation visit:
+                  # For each m in conf_days, only keep the earliest available confirmation visit:
                   conf_idx <- unname(sapply(names(conf_t), function(cm) {
                     min(intersect(conf_t[[cm]], conf_idx))
                   }))
@@ -822,7 +818,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
               } else if (phase==0 && ((event_type[length(event_type)]!='PIRA' & event=='firstPIRA')
                                       || (event_type[length(event_type)]!='RAW' & event=='firstRAW')
                                       || !valid_prog)) {
-                # If the event is NOT retained (as per `require_sust_weeks`, or not required event type),
+                # If the event is NOT retained (as per `require_sust_days`, or != required event type),
                 # proceed with search starting from the next change *from the event*:
                 search_idx <- ifelse(is.na(next_change_ev), nvisits, next_change_ev) #_r_#
               } else {
@@ -1033,13 +1029,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     results_df[results_df[[subj_col]] == subjid, 'total_fu'] <- total_fu[subjid]
     results_df[results_df[[subj_col]] == subjid, "time2event"] <- time2event[event_order]
     results_df[results_df[[subj_col]] == subjid, "bl2event"] <- bl2event[event_order]
-    for (m in conf_weeks) {
+    for (m in conf_days) {
       results_df[results_df[[subj_col]] == subjid, paste0("conf", m)] <- conf[[as.character(m)]][event_order]
       }
     results_df[results_df[[subj_col]] == subjid, "sust_days"] <- sustd[event_order]
     results_df[results_df[[subj_col]] == subjid, "sust_last"] <- sustl[event_order]
-    for (m in conf_weeks) {
-      # if (m!=conf_weeks[1]) {
+    for (m in conf_days) {
+      # if (m!=conf_days[1]) {
       results_df[results_df[[subj_col]] == subjid, paste0("PIRA_conf", m)] <- pira_conf[[as.character(m)]][event_order]}
       # }
     }
@@ -1084,7 +1080,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
     if (verbose >= 1) {
       message(paste0("\n---\nOutcome: ", outcome, "\nConfirmation", ifelse(check_intermediate, " over: ", " at: "),
-            paste(conf_weeks, collapse=", "), " weeks (-", conf_tol_days[1], " days, +",
+            paste(conf_days, collapse=", "), " days (-", conf_tol_days[1], " days, +",
             ifelse(conf_unbounded_right, "Inf", conf_tol_days[2]), " days)\nBaseline: ", baseline,
             ifelse(sub_threshold, " (sub-threshold)", ""),
             ifelse(relapse_rebl, ", and post-relapse re-baseline", ""),
@@ -1142,8 +1138,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
 
     prog_settings <- list(outcome=outcome, event=event, baseline=baseline,
-                  conf_weeks=conf_weeks, conf_tol_days=conf_tol_days, conf_unbounded_right=conf_unbounded_right,
-                  require_sust_weeks=require_sust_weeks, check_intermediate=check_intermediate,
+                  conf_days=conf_days, conf_tol_days=conf_tol_days, conf_unbounded_right=conf_unbounded_right,
+                  require_sust_days=require_sust_days, check_intermediate=check_intermediate,
                   relapse_to_bl=relapse_to_bl, relapse_to_event=relapse_to_event, relapse_to_conf=relapse_to_conf,
                   relapse_assoc=relapse_assoc, relapse_indep=relapse_indep,
                   sub_threshold=sub_threshold, relapse_rebl=relapse_rebl, min_value=min_value,
