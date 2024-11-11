@@ -2,7 +2,7 @@
 % Please edit documentation in R/MSprog.R
 \name{MSprog}
 \alias{MSprog}
-\title{Compute multiple sclerosis disability progression from longitudinal data.}
+\title{Assess multiple sclerosis disability course from longitudinal data.}
 \usage{
 MSprog(
   data,
@@ -16,13 +16,13 @@ MSprog(
   subjects = NULL,
   delta_fun = NULL,
   worsening = NULL,
-  event = "firstprog",
+  event = "firstCDW",
   baseline = "fixed",
   sub_threshold = F,
   relapse_rebl = F,
   validconf_col = NULL,
   conf_days = 12 * 7,
-  conf_tol_days = 30,
+  conf_tol_days = c(7, 365),
   conf_unbounded_right = F,
   require_sust_days = 0,
   check_intermediate = T,
@@ -32,7 +32,7 @@ MSprog(
   relapse_assoc = 90,
   relapse_indep = NULL,
   min_value = NULL,
-  prog_last_visit = F,
+  impute_last_visit = F,
   date_format = NULL,
   include_dates = F,
   include_value = F,
@@ -77,10 +77,10 @@ and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 
 \item{event}{Specifies which events to detect. Must be one of the following:
 \itemize{
-\item{\code{'firstprog'}}{ (first progression, default);}
-\item{\code{'first'}}{ (only the very first event - improvement or progression);}
-\item{\code{'firsteach'}}{ (first improvement and first progression - in chronological order);}
-\item{\code{'firstprogtype'}}{ (first progression of each kind - PIRA, RAW, and undefined, in chronological order);}
+\item{\code{'firstCDW'}}{ (first confirmed disability worsening (CDW), default);}
+\item{\code{'first'}}{ (only the very first confirmed event - improvement or worsening);}
+\item{\code{'firsteach'}}{ (first confirmed disability improvement and first CDW - in chronological order);}
+\item{\code{'firstCDWtype'}}{ (first CDW of each kind - PIRA, RAW, and undefined, in chronological order);}
 \item{\code{'firstPIRA'}}{ (first PIRA);}
 \item{\code{'firstRAW'}}{ (first RAW);}
 \item{\code{'multiple'}}{ (all events in chronological order).}
@@ -90,8 +90,8 @@ and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 \itemize{
 \item{\code{'fixed'}}{ (first valid outcome value, default);}
 \item{\code{'roving_impr'}}{ (updated every time the value is lower than the previous measure and confirmed at the following visit;
-suitable for a first-progression setting to discard fluctuations around baseline);}
-\item{\verb{'roving'``\}\{ (updated after each event to last valid confirmed outcome value; suitable for a multiple-event setting - i.e., when }event\verb{is set to}'multiple'\verb{, }'firsteach'\verb{, or }'firstprogtype'` - or when searching for a specific type of progression
+suitable for a first-CDW setting to discard fluctuations around baseline);}
+\item{\verb{'roving'``\}\{ (updated after each event to last valid confirmed outcome value; suitable for a multiple-event setting - i.e., when }event\verb{is set to}'multiple'\verb{, }'firsteach'\verb{, or }'firstCDWtype'` - or when searching for a specific type of CDW
 \itemize{
 \item i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}).}
 }
@@ -116,8 +116,8 @@ In all cases, the right end of the interval is ignored if \code{conf_unbounded_r
 
 \item{require_sust_days}{Minimum number of days over which a confirmed change must be sustained
 (i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
-Events sustained for the entire follow-up are retained regardless of follow-up duration.
-Setting \code{require_sust_days=Inf}, events are retained only when sustained for the entire follow-up duration.\if{html}{\out{<br />}}
+Events sustained for the remainder of the follow-up period are retained regardless of follow-up duration.
+Setting \code{require_sust_days=Inf}, events are retained only when sustained for the remainder of the follow-up period.\if{html}{\out{<br />}}
 (Warning: if \code{check_intermediate} is set to \code{FALSE}, \emph{only the end} of the specified period will be checked for confirmation.)}
 
 \item{check_intermediate}{If \code{TRUE} (default), events are confirmed \emph{over all intermediate visits}
@@ -133,7 +133,7 @@ events will be confirmed \emph{only at} the specified confirmation visit
 
 \item{relapse_to_conf}{Minimum distance from last relapse (days) for a visit to be a valid confirmation visit.}
 
-\item{relapse_assoc}{Maximum distance from last relapse (days) for a progression event to be considered as RAW.}
+\item{relapse_assoc}{Maximum distance from last relapse (days) for a CDW event to be considered as RAW.}
 
 \item{relapse_indep}{Specifies relapse-free intervals for PIRA definition.
 Must be given in the form produced by function \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}} by calling
@@ -149,10 +149,10 @@ event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For
 \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
 }}
 
-\item{min_value}{Only include progression events where the outcome is >= value.}
+\item{min_value}{Only include CDW events where the outcome is >= value.}
 
-\item{prog_last_visit}{If \code{TRUE}, include progressions occurring at last visit (i.e. with no confirmation).
-If a numeric value N is passed, unconfirmed events are included only if occurring within N days of follow up
+\item{impute_last_visit}{If \code{TRUE}, impute worsening events occurring at last visit (i.e. with no confirmation).
+If a numeric value N is passed, unconfirmed worsening events are imputed only if occurring within N days of follow-up
 (e.g., in case of early discontinuation).}
 
 \item{date_format}{Format of dates in the input data. If not specified, it will be inferred by function \code{\link[=as.Date]{as.Date()}}.}
@@ -176,12 +176,13 @@ An object of class \code{'MSprogOutput'} with the following attributes:
 \itemize{
 \item{\code{event_count}: }{a \code{data.frame} containing the event sequence detected for each subject, and the counts for each event type}
 \item{\code{results}: }{a \code{data.frame} with extended info on each event for all subjects}
-\item{\code{prog_settings}: }{a list containing all the arguments used to compute the output.}
+\item{\code{settings}: }{a list containing all the arguments used to compute the output.}
 }
 }
 \description{
-\code{MSprog()} detects and characterises the worsening (or improvement) events of an outcome measure
-(EDSS, NHPT, T25FW, or SDMT; or any custom outcome) for one or more subjects, based on repeated assessments
+\code{MSprog()} detects and characterises the confirmed disability worsening (CDW)
+or improvement events of an outcome measure (EDSS, NHPT, T25FW, or SDMT; or any custom outcome)
+for one or more subjects, based on repeated assessments
 through time (and on the dates of acute episodes, if any).
 Several qualitative and quantitative options are given as arguments that can be set
 by the user and reported as a complement to the results to ensure reproducibility.
@@ -190,20 +191,20 @@ by the user and reported as a complement to the results to ensure reproducibilit
 The events are detected sequentially by scanning the outcome values in chronological order.
 Valid time windows for confirmation visits are determined by arguments
 \code{conf_days}, \code{conf_tol_days}, \code{conf_unbounded_right}, \code{relapse_to_conf}.
-Progression events are classified as relapse-associated or relapse-independent based on their relative timing
+CDW events are classified as relapse-associated or relapse-independent based on their relative timing
 with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
-confirmed progression events occurring within a specified interval (\code{relapse_assoc} argument) from a relapse;
+CDW events occurring within a specified interval (\code{relapse_assoc} argument) from a relapse;
 the definition of progression independent of relapse activity (PIRA) is established by specifying relapse-free intervals
-around the baseline, event, and confirmation visits (\code{relapse_indep} argument).
+around the baseline, CDW event, and confirmation visits (\code{relapse_indep} argument).
 }
 \examples{
-# EDSS progression
+# EDSS course
 output_edss <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=1)
 print(output_edss$results) # extended info on each event for all subjects
 print(output_edss$event_count) # summary of event sequence for each subject
-# SDMT progression
+# SDMT course
 output_sdmt <- MSprog(toydata_visits, 'id', 'SDMT', 'date', 'sdmt',
     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=1)

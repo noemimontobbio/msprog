@@ -98,10 +98,10 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> ---
 #> Total subjects: 4
 #> ---
-#> Progressed subjects: 3 (PIRA: 3; RAW: 1)
-#> Improved subjects: 1
+#> Subjects with disability worsening: 3 (PIRA: 3; RAW: 1)
+#> Subjects with disability improvement: 1
 #> ---
-#> Progression events: 4 (PIRA: 3; RAW: 1)
+#> CDW events: 4 (PIRA: 3; RAW: 1)
 #> Improvement events: 1
 ```
 
@@ -114,11 +114,11 @@ class `MSprogOutput` with the following attributes.
 
     ``` r
     print(output$event_count)
-    #>   event_sequence improvement progression RAW PIRA undefined_prog
-    #> 1           PIRA           0           1   0    1              0
-    #> 2      RAW, PIRA           0           2   1    1              0
-    #> 3                          0           0   0    0              0
-    #> 4     impr, PIRA           1           1   0    1              0
+    #>   event_sequence improvement CDW RAW PIRA undefined_prog
+    #> 1           PIRA           0   1   0    1              0
+    #> 2      RAW, PIRA           0   2   1    1              0
+    #> 3                          0   0   0    0              0
+    #> 4     impr, PIRA           1   1   0    1              0
     ```
 
     where: `event_sequence` specifies the order of the events; the other
@@ -129,12 +129,12 @@ class `MSprogOutput` with the following attributes.
     ``` r
     print(output$results, row.names=FALSE)
     #>  id nevent event_type total_fu time2event bl2event conf84 PIRA_conf84 sust_days
-    #>   1      1       PIRA      534        292      292      0           0       242
-    #>   2      1        RAW      730        198      198      0          NA        84
-    #>   2      2       PIRA      730        539      257      0           0       191
+    #>   1      1       PIRA      534        292      292      1           1       242
+    #>   2      1        RAW      730        198      198      1          NA        84
+    #>   2      2       PIRA      730        539      257      1           1       191
     #>   3      0                 491        491       NA     NA          NA        NA
     #>   4      1       impr      586         77       77      1          NA        98
-    #>   4      2       PIRA      586        304      129      0           0       282
+    #>   4      2       PIRA      586        304      129      1           1       282
     #>  sust_last
     #>          1
     #>          0
@@ -159,7 +159,7 @@ complete reproducibility**:
 
 ``` r
 print(output)
-#> For each subject, we detected all EDSS changes (in chronological order) confirmed over 84 days or more. A visit could not be used as confirmation if occurring within 30 days from the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed progression or improvement event. The new baseline was set as the first available confirmation visit. Whenever the current baseline fell within 30 days from the onset of a relapse, it was moved to the next available visit. A confirmed EDSS worsening event was labelled as RAW if occurring within 90 days from the onset of a relapse. A confirmed EDSS worsening event was labelled as PIRA if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
+#> For each subject, we detected all EDSS changes (in chronological order) confirmed over 84 days or more. A visit could not be used as confirmation if occurring within 30 days from the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set as the first available confirmation visit. Whenever the current baseline fell within 30 days from the onset of a relapse, it was moved to the next available visit. A confirmed EDSS worsening event was labelled as RAW if occurring within 90 days from the onset of a relapse. A confirmed EDSS worsening event was labelled as PIRA if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
 ```
 
 <br />

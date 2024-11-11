@@ -1,6 +1,6 @@
 
 
-#' Textual description of criteria used to compute disability progression.
+#' Textual description of criteria used to assess disability course.
 #'
 #' `print` method for class `'MSprogOutput'`.
 #'
@@ -12,14 +12,13 @@
 #'
 #' @export
 #' @examples
-#' # EDSS progression
 #' output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
 #'     relapse=toydata_relapses, conf_days=7*12, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=2)
 #' print(output) # textual description of parameters used to obtain output
 print.MSprogOutput <- function(x, ...) {
 
-  s <- x$prog_settings
+  s <- x$settings
   outcome <- ifelse(s$outcome=='outcome', 'outcome', toupper(s$outcome))
   delta <- function(value) {
     if (is.null(s$delta_fun)) {
@@ -29,16 +28,16 @@ print.MSprogOutput <- function(x, ...) {
     }
   }
 
-  if (startsWith(s$event, 'firstprog')) {
-    event_text <- paste0('the first ', outcome, ' progression event')
+  if (startsWith(s$event, 'firstCDW')) {
+    event_text <- paste0('the first ', outcome, ' worsening event')
   } else if (s$event=='first') {
-    event_text <- paste0('the first ', outcome, ' progression or improvement event')
+    event_text <- paste0('the first ', outcome, ' worsening or improvement event')
   } else if (s$event=='firsteach') {
-    event_text <- paste0('the first ', outcome, ' progression and the first ',
+    event_text <- paste0('the first ', outcome, ' worsening and the first ',
                          outcome, ' improvement event (in chronological order) -')
-  } else if (s$event=='firstprogtype') {
+  } else if (s$event=='firstCDWtype') {
     event_text <- paste0('the first ', outcome,
-                         ' progression event of each kind - PIRA, RAW, and undefined (in chronological order) -')
+                         ' worsening event of each kind - PIRA, RAW, and undefined (in chronological order) -')
   } else if (s$event=='firstPIRA') {
     event_text <- paste0('the first ', outcome,' PIRA event')
   } else if (s$event=='firstRAW') {
@@ -82,7 +81,7 @@ print.MSprogOutput <- function(x, ...) {
            paste0('A roving baseline scheme was applied where the reference value was ',
                   ifelse(s$baseline=='roving_impr',
                          'updated every time the value was lower than the previous measure and confirmed. ',
-                         'updated after each confirmed progression or improvement event. '),
+                         'updated after each confirmed worsening or improvement event. '),
                   'The new baseline was set as the first available confirmation visit. ',
                   ifelse(s$sub_threshold,
                          paste0('Rebaseline was also triggered by (confirmed) \"sub-threshold\" events, i.e., when the shift in the ', outcome,
@@ -92,16 +91,16 @@ print.MSprogOutput <- function(x, ...) {
                          ''), ifelse(s$relapse_to_bl>0, paste0('Whenever the current baseline fell within ', s$relapse_to_bl,
                                                                ' days from the onset of a relapse, it was moved to the next available visit. '), ''))
     ),
-    ifelse(s$prog_last_visit>0, paste0('Progressions ',
-                                       ifelse(s$prog_last_visit<Inf, paste0('of patients terminating follow-up before day ',
-                                                                            s$prog_last_visit, ' '), ''),
+    ifelse(s$impute_last_visit>0, paste0('CDWs ',
+                                       ifelse(s$impute_last_visit<Inf, paste0('of patients terminating follow-up before day ',
+                                                                            s$impute_last_visit, ' '), ''),
                                        'were included if occurring at the last available visit without confirmation. '), ''),
     ifelse(s$require_sust_days>0, paste0('Events were only retained if sustained',
                                           ifelse(s$require_sust_days<Inf, paste0(' either over ', s$require_sust_days, ' days, or'), ''),
                                           ' until the end of follow-up. '), ''),
     ifelse(s$relapse_to_event>0, paste0('Events occurring within ', s$relapse_to_event,
                                         ' days after the onset of a relapse were discarded. '), ''),
-    ifelse(!is.null(s$min_value), paste0('Only progressions to ', outcome,
+    ifelse(!is.null(s$min_value), paste0('Only CDWs to ', outcome,
                                          ' values of at least ', s$min_value,
                                          ' were retained. '), ''),
     ifelse(s$event!='firstPIRA', paste0('A confirmed ', outcome, ' worsening event was labelled as RAW if occurring within ',

@@ -2,7 +2,7 @@
 % Please edit documentation in R/msprog_methods.R
 \name{print.MSprogOutput}
 \alias{print.MSprogOutput}
-\title{Textual description of criteria used to compute disability progression.}
+\title{Textual description of criteria used to assess disability course.}
 \usage{
 \method{print}{MSprogOutput}(x, ...)
 }
@@ -19,7 +19,6 @@ The method prints out a short paragraph describing the set of criteria used to
 obtain the output.
 }
 \examples{
-# EDSS progression
 output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
     relapse=toydata_relapses, conf_days=7*12, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=2)

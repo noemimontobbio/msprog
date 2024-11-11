@@ -74,7 +74,7 @@ head(toydata_visits)
 
 <br />
 
-For relapsing MS patients, an additional `data.frame` object with the onset dates of relapses is needed to correctly assess disease course, and to characterise disability worsening events as relapse-associated or relapse-independent. The dataset should contain (at least) the following columns:
+For relapsing MS patients, an additional `data.frame` object with the onset dates of relapses is needed to correctly assess disease course, and to characterise confirmed disability worsening (CDW) events as relapse-associated or relapse-independent. The dataset should contain (at least) the following columns:
 
 * Subject IDs;
 * Relapse onset dates.
@@ -123,7 +123,7 @@ print(output_edss)
 ```
 
 
-[^seq]: In this example, `event_sequence` can contain a maximum of one event, as we are not specifying the argument `event` - which defaults to `firstprog` (only detect the first progression event). For the same reason, `nevent` in `output$results` can only be 0 or 1 in this example. In a multiple-event setting (`event=multiple`), more than one event per subject can be detected. See [the relevant section](#multiple).
+[^seq]: In this example, `event_sequence` can contain a maximum of one event, as we are not specifying the argument `event` - which defaults to `firstCDW` (only detect the first CDW event). For the same reason, `nevent` in `output$results` can only be 0 or 1 in this example. In a multiple-event setting (`event=multiple`), more than one event per subject can be detected. See [the relevant section](#multiple).
 [^timeto]: For subjects with no confirmed events, `time2event` is the total follow-up length. To omit these subjects, set `include_stable=FALSE` in `MSprog()`.
 
 
@@ -185,7 +185,7 @@ The assessment of the disability evolution strongly depends on the choices made 
 
 * **Fixed baseline** (`baseline='fixed'`, default): the baseline visit is set to be the first available assessment.
 
-* **Improvement-based roving baseline** (`baseline='roving_impr'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed improvement to the first available confirmation visit. **This scheme is suitable for a first-progression setting to discard fluctuations around the baseline** [@muller2023]. The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog()`: this moves the reference value after *any* confirmed improvement, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold improvement events are used to move the baseline, but not listed in the event sequence.
+* **Improvement-based roving baseline** (`baseline='roving_impr'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed improvement to the first available confirmation visit. **This scheme is suitable for a first-CDW setting to discard fluctuations around the baseline** [@muller2023]. The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog()`: this moves the reference value after *any* confirmed improvement, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold improvement events are used to move the baseline, but not listed in the event sequence.
 
 * **Roving baseline** (`baseline='roving'`): the baseline visit is initially set as the first available assessment, then updated after each event to the first available confirmation visit. **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below). The re-baseline procedure can be made finer by setting `sub_threshold=TRUE` in `MSprog()`: this moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold events are used to move the baseline, but not listed in the event sequence.
 
@@ -199,7 +199,7 @@ Finally, on top of the chosen baseline scheme, *post-relapse re-baseline* @kappo
 
 ## Multiple events {#multiple}
 
-The `event` argument allows to specify which events to detect. By default, it is set to `'firstprog'` (only detect the first progression event). It can be set to `'multiple'` to sequentially detect all disability worsening or improvement events.
+The `event` argument allows to specify which events to detect. By default, it is set to `'firstCDW'` (only detect the first CDW event). It can be set to `'multiple'` to sequentially detect all disability worsening or improvement events.
 
 For example, extracting multiple EDSS events for subject `4` from `toydata_visits` with a **fixed** baseline would result in the following.
 ```{r}
@@ -213,7 +213,7 @@ output <- MSprog(data=toydata_visits,
 print(output$results, row.names=FALSE) # results
 ```
 
-Since the reference value was kept fixed at the first visit (EDSS=4.5), the EDSS worsening at visit 4 (EDSS=5) was not detected. On the other hand, with a **roving** baseline scheme, the baseline is moved to visit 3 after the confirmed improvement and the progression event is correctly detected:
+Since the reference value was kept fixed at the first visit (EDSS=4.5), the EDSS worsening at visit 4 (EDSS=5) was not detected. On the other hand, with a **roving** baseline scheme, the baseline is moved to visit 3 after the confirmed improvement and the worsening event is correctly detected:
 ```{r}
 output <- MSprog(data=toydata_visits, 
                  subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
@@ -229,11 +229,11 @@ Other valid values for the `event` argument are:
 
 * `'first'`: only the very first event -- improvement or worsening;
 * `'firsteach'`: first improvement *and* first worsening, in chronological order;
-* `'firstprogtype'`: first progression of each kind -- PIRA, RAW, and undefined, in chronological order;
+* `'firstCDWtype'`: first CDW of each kind -- PIRA, RAW, and undefined, in chronological order;
 * `'firstPIRA'`: first PIRA event;
 * `'firstRAW'`: first RAW event.
 
-Note: if, for example, `'event=firstPIRA'`, all non-PIRA events *preceding* the first PIRA are actually detected -- although not reported. This allows to combine this scenario with a roving baseline scheme, where the baseline is moved after every confirmed non-PIRA event. For instance, if a RAW event occurs first, the subsequent progression would be counted from the re-baselined outcome value after the RAW.
+Note: if, for example, `'event=firstPIRA'`, all non-PIRA events *preceding* the first PIRA are actually detected -- although not reported. This allows to combine this scenario with a roving baseline scheme, where the baseline is moved after every confirmed non-PIRA event. For instance, if a RAW event occurs first, the subsequent worsening would be counted from the re-baselined outcome value after the RAW.
 
 
 
@@ -259,7 +259,7 @@ ii. A common setting for observational data would be: `conf_days=7*24`, `conf_to
 
 * If the confirmation visit occurs in the vicinity of a clinical relapse, it is typically considered invalid. The `relapse_to_conf` argument allows to specify the minimum accepted distance (in days) of a confirmation visit from the onset of a previous relapse.
 
-* By default, a disability worsening occurring at the last available assessment is ignored by `MSprog()`. This behaviour can be changed using the `prog_last_visit` argument. If set to `TRUE`, any disability worsening occurring at the last visit is retained even though unconfirmed. If set to a numeric value N, unconfirmed worsening events are included only if occurring within N days of follow up (e.g., in case of early discontinuation).
+* By default, a disability worsening occurring at the last available assessment is ignored by `MSprog()`. This behaviour can be changed using the `impute_last_visit` argument. If set to `TRUE`, any disability worsening occurring at the last visit is retained even though unconfirmed. If set to a numeric value N, unconfirmed worsening events are included only if occurring within N days of follow up (e.g., in case of early discontinuation).
 
 * In scenarios (e.g., a clinical trial) where disability course is compared between two cohorts with different relapse rates, there may be an imbalance in visit frequency between the two groups, due to unscheduled visits after relapses. This implies a higher probability of detecting outcome changes in the group with more assessments. Such issue is sometimes addressed by only using scheduled visits as confirmation visits [@hauser2017]. It is possible to implement this with `MSprog()` by including an additional column in the longitudinal data, specifying which visits can (`TRUE`) or cannot (`FALSE`) be used as confirmation visits. The name of such column must be specified using the `validconf_col` argument.
 
@@ -274,15 +274,15 @@ ii. A common setting for observational data would be: `conf_days=7*24`, `conf_to
                      ...)
     ```
 
-## Sustained progression {#sustained}
+## Sustained worsening or improvement {#sustained}
 
 In addition to event confirmation, some studies require events to be *sustained* for a specified period of time. The `require_sust_days` argument allows to specify, if desired, the length of such period. For example, if `require_sust_days=7*48`, an event is only retained if the change in the outcome measure from the current baseline is confirmed at *all* visits falling within the following 48 weeks. If the event is sustained for the entire follow-up, it is retained even if the follow-up period ends <48 weeks after the event. Setting `require_sust_days=Inf`, events are retained only when sustained for the entire follow-up duration.
 
 The `require_sust_days` argument may be of use in the following scenarios.
 
-* Suppose the maximum follow-up in the population is 96 weeks excluding the baseline visit. If one wants to detect progressions sustained over the whole follow-up, coding it as "progression confirmed over 96 weeks or more" (`conf_days=7*96`, `conf_tol_days=0`, `conf_unbounded_right=T`) would discard progressions of patients whose follow-up is shorter than 96 weeks. In a scenario where patients have different follow-up lengths, the `require_sust_days` argument offers a more reliable way of implementing this, e.g., as "progression confirmed over 12 weeks or more and sustained for the whole follow-up period" (`conf_days=7*12`, `conf_tol_days=0`, `conf_unbounded_right=T`, `require_sust_days=Inf`). 
+* Suppose the maximum follow-up in the population is 96 weeks excluding the baseline visit. If one wants to detect CDWs sustained over the whole follow-up, coding it as "worsening confirmed over 96 weeks or more" (`conf_days=7*96`, `conf_tol_days=0`, `conf_unbounded_right=T`) would discard CDWs of patients whose follow-up is shorter than 96 weeks. In a scenario where patients have different follow-up lengths, the `require_sust_days` argument offers a more reliable way of implementing this, e.g., as "worsening confirmed over 12 weeks or more and sustained for the whole follow-up period" (`conf_days=7*12`, `conf_tol_days=0`, `conf_unbounded_right=T`, `require_sust_days=Inf`). 
 
-* In observational data with coarsely- and unevenly-spaced visits, the `require_sust_days` argument may be used to detect sustained progression (e.g., `require_sust_days=7*96`) while still requiring the presence of a confirmation visit within a specified interval from the event (e.g., `conf_days=7*12`, `conf_tol_days=c(0,7*12)`). 
+* In observational data with coarsely- and unevenly-spaced visits, the `require_sust_days` argument may be used to detect sustained CDW (e.g., `require_sust_days=7*96`) while still requiring the presence of a confirmation visit within a specified interval from the event (e.g., `conf_days=7*12`, `conf_tol_days=c(0,7*12)`). 
 
 * Sustained disability worsening can be required to exclude transient RAW events (see example below).
 
@@ -305,7 +305,7 @@ output <- MSprog(data=toydata_visits,
                  conf_days=c(7*12,7*24), verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
-The `relapse_indep` argument specifies the relapse-free intervals for a progression event to be classified as PIRA, see [the relevant section](#pira)[^pira]. In this case, a high-specificity definition of PIRA is used [@muller2023] that requires an absence of relapses between baseline and confirmation. The resulting events are a 12-week-confirmed RAW and a 12-week-confirmed PIRA. The RAW event was not confirmed over 24 weeks, i.e., 168 days (`conf168` is `0`). The PIRA event was also confirmed over 24 weeks (`conf168` is `1`). However, since a relapse occurred before the 24-week confirmation, the event cannot be classified as a 24-week-confirmed PIRA (`PIRA_conf168` is `0`) but only as a 24-week-confirmed *progression*.
+The `relapse_indep` argument specifies the relapse-free intervals for a CDW event to be classified as PIRA, see [the relevant section](#pira)[^pira]. In this case, a high-specificity definition of PIRA is used [@muller2023] that requires an absence of relapses between baseline and confirmation. The resulting events are a 12-week-confirmed RAW and a 12-week-confirmed PIRA. The RAW event was not confirmed over 24 weeks, i.e., 168 days (`conf168` is `0`). The PIRA event was also confirmed over 24 weeks (`conf168` is `1`). However, since a relapse occurred before the 24-week confirmation, the event cannot be classified as a 24-week-confirmed PIRA (`PIRA_conf168` is `0`) but only as a 24-week-confirmed *CDW*.
 
 [^pira]: See also `relapse_indep_from_bounds()` function documentation, and the dedicated package vignette *Assessing progression independent of relapse activity (PIRA) in MS*.
 
@@ -320,7 +320,7 @@ output <- MSprog(data=toydata_visits,
 print(output$results, row.names=FALSE) # results
 ```
 
-In this context, as the transient EDSS accumulation was not classified as an event, it did not trigger a re-baseline according to the roving baseline scheme. As a consequence, the PIRA event is classified as an undefined progression due to the onset of a relapse between baseline and confirmation. This can be handled by enabling *post-relapse re-baseline* @kappos2020 (`relapse_rebl=TRUE`) to force a re-baseline after each relapse:
+In this context, as the transient EDSS accumulation was not classified as an event, it did not trigger a re-baseline according to the roving baseline scheme. As a consequence, the PIRA event is classified as an undefined CDW due to the onset of a relapse between baseline and confirmation. This behaviour can be changed by enabling *post-relapse re-baseline* @kappos2020 (`relapse_rebl=TRUE`) to force a re-baseline after each relapse:
 ```{r}
 output <- MSprog(data=toydata_visits,
                  subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
@@ -331,7 +331,7 @@ output <- MSprog(data=toydata_visits,
                 conf_days=c(7*12,7*24), require_sust_days=7*48, verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
-The event is now correctly classified as PIRA.
+The event is now classified as PIRA.
 
 A more detailed report of the event detection process in each of the three cases examined may be visualized by re-running the above code snippets with `verbose=2`, see ["Printing progress info"](#progressinfo).
 
@@ -349,7 +349,7 @@ RAW events are typically defined as confirmed disability worsening events occurr
 
 ## Progression independent of relapse activity (PIRA) {#pira}
 
-In the literature, PIRA is typically defined by requiring an absence of relapses within appropriate intervals based on the dates of the baseline visit, the disability progression event, and the confirmation visit [@kappos2020; @cagol2022; @muller2023]. The `relapse_indep` argument in `MSprog()` allows to specify custom relapse-free intervals. The argument must be provided in the form produced by the auxiliary function `relapse_indep_from_bounds()`, as follows:
+In the literature, PIRA is typically defined by requiring an absence of relapses within appropriate intervals based on the dates of the baseline visit, the worsening event, and the confirmation visit [@kappos2020; @cagol2022; @muller2023]. The `relapse_indep` argument in `MSprog()` allows to specify custom relapse-free intervals. The argument must be provided in the form produced by the auxiliary function `relapse_indep_from_bounds()`, as follows:
 ``` {r, eval=FALSE}
 output <- MSprog(...
                  relapse_indep=relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1),
@@ -361,7 +361,7 @@ where: `b0` and `b1` specify the interval around the baseline visit; `e0` and `e
 knitr::include_graphics(paste0(getwd(), 'relapse_indep_def.png'))
 ```
 
-For example, in @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation visit for a progression event to be considered as PIRA. This translates into: `b0<-0`, `b1<-0`, `e0<-90`, `e1<-30`, `c0<-90`, `c1<-30`. When a high specificity is desired, they recommend an absence of relapses in the whole period between the reference visit and the confirmation visit, which is implemented by setting: `b0<-0`, `b1<-NULL`, `e0<-NULL`, `e1<-NULL`, `c0<-NULL`, `c1<-0`. 
+For example, in @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation visit for a CDW event to be considered as PIRA. This translates into: `b0<-0`, `b1<-0`, `e0<-90`, `e1<-30`, `c0<-90`, `c1<-30`. When a high specificity is desired, they recommend an absence of relapses in the whole period between the reference visit and the confirmation visit, which is implemented by setting: `b0<-0`, `b1<-NULL`, `e0<-NULL`, `e1<-NULL`, `c0<-NULL`, `c1<-0`. 
 
 <br />
 
@@ -369,7 +369,7 @@ For more details and examples on PIRA computation, please refer to the dedicated
 
 
 
-# Outputs
+# `MSprog()` outputs
 
 ## What to include in results
 
@@ -403,6 +403,26 @@ output <- MSprog(data=toydata_visits,
 ```
 
 
+# Time to disability milestone
+
+Instead of studying disability course with respect to a baseline value, one can focus on the time taken to reach a specific disability milestone (e.g., EDSS $\geq$ 6). This can be computed using another function from the `msprog` package, `value_milestone()`.
+
+The following code detects the time to EDSS $\geq$ 6 for each subject in the toy data. 
+```{r}
+vm <- value_milestone(toydata_visits, milestone=6,
+                 subj_col='id', value_col='EDSS', date_col='date',
+                 outcome='edss', relapse=toydata_relapses,
+                 verbose=0)
+```
+The function returns a `data.frame` with one row per subject:
+```{r}
+print(vm)
+```
+where: `'date'` contains the date of the first confirmed EDSS $\geq$ 6 (or last date of follow-up if milestone is not reached or not confirmed); `'EDSS'` contains the first EDSS value $\geq$ 6, if present, otherwise no value; `'time2event'` contains the time to reach EDSS $\geq$ 6 (or total follow-up length if not reached or not confirmed); `'observed'` indicates whether EDSS $\geq$ 6 was reached (1) or not (0).
+
+Several arguments controlling the behaviour of the `MSprog()` function are also available for the `value_milestone()` function (e.g., `require_sust_days`, `impute_last_visit`...). Please refer to the documentation (by typing `?value_milestone`) for a complete illustration of each of the function arguments and their default values.
+
+For more examples on the usage of the `value_milestone()` function, please refer to the package vignette *Time to event*.
 
 # References
 

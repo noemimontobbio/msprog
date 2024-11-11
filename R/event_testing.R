@@ -1,5 +1,5 @@
 
-#' Definition of progression deltas for different tests.
+#' Definition of minimum valid shift for different tests.
 #'
 #' `compute_delta()` returns the minimum delta to be considered as a valid change
 #' from baseline of an outcome measure (EDSS, NHPT, T25FW, or SDMT).
@@ -63,14 +63,14 @@ compute_delta <- function(baseline, outcome='edss') {
 
 #' Compare value to reference.
 #'
-#' `is_event()` checks if an outcome value determines a valid progression,
+#' `is_event()` checks if an outcome value determines a valid worsening,
 #' or improvement, or change, from a given reference value.
 #'
 #' @param x Outcome value to test.
 #' @param baseline Outcome value at baseline.
 #' @param type One of: \cr
 #' \itemize{
-##' \item{`'prog'`}{ (progression);}
+##' \item{`'wors'`}{ (worsening);}
 #'  \item{`'impr'`}{ (improvement);}
 #'  \item{`'change'`}{ (any valid change).}
 #'  }
@@ -89,13 +89,13 @@ compute_delta <- function(baseline, outcome='edss') {
 #' @param delta_fun Custom function specifying the minimum shift corresponding
 #' to a valid change from the provided baseline value. If none is specified (default),
 #' [compute_delta()] for the specified outcome is used.
-#' @param sub_threshold If `TRUE`, any confirmed progression, or improvement, or change in the outcome measure is valid,
+#' @param sub_threshold If `TRUE`, any confirmed worsening, or improvement, or change in the outcome measure is valid,
 #'  regardless of `delta_fun`.
 #' @return A boolean value specifying if a valid event was found.
 #' @export is_event
 #' @examples
-#' is_event(x=4.5, baseline=4, type='prog', outcome='edss')
-#' is_event(x=50, baseline=57, type='prog', outcome='sdmt')
+#' is_event(x=4.5, baseline=4, type='wors', outcome='edss')
+#' is_event(x=50, baseline=57, type='wors', outcome='sdmt')
 is_event <- function(x, baseline, type, outcome='edss', worsening=NULL,
                      delta_fun=NULL, sub_threshold=FALSE) {
   if (!is.null(outcome) && outcome %in% c('edss', 'nhpt', 't25fw')) {
@@ -135,7 +135,7 @@ is_event <- function(x, baseline, type, outcome='edss', worsening=NULL,
   }
 
   event <- list(
-    prog = event_sign[[worsening]],
+    wors = event_sign[[worsening]],
     impr = event_sign[[improvement]],
     change = event_sign[['change']]
   )

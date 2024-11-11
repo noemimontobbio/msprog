@@ -21,7 +21,7 @@ is_event(
 
 \item{type}{One of: \cr
 \itemize{
-\item{\code{'prog'}}{ (progression);}
+\item{\code{'wors'}}{ (worsening);}
 \item{\code{'impr'}}{ (improvement);}
 \item{\code{'change'}}{ (any valid change).}
 }}
@@ -44,17 +44,17 @@ and to \code{'decrease'} for SDMT.}
 to a valid change from the provided baseline value. If none is specified (default),
 \code{\link[=compute_delta]{compute_delta()}} for the specified outcome is used.}
 
-\item{sub_threshold}{If \code{TRUE}, any confirmed progression, or improvement, or change in the outcome measure is valid,
+\item{sub_threshold}{If \code{TRUE}, any confirmed worsening, or improvement, or change in the outcome measure is valid,
 regardless of \code{delta_fun}.}
 }
 \value{
 A boolean value specifying if a valid event was found.
 }
 \description{
-\code{is_event()} checks if an outcome value determines a valid progression,
+\code{is_event()} checks if an outcome value determines a valid worsening,
 or improvement, or change, from a given reference value.
 }
 \examples{
-is_event(x=4.5, baseline=4, type='prog', outcome='edss')
-is_event(x=50, baseline=57, type='prog', outcome='sdmt')
+is_event(x=4.5, baseline=4, type='wors', outcome='edss')
+is_event(x=50, baseline=57, type='wors', outcome='sdmt')
 }

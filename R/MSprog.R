@@ -1,8 +1,9 @@
 
-#' Compute multiple sclerosis disability progression from longitudinal data.
+#' Assess multiple sclerosis disability course from longitudinal data.
 #'
-#' `MSprog()` detects and characterises the worsening (or improvement) events of an outcome measure
-#' (EDSS, NHPT, T25FW, or SDMT; or any custom outcome) for one or more subjects, based on repeated assessments
+#' `MSprog()` detects and characterises the confirmed disability worsening (CDW)
+#' or improvement events of an outcome measure (EDSS, NHPT, T25FW, or SDMT; or any custom outcome)
+#' for one or more subjects, based on repeated assessments
 #' through time (and on the dates of acute episodes, if any).
 #' Several qualitative and quantitative options are given as arguments that can be set
 #' by the user and reported as a complement to the results to ensure reproducibility.
@@ -10,11 +11,11 @@
 #' The events are detected sequentially by scanning the outcome values in chronological order.
 #' Valid time windows for confirmation visits are determined by arguments
 #' `conf_days`, `conf_tol_days`, `conf_unbounded_right`, `relapse_to_conf`.
-#' Progression events are classified as relapse-associated or relapse-independent based on their relative timing
+#' CDW events are classified as relapse-associated or relapse-independent based on their relative timing
 #' with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
-#' confirmed progression events occurring within a specified interval (`relapse_assoc` argument) from a relapse;
+#' CDW events occurring within a specified interval (`relapse_assoc` argument) from a relapse;
 #' the definition of progression independent of relapse activity (PIRA) is established by specifying relapse-free intervals
-#' around the baseline, event, and confirmation visits (`relapse_indep` argument).
+#' around the baseline, CDW event, and confirmation visits (`relapse_indep` argument).
 #'
 #'
 #' @param data `data.frame` containing longitudinal data, including: subject ID, outcome value, date of visit.
@@ -42,10 +43,10 @@
 #'  and to `'decrease'` if `outcome` is set to `'sdmt'`.
 #' @param event Specifies which events to detect. Must be one of the following:
 #' \itemize{
-#' \item{`'firstprog'`}{ (first progression, default);}
-#' \item{`'first'`}{ (only the very first event - improvement or progression);}
-#' \item{`'firsteach'`}{ (first improvement and first progression - in chronological order);}
-#' \item{`'firstprogtype'`}{ (first progression of each kind - PIRA, RAW, and undefined, in chronological order);}
+#' \item{`'firstCDW'`}{ (first confirmed disability worsening (CDW), default);}
+#' \item{`'first'`}{ (only the very first confirmed event - improvement or worsening);}
+#' \item{`'firsteach'`}{ (first confirmed disability improvement and first CDW - in chronological order);}
+#' \item{`'firstCDWtype'`}{ (first CDW of each kind - PIRA, RAW, and undefined, in chronological order);}
 #' \item{`'firstPIRA'`}{ (first PIRA);}
 #' \item{`'firstRAW'`}{ (first RAW);}
 #' \item{`'multiple'`}{ (all events in chronological order).}
@@ -54,10 +55,10 @@
 #' \itemize{
 #' \item{`'fixed'`}{ (first valid outcome value, default);}
 #' \item{`'roving_impr'`}{ (updated every time the value is lower than the previous measure and confirmed at the following visit;
-#' suitable for a first-progression setting to discard fluctuations around baseline);}
+#' suitable for a first-CDW setting to discard fluctuations around baseline);}
 #' \item{`'roving'``}{ (updated after each event to last valid confirmed outcome value;
 #' suitable for a multiple-event setting - i.e., when `event` is set to `'multiple'`,
-#' `'firsteach'`, or `'firstprogtype'` - or when searching for a specific type of progression
+#' `'firsteach'`, or `'firstCDWtype'` - or when searching for a specific type of CDW
 #' - i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`).}
 #' }
 #' @param sub_threshold This argument is only used if `baseline='roving'` or `baseline='roving_impr'`. If `TRUE`, move roving baseline
@@ -73,8 +74,8 @@
 #' @param conf_unbounded_right If `TRUE`, confirmation window is unbounded on the right.
 #' @param require_sust_days Minimum number of days over which a confirmed change must be sustained
 #' (i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
-#' Events sustained for the entire follow-up are retained regardless of follow-up duration.
-#' Setting `require_sust_days=Inf`, events are retained only when sustained for the entire follow-up duration.<br />
+#' Events sustained for the remainder of the follow-up period are retained regardless of follow-up duration.
+#' Setting `require_sust_days=Inf`, events are retained only when sustained for the remainder of the follow-up period.<br />
 #' (Warning: if `check_intermediate` is set to `FALSE`, \emph{only the end} of the specified period will be checked for confirmation.)
 #' @param check_intermediate If `TRUE` (default), events are confirmed \emph{over all intermediate visits}
 #' up to the confirmation visit. <br />
@@ -85,7 +86,7 @@
 #' (otherwise the next available visit is used as baseline).
 #' @param relapse_to_event Minimum distance from last relapse (days) for an event to be considered as such.
 #' @param relapse_to_conf Minimum distance from last relapse (days) for a visit to be a valid confirmation visit.
-#' @param relapse_assoc Maximum distance from last relapse (days) for a progression event to be considered as RAW.
+#' @param relapse_assoc Maximum distance from last relapse (days) for a CDW event to be considered as RAW.
 #' @param relapse_indep Specifies relapse-free intervals for PIRA definition.
 #' Must be given in the form produced by function [relapse_indep_from_bounds()] by calling
 #' `relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1)`
@@ -99,9 +100,9 @@
 #' \item{No relapses within baseline->event+30dd and within confirmation+-30dd \[2\]:
 #' \cr`relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)`}
 #' }
-#' @param min_value Only include progression events where the outcome is >= value.
-#' @param prog_last_visit If `TRUE`, include progressions occurring at last visit (i.e. with no confirmation).
-#' If a numeric value N is passed, unconfirmed events are included only if occurring within N days of follow up
+#' @param min_value Only include CDW events where the outcome is >= value.
+#' @param impute_last_visit If `TRUE`, impute worsening events occurring at last visit (i.e. with no confirmation).
+#' If a numeric value N is passed, unconfirmed worsening events are imputed only if occurring within N days of follow-up
 #' (e.g., in case of early discontinuation).
 #' @param date_format Format of dates in the input data. If not specified, it will be inferred by function [as.Date()].
 #' @param include_dates If `TRUE`, report dates of events.
@@ -129,20 +130,20 @@
 #' \itemize{
 #' \item{`event_count`: }{a `data.frame` containing the event sequence detected for each subject, and the counts for each event type}
 #' \item{`results`: }{a `data.frame` with extended info on each event for all subjects}
-#' \item{`prog_settings`: }{a list containing all the arguments used to compute the output.}
+#' \item{`settings`: }{a list containing all the arguments used to compute the output.}
 #' }
 #'
 #' @importFrom stats na.omit setNames complete.cases
 #' @importFrom dplyr %>% group_by_at vars slice n mutate across
 #' @export
 #' @examples
-#' # EDSS progression
+#' # EDSS course
 #' output_edss <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
 #'     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=1)
 #' print(output_edss$results) # extended info on each event for all subjects
 #' print(output_edss$event_count) # summary of event sequence for each subject
-#' # SDMT progression
+#' # SDMT course
 #' output_sdmt <- MSprog(toydata_visits, 'id', 'SDMT', 'date', 'sdmt',
 #'     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=1)
@@ -150,10 +151,10 @@
 #' print(output_sdmt$event_count) # summary of event sequence for each subject
 MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, subjects=NULL,
-                   delta_fun=NULL, worsening=NULL, event='firstprog', baseline='fixed', sub_threshold=F, relapse_rebl=F,
-                   validconf_col=NULL, conf_days=12*7, conf_tol_days=30, conf_unbounded_right=F, require_sust_days=0, check_intermediate=T,
+                   delta_fun=NULL, worsening=NULL, event='firstCDW', baseline='fixed', sub_threshold=F, relapse_rebl=F,
+                   validconf_col=NULL, conf_days=12*7, conf_tol_days=c(7,365), conf_unbounded_right=F, require_sust_days=0, check_intermediate=T,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30, relapse_assoc=90, relapse_indep=NULL,
-                   min_value=NULL, prog_last_visit=F,
+                   min_value=NULL, impute_last_visit=F,
                    date_format=NULL, include_dates=F, include_value=F, include_stable=T, verbose=1
                    ) {
 
@@ -255,9 +256,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     min_value_ifany <- min_value
   }
 
-  # If prog_last_visit==T, set no limit to follow-up length (Inf)
-  if (prog_last_visit==T) {
-    prog_last_visit <- Inf
+  # If impute_last_visit==T, set no limit to follow-up length (Inf)
+  if (impute_last_visit==T) {
+    impute_last_visit <- Inf
   }
 
 
@@ -271,7 +272,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
 
   # Define local is_event() function
-  isevent_loc <- function(x, baseline, type='prog', st=F) {
+  isevent_loc <- function(x, baseline, type='wors', st=F) {
     is_event(x, baseline, type=type, outcome=outcome, worsening=worsening,
              sub_threshold=st, delta_fun=delta_fun)
   }
@@ -293,7 +294,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
 
   #################################################################
-  # Assess progression
+  # Assess disability course
 
   all_subj <- unique(data[[subj_col]])
   nsub <- length(all_subj)
@@ -310,7 +311,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   results_df$nevent <- rep(1:max_nevents, times=nsub)
 
   summary <- data.frame(matrix(nrow=nsub, ncol=6))
-  colnames(summary) <- c('event_sequence', 'improvement', 'progression', 'RAW', 'PIRA', 'undefined_prog')
+  colnames(summary) <- c('event_sequence', 'improvement', 'CDW', 'RAW', 'PIRA', 'undefined_prog')
   rownames(summary) <- all_subj
 
 
@@ -479,7 +480,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                        type='impr'))),  # improvement is confirmed at (all visits up to) first valid date
             isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl[[value_col]], type='impr'))  # improvement is confirmed at first valid date
             && phase == 0 # skip if re-checking for PIRA with post-relapse re-baseline
-            && !((event %in% c('firstprog', 'firstprogtype', 'firstPIRA', 'firstRAW')) && baseline=='fixed')
+            && !((event %in% c('firstCDW', 'firstCDWtype', 'firstPIRA', 'firstRAW')) && baseline=='fixed')
             ) {
 
           # First visit at which improvement is not sustained:
@@ -527,7 +528,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             for (cm in names(conf_t)) {
               confirmed_at <- intersect(conf_t[[cm]], conf_idx)
               if (length(confirmed_at)==0) {
-                within(conf_t, rm(list=cm))
+                conf_t <- within(conf_t, rm(list=cm))
               }
               conf[[cm]] <- c(conf[[cm]], as.integer(length(confirmed_at)>0))
               pira_conf[[cm]] <- c(pira_conf[[cm]], NA)}
@@ -614,20 +615,20 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
               }
             }
 
-      # CONFIRMED PROGRESSION:
-      # ---------------------
+      # CONFIRMED CDW:
+      # --------------
       else if (data_id[change_idx,][[value_col]] >= min_value_ifany
-         && isevent_loc(data_id[change_idx,][[value_col]], bl[[value_col]], type='prog')  # value worsened (>delta) from baseline
+         && isevent_loc(data_id[change_idx,][[value_col]], bl[[value_col]], type='wors')  # value worsened (>delta) from baseline
 
          && ((length(conf_idx) > 0 && # confirmation visits available
            ifelse(check_intermediate,
               all(sapply((change_idx + 1):conf_idx[[1]],
-               function(x) isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='prog'))),  # progression is confirmed at (all visits up to) first valid date
-              isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl[[value_col]], type='prog') # progression is confirmed at first valid date
+               function(x) isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='wors'))),  # worsenind is confirmed at (all visits up to) first valid date
+              isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl[[value_col]], type='wors') # worsening is confirmed at first valid date
            ) &&
           all(sapply((change_idx + 1):conf_idx[[1]],
               function(x) data_id[x,][[value_col]] >= min_value_ifany)) # confirmation above min_value too
-          ) || (data_id[change_idx,][[date_col]] - data_id[1,][[date_col]] <= prog_last_visit && change_idx == nvisits))
+          ) || (data_id[change_idx,][[date_col]] - data_id[1,][[date_col]] <= impute_last_visit && change_idx == nvisits))
 
          ) {
 
@@ -639,7 +640,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   next_nonsust <- NA
                   } else {
                     next_nonsust <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col], bl[[value_col]],
-                                          type='prog'))[1] + conf_idx[[1]] }
+                                          type='wors'))[1] + conf_idx[[1]] }
                 # Discard potential confirmation visits if these occur out of sustained interval:
                 if (!is.na(next_nonsust)) {
                   conf_idx <- conf_idx[conf_idx < next_nonsust] } # confirmed dates
@@ -655,8 +656,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     } else {sust_vis <- nvisits}
                   valid_prog <- ifelse(check_intermediate,
                     is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
-                                data_id[change_idx,][[date_col]]) > require_sust_days, # progression sustained up to end of follow-up, or for `require_sust_days`
-                    isevent_loc(data_id[sust_vis,][[value_col]], bl[[value_col]], type='prog') # progression confirmed at last visit, or first visit after `require_sust_days`
+                                data_id[change_idx,][[date_col]]) > require_sust_days, # worsening sustained up to end of follow-up, or for `require_sust_days`
+                    isevent_loc(data_id[sust_vis,][[value_col]], bl[[value_col]], type='wors') # worsening confirmed at last visit, or first visit after `require_sust_days`
                   )
                 }
 
@@ -682,6 +683,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                       next
                     }
 
+                    # The detected CDW is not RAW. Let's check if it's PIRA.
 
                     # Compute intervals that must be relapse-free for PIRA definition
                     left <- right <- list() # left/right borders of relapse-free intervals
@@ -716,26 +718,26 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                       }))
                     })
 
-                    # Store info if PIRA:
+                    # Store info:
                     pconf_idx <- conf_idx[!rel_inbetween] # PIRA confirmation visits (a subset of original confirmation visits)
                     if (length(pconf_idx) > 0) {
                       pconf_t <- conf_t
                       for (cm in names(conf_t)) {
-                        confirmed_at <- intersect(pconf_t[cm], pconf_idx)
+                        confirmed_at <- intersect(pconf_t[[cm]], pconf_idx)
                         if (length(confirmed_at)==0) {
-                          within(pconf_t, rm(list=cm))
+                          pconf_t <- within(pconf_t, rm(list=cm))
                         }
                         pira_conf[[cm]] <- c(pira_conf[[cm]], as.integer(length(confirmed_at)>0))
                       }
                       event_type <- c(event_type, 'PIRA')
                       event_index <- c(event_index, change_idx)
                     } else if (phase == 0) {
-                      event_type <- c(event_type, 'prog')
+                      event_type <- c(event_type, 'CDW')
                       event_index <- c(event_index, change_idx)
                     }
                   }
 
-                  # Store info if not PIRA:
+                  # Store info:
                   if (phase==0 & event_type[length(event_type)] != 'PIRA') {
                     for (m in conf_days) {
                         pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], NA)}
@@ -748,9 +750,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     bl2event <- c(bl2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
                     time2event <- c(time2event, data_id[change_idx,][[date_col]] - data_id[1,][[date_col]])
                     for (cm in names(conf_t)) {
-                      confirmed_at <- intersect(conf_t[cm], conf_idx)
+                      confirmed_at <- intersect(conf_t[[cm]], conf_idx)
                       if (length(confirmed_at)==0) {
-                        within(conf_t, rm(list=cm))
+                        conf_t <- within(conf_t, rm(list=cm))
                       }
                       conf[[cm]] <- c(conf[[cm]], as.integer(length(confirmed_at)>0))
                     }
@@ -759,8 +761,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
                     # Print info
                     if (verbose == 2) {
-                      message(outcome, " progression[", event_type[length(event_type)],
-                                   "] (visit no.", change_idx, ", ",
+                      message(outcome, " ", event_type[length(event_type)],
+                                   " (visit no.", change_idx, ", ",
                                   global_start + as.difftime(data_id[change_idx,][[date_col]], units='days'),
                               ifelse(length(conf_t)>0, paste0(") confirmed at ",
                               paste(ifelse(event_type[length(event_type)]=='PIRA', names(pconf_t), names(conf_t)), collapse=", "),
@@ -773,6 +775,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
                   } else {
                     # If the event is NOT retained (as per `require_sust_days`), we proceed.
+                    for (cm in names(conf_t)) {
+                      confirmed_at <- intersect(conf_t[[cm]], conf_idx)
+                      if (length(confirmed_at)==0) {
+                        conf_t <- within(conf_t, rm(list=cm))
+                      }
+                    }
                     if (verbose == 2) {
                       message("Change confirmed but not sustained over ",
                               ifelse(require_sust_days<Inf, paste(">=", require_sust_days, "days"),
@@ -792,7 +800,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   next_change <- NA
                   if (conf_idx[[1]]<nvisits) {
                     for (x in (conf_idx[[1]] + 1):nvisits) {
-                      if (!isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='prog') # either not sustained
+                      if (!isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='wors') # either not sustained
                           || isevent_loc(data_id[x,][[value_col]],  data_id[conf_idx[[1]],][[value_col]],
                                          type='change')) {  # or further change from *first* confirmation
                         next_change <- x
@@ -808,8 +816,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
 
               # Move the search index, and optionally the baseline.
-              if (length(conf_t) == 0 # progression occurring at last visit
-                || (phase==1 && length(event_type)==nev)) { # ongoing relapse-based rebaseline, and the progression found is not PIRA
+              if (length(conf_t) == 0 # worsening occurring at last visit
+                || (phase==1 && length(event_type)==nev)) { # ongoing relapse-based rebaseline, and the worsening found is not PIRA
                 search_idx <- change_idx + 1
               } else if (baseline == 'roving' && phase == 0) {
                 # In a roving baseline setting, the baseline is moved after the confirmed event (even if it is not sustained):
@@ -834,14 +842,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
           }
 
-       # Confirmed sub-threshold progression: RE-BASELINE
+       # Confirmed sub-threshold worsening: RE-BASELINE
        # ------------------------------------------------
       else if (length(conf_idx) > 0
-               && isevent_loc(data_id[change_idx,][[value_col]], bl[[value_col]], type='prog', st=T)
+               && isevent_loc(data_id[change_idx,][[value_col]], bl[[value_col]], type='wors', st=T)
                && ifelse(check_intermediate,
                     all(sapply((change_idx + 1):conf_idx[[1]], function(x)
-                      isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='prog', st=T))), # (sub-threshold) progression confirmed over (all visits up to) first valid date
-                    isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl[[value_col]], type='prog', st=T))  # (sub-threshold) progression confirmed at first valid date
+                      isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='wors', st=T))), # (sub-threshold) worsening confirmed over (all visits up to) first valid date
+                    isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl[[value_col]], type='wors', st=T))  # (sub-threshold) worsening confirmed at first valid date
                && baseline == 'roving'
                && sub_threshold
                && phase == 0 # skip if re-checking for PIRA after post-relapse re-baseline
@@ -850,13 +858,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     next_change <- NA
                     } else {
                     next_change <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col],
-                                        bl[[value_col]], type='prog', st=T))[1] + conf_idx[[1]]
+                                        bl[[value_col]], type='wors', st=T))[1] + conf_idx[[1]]
                     }
                   # Set new baseline at first confirmation visit:
                   bl_idx <- conf_idx[[1]]  #ifelse(is.na(next_change), nvisits, next_change - 1)
                   search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
                   if (verbose == 2) {
-                    message("Confirmed sub-threshold", outcome, "progression (visit no.", change_idx, ")")
+                    message("Confirmed sub-threshold", outcome, "worsening (visit no.", change_idx, ")")
                     message("Baseline at visit no.", bl_idx, ", searching for events from visit no.",
                             ifelse(search_idx > nvisits, "-", search_idx), " on")
                   }
@@ -891,9 +899,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
         # In a first-event setting, stop search if specified event was already found:
         if (proceed && ((event == "first" && length(event_type) > 1) ||
-                        (event == "firsteach" && ("impr" %in% event_type) && ("prog" %in% event_type)) ||
-                        (event == "firstprog" && (("RAW" %in% event_type) || ("PIRA" %in% event_type) || ("prog" %in% event_type))) ||
-                        (event == "firstprogtype" && ("RAW" %in% event_type) && ("PIRA" %in% event_type) && ("prog" %in% event_type)) ||
+                        (event == "firsteach" && ("impr" %in% event_type) && ("CDW" %in% event_type)) ||
+                        (event == "firstCDW" && (("RAW" %in% event_type) || ("PIRA" %in% event_type) || ("CDW" %in% event_type))) ||
+                        (event == "firstCDWtype" && ("RAW" %in% event_type) && ("PIRA" %in% event_type) && ("CDW" %in% event_type)) ||
                         (event == "firstPIRA" && ("PIRA" %in% event_type)) ||
                         (event == "firstRAW" && ("RAW" %in% event_type)))
             ) {
@@ -982,16 +990,16 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
     if (startsWith(event, "first")) {
       impr_idx <- which(event_type == "impr")[1]
-      prog_idx <- which(event_type %in% c("prog", "RAW", "PIRA"))[1]
+      prog_idx <- which(event_type %in% c("CDW", "RAW", "PIRA"))[1]
       raw_idx <- which(event_type == "RAW")[1]
       pira_idx <- which(event_type == "PIRA")[1]
-      undef_prog_idx <- which(event_type == "prog")[1]
+      undef_prog_idx <- which(event_type == "CDW")[1]
 
       if (event == "firsteach") {
         first_events <- c(impr_idx, prog_idx)
-      } else if (event == "firstprog") {
+      } else if (event == "firstCDW") {
         first_events <- c(prog_idx)
-      } else if (event == "firstprogtype") {
+      } else if (event == "firstCDWtype") {
         first_events <- c(raw_idx, pira_idx, undef_prog_idx)
       } else if (event == "firstPIRA") {
         first_events <- pira_idx
@@ -1053,17 +1061,17 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
 
   improvement <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "impr")
-  progression <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] %in% c("prog", "RAW", "PIRA"))
-  undefined_prog <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "prog")
+  CDW <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] %in% c("CDW", "RAW", "PIRA"))
+  undefined_prog <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "CDW")
   RAW <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "RAW")
   PIRA <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "PIRA")
 
-  summary[as.character(subjid), c('improvement', 'progression', 'RAW', 'PIRA', 'undefined_prog'
-          )] <- c(improvement, progression, RAW, PIRA, undefined_prog)
+  summary[as.character(subjid), c('improvement', 'CDW', 'RAW', 'PIRA', 'undefined_prog'
+          )] <- c(improvement, CDW, RAW, PIRA, undefined_prog)
 
   summary[as.character(subjid), 'event_sequence'] <- paste(event_type, collapse=", ")
 
-  if (startsWith(event, "firstprog")) {
+  if (startsWith(event, "firstCDW")) {
     summary <- summary[, !colnames(summary) %in% "improvement"]
   }
 
@@ -1088,14 +1096,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             relapse_to_event, " days\nRelapse influence (confirmation): ", relapse_to_conf, " days\nEvents detected: ", event))
       if (is.null(subjects) | length(subjects)>1) {
           message("\n---\nTotal subjects: ", nsub,
-              "\n---\nProgressed subjects: ", sum(summary$progression > 0), " (PIRA: ", sum(summary$PIRA > 0),
+              "\n---\nSubjects with disability worsening: ", sum(summary$CDW > 0), " (PIRA: ", sum(summary$PIRA > 0),
               "; RAW: ", sum(summary$RAW > 0), ")")
-          if (!(event %in% c('firstprog', 'firstprogtype', 'firstPIRA', 'firstRAW'))) {
-          message("Improved subjects: ", sum(summary$improvement > 0))
+          if (!(event %in% c('firstCDW', 'firstCDWtype', 'firstPIRA', 'firstRAW'))) {
+          message("Subjects with disability improvement: ", sum(summary$improvement > 0))
           }
-          if (event %in% c('multiple', 'firstprogtype')) {
-          message("---\nProgression events: ",
-              sum(summary$progression), " (PIRA: ", sum(summary$PIRA), "; RAW: ", sum(summary$RAW), ")")
+          if (event %in% c('multiple', 'firstCDWtype')) {
+          message("---\nCDW events: ",
+              sum(summary$CDW), " (PIRA: ", sum(summary$PIRA), "; RAW: ", sum(summary$RAW), ")")
           }
           if (event %in% c('multiple','firsteach')) {
             message("Improvement events: ", sum(summary$improvement))
@@ -1103,8 +1111,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         }
 
       if (!is.null(min_value)) {
-        message("---\n*** NOTE: only progressions to ", outcome, ">=",
-                min_value, " are considered ***\n")
+        message("---\n*** NOTE: only CDW to ", outcome, ">=",
+                min_value, " is considered ***\n")
       }
     }
 
@@ -1117,7 +1125,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     }
 
     scolumns <- names(summary)
-    if (event %in% c('firstprog', 'firstprogtype', 'firstPIRA', 'firstRAW')) {
+    if (event %in% c('firstCDW', 'firstCDWtype', 'firstPIRA', 'firstRAW')) {
       scolumns <- scolumns[scolumns!='improvement']
     }
     if (event=='firstPIRA') {
@@ -1137,15 +1145,15 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     }
 
 
-    prog_settings <- list(outcome=outcome, event=event, baseline=baseline,
+    settings <- list(outcome=outcome, event=event, baseline=baseline,
                   conf_days=conf_days, conf_tol_days=conf_tol_days, conf_unbounded_right=conf_unbounded_right,
                   require_sust_days=require_sust_days, check_intermediate=check_intermediate,
                   relapse_to_bl=relapse_to_bl, relapse_to_event=relapse_to_event, relapse_to_conf=relapse_to_conf,
                   relapse_assoc=relapse_assoc, relapse_indep=relapse_indep,
                   sub_threshold=sub_threshold, relapse_rebl=relapse_rebl, min_value=min_value,
-                  prog_last_visit=prog_last_visit, delta_fun=delta_fun)
+                  impute_last_visit=impute_last_visit, delta_fun=delta_fun)
 
-    output <- list(event_count=summary, results=results_df, prog_settings=prog_settings)
+    output <- list(event_count=summary, results=results_df, settings=settings)
     class(output) <- 'MSprogOutput'
 
 

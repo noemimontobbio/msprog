@@ -34,8 +34,14 @@
 #' @param conf_days Period before confirmation (days).
 #' @param conf_tol_days Tolerance window for confirmation visit (days).
 #' @param conf_unbounded_right If `TRUE`, confirmation window is unbounded on the right.
+#' @param require_sust_days Minimum number of days over which the milestone must be sustained
+#' (i.e., confirmed at \emph{all} visits occurring in the specified period).
+#' If the milestone is sustained for the remainder of the follow-up period, it is considered reached regardless of follow-up duration.
+#' Setting `require_sust_days=Inf`, values are retained only when sustained for the remainder of the follow-up period.
 #' @param relapse_to_event Minimum distance from a relapse (days) for an outcome value to be valid.
 #' @param relapse_to_conf Minimum distance from a relapse (days) for a valid confirmation visit.
+#' @param impute_last_visit If `TRUE`, impute milestone occurring at last visit (i.e. with no confirmation).
+#' If `FALSE`, censor it.
 #' @param verbose, One of:
 #' \itemize{
 #'  \item{0}{ (print no info);}
@@ -55,8 +61,8 @@
 
 value_milestone <- function(data, milestone, value_col, date_col, subj_col, outcome,
                             worsening=NULL, relapse=NULL, rsubj_col=NULL, rdate_col=NULL,
-                            conf_days=24*7, conf_tol_days=30, conf_unbounded_right=FALSE,
-                            relapse_to_event=0, relapse_to_conf=30,
+                            conf_days=24*7, conf_tol_days=c(7, 365), conf_unbounded_right=F, require_sust_days=0,
+                            relapse_to_event=0, relapse_to_conf=30, impute_last_visit=F,
                             verbose=0) {
 
   # If conf_tol_days is a single value, duplicate it (equal left and right tolerance)
@@ -196,8 +202,6 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
       }
 
       if (is.na(milestone_idx)) {
-        # results[subjid, date_col] <- global_start + as.difftime(data_id[nvisits,][[date_col]], unit='days') # end of FU
-        # results[subjid, 'time2event'] <- data_id[nvisits,][[date_col]] - data_id[1,][[date_col]] # total FU length
         proceed <- FALSE
         if (verbose == 2) {
           message("No value",  ifelse(worsening=='increase', '>=', '<='), milestone, " in any visit: end process\n")
@@ -221,44 +225,76 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
             match_idx
           })
           conf_idx <- unique(unlist(conf_idx))
-          ####### #_conf_#
         }
         if (verbose == 2) {
           message("Found value", ifelse(worsening=='increase', '>=', '<='), milestone,
                   " at visit no.", milestone_idx, " (",
                   global_start + as.difftime(data_id[milestone_idx,][[date_col]], units="days"),
-                  "); potential confirmation visits available: ", ifelse(length(conf_idx)>0, "no.", "none"),
-                  paste(conf_idx, collapse=", "))
+                  "); potential confirmation visits available: ", ifelse(length(conf_idx)>0,
+                                        paste0("no. ", paste(conf_idx, collapse=", ")), "none")
+                  )
         }
 
-        if (length(conf_idx) > 0
+        if ((length(conf_idx) > 0
             && ifelse(worsening=='increase',
                       all(data_id[(milestone_idx + 1):conf_idx[[1]], value_col] >= milestone),
-                      all(data_id[(milestone_idx + 1):conf_idx[[1]], value_col] <= milestone))) {
+                      all(data_id[(milestone_idx + 1):conf_idx[[1]], value_col] <= milestone)))
+            || (impute_last_visit && milestone_idx == nvisits)) {
+
+          if (milestone_idx == nvisits) { # i.e., when imputing event at last visit
+            conf_idx <- c(nvisits)
+          }
+
+          # The confirmed milestone can still be rejected if `require_sust_days>0`.
+          # The `valid` flag indicates whether the event can (1) or cannot (0) be retained:
+          valid <- 1
+          if (require_sust_days>0) {
+            # First visit at which worsening is not sustained:
+            if (conf_idx[[1]]==nvisits) {
+              next_nonsust <- NA
+            } else {
+              next_nonsust <- which(ifelse(worsening=='increase',
+                                           data_id[(conf_idx[[1]] + 1):nvisits, value_col] < milestone,
+                                           data_id[(conf_idx[[1]] + 1):nvisits, value_col] > milestone)
+              )[1] + conf_idx[[1]]
+            }
+            valid <- is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
+                                               data_id[change_idx,][[date_col]]) > require_sust_days # worsening sustained up to end of follow-up, or for `require_sust_days`
+          }
+
+          if (valid) {
           results[subjid, date_col] <- as.character(global_start
                 + as.difftime(data_id[milestone_idx,][[date_col]], unit='days')) # date of reaching the milestone
           results[subjid, value_col] <- data_id[milestone_idx, value_col] # first value >= milestone
           results[subjid, 'time2event'] <- data_id[milestone_idx, date_col] - data_id[1, date_col] # time to reach the milestone
           results[subjid, 'observed'] <- 1 # whether milestone was reached
           proceed <- FALSE
-          if (verbose == 2) message("Confirmed value",  ifelse(worsening=='increase', '>=', '<='), milestone,
-                                    " (visit no.", milestone_idx, ", ",
-                                    global_start + as.difftime(data_id[milestone_idx,][[date_col]], units="days"),
+          if (verbose == 2) message(ifelse(milestone_idx == nvisits, "Imputed", "Confirmed"), " value",
+                                    ifelse(worsening=='increase', '>=', '<='), milestone,
+                                    ifelse(milestone_idx == nvisits, " (last visit", paste0(" (visit no.", milestone_idx, ", ",
+                                    global_start + as.difftime(data_id[milestone_idx,][[date_col]], units="days"))),
                                     "): end process\n")
-        } else {
-
-          if (milestone_idx==nvisits) {
-            next_change <- NA
           } else {
-          next_change <- which(ifelse(worsening=='increase',
-                                data_id[(milestone_idx + 1):nvisits, value_col] < milestone,
-                                data_id[(milestone_idx + 1):nvisits, value_col] > milestone)
-                               )[1] + milestone_idx
+            # (not sustained)
+            next_change <- which(ifelse(worsening=='increase',
+                                          data_id[(conf_idx[[1]] + 1):nvisits, value_col] < milestone,
+                                          data_id[(conf_idx[[1]] + 1):nvisits, value_col] > milestone)
+                                )[1] + conf_idx[[1]]
+            search_idx <- next_change + 1
+            if (verbose == 2) {
+              message("Value", ifelse(worsening=='increase', '>=', '<='),
+                      milestone, " confirmed but not sustained over ",
+                      ifelse(require_sust_days<Inf, paste(">=", require_sust_days, "days"),
+                             "remainder of follow-up"), ": proceed with search")
+            }
           }
-          search_idx <- ifelse(is.na(next_change), search_idx + 1, next_change + 1)
+
+        } else {
+          # (not confirmed)
+          search_idx <- search_idx + 1
           if (verbose == 2) {
             message("Value", ifelse(worsening=='increase', '>=', '<='),
-                              milestone, " not confirmed: continue search")
+                              milestone, " not confirmed: proceed with search")
             }
         }
       }

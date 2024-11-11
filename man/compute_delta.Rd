@@ -2,7 +2,7 @@
 % Please edit documentation in R/event_testing.R
 \name{compute_delta}
 \alias{compute_delta}
-\title{Definition of progression deltas for different tests.}
+\title{Definition of minimum valid shift for different tests.}
 \usage{
 compute_delta(baseline, outcome = "edss")
 }
