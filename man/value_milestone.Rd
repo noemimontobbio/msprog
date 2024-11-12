@@ -26,7 +26,7 @@ value_milestone(
 )
 }
 \arguments{
-\item{data}{a \code{data.frame} containing longitudinal data containing subject ID, outcome value, date of visit.}
+\item{data}{a \code{data.frame} containing longitudinal data, including: subject ID, outcome value, date of visit.}
 
 \item{milestone}{Disability milestone (outcome value to check data against).}
 
@@ -58,16 +58,19 @@ and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 
 \item{conf_days}{Period before confirmation (days).}
 
-\item{conf_tol_days}{Tolerance window for confirmation visit (days).}
+\item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
+or list-like of length 2 (different tolerance on left and right).
+In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}.}
 
-\item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right.}
+\item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right
+(regardless of the right end indicated by \code{conf_tol_days}).}
 
 \item{require_sust_days}{Minimum number of days over which the milestone must be sustained
 (i.e., confirmed at \emph{all} visits occurring in the specified period).
 If the milestone is sustained for the remainder of the follow-up period, it is considered reached regardless of follow-up duration.
 Setting \code{require_sust_days=Inf}, values are retained only when sustained for the remainder of the follow-up period.}
 
-\item{relapse_to_event}{Minimum distance from a relapse (days) for an outcome value to be valid.}
+\item{relapse_to_event}{Minimum distance from a relapse (days) for the milestone to be considered reached.}
 
 \item{relapse_to_conf}{Minimum distance from a relapse (days) for a valid confirmation visit.}
 
@@ -85,7 +88,7 @@ If \code{FALSE}, censor it.}
 A \code{data.frame} containing the following columns:
 \itemize{
 \item{\code{date_col}: }{the date of first reaching a value >= milestone (or last date of follow-up if milestone is not reached);}
-\item{\code{value_col}: }{the first value >= milestone, if present, otherwise no value is reported;}
+\item{\code{value_col}: }{the first value >= milestone, if present, otherwise no value;}
 \item{\code{'time2event'}: }{the time to reach a value >= milestone (or total follow-up length if milestone is not reached);}
 \item{\code{'observed'}: }{whether the milestone was reached (1) or not (0).}
 }

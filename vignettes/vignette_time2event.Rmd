@@ -22,6 +22,21 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r wrap-hook, include=FALSE}
+library(knitr)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = xfun::split_lines(x) #substring(x, 4, nchar(x)))
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste0(paste(x, collapse = '\n#> '), '\n')
+  }
+  hook_output(x, options)
+})
+```
+
 This vignette demonstrates how to use the `msprog` package to analyse the disability course in multiple sclerosis (MS) in a time-to-event setting (e.g., to compute survival times for survival analysis).
 
 We shall use the toy datasets `toydata_visits` and `toydata_relapses` provided in `msprog`.
@@ -57,7 +72,7 @@ output_edss <- MSprog(toydata_visits,
 ```
 
 Note in particular that the `event` argument is set to `firstCDW` -- i.e., only the first confirmed disability worsening (CDW) event is detected. Many other arguments are not explicitly set: for those, the defaults are used (you can type `?MSprog` to access the documentation explaining how to specify each argument). Let's print out a description of the criteria used for the above computation, to make sure all the settings are as expected. 
-```{r}
+```{r, linewidth=90}
 print(output_edss)
 ```
 
@@ -115,7 +130,7 @@ print(toydata_visits[toydata_visits$id==4, c('date', 'EDSS')], row.names=FALSE)
 
 The function returned the following `data.frame`:
 ```{r}
-print(vm, row.names=FALSE)
+print(vm)
 ```
 where: `'date'` contains the date of the first confirmed EDSS $\geq$ 4.5 (or last date of follow-up if milestone was not reached or not confirmed); `'EDSS'` contains the first EDSS value $\geq$ 4.5, if present, otherwise no value; `'time2event'` contains the time to reach EDSS $\geq$ 4.5 (or total follow-up length if not reached or not confirmed); `'observed'` indicates whether EDSS $\geq$ 4.5 was reached (1) or not (0).
 

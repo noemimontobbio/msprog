@@ -11,7 +11,7 @@
 #' Valid time windows for confirmation visits are determined by arguments
 #' `conf_days`, `conf_tol_days`, `conf_unbounded_right`, `relapse_to_conf`.
 #'
-#' @param data a `data.frame` containing longitudinal data containing subject ID, outcome value, date of visit.
+#' @param data a `data.frame` containing longitudinal data, including: subject ID, outcome value, date of visit.
 #' @param milestone Disability milestone (outcome value to check data against).
 #' @param subj_col Name of data column with subject ID.
 #' @param value_col Name of data column with outcome value.
@@ -32,13 +32,16 @@
 #' @param rsubj_col Name of subject column for relapse data, if different from outcome data.
 #' @param rdate_col Name of date column for relapse data, if different from outcome data.
 #' @param conf_days Period before confirmation (days).
-#' @param conf_tol_days Tolerance window for confirmation visit (days).
-#' @param conf_unbounded_right If `TRUE`, confirmation window is unbounded on the right.
+#' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
+#' or list-like of length 2 (different tolerance on left and right).
+#' In all cases, the right end of the interval is ignored if `conf_unbounded_right` is set to `TRUE`.
+#' @param conf_unbounded_right If `TRUE`, confirmation window is unbounded on the right
+#' (regardless of the right end indicated by `conf_tol_days`).
 #' @param require_sust_days Minimum number of days over which the milestone must be sustained
 #' (i.e., confirmed at \emph{all} visits occurring in the specified period).
 #' If the milestone is sustained for the remainder of the follow-up period, it is considered reached regardless of follow-up duration.
 #' Setting `require_sust_days=Inf`, values are retained only when sustained for the remainder of the follow-up period.
-#' @param relapse_to_event Minimum distance from a relapse (days) for an outcome value to be valid.
+#' @param relapse_to_event Minimum distance from a relapse (days) for the milestone to be considered reached.
 #' @param relapse_to_conf Minimum distance from a relapse (days) for a valid confirmation visit.
 #' @param impute_last_visit If `TRUE`, impute milestone occurring at last visit (i.e. with no confirmation).
 #' If `FALSE`, censor it.
@@ -51,7 +54,7 @@
 #' @return A `data.frame` containing the following columns:
 #' \itemize{
 #' \item{`date_col`: }{the date of first reaching a value >= milestone (or last date of follow-up if milestone is not reached);}
-#' \item{`value_col`: }{the first value >= milestone, if present, otherwise no value is reported;}
+#' \item{`value_col`: }{the first value >= milestone, if present, otherwise no value;}
 #' \item{`'time2event'`: }{the time to reach a value >= milestone (or total follow-up length if milestone is not reached);}
 #' \item{`'observed'`: }{whether the milestone was reached (1) or not (0).}
 #' }

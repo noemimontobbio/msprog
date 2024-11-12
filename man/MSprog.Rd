@@ -31,7 +31,6 @@ MSprog(
   relapse_to_conf = 30,
   relapse_assoc = 90,
   relapse_indep = NULL,
-  min_value = NULL,
   impute_last_visit = F,
   date_format = NULL,
   include_dates = F,
@@ -112,7 +111,8 @@ If \code{validconf_col=NULL}, all visits are potentially used as confirmation vi
 or list-like of length 2 (different tolerance on left and right).
 In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}.}
 
-\item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right.}
+\item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right
+(regardless of the right end indicated by \code{conf_tol_days}).}
 
 \item{require_sust_days}{Minimum number of days over which a confirmed change must be sustained
 (i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
@@ -148,8 +148,6 @@ event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For
 \item{No relapses within baseline->event+30dd and within confirmation+-30dd [2]:
 \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
 }}
-
-\item{min_value}{Only include CDW events where the outcome is >= value.}
 
 \item{impute_last_visit}{If \code{TRUE}, impute worsening events occurring at last visit (i.e. with no confirmation).
 If a numeric value N is passed, unconfirmed worsening events are imputed only if occurring within N days of follow-up

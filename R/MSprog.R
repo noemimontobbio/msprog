@@ -71,7 +71,8 @@
 #' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 #' or list-like of length 2 (different tolerance on left and right).
 #' In all cases, the right end of the interval is ignored if `conf_unbounded_right` is set to `TRUE`.
-#' @param conf_unbounded_right If `TRUE`, confirmation window is unbounded on the right.
+#' @param conf_unbounded_right If `TRUE`, confirmation window is unbounded on the right
+#' (regardless of the right end indicated by `conf_tol_days`).
 #' @param require_sust_days Minimum number of days over which a confirmed change must be sustained
 #' (i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
 #' Events sustained for the remainder of the follow-up period are retained regardless of follow-up duration.
@@ -100,7 +101,6 @@
 #' \item{No relapses within baseline->event+30dd and within confirmation+-30dd \[2\]:
 #' \cr`relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)`}
 #' }
-#' @param min_value Only include CDW events where the outcome is >= value.
 #' @param impute_last_visit If `TRUE`, impute worsening events occurring at last visit (i.e. with no confirmation).
 #' If a numeric value N is passed, unconfirmed worsening events are imputed only if occurring within N days of follow-up
 #' (e.g., in case of early discontinuation).
@@ -154,8 +154,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    delta_fun=NULL, worsening=NULL, event='firstCDW', baseline='fixed', sub_threshold=F, relapse_rebl=F,
                    validconf_col=NULL, conf_days=12*7, conf_tol_days=c(7,365), conf_unbounded_right=F, require_sust_days=0, check_intermediate=T,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30, relapse_assoc=90, relapse_indep=NULL,
-                   min_value=NULL, impute_last_visit=F,
-                   date_format=NULL, include_dates=F, include_value=F, include_stable=T, verbose=1
+                   impute_last_visit=F, date_format=NULL, include_dates=F, include_value=F, include_stable=T, verbose=1
                    ) {
 
   # SETUP
@@ -249,12 +248,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     }
   }
 
-  # Set minimum value
-  if (is.null(min_value)) {
-    min_value_ifany <- -Inf
-  } else {
-    min_value_ifany <- min_value
-  }
+  # # Set minimum value
+  # if (is.null(min_value)) {
+  #   min_value_ifany <- -Inf
+  # } else {
+  #   min_value_ifany <- min_value
+  # }
 
   # If impute_last_visit==T, set no limit to follow-up length (Inf)
   if (impute_last_visit==T) {
@@ -617,17 +616,17 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
       # CONFIRMED CDW:
       # --------------
-      else if (data_id[change_idx,][[value_col]] >= min_value_ifany
-         && isevent_loc(data_id[change_idx,][[value_col]], bl[[value_col]], type='wors')  # value worsened (>delta) from baseline
+      else if ( #data_id[change_idx,][[value_col]] >= min_value_ifany &&
+         isevent_loc(data_id[change_idx,][[value_col]], bl[[value_col]], type='wors')  # value worsened (>delta) from baseline
 
          && ((length(conf_idx) > 0 && # confirmation visits available
            ifelse(check_intermediate,
               all(sapply((change_idx + 1):conf_idx[[1]],
                function(x) isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='wors'))),  # worsenind is confirmed at (all visits up to) first valid date
               isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl[[value_col]], type='wors') # worsening is confirmed at first valid date
-           ) &&
-          all(sapply((change_idx + 1):conf_idx[[1]],
-              function(x) data_id[x,][[value_col]] >= min_value_ifany)) # confirmation above min_value too
+           )
+          # && all(sapply((change_idx + 1):conf_idx[[1]],
+          #     function(x) data_id[x,][[value_col]] >= min_value_ifany)) # confirmation above min_value too
           ) || (data_id[change_idx,][[date_col]] - data_id[1,][[date_col]] <= impute_last_visit && change_idx == nvisits))
 
          ) {
@@ -1110,10 +1109,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           }
         }
 
-      if (!is.null(min_value)) {
-        message("---\n*** NOTE: only CDW to ", outcome, ">=",
-                min_value, " is considered ***\n")
-      }
+      # if (!is.null(min_value)) {
+      #   message("---\n*** NOTE: only CDW to ", outcome, ">=",
+      #           min_value, " is considered ***\n")
+      # }
     }
 
     columns <- names(results_df)
@@ -1150,7 +1149,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   require_sust_days=require_sust_days, check_intermediate=check_intermediate,
                   relapse_to_bl=relapse_to_bl, relapse_to_event=relapse_to_event, relapse_to_conf=relapse_to_conf,
                   relapse_assoc=relapse_assoc, relapse_indep=relapse_indep,
-                  sub_threshold=sub_threshold, relapse_rebl=relapse_rebl, min_value=min_value,
+                  sub_threshold=sub_threshold, relapse_rebl=relapse_rebl, #min_value=min_value,
                   impute_last_visit=impute_last_visit, delta_fun=delta_fun)
 
     output <- list(event_count=summary, results=results_df, settings=settings)
