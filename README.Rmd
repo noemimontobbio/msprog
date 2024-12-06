@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-`msprog` is an R package providing tools for exhaustive and reproducible analysis of disability course in multiple sclerosis (MS) from longitudinal data [@msprog2024]. 
+`msprog` is an R package providing tools for exhaustive and reproducible analysis of disability course in multiple sclerosis (MS) from longitudinal data [@msprog2024].
 
 Its core function, `MSprog()`, detects and characterises the evolution of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes (if any).
 

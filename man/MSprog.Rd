@@ -13,16 +13,19 @@ MSprog(
   relapse = NULL,
   rsubj_col = NULL,
   rdate_col = NULL,
+  renddate_col = NULL,
   subjects = NULL,
   delta_fun = NULL,
   worsening = NULL,
   event = "firstCDW",
   baseline = "fixed",
-  sub_threshold = F,
+  proceed_from = "firstconf",
+  sub_threshold_rebl = "none",
   relapse_rebl = F,
+  skip_local_extrema = F,
   validconf_col = NULL,
   conf_days = 12 * 7,
-  conf_tol_days = c(7, 365),
+  conf_tol_days = c(7, 2 * 365.25),
   conf_unbounded_right = F,
   require_sust_days = 0,
   check_intermediate = T,
@@ -31,7 +34,7 @@ MSprog(
   relapse_to_conf = 30,
   relapse_assoc = 90,
   relapse_indep = NULL,
-  impute_last_visit = F,
+  impute_last_visit = 0,
   date_format = NULL,
   include_dates = F,
   include_value = F,
@@ -61,7 +64,9 @@ MSprog(
 
 \item{rsubj_col}{Name of subject ID column for relapse data, if different from outcome data.}
 
-\item{rdate_col}{Name of date column for relapse data, if different from outcome data.}
+\item{rdate_col}{Name of onset date column for relapse data, if different from outcome data.}
+
+\item{renddate_col}{Name of end date column for relapse data (if present).}
 
 \item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included.}
 
@@ -96,16 +101,34 @@ suitable for a first-CDW setting to discard fluctuations around baseline);}
 }
 }}
 
-\item{sub_threshold}{This argument is only used if \code{baseline='roving'} or \code{baseline='roving_impr'}. If \code{TRUE}, move roving baseline
-at any sub-threshold confirmed event (i.e. any confirmed change in outcome measure, regardless of \code{delta_fun}).}
+\item{proceed_from}{After detecting a confirmed disability event, continue searching after the first
+qualifying confirmation visit if \code{proceed_from='firstconf'}, after the event date if \code{proceed_from='event'}.
+When rebaselining after a confirmed disability event (if \code{baseline='roving'} or \code{baseline='roving_impr'}),
+the baseline is moved to the first qualifying confirmation visit if \code{proceed_from='firstconf'},
+to the event date if \code{proceed_from='event'}.}
+
+\item{sub_threshold_rebl}{This argument is only used if \code{baseline='roving'} or \code{baseline='roving_impr'}.
+Must be one of the following:
+\itemize{
+\item{\code{'event'}:}{ move roving baseline at any, possibly sub-threshold, confirmed event
+(i.e. any confirmed change in outcome measure, regardless of \code{delta_fun});}
+\item{\code{'improvement'}:}{ move roving baseline at any, possibly sub-threshold, confirmed improvement
+(i.e. any confirmed improvement in outcome measure, regardless of \code{delta_fun});}
+\item{\verb{'worsening'``:\}\{ move roving baseline at any, possibly sub-threshold, confirmed worsening (i.e. any confirmed worsening in outcome measure, regardless of }delta_fun\verb{);\} \\item\{}'none'``:}{ only use valid confirmed events (as per \code{delta_fun}) for rebaseline.}
+}}
 
 \item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse to search for PIRA events.}
+
+\item{skip_local_extrema}{This argument is only used if \code{baseline='roving'} or \code{baseline='roving_impr'}.
+If \code{TRUE}, local minima or maxima of the outcome are skipped when moving the baseline.
+A visit \code{i} is a local minimum point for \code{outcome} if \code{outcome(i+1)-outcome(i)>=delta_fun(outcome(i))}
+and \code{outcome(i-1)-outcome(i)>=delta_fun(outcome(i))}. Local maxima are defined similarly.}
 
 \item{validconf_col}{Name of data column specifying which visits can (\code{T}) or cannot (\code{F}) be used as confirmation visits.
 The input data does not necessarily have to include such a column.
 If \code{validconf_col=NULL}, all visits are potentially used as confirmation visits.}
 
-\item{conf_days}{Period before confirmation (days).}
+\item{conf_days}{Period before confirmation (days). Can be a single value or list-like of any length if multiple windows are to be considered.}
 
 \item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 or list-like of length 2 (different tolerance on left and right).
@@ -126,14 +149,33 @@ If set to \code{FALSE} (not recommended in most cases, as it may discard meaning
 events will be confirmed \emph{only at} the specified confirmation visit
 (and \emph{only at the end} of the period defined by \code{require_sust_days}, if any).}
 
-\item{relapse_to_bl}{Minimum distance from last relapse (days) for a visit to be used as baseline
-(otherwise the next available visit is used as baseline).}
+\item{relapse_to_bl}{Minimum distance from a relapse (days) for a visit to be used as baseline.
+Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
+(minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+Note that setting the distance to zero means keeping the baseline regardless of surrounding relapses.
+If relapse end dates are available (\code{renddate_col}), the minimum distance from last relapse
+is overwritten by the relapse duration, unless it was set to zero (in which case it stays 0).
+If the designated baseline does not not respect this constraint, the baseline is moved to the next available visit.}
 
-\item{relapse_to_event}{Minimum distance from last relapse (days) for an event to be considered as such.}
+\item{relapse_to_event}{Minimum distance from a relapse (days) for an event to be considered as such.
+Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
+(minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+Note that setting the distance to zero means keeping the event regardless of surrounding relapses.
+If relapse end dates are available (\code{renddate_col}), the minimum distance from last relapse
+is overwritten by the relapse duration, unless it was set to zero (in which case it stays 0).}
 
-\item{relapse_to_conf}{Minimum distance from last relapse (days) for a visit to be a valid confirmation visit.}
+\item{relapse_to_conf}{Minimum distance from a relapse (days) for a visit to be a valid confirmation visit.
+Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
+(minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+Note that setting the distance to zero means keeping a confirmation visit regardless of surrounding relapses.
+If relapse end dates are available (\code{renddate_col}), the minimum distance from last relapse
+is overwritten by the relapse duration, unless it was set to zero (in which case it stays 0).}
 
-\item{relapse_assoc}{Maximum distance from last relapse (days) for a CDW event to be considered as RAW.}
+\item{relapse_assoc}{Maximum distance from a relapse (days) for a CDW event to be considered as RAW.
+Can be an integer (maximum distance from \emph{last} relapse) or list-like of length 2
+(maximum distance from \emph{last} relapse, maximum distance from \emph{next} relapse).
+If relapse end dates are available (\code{renddate_col}), the maximum distance from last relapse
+is overwritten by the relapse duration.}
 
 \item{relapse_indep}{Specifies relapse-free intervals for PIRA definition.
 Must be given in the form produced by function \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}} by calling
@@ -147,10 +189,15 @@ event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For
 \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)};}
 \item{No relapses within baseline->event+30dd and within confirmation+-30dd [2]:
 \cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
-}}
+}
+If relapse end dates are available (\code{renddate_col}), it is possible to define PIRA based on those
+by setting \code{use_end_dates=T} in \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}}.}
 
-\item{impute_last_visit}{If \code{TRUE}, impute worsening events occurring at last visit (i.e. with no confirmation).
-If a numeric value N is passed, unconfirmed worsening events are imputed only if occurring within N days of follow-up
+\item{impute_last_visit}{Imputation probability for worsening events occurring at last visit (i.e. with no confirmation).
+Unconfirmed worsening events occurring al the last visit are never imputed if \code{impute_last_visit=0};
+they are always imputed if \code{impute_last_visit=1};
+they are imputed with probability \code{p}, \verb{0<p<1}, if \code{impute_last_visit=p}.
+If a value \code{N>1} is passed, unconfirmed worsening events are imputed only if occurring within \code{N} days of follow-up
 (e.g., in case of early discontinuation).}
 
 \item{date_format}{Format of dates in the input data. If not specified, it will be inferred by function \code{\link[=as.Date]{as.Date()}}.}

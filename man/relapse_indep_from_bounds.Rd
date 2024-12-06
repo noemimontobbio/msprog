@@ -4,7 +4,15 @@
 \alias{relapse_indep_from_bounds}
 \title{Define relapse-free intervals for PIRA definition.}
 \usage{
-relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1)
+relapse_indep_from_bounds(
+  b0 = 0,
+  b1 = 0,
+  e0 = 90,
+  e1 = 30,
+  c0 = 90,
+  c1 = 30,
+  use_end_dates = F
+)
 }
 \arguments{
 \item{b0}{Days before baseline (\verb{>=0}).}
@@ -18,6 +26,10 @@ relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1)
 \item{c0}{Days before confirmation (\verb{>=0}), or \code{NULL}.}
 
 \item{c1}{Days after confirmation (\verb{>=0}).}
+
+\item{use_end_dates}{If \code{TRUE}, only the right bounds (\code{e1}, \code{c1}) are used,
+as the right bounds will be defined by the onset-to-end interval of each relapse.
+This option is only relevant when relapse end dates are available.}
 }
 \value{
 A named list to be given as argument \code{relapse_indep} to function \code{\link[=MSprog]{MSprog()}}

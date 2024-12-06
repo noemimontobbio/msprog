@@ -46,6 +46,7 @@ print.MSprogOutput <- function(x, ...) {
     event_text <- paste0('all ', outcome, ' changes (in chronological order)')
   }
 
+  if (length(s$relapse_indep[['event']])==2) {
   pira_text <- ''
   for (point in c('bl', 'event', 'conf')) {
     if (!(is.null(s$relapse_indep[[point]][[1]]) & is.null(s$relapse_indep[[point]][[2]]))
@@ -61,6 +62,7 @@ print.MSprogOutput <- function(x, ...) {
     }
   }
   pira_text <- gsub('.{5}$', '', pira_text)
+  }
 
   text <- paste0(
     'For each subject, we detected ', event_text, ' confirmed', ifelse(s$check_intermediate, ' over ', ' at '),
@@ -73,44 +75,73 @@ print.MSprogOutput <- function(x, ...) {
            ifelse(s$conf_unbounded_right || s$conf_tol_days[2]==0, '', paste0(' (with a tolerance of ',
                                                                               s$conf_tol_days[2], ' days on the right)'))),
     ifelse(s$check_intermediate, '. ', ', ignoring all intermediate visits. '),
-    ifelse(s$relapse_to_conf>0, paste0('A visit could not be used as confirmation if occurring within ',
-                                       s$relapse_to_conf, ' days from the onset of a relapse. '), ''),
+    ifelse(s$validconf_p<1,
+           'Visits [insert condition implemented by `validconf_col`] were not used for event confirmation. ', ''),
+    ifelse(s$relapse_to_conf[1]>0, paste0('A visit could not be used as confirmation if occurring within ',
+                ifelse(is.null(s$renddate_col), paste0(s$relapse_to_conf[1], ' days after the onset of a relapse'),
+                                                 'a relapse (onset-to-end)')), ''),
+    ifelse(s$relapse_to_conf[2]>0, paste0(ifelse(s$relapse_to_conf[1]>0, ', or within ',
+              'A visit could not be used as confirmation if occurring within '), paste0(s$relapse_to_conf[2],
+                                          ' days before the onset of a relapse')), ''),
+    ifelse(s$relapse_to_conf[1]>0 | s$relapse_to_conf[2]>0, '. ', ''),
     ifelse(s$baseline=='fixed',
            paste0('The baseline was kept fixed at the first visit',
-                  ifelse(s$relapse_to_bl>0, paste0(', unless occurring within ', s$relapse_to_bl,
-                                                   ' days after the onset of a relapse (in which case it was moved to the next available assessment out of relapse influence). '), '. ')),
+                  ifelse(s$relapse_to_bl[1]>0, paste0(', unless occurring within ', ifelse(is.null(s$renddate_col),
+                      paste0(s$relapse_to_bl[1], ' days after the onset of a relapse'), 'a relapse (onset-to-end)'))),
+                  ifelse(s$relapse_to_bl[2]>0, paste0(ifelse(s$relapse_to_bl[1]>0, ', or within ',
+                        ', unless occurring within '), paste0(s$relapse_to_bl[2], ' days before the onset of a relapse')), ''),
+            ifelse(s$relapse_to_bl[1]>0 | s$relapse_to_bl[2]>0,
+                   ' (in which case it was moved to the next available assessment out of relapse influence. )', '. ')),
            paste0('A roving baseline scheme was applied where the reference value was ',
                   ifelse(s$baseline=='roving_impr',
-                         'updated every time the value was lower than the previous measure and confirmed. ',
+                         'updated after each confirmed improvement event. ',
                          'updated after each confirmed worsening or improvement event. '),
-                  'The new baseline was set as the first available confirmation visit. ',
-                  ifelse(s$sub_threshold,
-                         paste0('Rebaseline was also triggered by (confirmed) \"sub-threshold\" events, i.e., when the shift in the ', outcome,
+                  'The new baseline was set at ', ifelse(s$proceed_from=='event',
+                                                         'the event. ',
+                                                         'the first available confirmation visit. '),
+                  ifelse(s$sub_threshold_rebl!='none',
+                         paste0('Rebaseline was also triggered by confirmed \"sub-threshold\" ', s$sub_threshold_rebl,
+                                ', i.e., when the shift in the ', outcome,
                                 ' value was too small to define a valid event. ' # (e.g., a confirmed change from
                                 #outcome, '=', s$bl_value, ' to ', outcome, '=', s$bl_value + round(delta(s$bl_value)/2), '). '
-                         ),
-                         ''), ifelse(s$relapse_to_bl>0, paste0('Whenever the current baseline fell within ', s$relapse_to_bl,
-                                                               ' days from the onset of a relapse, it was moved to the next available visit. '), ''))
-    ),
-    ifelse(s$impute_last_visit>0, paste0('CDWs ',
-                                       ifelse(s$impute_last_visit<Inf, paste0('of patients terminating follow-up before day ',
-                                                                            s$impute_last_visit, ' '), ''),
-                                       'were included if occurring at the last available visit without confirmation. '), ''),
+                         ), ''),
+                  ifelse(s$relapse_to_bl[1]>0, paste0('Whenever the current baseline fell within ',
+                              ifelse(is.null(s$renddate_col), paste0(s$relapse_to_bl[1], ' days after the onset of a relapse, '),
+                                'a relapse (onset-to-end)')),  ''),
+                  ifelse(s$relapse_to_bl[2]>0, paste0(ifelse(s$relapse_to_bl[1]>0, ', or within ',
+                            'Whenever the current baseline fell within '), s$relapse_to_bl[2],
+                                                          ' days before the onset of a relapse'), ''),
+                  ifelse(s$relapse_to_bl[1]>0 | s$relapse_to_bl[2]>0, ', it was moved to the next available visit. ', '')
+              ) #end[paste0(roving)]
+        ), #end[ifelse(baseline=='fixed)]
+    ifelse(s$impute_last_visit>0, paste0('CDWs ', ifelse(s$impute_last_visit<Inf & s$impute_last_visit>=1,
+                          paste0('of patients terminating follow-up before day ', s$impute_last_visit, ' '), ''),
+                                       'were included if occurring at the last available visit without confirmation',
+                          ifelse(s$impute_last_visit<1, paste0(' with a probability of ', s$impute_last_visit), ''), '. '), ''),
     ifelse(s$require_sust_days>0, paste0('Events were only retained if sustained',
                                           ifelse(s$require_sust_days<Inf, paste0(' either over ', s$require_sust_days, ' days, or'), ''),
                                           ' until the end of follow-up. '), ''),
-    ifelse(s$relapse_to_event>0, paste0('Events occurring within ', s$relapse_to_event,
-                                        ' days after the onset of a relapse were discarded. '), ''),
+    ifelse(s$relapse_to_event[1]>0, paste0('Events occurring within ', ifelse(is.null(s$renddate_col),
+                    paste0(s$relapse_to_event[1], ' days after the onset of a relapse'), 'a relapse (onset-to-end)')), ''),
+    ifelse(s$relapse_to_event[2]>0, paste0(ifelse(s$relapse_to_event[1]>0, ', or within ', 'Events occurring within '),
+                      paste0(s$relapse_to_event[2], ' days before the onset of a relapse')), ''),
+    ifelse(s$relapse_to_event[1]>0 | s$relapse_to_event[2]>0, ' were discarded. ', ''),
     # ifelse(!is.null(s$min_value), paste0('Only CDWs to ', outcome,
     #                                      ' values of at least ', s$min_value,
     #                                      ' were retained. '), ''),
     ifelse(s$event!='firstPIRA', paste0('A confirmed ', outcome, ' worsening event was labelled as RAW if occurring within ',
-                                        s$relapse_assoc, ' days from the onset of a relapse. '), ''),
-    ifelse(s$event!='firstRAW', paste0('A confirmed ', outcome,
-                                       ' worsening event was labelled as PIRA if no relapses started in the interval ',
-                                       pira_text, '. '), ''),
+            ifelse(is.null(s$renddate_col), paste0(s$relapse_assoc[1], ' days after the onset of a relapse'),
+                        'a relapse (between onset and end)'),
+            ifelse(s$relapse_assoc[2]>0, paste0(', or within ', s$relapse_assoc[2], ' days before the onset of a relapse'), ''),
+                 '. '), ''),
+    ifelse(s$event!='firstRAW', paste0('A confirmed ', outcome, ' worsening event was labelled as PIRA if ',
+                          ifelse(length(s$relapse_indep[['event']])==2, paste0('no relapses started in the interval ', pira_text, '. '),
+                                 paste0('it did not occur within a relapse (onset to end)', ifelse(s$relapse_indep[['event']]>0,
+                                        paste0(', or less than ', s$relapse_indep[['event']], ' days before a relapse')),
+                                        ', and the confirmation did not occur within a relapse', ifelse(s$relapse_indep[['conf']]>0,
+                                        paste0(', or less than ', s$relapse_indep[['conf']], ' days before a relapse')), '. '))), ''),
     ifelse(s$relapse_rebl, paste0('A further search for PIRA events was performed by resetting the baseline to the first available visit after ',
-                                  ifelse(s$relapse_to_bl>0, paste0(s$relapse_to_bl, ' days from the onset of each relapse. '), 'each relapse. ')),
+                                  ifelse(s$relapse_to_bl[1]>0, paste0(s$relapse_to_bl[1], ' days from the onset of each relapse. '), 'each relapse. ')),
            '')
   )
 

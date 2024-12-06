@@ -90,10 +90,12 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> Outcome: edss
 #> Confirmation over: 84 days (-0 days, +Inf days)
 #> Baseline: roving
-#> Relapse influence (baseline): 30 days
-#> Relapse influence (event): 0 days
-#> Relapse influence (confirmation): 30 days
+#> Baseline skipped if: <30 days from last relapse
+#> Event skipped if: -
+#> Confirmation visit skipped if: <30 days from last relapse
 #> Events detected: multiple
+#> 
+#> *Please use `print(output)` to display full info on event detection criteria*
 #> 
 #> ---
 #> Total subjects: 4
@@ -159,7 +161,7 @@ complete reproducibility**:
 
 ``` r
 print(output)
-#> For each subject, we detected all EDSS changes (in chronological order) confirmed over 84 days or more. A visit could not be used as confirmation if occurring within 30 days from the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set as the first available confirmation visit. Whenever the current baseline fell within 30 days from the onset of a relapse, it was moved to the next available visit. A confirmed EDSS worsening event was labelled as RAW if occurring within 90 days from the onset of a relapse. A confirmed EDSS worsening event was labelled as PIRA if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
+#> For each subject, we detected all EDSS changes (in chronological order) confirmed over 84 days or more. A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first available confirmation visit. Whenever the current baseline fell within 30 days after the onset of a relapse, , it was moved to the next available visit. A confirmed EDSS worsening event was labelled as RAW if occurring within 90 days after the onset of a relapse. A confirmed EDSS worsening event was labelled as PIRA if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
 ```
 
 <br />
