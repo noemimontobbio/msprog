@@ -91,7 +91,7 @@ print.MSprogOutput <- function(x, ...) {
                   ifelse(s$relapse_to_bl[2]>0, paste0(ifelse(s$relapse_to_bl[1]>0, ', or within ',
                         ', unless occurring within '), paste0(s$relapse_to_bl[2], ' days before the onset of a relapse')), ''),
             ifelse(s$relapse_to_bl[1]>0 | s$relapse_to_bl[2]>0,
-                   ' (in which case it was moved to the next available assessment out of relapse influence. )', '. ')),
+                   ' (in which case it was moved to the next available assessment out of relapse influence). ', '. ')),
            paste0('A roving baseline scheme was applied where the reference value was ',
                   ifelse(s$baseline=='roving_impr',
                          'updated after each confirmed improvement event. ',
@@ -108,12 +108,17 @@ print.MSprogOutput <- function(x, ...) {
                   ifelse(s$relapse_to_bl[1]>0, paste0('Whenever the current baseline fell within ',
                               ifelse(is.null(s$renddate_col), paste0(s$relapse_to_bl[1], ' days after the onset of a relapse, '),
                                 'a relapse (onset-to-end)')),  ''),
-                  ifelse(s$relapse_to_bl[2]>0, paste0(ifelse(s$relapse_to_bl[1]>0, ', or within ',
+                  ifelse(s$relapse_to_bl[2]>0, paste0(ifelse(s$relapse_to_bl[1]>0, 'or within ',
                             'Whenever the current baseline fell within '), s$relapse_to_bl[2],
                                                           ' days before the onset of a relapse'), ''),
                   ifelse(s$relapse_to_bl[1]>0 | s$relapse_to_bl[2]>0, ', it was moved to the next available visit. ', '')
               ) #end[paste0(roving)]
         ), #end[ifelse(baseline=='fixed)]
+    ifelse(s$relapse_rebl, paste0('The onset of each relapse', ifelse(s$baseline=='fixed', '', ' also'),
+            ' prompted a re-baseline to the next available visit',
+            ifelse(s$relapse_to_bl[1]>0 | s$relapse_to_bl[2]>0, ' out of relapse influence. ', '. ')), ''),
+    ifelse(s$skip_local_extrema & (s$relapse_to_bl[1]>0 || s$relapse_to_bl[2]>0 || s$relapse_rebl || s$baseline!='fixed'),
+           'Local minima or maxima were skipped when updating the baseline. ', ''),
     ifelse(s$impute_last_visit>0, paste0('CDWs ', ifelse(s$impute_last_visit<Inf & s$impute_last_visit>=1,
                           paste0('of patients terminating follow-up before day ', s$impute_last_visit, ' '), ''),
                                        'were included if occurring at the last available visit without confirmation',
@@ -139,10 +144,7 @@ print.MSprogOutput <- function(x, ...) {
                                  paste0('it did not occur within a relapse (onset to end)', ifelse(s$relapse_indep[['event']]>0,
                                         paste0(', or less than ', s$relapse_indep[['event']], ' days before a relapse')),
                                         ', and the confirmation did not occur within a relapse', ifelse(s$relapse_indep[['conf']]>0,
-                                        paste0(', or less than ', s$relapse_indep[['conf']], ' days before a relapse')), '. '))), ''),
-    ifelse(s$relapse_rebl, paste0('A further search for PIRA events was performed by resetting the baseline to the first available visit after ',
-                                  ifelse(s$relapse_to_bl[1]>0, paste0(s$relapse_to_bl[1], ' days from the onset of each relapse. '), 'each relapse. ')),
-           '')
+                                        paste0(', or less than ', s$relapse_indep[['conf']], ' days before a relapse')), '. '))), '')
   )
 
   cat(text)

@@ -195,7 +195,9 @@ The assessment of the disability evolution strongly depends on the choices made 
 
 If the baseline visit occurs in the vicinity of a clinical relapse, the reference value may be overestimated. The `relapse_to_bl` argument allows to specify the minimum accepted distance (in days) of the baseline visit from the onset of a previous relapse. For instance, if `baseline='fixed'` and `relapse_to_bl=30`, the baseline visit is chosen as the first available visit satisfying the requirement of "not occurring less than 30 days after the onset of a relapse". If the `baseline` argument is set to a roving scheme, the above applies to every baseline change as well.
 
-Finally, on top of the chosen baseline scheme, *post-relapse re-baseline* @kappos2020 can be applied by setting `relapse_rebl=TRUE` in `MSprog()`. If this is enabled, outcome values are scanned once more from the beginning by resetting the baseline after the onset of each relapse (first visit available occurring at least `relapse_to_bl` days after the relapse onset) to classify potential events left undefined as PIRA.
+On top of the chosen baseline scheme, *post-relapse re-baseline* @kappos2020 can be applied by setting `relapse_rebl=TRUE` in `MSprog()`. If this is enabled, the onset of each relapse prompts a re-baseline to the next available visit out of relapse influence. 
+
+Finally, as an additional constraint, an updated baseline can be forced to have a score greater than or equal to the previous baseline by setting `bl_geq=TRUE` in `MSprog()`.
 
 ## Multiple events {#multiple}
 

@@ -21,6 +21,7 @@ MSprog(
   baseline = "fixed",
   proceed_from = "firstconf",
   sub_threshold_rebl = "none",
+  bl_geq = F,
   relapse_rebl = F,
   skip_local_extrema = F,
   validconf_col = NULL,
@@ -117,10 +118,13 @@ Must be one of the following:
 \item{\verb{'worsening'``:\}\{ move roving baseline at any, possibly sub-threshold, confirmed worsening (i.e. any confirmed worsening in outcome measure, regardless of }delta_fun\verb{);\} \\item\{}'none'``:}{ only use valid confirmed events (as per \code{delta_fun}) for rebaseline.}
 }}
 
-\item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse to search for PIRA events.}
+\item{bl_geq}{This argument is only used if the baseline is moved.
+If \code{TRUE}, the new reference value must always be greater or equal than the previous one;
+when it is not, the old reference value is assigned to it [2].}
 
-\item{skip_local_extrema}{This argument is only used if \code{baseline='roving'} or \code{baseline='roving_impr'}.
-If \code{TRUE}, local minima or maxima of the outcome are skipped when moving the baseline.
+\item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse.}
+
+\item{skip_local_extrema}{If \code{TRUE}, the baseline cannot be placed at a local minimum or maximum.
 A visit \code{i} is a local minimum point for \code{outcome} if \code{outcome(i+1)-outcome(i)>=delta_fun(outcome(i))}
 and \code{outcome(i-1)-outcome(i)>=delta_fun(outcome(i))}. Local maxima are defined similarly.}
 
