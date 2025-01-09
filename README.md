@@ -46,10 +46,12 @@ appreciated!
 
 ## Installation
 
-You can install the development version of `msprog` from GitHub with:
+You can install the development version of `msprog` from GitHub by
+running the command below. If using RStudio, please make sure to restart
+the R session right before running the installation.
 
 ``` r
-# install.packages("devtools")
+# install.packages("devtools") # if not already installed
 devtools::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
 ```
 

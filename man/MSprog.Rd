@@ -71,9 +71,10 @@ MSprog(
 
 \item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included.}
 
-\item{delta_fun}{Custom function specifying the minimum shift corresponding to a valid change from the provided reference value.
-It must take a numeric value (reference) as input, and return a numeric value corresponding to the minimum shift from baseline.
-If none is specified (default), function \code{\link[=compute_delta]{compute_delta()}} for the specified outcome is used.}
+\item{delta_fun}{Custom function specifying the minimum shift in the outcome measure that counts as a valid change from the provided reference value.
+The function provided must take a numeric value (reference score) as input, and return a numeric value corresponding to the minimum shift from baseline, see example 3 below.
+If none is specified (default), the user must provide a non-\code{NULL} value for the \code{outcome} argument (see above) in order to use
+the built-in function \code{\link[=compute_delta]{compute_delta()}}.}
 
 \item{worsening}{The direction of worsening (\code{'increase'} if higher values correspond to worse disease course, \code{'decrease'} otherwise).\if{html}{\out{<br />}}
 This argument is only used when \code{outcome} is set to \code{NULL}. Otherwise, \code{worsening} is automatically set to
@@ -83,9 +84,9 @@ and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 \item{event}{Specifies which events to detect. Must be one of the following:
 \itemize{
 \item{\code{'firstCDW'}}{ (first confirmed disability worsening (CDW), default);}
-\item{\code{'first'}}{ (only the very first confirmed event - improvement or worsening);}
-\item{\code{'firsteach'}}{ (first confirmed disability improvement and first CDW - in chronological order);}
-\item{\code{'firstCDWtype'}}{ (first CDW of each kind - PIRA, RAW, and undefined, in chronological order);}
+\item{\code{'first'}}{ (only the very first confirmed event -- improvement or worsening);}
+\item{\code{'firsteach'}}{ (first confirmed disability improvement and first CDW -- in chronological order);}
+\item{\code{'firstCDWtype'}}{ (first CDW of each kind -- PIRA, RAW, and undefined, in chronological order);}
 \item{\code{'firstPIRA'}}{ (first PIRA);}
 \item{\code{'firstRAW'}}{ (first RAW);}
 \item{\code{'multiple'}}{ (all events in chronological order).}
@@ -94,28 +95,36 @@ and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 \item{baseline}{Specifies the baseline scheme. Must be one of the following:
 \itemize{
 \item{\code{'fixed'}}{ (first valid outcome value, default);}
-\item{\code{'roving_impr'}}{ (updated every time the value is lower than the previous measure and confirmed at the following visit;
+\item{\code{'roving_impr'}}{ (updated after every confirmed disability improvement to the visit determined by \code{proceed_from};
 suitable for a first-CDW setting to discard fluctuations around baseline);}
-\item{\verb{'roving'``\}\{ (updated after each event to last valid confirmed outcome value; suitable for a multiple-event setting - i.e., when }event\verb{is set to}'multiple'\verb{, }'firsteach'\verb{, or }'firstCDWtype'` - or when searching for a specific type of CDW
-\itemize{
-\item i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}).}
-}
+\item{\code{'roving'}}{ (updated after each improvement or worsening event to the visit determined by \code{proceed_from};
+suitable for a multiple-event setting -- i.e., when \code{event} is set to \code{'multiple'},
+\code{'firsteach'}, or \code{'firstCDWtype'} -- or when searching for a specific type of CDW
+-- i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}).}
 }}
 
-\item{proceed_from}{After detecting a confirmed disability event, continue searching after the first
-qualifying confirmation visit if \code{proceed_from='firstconf'}, after the event date if \code{proceed_from='event'}.
-When rebaselining after a confirmed disability event (if \code{baseline='roving'} or \code{baseline='roving_impr'}),
-the baseline is moved to the first qualifying confirmation visit if \code{proceed_from='firstconf'},
-to the event date if \code{proceed_from='event'}.}
+\item{proceed_from}{After detecting a confirmed disability event, continue searching:
+\itemize{
+\item{}{from the next visit after the first qualifying confirmation visit if \code{proceed_from='firstconf'};}
+\item{}{from the next visit after the event if \code{proceed_from='event'}.}
+}
+If \code{baseline='roving'} or \code{baseline='roving_impr'}, when rebaselining after a confirmed disability event,
+the baseline is moved to:
+\itemize{
+\item{}{the first qualifying confirmation visit if \code{proceed_from='firstconf'};}
+\item{}{the event visit if \code{proceed_from='event'}.}
+}}
 
 \item{sub_threshold_rebl}{This argument is only used if \code{baseline='roving'} or \code{baseline='roving_impr'}.
 Must be one of the following:
 \itemize{
-\item{\code{'event'}:}{ move roving baseline at any, possibly sub-threshold, confirmed event
-(i.e. any confirmed change in outcome measure, regardless of \code{delta_fun});}
-\item{\code{'improvement'}:}{ move roving baseline at any, possibly sub-threshold, confirmed improvement
-(i.e. any confirmed improvement in outcome measure, regardless of \code{delta_fun});}
-\item{\verb{'worsening'``:\}\{ move roving baseline at any, possibly sub-threshold, confirmed worsening (i.e. any confirmed worsening in outcome measure, regardless of }delta_fun\verb{);\} \\item\{}'none'``:}{ only use valid confirmed events (as per \code{delta_fun}) for rebaseline.}
+\item{\code{'event'}:}{ any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
+regardless of \code{delta_fun}) can potentially trigger a re-baseline;}
+\item{\code{'improvement'}:}{ any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
+regardless of \code{delta_fun}) can potentially trigger a re-baseline;}
+\item{\code{'worsening'}:}{ any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
+regardless of \code{delta_fun}) can potentially trigger a re-baseline;}
+\item{\code{'none'}:}{ only use valid confirmed events (as per \code{delta_fun}) for rebaseline.}
 }}
 
 \item{bl_geq}{This argument is only used if the baseline is moved.
@@ -143,9 +152,9 @@ In all cases, the right end of the interval is ignored if \code{conf_unbounded_r
 
 \item{require_sust_days}{Minimum number of days over which a confirmed change must be sustained
 (i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
-Events sustained for the remainder of the follow-up period are retained regardless of follow-up duration.
+Events sustained for the remainder of the follow-up period are always retained regardless of follow-up duration.
 Setting \code{require_sust_days=Inf}, events are retained only when sustained for the remainder of the follow-up period.\if{html}{\out{<br />}}
-(Warning: if \code{check_intermediate} is set to \code{FALSE}, \emph{only the end} of the specified period will be checked for confirmation.)}
+(Warning: if \code{check_intermediate} is set to \code{FALSE}, sustained change will be established based \emph{only on the end} of the specified period.)}
 
 \item{check_intermediate}{If \code{TRUE} (default), events are confirmed \emph{over all intermediate visits}
 up to the confirmation visit. \if{html}{\out{<br />}}
@@ -156,26 +165,26 @@ events will be confirmed \emph{only at} the specified confirmation visit
 \item{relapse_to_bl}{Minimum distance from a relapse (days) for a visit to be used as baseline.
 Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
 (minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
-Note that setting the distance to zero means keeping the baseline regardless of surrounding relapses.
+Note that setting the distance to zero means keeping the baseline where it is regardless of surrounding relapses.
 If relapse end dates are available (\code{renddate_col}), the minimum distance from last relapse
 is overwritten by the relapse duration, unless it was set to zero (in which case it stays 0).
-If the designated baseline does not not respect this constraint, the baseline is moved to the next available visit.}
+If the designated baseline does not respect this constraint, the baseline is moved to the next available visit.}
 
 \item{relapse_to_event}{Minimum distance from a relapse (days) for an event to be considered as such.
 Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
 (minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
-Note that setting the distance to zero means keeping the event regardless of surrounding relapses.
+Note that setting the distance to zero means retaining the event regardless of surrounding relapses.
 If relapse end dates are available (\code{renddate_col}), the minimum distance from last relapse
 is overwritten by the relapse duration, unless it was set to zero (in which case it stays 0).}
 
 \item{relapse_to_conf}{Minimum distance from a relapse (days) for a visit to be a valid confirmation visit.
 Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
 (minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
-Note that setting the distance to zero means keeping a confirmation visit regardless of surrounding relapses.
+Note that setting the distance to zero means using any visit for confirmation regardless of surrounding relapses.
 If relapse end dates are available (\code{renddate_col}), the minimum distance from last relapse
 is overwritten by the relapse duration, unless it was set to zero (in which case it stays 0).}
 
-\item{relapse_assoc}{Maximum distance from a relapse (days) for a CDW event to be considered as RAW.
+\item{relapse_assoc}{Maximum distance from a relapse (days) for a CDW event to be classified as RAW.
 Can be an integer (maximum distance from \emph{last} relapse) or list-like of length 2
 (maximum distance from \emph{last} relapse, maximum distance from \emph{next} relapse).
 If relapse end dates are available (\code{renddate_col}), the maximum distance from last relapse
@@ -183,7 +192,7 @@ is overwritten by the relapse duration.}
 
 \item{relapse_indep}{Specifies relapse-free intervals for PIRA definition.
 Must be given in the form produced by function \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}} by calling
-\code{relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1)}
+\cr\code{relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1)}\cr
 to specify the intervals around baseline (\code{b0} and \code{b1}),
 event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For instance:
 \itemize{
@@ -198,7 +207,7 @@ If relapse end dates are available (\code{renddate_col}), it is possible to defi
 by setting \code{use_end_dates=T} in \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}}.}
 
 \item{impute_last_visit}{Imputation probability for worsening events occurring at last visit (i.e. with no confirmation).
-Unconfirmed worsening events occurring al the last visit are never imputed if \code{impute_last_visit=0};
+Unconfirmed worsening events occurring at the last visit are never imputed if \code{impute_last_visit=0};
 they are always imputed if \code{impute_last_visit=1};
 they are imputed with probability \code{p}, \verb{0<p<1}, if \code{impute_last_visit=p}.
 If a value \code{N>1} is passed, unconfirmed worsening events are imputed only if occurring within \code{N} days of follow-up
@@ -206,11 +215,13 @@ If a value \code{N>1} is passed, unconfirmed worsening events are imputed only i
 
 \item{date_format}{Format of dates in the input data. If not specified, it will be inferred by function \code{\link[=as.Date]{as.Date()}}.}
 
-\item{include_dates}{If \code{TRUE}, report dates of events.}
+\item{include_dates}{If \code{TRUE}, \code{output$results} will include the date of each event (\code{'date'} column)
+and the date of the corresponding baseline (\code{'bldate'} column).}
 
-\item{include_value}{If \code{TRUE}, report value of outcome at event.}
+\item{include_value}{If \code{TRUE},  \code{output$results} will include the outcome value at each event (\code{'value'} column)
+and at the corresponding baseline (\code{'blvalue'} column).}
 
-\item{include_stable}{If \code{TRUE}, subjects with no confirmed events are included in extended output \code{data.frame},
+\item{include_stable}{If \code{TRUE}, subjects with no confirmed events are included in \code{output$results},
 with \code{time2event} = total follow up.}
 
 \item{verbose}{One of:
@@ -247,14 +258,22 @@ the definition of progression independent of relapse activity (PIRA) is establis
 around the baseline, CDW event, and confirmation visits (\code{relapse_indep} argument).
 }
 \examples{
-# EDSS course
+# 1. EDSS course
 output_edss <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=1)
 print(output_edss$results) # extended info on each event for all subjects
 print(output_edss$event_count) # summary of event sequence for each subject
-# SDMT course
+# 2. SDMT course
 output_sdmt <- MSprog(toydata_visits, 'id', 'SDMT', 'date', 'sdmt',
+    relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
+    event='multiple', baseline='roving', verbose=1)
+print(output_sdmt$results) # extended info on each event for all subjects
+print(output_sdmt$event_count) # summary of event sequence for each subject
+# 3. SDMT course, with a custom delta function
+my_sdmt_delta <- function(reference_value) {min(c(reference_value/5, 4))}
+output_sdmt <- MSprog(toydata_visits, 'id', 'SDMT', 'date', NULL,
+    delta_fun=my_sdmt_delta,
     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=1)
 print(output_sdmt$results) # extended info on each event for all subjects
