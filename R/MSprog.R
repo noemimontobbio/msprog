@@ -192,25 +192,25 @@
 #' @export
 #' @examples
 #' # 1. EDSS course
-#' output_edss <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
+#' output <- MSprog(toydata_visits, subj_col='id', value_col='EDSS', date_col='date', outcome='edss',
 #'     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=1)
-#' print(output_edss$results) # extended info on each event for all subjects
-#' print(output_edss$event_count) # summary of event sequence for each subject
+#' print(output$results) # extended info on each event for all subjects
+#' print(output$event_count) # summary of event sequence for each subject
 #' # 2. SDMT course
-#' output_sdmt <- MSprog(toydata_visits, 'id', 'SDMT', 'date', 'sdmt',
+#' output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
 #'     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=1)
-#' print(output_sdmt$results) # extended info on each event for all subjects
-#' print(output_sdmt$event_count) # summary of event sequence for each subject
+#' print(output$results) # extended info on each event for all subjects
+#' print(output$event_count) # summary of event sequence for each subject
 #' # 3. SDMT course, with a custom delta function
 #' my_sdmt_delta <- function(reference_value) {min(c(reference_value/5, 4))}
-#' output_sdmt <- MSprog(toydata_visits, 'id', 'SDMT', 'date', NULL,
+#' output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
 #'     delta_fun=my_sdmt_delta,
 #'     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=1)
-#' print(output_sdmt$results) # extended info on each event for all subjects
-#' print(output_sdmt$event_count) # summary of event sequence for each subject
+#' print(output$results) # extended info on each event for all subjects
+#' print(output$event_count) # summary of event sequence for each subject
 MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, renddate_col=NULL,
                    subjects=NULL, delta_fun=NULL, worsening=NULL, event='firstCDW',
