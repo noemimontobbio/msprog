@@ -47,12 +47,15 @@ print.MSprogOutput <- function(x, ...) {
   }
 
   if (length(s$relapse_indep[['event']])==2) {
+    prec <- ifelse(s$relapse_indep[['prec_type']]=='baseline', 'the baseline',
+                   ifelse(s$relapse_indep[['prec_type']]=='last', 'the last visit preceding the event',
+                          paste0('the last pre-worsening visit')))
   pira_text <- ''
-  for (point in c('bl', 'event', 'conf')) {
+  for (point in c('prec', 'event', 'conf')) {
     if (!(is.null(s$relapse_indep[[point]][[1]]) & is.null(s$relapse_indep[[point]][[2]]))
         & !((!is.null(s$relapse_indep[[point]][[1]]) && (s$relapse_indep[[point]][[1]]==0))
             & (!is.null(s$relapse_indep[[point]][[2]]) && (s$relapse_indep[[point]][[2]]==0)))) {
-      pp <- ifelse(point=='bl', 'baseline', ifelse(point=='event', 'the event', 'confirmation'))
+      pp <- ifelse(point=='prec', prec, ifelse(point=='event', 'the event', 'confirmation'))
       pira_text <- paste0(pira_text, ifelse(!is.null(s$relapse_indep[[point]][[1]]), paste0('from ',
                   ifelse(s$relapse_indep[[point]][[1]]>0, paste0(s$relapse_indep[[point]][[1]],
                                                                  ' days before '), ''), pp), ''))
@@ -117,7 +120,7 @@ print.MSprogOutput <- function(x, ...) {
     ifelse(s$relapse_rebl, paste0('The onset of each relapse', ifelse(s$baseline=='fixed', '', ' also'),
             ' prompted a re-baseline to the next available visit',
             ifelse(s$relapse_to_bl[1]>0 | s$relapse_to_bl[2]>0, ' out of relapse influence. ', '. ')), ''),
-    ifelse(s$skip_local_extrema & (s$relapse_to_bl[1]>0 || s$relapse_to_bl[2]>0 || s$relapse_rebl || s$baseline!='fixed'),
+    ifelse(s$skip_local_extrema!='none' & (s$relapse_to_bl[1]>0 || s$relapse_to_bl[2]>0 || s$relapse_rebl || s$baseline!='fixed'),
            'Local minima or maxima were skipped when updating the baseline. ', ''),
     ifelse(s$impute_last_visit>0, paste0('CDWs ', ifelse(s$impute_last_visit<Inf & s$impute_last_visit>=1,
                           paste0('of patients terminating follow-up before day ', s$impute_last_visit, ' '), ''),

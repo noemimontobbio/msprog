@@ -303,7 +303,7 @@ output <- MSprog(data=toydata_visits,
                  subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
                  relapse=toydata_relapses, subjects=2,
                  event='multiple', baseline='roving', 
-                 relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0),
+                 relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=NULL, c0=NULL, c1=0),
                  conf_days=c(7*12,7*24), verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
@@ -317,7 +317,7 @@ output <- MSprog(data=toydata_visits,
                  subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
                  relapse=toydata_relapses, subjects=2,
                  event='multiple', baseline='roving', 
-                 relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0),
+                 relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=NULL, c0=NULL, c1=0),
                  conf_days=c(7*12,7*24), require_sust_days=7*48, verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
@@ -328,7 +328,7 @@ output <- MSprog(data=toydata_visits,
                  subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
                 relapse=toydata_relapses, subjects=2,
                 event='multiple', baseline='roving', 
-                relapse_indep=relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0),
+                relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=NULL, c0=NULL, c1=0),
                 relapse_rebl=TRUE,
                 conf_days=c(7*12,7*24), require_sust_days=7*48, verbose=0)
 print(output$results, row.names=FALSE) # results
@@ -354,16 +354,16 @@ RAW events are typically defined as confirmed disability worsening events occurr
 In the literature, PIRA is typically defined by requiring an absence of relapses within appropriate intervals based on the dates of the baseline visit, the worsening event, and the confirmation visit [@kappos2020; @cagol2022; @muller2023]. The `relapse_indep` argument in `MSprog()` allows to specify custom relapse-free intervals. The argument must be provided in the form produced by the auxiliary function `relapse_indep_from_bounds()`, as follows:
 ``` {r, eval=FALSE}
 output <- MSprog(...
-                 relapse_indep=relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1),
+                 relapse_indep=relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1),
                  ...)
 ```
-where: `b0` and `b1` specify the interval around the baseline visit; `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If the right end (`b1` or `e1`) is `NULL`, the interval is assumed to extend up to the left end of the next interval. If the left end is `NULL`  (`e0` or `c0`), the interval is assumed to extend up to the right end of the previous interval. 
+where: `p0` and `p1` specify the interval around a visit preceding the event (can be current reference, last visit preceding the event, or last visit `i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`[^pira]); `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If the right end (`b1` or `e1`) is `NULL`, the interval is assumed to extend up to the left end of the next interval. If the left end is `NULL`  (`e0` or `c0`), the interval is assumed to extend up to the right end of the previous interval. 
 
-```{r echo=FALSE, out.width="50%", fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `b0`, `b1`, `e0`, `e1`, `c0`, `c1`.*"}
+```{r echo=FALSE, out.width="50%", fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `p0`, `p1`, `e0`, `e1`, `c0`, `c1`.*"}
 knitr::include_graphics(paste0(getwd(), 'relapse_indep_def.png'))
 ```
 
-For example, in @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation visit for a CDW event to be considered as PIRA. This translates into: `b0<-0`, `b1<-0`, `e0<-90`, `e1<-30`, `c0<-90`, `c1<-30`. When a high specificity is desired, they recommend an absence of relapses in the whole period between the reference visit and the confirmation visit, which is implemented by setting: `b0<-0`, `b1<-NULL`, `e0<-NULL`, `e1<-NULL`, `c0<-NULL`, `c1<-0`. 
+For example, in @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation visit for a CDW event to be considered as PIRA. This translates into: `p0<-0`, `p1<-0`, `e0<-90`, `e1<-30`, `c0<-90`, `c1<-30`. When a high specificity is desired, they recommend an absence of relapses in the whole period between the reference visit and the confirmation visit, which is implemented by setting: `p0<-0`, `p1<-NULL`, `e0<-NULL`, `e1<-NULL`, `c0<-NULL`, `c1<-0`. 
 
 <br />
 

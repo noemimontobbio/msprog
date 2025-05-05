@@ -89,9 +89,19 @@
 #' If `TRUE`, the new reference value must always be greater or equal than the previous one;
 #' when it is not, the old reference value is assigned to it \[2\].
 #' @param relapse_rebl If `TRUE`, re-baseline after every relapse.
-#' @param skip_local_extrema If `TRUE`, the baseline cannot be placed at a local minimum or maximum.
-#' A visit `i` is a local minimum point for `outcome` if `outcome(i+1)-outcome(i)>=delta_fun(outcome(i))`
-#' and `outcome(i-1)-outcome(i)>=delta_fun(outcome(i))`. Local maxima are defined similarly.
+#' @param skip_local_extrema This argument is only used if the baseline is moved.
+#' It controls function behaviour in the presence of local minima or maxima.
+#' Must be one of the following.
+#' \itemize{
+#' \item{`'none'`:}{ local extrema are always accepted as valid baseline values.}
+#' \item{`'delta'`:}{ the baseline cannot be placed at a \emph{strict} local minimum or maximum, where:
+#' visit `i` is a strict local minimum point for `outcome` if <br /> `outcome[i+1]-outcome[i]>=delta_fun(outcome[i])`;
+#' <br /> `outcome[i-1]-outcome[i]>=delta_fun(outcome[i])`. <br />
+#' Strict local maxima are defined similarly.}
+#' \item{`'all'`:}{ the baseline cannot be placed at a local minimum or maximum, where:
+#' visit `i` is a local minimum point for `outcome` if `outcome[i+1]>outcome[i]`
+#' and `outcome[i-1]>outcome[i]`; local maxima are defined similarly.}
+#' }
 #' @param validconf_col Name of data column specifying which visits can (`T`) or cannot (`F`) be used as confirmation visits.
 #' The input data does not necessarily have to include such a column.
 #' If `validconf_col=NULL`, all visits are potentially used as confirmation visits.
@@ -137,17 +147,9 @@
 #' is overwritten by the relapse duration.
 #' @param relapse_indep Specifies relapse-free intervals for PIRA definition.
 #' Must be given in the form produced by function [relapse_indep_from_bounds()] by calling
-#' \cr`relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1)`\cr
-#' to specify the intervals around baseline (`b0` and `b1`),
-#' event (`e0` and `e1`), and confirmation (`c0` and `c1`). For instance:
-#' \itemize{
-#' \item{No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd \[1\]:
-#' \cr`relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)` (default);}
-#' \item{No relapses between baseline and confirmation (high-specificity definition from \[1\]):
-#' \cr`relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)`;}
-#' \item{No relapses within baseline->event+30dd and within confirmation+-30dd \[2\]:
-#' \cr`relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)`}
-#' }
+#' \cr`relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1)`\cr
+#' to specify the intervals around preceding visit, e.g., baseline (`p0` and `p1`),
+#' event (`e0` and `e1`), and confirmation (`c0` and `c1`).
 #' If relapse end dates are available (`renddate_col`), it is possible to define PIRA based on those
 #' by setting `use_end_dates=T` in [relapse_indep_from_bounds()].
 #' @param impute_last_visit Imputation probability for worsening events occurring at last visit (i.e. with no confirmation).
@@ -215,7 +217,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, renddate_col=NULL,
                    subjects=NULL, delta_fun=NULL, worsening=NULL, event='firstCDW',
                    baseline='fixed', proceed_from='firstconf', sub_threshold_rebl='none',
-                   bl_geq=F, relapse_rebl=F, skip_local_extrema=F,
+                   bl_geq=F, relapse_rebl=F, skip_local_extrema='none',
                    validconf_col=NULL, conf_days=12*7, conf_tol_days=c(7,2*365.25), conf_unbounded_right=F, require_sust_days=0, check_intermediate=T,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30,
                    relapse_assoc=90, relapse_indep=NULL,
@@ -403,7 +405,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
   # Define relapse-free intervals for PIRA definition
   if (is.null(relapse_indep)) {
-    relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)
+    relapse_indep <- relapse_indep_from_bounds(p0=0, p1=0, e0=90, e1=30, c0=90, c1=30)
   }
 
 
@@ -526,12 +528,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     while (proceed) {
 
       # Set baseline (skip if within relapse influence)
-      if (skip_local_extrema) {
+      if (skip_local_extrema!='none') {
         prec <- ifelse(bl_idx==1, data_id[bl_idx,][[value_col]], data_id[bl_idx-1,][[value_col]])
         subs <- ifelse(bl_idx==nvisits, data_id[bl_idx,][[value_col]], data_id[bl_idx+1,][[value_col]])
         vis <- data_id[bl_idx,][[value_col]]
-        local_extr <- (isevent_loc(prec, baseline=vis, type='wors') && isevent_loc(subs, baseline=vis, type='wors')) || (
-                        isevent_loc(prec, baseline=vis, type='impr') && isevent_loc(subs, baseline=vis, type='impr'))
+        local_extr <- (isevent_loc(prec, baseline=vis, type='wors', st=skip_local_extrema=='all')
+                       && isevent_loc(subs, baseline=vis, type='wors', st=skip_local_extrema=='all')) || (
+                        isevent_loc(prec, baseline=vis, type='impr', st=skip_local_extrema=='all')
+                        && isevent_loc(subs, baseline=vis, type='impr', st=skip_local_extrema=='all'))
       } else {
         local_extr <- F
       }
@@ -547,12 +551,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         bl_idx <- bl_idx + 1
         search_idx <- search_idx + 1
         #
-        if (skip_local_extrema) {
+        if (skip_local_extrema != 'none') {
           prec <- ifelse(bl_idx==1, data_id[bl_idx,][[value_col]], data_id[bl_idx-1,][[value_col]])
           subs <- ifelse(bl_idx==nvisits, data_id[bl_idx,][[value_col]], data_id[bl_idx+1,][[value_col]])
           vis <- data_id[bl_idx,][[value_col]]
-          local_extr <- (isevent_loc(prec, baseline=vis, type='wors') && isevent_loc(subs, baseline=vis, type='wors')) || (
-            isevent_loc(prec, baseline=vis, type='impr') && isevent_loc(subs, baseline=vis, type='impr'))
+          local_extr <- (isevent_loc(prec, baseline=vis, type='wors', st=skip_local_extrema=='all')
+                         && isevent_loc(subs, baseline=vis, type='wors', st=skip_local_extrema=='all')) || (
+                        isevent_loc(prec, baseline=vis, type='impr', st=skip_local_extrema=='all')
+                        && isevent_loc(subs, baseline=vis, type='impr', st=skip_local_extrema=='all'))
         } else {
           local_extr <- F
         }
@@ -869,39 +875,52 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                         || length(relapse_indep[['conf']]==2)) { # or they are provided but not used for PIRA (`use_end_dates=F` in `relapse_indep_from_bounds`)
 
                       # Compute intervals that must be relapse-free for PIRA definition
-                    left <- right <- list() # left/right borders of relapse-free intervals
-                    for (iic in 1:length(conf_idx)) {
-                      left[[iic]] <- list() # left borders of relapse-free intervals for current confirmation visit
-                      right[[iic]] <- list() # right borders of relapse-free intervals for current confirmation visit
-                      ic <- conf_idx[[iic]]
-                      for (point in c('bl', 'event', 'conf')) {
-                        t <- ifelse(point == 'bl', bl[[date_col]],
-                                    ifelse(point == 'event', data_id[change_idx,][[date_col]],
-                                           data_id[ic,][[date_col]]))
+                      if (relapse_indep[['prec_type']]=='baseline') {
+                        prec <- bl
+                      } else if (relapse_indep[['prec_type']]=='last') {
+                        prec <- data_id[change_idx - 1,]  # last visit before the event
+                      } else {
+                        valid_ref <- F
+                        iref <- change_idx
+                        while (iref>1 && !valid_ref) {
+                          iref <- iref - 1
+                          valid_ref <- isevent_loc(data_id[change_idx,], baseline=data_id[iref,], type='wors')
+                        }
+                        if (valid_ref) {prec <- data_id[iref,]} else {prec <- bl}   # last pre-worsening visit
+                      }
+                      left <- right <- list() # left/right borders of relapse-free intervals
+                      for (iic in 1:length(conf_idx)) {
+                        left[[iic]] <- list() # left borders of relapse-free intervals for current confirmation visit
+                        right[[iic]] <- list() # right borders of relapse-free intervals for current confirmation visit
+                        ic <- conf_idx[[iic]]
+                        for (point in c('prec', 'event', 'conf')) {
+                          t <- ifelse(point == 'prec', prec[[date_col]],
+                                      ifelse(point == 'event', data_id[change_idx,][[date_col]],
+                                             data_id[ic,][[date_col]]))
 
-                        if (!is.null(relapse_indep[[point]][[1]])) {
-                          t0 <- t - relapse_indep[[point]][[1]]
-                        } # for bl, a value for t0 is always set;
-                          # for the other points, if not set, the values is recovered from previous interval.
+                          if (!is.null(relapse_indep[[point]][[1]])) {
+                            t0 <- t - relapse_indep[[point]][[1]]
+                          } # for prec, a value for t0 is always set;
+                            # for the other points, if not set, the values is recovered from previous interval.
 
-                        if (!is.null(relapse_indep[[point]][[2]])) {
-                          t1 <- t + relapse_indep[[point]][[2]]
-                          # t1 is set as soon as a right bound is found.
+                          if (!is.null(relapse_indep[[point]][[2]])) {
+                            t1 <- t + relapse_indep[[point]][[2]]
+                            # t1 is set as soon as a right bound is found.
 
-                          if (t1 > t0) {
-                            left[[iic]] <- append(left[[iic]], t0)
-                            right[[iic]] <- append(right[[iic]], t1)
+                            if (t1 > t0) {
+                              left[[iic]] <- append(left[[iic]], t0)
+                              right[[iic]] <- append(right[[iic]], t1)
+                            }
                           }
                         }
                       }
-                    }
 
-                    # Check if confirmation visits meet relapse-free interval rules
-                    rel_inbetween <- sapply(1:length(conf_idx), function(iic) {
-                      any(sapply(1:length(left[[iic]]), function(j) {
-                        any((left[[iic]][j] <= relapse_dates) & (relapse_dates <= right[[iic]][j]))
-                      }))
-                    })
+                      # Check if confirmation visits meet relapse-free interval rules
+                      rel_inbetween <- sapply(1:length(conf_idx), function(iic) {
+                        any(sapply(1:length(left[[iic]]), function(j) {
+                          any((left[[iic]][j] <= relapse_dates) & (relapse_dates <= right[[iic]][j]))
+                        }))
+                      })
                     } else {  # if using relapse end dates!
 
                       if (data_id[change_idx,][['closest_rel_before']] < Inf
@@ -1271,9 +1290,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   "within duration of a relapse"), ""),
                 ifelse(relapse_to_bl[2]>0, paste0(ifelse(relapse_to_bl[1]>0, ", <", '<'),
                         relapse_to_bl[2], " days to next relapse"), ""),
-            ifelse(skip_local_extrema, paste0(ifelse(relapse_to_bl[1]==0 && relapse_to_bl[2]==0, "",
+            ifelse(skip_local_extrema!='none', paste0(ifelse(relapse_to_bl[1]==0 && relapse_to_bl[2]==0, "",
                                 ", or "), "local extremum"), ""),
-            ifelse(relapse_to_bl[1]==0 && relapse_to_bl[2]==0 && !skip_local_extrema, '-', ''),
+            ifelse(relapse_to_bl[1]==0 && relapse_to_bl[2]==0 && skip_local_extrema=='none', '-', ''),
             "\nEvent skipped if: ", ifelse(relapse_to_event[1]>0, ifelse(is.null(renddate_col),
                   paste0("<", relapse_to_event[1], " days from last relapse"),
                   "within last relapse duration"), ""),

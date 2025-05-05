@@ -23,7 +23,7 @@ MSprog(
   sub_threshold_rebl = "none",
   bl_geq = F,
   relapse_rebl = F,
-  skip_local_extrema = F,
+  skip_local_extrema = "none",
   validconf_col = NULL,
   conf_days = 12 * 7,
   conf_tol_days = c(7, 2 * 365.25),
@@ -133,9 +133,19 @@ when it is not, the old reference value is assigned to it [2].}
 
 \item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse.}
 
-\item{skip_local_extrema}{If \code{TRUE}, the baseline cannot be placed at a local minimum or maximum.
-A visit \code{i} is a local minimum point for \code{outcome} if \code{outcome(i+1)-outcome(i)>=delta_fun(outcome(i))}
-and \code{outcome(i-1)-outcome(i)>=delta_fun(outcome(i))}. Local maxima are defined similarly.}
+\item{skip_local_extrema}{This argument is only used if the baseline is moved.
+It controls function behaviour in the presence of local minima or maxima.
+Must be one of the following.
+\itemize{
+\item{\code{'none'}:}{ local extrema are always accepted as valid baseline values.}
+\item{\code{'delta'}:}{ the baseline cannot be placed at a \emph{strict} local minimum or maximum, where:
+visit \code{i} is a strict local minimum point for \code{outcome} if \if{html}{\out{<br />}} \code{outcome[i+1]-outcome[i]>=delta_fun(outcome[i])};
+\if{html}{\out{<br />}} \code{outcome[i-1]-outcome[i]>=delta_fun(outcome[i])}. \if{html}{\out{<br />}}
+Strict local maxima are defined similarly.}
+\item{\code{'all'}:}{ the baseline cannot be placed at a local minimum or maximum, where:
+visit \code{i} is a local minimum point for \code{outcome} if \code{outcome[i+1]>outcome[i]}
+and \code{outcome[i-1]>outcome[i]}; local maxima are defined similarly.}
+}}
 
 \item{validconf_col}{Name of data column specifying which visits can (\code{T}) or cannot (\code{F}) be used as confirmation visits.
 The input data does not necessarily have to include such a column.
@@ -192,17 +202,9 @@ is overwritten by the relapse duration.}
 
 \item{relapse_indep}{Specifies relapse-free intervals for PIRA definition.
 Must be given in the form produced by function \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}} by calling
-\cr\code{relapse_indep_from_bounds(b0, b1, e0, e1, c0, c1)}\cr
-to specify the intervals around baseline (\code{b0} and \code{b1}),
-event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}). For instance:
-\itemize{
-\item{No relapses within event-90dd->event+30dd and within confirmation-90dd->confirmation+30dd [1]:
-\cr\code{relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)} (default);}
-\item{No relapses between baseline and confirmation (high-specificity definition from [1]):
-\cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)};}
-\item{No relapses within baseline->event+30dd and within confirmation+-30dd [2]:
-\cr\code{relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)}}
-}
+\cr\code{relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1)}\cr
+to specify the intervals around preceding visit, e.g., baseline (\code{p0} and \code{p1}),
+event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}).
 If relapse end dates are available (\code{renddate_col}), it is possible to define PIRA based on those
 by setting \code{use_end_dates=T} in \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}}.}
 

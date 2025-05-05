@@ -1,21 +1,44 @@
 
 #' Define relapse-free intervals for PIRA definition.
 #'
-#' `relapse_indep_from_bounds()` organises the given interval bounds around baseline, event, and confirmation
+#' `relapse_indep_from_bounds()` organises the given interval bounds
 #' into a named list to be given as argument `relapse_indep` to function [MSprog()].
+#' The relapse-free intervals may be anchored to (any subset of) the following three data-driven checkpoints.
+#' \itemize{
+#' \item{`'prec'`:}{ a visit preceding the event: can be (i) the current baseline, (ii) the last visit before the event,
+#' or (iii) the last pre-worsening visit (`i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`);}
+#' \item{`'event'`:}{ the disability worsening event;}
+#' \item{`'conf'`:}{ the (first) confirmation visit.}
+#' }
 #'
-#' If the right end is `NULL`, the interval is assumed to extend up to the left end of the next interval.
+#' If both ends of an interval are 0 (e.g., if both `p0=0` and `p1=0`), the checkpoint is ignored. If the right end is `NULL`, the interval is assumed to extend up to the left end of the next interval.
 #' If the left end is `NULL`, the interval is assumed to extend up to the right end of the previous interval.
+#' Here are some examples:
+#' \itemize{
+#' \item{No relapses from 90dd before to 30dd after the event, and from 90dd before to 30dd after the confirmation \[1\]:
+#' \cr`relapse_indep_from_bounds(e0=90,e1=30,c0=90,c1=30)`;}
+#' \item{No relapses between baseline and confirmation (high-specificity definition from \[1\]):
+#' \cr`relapse_indep_from_bounds(p0=0,p1=NULL,e0=NULL,e1=NULL,c0=NULL,c1=0)`;}
+#' \item{No relapses from baseline to 30dd after the event, and within confirmation+-30dd \[2\]:
+#' \cr`relapse_indep_from_bounds(p0=0,p1=NULL,e0=NULL,e1=30,c0=30,c1=30)`.}
+#' }
 #'
-#' @param b0 Days before baseline (`>=0`).
-#' @param b1 Days after baseline (`>=0`), or `NULL`.
+#' @param p0 Days before preceding visit (`>=0`).
+#' @param p1 Days after preceding visit (`>=0`), or `NULL`.
 #' @param e0 Days before event (`>=0`), or `NULL`.
 #' @param e1 Days after event (`>=0`), or `NULL`.
 #' @param c0 Days before confirmation (`>=0`), or `NULL`.
 #' @param c1 Days after confirmation (`>=0`).
+#' @param prec_type Which visit to use as "preceding visit". Must be one of:
+#' \itemize{
+#' \item{`'baseline'`:}{ the current baseline;}
+#' \item{`'last'`:}{ the last visit before the event;}
+#' \item{`'last_lower'`:}{ the last pre-worsening visit, i.e.,
+#' the last visit `i` where `outcome[event] - outcome[i] >= delta_fun(outcome[i])`.}
+#' }
 #' @param use_end_dates If `TRUE`, only the right bounds (`e1`, `c1`) are used,
 #' as the right bounds will be defined by the onset-to-end interval of each relapse.
-#' This option is only relevant when relapse end dates are available.
+#' This option is only relevant when relapse \emph{end} dates are available.
 #'
 #' @references
 #' \[1\] Müller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli Ö, et al.
@@ -28,23 +51,18 @@
 #'
 #' @return A named list to be given as argument `relapse_indep` to function [MSprog()]
 #' @export relapse_indep_from_bounds
-#' @examples
-#' # No relapses between baseline and confirmation (high-specificity definition from [1]):
-#' relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,NULL,NULL,0)
-#' # No relapses within event-90dd->event+30dd
-#' # and within confirmation-90dd->confirmation+30dd [1]:
-#' relapse_indep <- relapse_indep_from_bounds(0,0,90,30,90,30)
-#' # No relapses within baseline->event+30dd and within confirmation+-30dd [2]:
-#' relapse_indep <- relapse_indep_from_bounds(0,NULL,NULL,30,30,30)
-relapse_indep_from_bounds <- function(b0=0, b1=0, e0=90, e1=30, c0=90, c1=30, use_end_dates=F) {
-  for (p in c(b0, b1, e0, e1, c0, c1)) {
+relapse_indep_from_bounds <- function(p0=0, p1=0, e0=0, e1=0, c0=0, c1=0, prec_type='baseline', use_end_dates=F) {
+  if (!(prec_type %in% c('baseline', 'last', 'last_lower'))) {
+    stop('invalid value for `prec_type` argument, please provide one of: \'baseline\', \'last\', \'last_lower\'')
+  }
+  for (p in c(p0, p1, e0, e1, c0, c1)) {
     if (!is.null(p) & p<0) {
       stop('invalid bounds: please either provide `NULL` or a non-negative number')
     }
   }
 
-  if (is.null(b0) & !use_end_dates) {
-    stop('`b0` cannot be `NULL`: please provide a non-negative number')
+  if (is.null(p0) & !use_end_dates) {
+    stop('`p0` cannot be `NULL`: please provide a non-negative number')
   }
   if (is.null(c1)) {
     stop('`c1` cannot be `NULL`: please provide a non-negative number')
@@ -59,7 +77,7 @@ relapse_indep_from_bounds <- function(b0=0, b1=0, e0=90, e1=30, c0=90, c1=30, us
   if (use_end_dates) {
     list('event'=e1, 'conf'=c1)
   } else {
-  list('bl'=list(b0, b1), 'event'=list(e0, e1), 'conf'=list(c0, c1))
+  list('prec'=list(p0, p1), 'event'=list(e0, e1), 'conf'=list(c0, c1), 'prec_type'=prec_type)
   }
 }
 
