@@ -64,15 +64,15 @@ relapse_indep_from_bounds <- function(p0=0, p1=0, e0=0, e1=0, c0=0, c1=0, prec_t
   if (is.null(p0) & !use_end_dates) {
     stop('`p0` cannot be `NULL`: please provide a non-negative number')
   }
-  if (is.null(c1)) {
+  if (is.null(c1) & !use_end_dates) {  #if (is.null(c1))
     stop('`c1` cannot be `NULL`: please provide a non-negative number')
   }
 
-  for (p in c(e1, c1)) {
-  if (use_end_dates & (is.null(p) || p<0)) {
-    stop('invalid bounds: please provide a non-negative number')
-    }
-  }
+  # for (p in c(e1, c1)) {
+  # if (use_end_dates & (is.null(p) || p<0)) {
+  #   stop('invalid bounds: please provide a non-negative number')
+  #   }
+  # }
 
   if (use_end_dates) {
     list('event'=e1, 'conf'=c1)

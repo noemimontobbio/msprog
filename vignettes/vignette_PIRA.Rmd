@@ -52,10 +52,12 @@ For example, in @kappos2020, an absence of relapses was required between the ref
 Such an approach is easily integrated into the `msprog::MSprog` function through its argument `relapse_indep`, allowing to specify custom relapse-free intervals based on *any subset* of the checkpoints 1-3, thus allowing to replicate any of the above-mentioned definitions. The `relapse_indep` argument must be provided in the form produced by function `msprog::relapse_indep_from_bounds()`, as follows:
 ``` {r, eval=FALSE}
 output <- MSprog(...
-                 relapse_indep=relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1, prec_type),
+                 relapse_indep=relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1, prec_type, use_end_dates),
                  ...)
 ```
-where: `p0` and `p1` specify the interval around the preceding visit; `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If the right end (`p1` or `e1`) is `NULL`, the interval is assumed to extend up to the left end of the next interval. If the left end is `NULL`  (`e0` or `c0`), the interval is assumed to extend up to the right end of the previous interval. The `prec_type` argument specifies which preceding visit to take into account (`'baseline'` for current reference, `'last'` for last visit preceding the event, `'last_lower'` for last visit `i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`).
+where: `p0` and `p1` specify the interval around the preceding visit; `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If the right end (`p1` or `e1`) is `NULL`, the interval is assumed to extend up to the left end of the next interval. If the left end is `NULL`  (`e0` or `c0`), the interval is assumed to extend up to the right end of the previous interval. The `prec_type` argument specifies which preceding visit to take into account (`'baseline'` for current reference, `'last'` for last visit preceding the event, `'last_lower'` for last visit `i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`).[^enddates]
+
+[^enddates]: If **end dates** of relapses are available (may be provided as an additional column in the relapse file whose name is specified by argument `renddate_col` in `MSprog()`), the `use_end_dates` argument in `relapse_indep_from_bounds()` controls whether they are used for PIRA or not. The default is `use_end_dates=F`. If `use_end_dates=T`, the provided intervals are ignored and PIRA is defined by the event or the confirmation not falling within the duration (onset to end) of a relapse. 
 
 ```{r echo=FALSE, out.width="50%", fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `p0`, `p1`, `e0`, `e1`, `c0`, `c1`.*"}
 knitr::include_graphics(paste0(getwd(), 'relapse_indep_def.png'))

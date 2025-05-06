@@ -185,19 +185,27 @@ The assessment of the disability evolution strongly depends on the choices made 
 
 * **Fixed baseline** (`baseline='fixed'`, default): the baseline visit is set to be the first available assessment.
 
-* **Improvement-based roving baseline** (`baseline='roving_impr'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed improvement to the first available confirmation visit. **This scheme is suitable for a first-CDW setting to discard fluctuations around the baseline** [@muller2023]. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='improvement'`, for instance, moves the reference value after *any* confirmed improvement, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold improvement events are used to move the baseline, but not listed in the event sequence.
+* **Improvement-based roving baseline** (`baseline='roving_impr'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed improvement. **This scheme is suitable for a first-CDW setting to discard fluctuations around the baseline [@muller2023], but not recommended for clinical trial data as it may break the randomisation**. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='improvement'`, for instance, moves the reference value after *any* confirmed improvement, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold improvement events are used to move the baseline, but not listed in the event sequence.
 
-* **Roving baseline** (`baseline='roving'`): the baseline visit is initially set as the first available assessment, then updated after each event to the first available confirmation visit. **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below). The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='event'`, for instance,  moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold events are used to move the baseline, but not listed in the event sequence.
+* **Worsening-based roving baseline** (`baseline='roving_wors'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed worsening. **This scheme is suitable when the endpoint of interest is a specific type of CDW**: for instance, when searching specifically for PIRA events, the reference should be moved after any previous RAW event; when searching specifically for RAW events, the reference should be moved after any previous PIRA event. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='worsening'`, for instance, moves the reference value after *any* confirmed worsening, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold worsening events are used to move the baseline, but not listed in the event sequence.
+
+* **Roving baseline** (`baseline='roving'`): the baseline visit is initially set as the first available assessment, then updated after each event. **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below), **but not recommended for clinical trial data as it may break the randomisation**. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='event'`, for instance,  moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold events are used to move the baseline, but not listed in the event sequence.
 
 **NOTE.** If the baseline data is stored in a separate file, the user should merge it with the main `data.frame` containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the beginning of the `data.frame` (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). <span style="color: red;">The possibility to directly input a separate file for baseline data may be added in the future.</span>
 
 <br />
 
-If the baseline visit occurs in the vicinity of a clinical relapse, the reference value may be overestimated. The `relapse_to_bl` argument allows to specify the minimum accepted distance (in days) of the baseline visit from the onset of a previous relapse. For instance, if `baseline='fixed'` and `relapse_to_bl=30`, the baseline visit is chosen as the first available visit satisfying the requirement of "not occurring less than 30 days after the onset of a relapse". If the `baseline` argument is set to a roving scheme, the above applies to every baseline change as well.
+When a roving baseline is used, the reference is moved after a previously detected event. The new reference may be set at the date of the previous event (`proceed_from='event'`), or at the first confirmation visit of such event (`proceed_from='firstconf'`, default).
 
-On top of the chosen baseline scheme, *post-relapse re-baseline* @kappos2020 can be applied by setting `relapse_rebl=TRUE` in `MSprog()`. If this is enabled, the onset of each relapse prompts a re-baseline to the next available visit out of relapse influence. 
+If the baseline visit occurs in the vicinity of a clinical relapse, the reference value may be overestimated. The `relapse_to_bl` argument allows to specify the minimum accepted distance (in days) of the baseline visit from the onset of a previous relapse. For instance, if `baseline='fixed'` and `relapse_to_bl=30`, the baseline visit is chosen as the first available visit satisfying the requirement of "no relapses within the preceding 30 days". If two values are provided, they are interpreted as intervals before *and after* the event -- e.g., `relapse_to_bl=c(30, 2)` implements the constraint of "no relapses within the preceding 30 days or within the following 2 days". If relapse **end dates** are available (may be provided as an additional column in the relapse file whose name is specified by argument `renddate_col` in `MSprog()`), the first value of `relapse_to_bl` is overwritten by the relapse duration, unless it was set to 0 (in which case it stays 0 and the baseline is **not** moved based on the influence of previous relapses). If the `baseline` argument is set to a roving scheme, all the above applies to every baseline change as well. 
+
+On top of the chosen baseline scheme, *post-relapse re-baseline* @kappos2020 can be applied by setting `relapse_rebl=TRUE` in `MSprog()`. If this is enabled, the onset of each relapse prompts a re-baseline to the next available visit following the relapse and out of its influence (as per `relapse_to_bl`). 
+
+Due to fluctuations in the data, the new reference value following a re-baseline may fall at a local minimum or maximum of the disability trajectory. These may be excluded for consideration as baseline visits using the `skip_local_extrema` argument in `MSprog()`.
 
 Finally, as an additional constraint, an updated baseline can be forced to have a score greater than or equal to the previous baseline by setting `bl_geq=TRUE` in `MSprog()`.
+
+As already mentioned above, extra caution should be used when applying any re-baseline scheme to randomised data, as moving the reference value based on post-randomisation events can introduce bias (especially if the occurrence of these events is influenced by the treatment). **For clinical trial data, general recommendation is to use a fixed baseline (at the time of randomisation).**
 
 ## Multiple events {#multiple}
 
@@ -205,7 +213,7 @@ The `event` argument allows to specify which events to detect. By default, it is
 
 For example, extracting multiple EDSS events for subject `4` from `toydata_visits` with a **fixed** baseline would result in the following.
 ```{r}
-print(toydata_visits[toydata_visits$id==4, c('date', 'EDSS')], row.names=FALSE) # EDSS visits
+print(toydata_visits[toydata_visits$id==4, c('date', 'EDSS')]) # EDSS visits
 
 output <- MSprog(data=toydata_visits, 
                  subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
@@ -247,9 +255,9 @@ An event is only validated if the change in the outcome value from the current b
 
 The chosen confirmation period depends on the type of study and on the frequency of visits, and can be set in `MSprog()` by using the `conf_days` argument. A tolerance interval around `conf_days` can be specified using the `conf_tol_days` argument, given as a sequence of two integers (left and right tolerance)[^lrtol]. Further, the `conf_unbounded_right` argument allows event confirmation to occur at any visit *after* `conf_days` (i.e., right tolerance set to infinity). Let's see two examples.
 
-i. A common setting for clinical trial data would be: `conf_days=7*12`, `conf_tol_days=0`, `conf_unbounded_right=T`, i.e., "confirmation over 12 or more weeks".
+i. A common setting for **clinical trial data** would be: `conf_days=7*12`, `conf_tol_days=0`, `conf_unbounded_right=T`, i.e., "confirmation over 12 or more weeks".
 
-ii. A common setting for observational data would be: `conf_days=7*24`, `conf_tol_days=c(0,7*12)`, `conf_unbounded_right=F`, i.e., the confirmation visit must lie between 24 weeks after the event, and 36 weeks after the event.
+ii. A common setting for **observational data** would be: `conf_days=7*24`, `conf_tol_days=c(0,7*12)`, `conf_unbounded_right=F`, i.e., the confirmation visit must lie between 24 weeks after the event, and 36 weeks after the event.
 
 [^lrtol]: `conf_tol_days` can also be specified as a single integer if the same tolerance on left and right is desired.
 
@@ -259,7 +267,7 @@ ii. A common setting for observational data would be: `conf_days=7*24`, `conf_to
 
 [^1224]: An event is only confirmed if the value change from baseline is maintained **at all visits up to the confirmation visit**. So an event can only be "confirmed over 24 weeks" and *not* "confirmed over 12 weeks" if there are no valid confirmation visits falling within the 12-week window (unless `check_intermediate=FALSE`).
 
-* If the confirmation visit occurs in the vicinity of a clinical relapse, it is typically considered invalid. The `relapse_to_conf` argument allows to specify the minimum accepted distance (in days) of a confirmation visit from the onset of a previous relapse.
+* If the confirmation visit occurs in the vicinity of a clinical relapse, it is typically considered invalid. The `relapse_to_conf` argument allows to specify the minimum accepted distance (in days) of a confirmation visit from the onset of a previous relapse. For example, `relapse_to_conf=30` implements the constraint "no relapses within the preceding 30 days" for a visit to be used as confirmation. If two values are provided, they are interpreted as intervals before *and after* the event -- e.g., `relapse_to_conf=c(30, 2)` implements the constraint "no relapses within the preceding 30 days or within the following 2 days". If relapse **end dates** are available (may be provided as an additional column in the relapse file whose name is specified by argument `renddate_col` in `MSprog()`), the first value of `relapse_to_conf` is overwritten by the relapse duration, unless it was set to 0 (in which case it stays 0 and confirmation visits are **not** discarded based on the influence of previous relapses).
 
 * By default, a disability worsening occurring at the last available assessment is ignored by `MSprog()`. This behaviour can be changed using the `impute_last_visit` argument. If set to `TRUE`, any disability worsening occurring at the last visit is retained even though unconfirmed. If set to a numeric value N, unconfirmed worsening events are included only if occurring within N days of follow up (e.g., in case of early discontinuation).
 
@@ -293,8 +301,8 @@ The `require_sust_days` argument may be of use in the following scenarios.
 
 Let's look at subject `2` from `toydata_visits`:
 ```{r}
-print(toydata_visits[toydata_visits$id==2,c('date', 'EDSS')], row.names=FALSE) # EDSS visits
-print(toydata_relapses[toydata_relapses$id==2,], row.names=FALSE) # relapses
+print(toydata_visits[toydata_visits$id==2,c('date', 'EDSS')]) # EDSS visits
+print(toydata_relapses[toydata_relapses$id==2,]) # relapses
 ```
 
 The following code detects 12- or 24-week (84- or 168-day) confirmed events for subject `2`. 
@@ -347,7 +355,10 @@ When relevant, relapse data is to be provided using the optional `relapse` argum
 
 ## Relapse-associated worsening (RAW) {#raw}
 
-RAW events are typically defined as confirmed disability worsening events occurring within a specified interval from the onset of a relapse. The length (in days) of such interval can be specified using the `relapse_assoc` argument in `MSprog()`. Common values are 30 or 90 days.
+RAW events are typically defined as CDW events occurring within a specified interval from the onset of a relapse. The length (in days) of such interval can be specified using the `relapse_assoc` argument in `MSprog()`. Common values are 30 or 90 days. Additionally, one may also provide a maximum distance from relapses whose onset is *after* the event. The logic is that the reported onset date of a relapse may be slightly delayed. The examples below illustrate the usage of the `relapse_assoc` argument:
+
+* `relapse_assoc=90` (equivalent to `relapse_assoc=c(90, 0)`): RAW = "a CDW event occurring within 90 days after the onset of a relapse";
+* `relapse_assoc=c(90, 7)`: RAW = "a CDW event occurring no more than 90 days after and no more than 7 days before the onset of a relapse".
 
 ## Progression independent of relapse activity (PIRA) {#pira}
 

@@ -53,28 +53,30 @@
 #' \item{`'firstRAW'`}{ (first RAW);}
 #' \item{`'multiple'`}{ (all events in chronological order).}
 #' }
-#' @param baseline Specifies the baseline scheme. Must be one of the following:
+#' @param baseline Specifies the baseline scheme. Must be one of the following.
 #' \itemize{
-#' \item{`'fixed'`}{ (first valid outcome value, default);}
-#' \item{`'roving_impr'`}{ (updated after every confirmed disability improvement to the visit determined by `proceed_from`;
-#' suitable for a first-CDW setting to discard fluctuations around baseline);}
-#' \item{`'roving'`}{ (updated after each improvement or worsening event to the visit determined by `proceed_from`;
-#' suitable for a multiple-event setting -- i.e., when `event` is set to `'multiple'`,
-#' `'firsteach'`, or `'firstCDWtype'` -- or when searching for a specific type of CDW
-#' -- i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`).}
+#' \item{`'fixed'`:}{ first valid outcome value, default;}
+#' \item{`'roving_impr'`:}{ updated after every confirmed disability improvement (to the visit determined by `proceed_from`);
+#' suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for randomised data;}
+#' \item{`'roving_wors'`:}{ updated after every CDW (to the visit determined by `proceed_from`);
+#' suitable when searching for a specific type of CDW (i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`);}
+#' \item{`'roving'`:}{ updated after each improvement or worsening event to the visit determined by `proceed_from`;
+#' suitable for a multiple-event setting (i.e., when `event` is set to `'multiple'`,
+#' `'firsteach'`, or `'firstCDWtype'`) or when searching for a specific type of CDW
+#' (i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`) -- not recommended for randomised data.}
 #' }
 #' @param proceed_from After detecting a confirmed disability event, continue searching:
 #' \itemize{
 #' \item{}{from the next visit after the first qualifying confirmation visit if `proceed_from='firstconf'`;}
 #'\item{}{from the next visit after the event if `proceed_from='event'`.}
 #' }
-#' If `baseline='roving'` or `baseline='roving_impr'`, when rebaselining after a confirmed disability event,
-#' the baseline is moved to:
+#' If `baseline` is set to `'roving'`, `'roving_impr'`, or `'roving_wors'`,
+#' when rebaselining after a confirmed disability event, the baseline is moved to:
 #' \itemize{
 #' \item{}{the first qualifying confirmation visit if `proceed_from='firstconf'`;}
 #'\item{}{the event visit if `proceed_from='event'`.}
 #' }
-#' @param sub_threshold_rebl This argument is only used if `baseline='roving'` or `baseline='roving_impr'`.
+#' @param sub_threshold_rebl This argument is only used if `baseline` is not set to `'fixed'`.
 #' Must be one of the following:
 #' \itemize{
 #' \item{`'event'`:}{ any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
@@ -228,6 +230,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
   warnings <- list()
 
+  ###########################
+  # CHECKS ON ARGUMENT VALUES
+
   # If conf_tol_days is a single value, duplicate it (equal left and right tolerance)
   if (length(conf_tol_days)==1) {
     conf_tol_days <- c(conf_tol_days, conf_tol_days)
@@ -250,7 +255,6 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     relapse_assoc <- c(relapse_assoc, 0)
   }
 
-
   if (is.null(outcome) ||
       !(tolower(outcome) %in% c('edss', 'nhpt', 't25fw', 'sdmt'))) {
     outcome <- 'outcome'
@@ -263,9 +267,24 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     stop('Invalid value for `event` argument. Valid values: \'firstCDW\', \'first\', \'firsteach\', \'firstCDWtype\', \'firstPIRA\', \'multiple\'.')
   }
 
-  if (!baseline %in% c('fixed', 'roving_impr', 'roving')) {
-    stop('Invalid value for `baseline` argument. Valid values: \'fixed\', \'roving_impr\', \'roving\'.')
+  if (!baseline %in% c('fixed', 'roving_impr', 'roving_wors', 'roving')) {
+    stop('Invalid value for `baseline` argument. Valid values: \'fixed\', \'roving_impr\', \'roving_wors\', \'roving\'.')
   }
+
+  if (!proceed_from %in% c('event', 'firstconf')) {
+    stop('Invalid value for `proceed_from` argument. Valid values: \'event\', \'firstconf\'.')
+  }
+
+  if (!sub_threshold_rebl %in% c('event', 'improvement', 'worsening', 'none')) {
+    stop('Invalid value for `sub_threshold_rebl` argument. Valid values: \'event\', \'improvement\', \'worsening\', \'none\'.')
+  }
+
+  if (!skip_local_extrema %in% c('none', 'delta', 'all')) {
+    stop('Invalid value for `skip_local_extrema` argument. Valid values: \'none\', \'delta\', \'all\'.')
+  }
+
+  # end of checks
+  ###########################
 
   if (!is.null(renddate_col)) {
     relapse_to_bl[1] <- ifelse(relapse_to_bl[1]==0, 0, Inf)
@@ -388,8 +407,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
 
   # Define local is_event() function
-  isevent_loc <- function(x, baseline, type='wors', st=F) {
-    is_event(x, baseline, type=type, outcome=outcome, worsening=worsening,
+  isevent_loc <- function(x, bl, type='wors', st=F) {
+    is_event(x, bl, type=type, outcome=outcome, worsening=worsening,
              sub_threshold=st, delta_fun=delta_fun)
   }
 
@@ -532,10 +551,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         prec <- ifelse(bl_idx==1, data_id[bl_idx,][[value_col]], data_id[bl_idx-1,][[value_col]])
         subs <- ifelse(bl_idx==nvisits, data_id[bl_idx,][[value_col]], data_id[bl_idx+1,][[value_col]])
         vis <- data_id[bl_idx,][[value_col]]
-        local_extr <- (isevent_loc(prec, baseline=vis, type='wors', st=skip_local_extrema=='all')
-                       && isevent_loc(subs, baseline=vis, type='wors', st=skip_local_extrema=='all')) || (
-                        isevent_loc(prec, baseline=vis, type='impr', st=skip_local_extrema=='all')
-                        && isevent_loc(subs, baseline=vis, type='impr', st=skip_local_extrema=='all'))
+        local_extr <- (isevent_loc(prec, bl=vis, type='wors', st=skip_local_extrema=='all')
+                       && isevent_loc(subs, bl=vis, type='wors', st=skip_local_extrema=='all')) || (
+                        isevent_loc(prec, bl=vis, type='impr', st=skip_local_extrema=='all')
+                        && isevent_loc(subs, bl=vis, type='impr', st=skip_local_extrema=='all'))
       } else {
         local_extr <- F
       }
@@ -555,10 +574,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           prec <- ifelse(bl_idx==1, data_id[bl_idx,][[value_col]], data_id[bl_idx-1,][[value_col]])
           subs <- ifelse(bl_idx==nvisits, data_id[bl_idx,][[value_col]], data_id[bl_idx+1,][[value_col]])
           vis <- data_id[bl_idx,][[value_col]]
-          local_extr <- (isevent_loc(prec, baseline=vis, type='wors', st=skip_local_extrema=='all')
-                         && isevent_loc(subs, baseline=vis, type='wors', st=skip_local_extrema=='all')) || (
-                        isevent_loc(prec, baseline=vis, type='impr', st=skip_local_extrema=='all')
-                        && isevent_loc(subs, baseline=vis, type='impr', st=skip_local_extrema=='all'))
+          local_extr <- (isevent_loc(prec, bl=vis, type='wors', st=skip_local_extrema=='all')
+                         && isevent_loc(subs, bl=vis, type='wors', st=skip_local_extrema=='all')) || (
+                        isevent_loc(prec, bl=vis, type='impr', st=skip_local_extrema=='all')
+                        && isevent_loc(subs, bl=vis, type='impr', st=skip_local_extrema=='all'))
         } else {
           local_extr <- F
         }
@@ -589,7 +608,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       change_idx <- NA
       if (search_idx<=nvisits) {
       for (x in search_idx:nvisits) {
-          if (isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='change',
+          if (isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='change',
                           st=sub_threshold_rebl!='none') &
               data_id[x,][['closest_rel_before']] >= relapse_to_event[1]
                && data_id[x,][['closest_rel_after']] >= relapse_to_event[2]) {
@@ -645,13 +664,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
         # CONFIRMED IMPROVEMENT:
         # --------------------
-        if (isevent_loc(data_id[change_idx,][[value_col]], bl[[value_col]], type='impr') # value improved (>delta) from baseline
+        if (isevent_loc(data_id[change_idx,][[value_col]], bl=bl[[value_col]], type='impr') # value improved (>delta) from baseline
             && length(conf_idx) > 0 # confirmation visits available
             && ifelse(check_intermediate,
-            all(sapply((change_idx + 1):conf_idx[[1]], function(x) isevent_loc(data_id[x,][[value_col]], bl[[value_col]],
+            all(sapply((change_idx + 1):conf_idx[[1]], function(x) isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]],
                        type='impr'))),  # improvement is confirmed at (all visits up to) first valid date
-            isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl[[value_col]], type='impr'))  # improvement is confirmed at first valid date
-            && !((event %in% c('firstCDW', 'firstCDWtype', 'firstPIRA', 'firstRAW')) && baseline=='fixed')
+            isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl=bl[[value_col]], type='impr'))  # improvement is confirmed at first valid date
+            && !((event %in% c('firstCDW', 'firstCDWtype', 'firstPIRA', 'firstRAW')) && baseline %in% c('fixed', 'roving_wors'))
             ) {
 
           # First visit at which improvement is not sustained:
@@ -659,7 +678,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             next_nonsust <- NA
             } else {
               next_nonsust <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col],
-                                  bl[[value_col]], type='impr'))[1] + conf_idx[[1]]
+                                  bl=bl[[value_col]], type='impr'))[1] + conf_idx[[1]]
           }
           # Discard potential confirmation visits if these occur out of sustained interval:
           if (!is.na(next_nonsust)) {
@@ -681,7 +700,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             valid_impr <- ifelse(check_intermediate,
                 is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]]
                           - data_id[change_idx, date_col]) >= require_sust_days,  # improvement sustained up to end of follow-up, or for `require_sust_days`
-                isevent_loc(data_id[sust_vis,][[value_col]], bl[[value_col]], type='impr')  # improvement confirmed at `sust_vis` (last visit, or first visit after `require_sust_days`)
+                isevent_loc(data_id[sust_vis,][[value_col]], bl=bl[[value_col]], type='impr')  # improvement confirmed at `sust_vis` (last visit, or first visit after `require_sust_days`)
             )
           }
 
@@ -742,9 +761,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           next_change <- NA
           if (newref<nvisits) {
             for (x in (newref + 1):nvisits) {
-              if (isevent_loc(data_id[x,][[value_col]], data_id[bl_idx,][[value_col]],
+              if (isevent_loc(data_id[x,][[value_col]], bl=data_id[bl_idx,][[value_col]],
                                                             type='change') # further change in any direction (from updated baseline)
-                  # || !isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='impr') # or improvement not sustained (from original baseline)
+                  # || !isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='impr') # or improvement not sustained (from original baseline)
                   ) {
                 next_change <- x
                 break
@@ -753,7 +772,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           }
           # # Next valid change (in any direction!) starting from *event*:
           # next_change_ev <- which(isevent_loc(data_id[(change_idx + 1):nvisits, value_col],
-          #                                   data_id[bl_idx,][[value_col]], type='change'))[1] + change_idx
+          #                                   bl=data_id[bl_idx,][[value_col]], type='change'))[1] + change_idx
 
           # Move the search index.
           search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
@@ -768,11 +787,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       # Confirmed sub-threshold improvement: RE-BASELINE
       # ------------------------------------------------
       else if (length(conf_idx) > 0 # confirmation visits available
-          && isevent_loc(data_id[change_idx,][[value_col]], bl[[value_col]], type='impr', st=T) # (sub-threshold) improvement from baseline
+          && isevent_loc(data_id[change_idx,][[value_col]], bl=bl[[value_col]], type='impr', st=T) # (sub-threshold) improvement from baseline
           && ifelse(check_intermediate,
           all(sapply((change_idx + 1):conf_idx[[1]], function(x)
-            isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='impr', st=T))), # (sub-threshold) improvement is confirmed over (all visits up to) first valid date
-            isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl[[value_col]], type='impr', st=T)) # (sub-threshold) improvement is confirmed at first valid date
+            isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='impr', st=T))), # (sub-threshold) improvement is confirmed over (all visits up to) first valid date
+            isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl=bl[[value_col]], type='impr', st=T)) # (sub-threshold) improvement is confirmed at first valid date
           && baseline %in% c('roving', 'roving_impr') #_r_#
           && sub_threshold_rebl %in% c('event', 'improvement')
               ) {
@@ -785,7 +804,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                 next_change <- NA
               } else {
                 next_change <- which(!isevent_loc(data_id[(newref + 1):nvisits, value_col],
-                                      data_id[bl_idx,][[value_col]], type='impr', st=T))[1] + newref
+                                      bl=data_id[bl_idx,][[value_col]], type='impr', st=T))[1] + newref
               }
               search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
 
@@ -796,16 +815,16 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
               }
             }
 
-      # CONFIRMED CDW:
-      # --------------
+      # CONFIRMED WORSENING:
+      # -------------------
       else if ( #data_id[change_idx,][[value_col]] >= min_value_ifany &&
-         isevent_loc(data_id[change_idx,][[value_col]], bl[[value_col]], type='wors')  # value worsened (>delta) from baseline
+         isevent_loc(data_id[change_idx,][[value_col]], bl=bl[[value_col]], type='wors')  # value worsened (>delta) from baseline
 
          && ((length(conf_idx) > 0 && # confirmation visits available
            ifelse(check_intermediate,
               all(sapply((change_idx + 1):conf_idx[[1]],
-               function(x) isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='wors'))),  # worsenind is confirmed at (all visits up to) first valid date
-              isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl[[value_col]], type='wors') # worsening is confirmed at first valid date
+               function(x) isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='wors'))),  # worsening is confirmed at (all visits up to) first valid date
+              isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl=bl[[value_col]], type='wors') # worsening is confirmed at first valid date
            )
           # && all(sapply((change_idx + 1):conf_idx[[1]],
           #     function(x) data_id[x,][[value_col]] >= min_value_ifany)) # confirmation above min_value too
@@ -823,7 +842,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                 if (conf_idx[[1]]==nvisits) {
                   next_nonsust <- NA
                   } else {
-                    next_nonsust <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col], bl[[value_col]],
+                    next_nonsust <- which(!isevent_loc(data_id[(conf_idx[[1]] + 1):nvisits, value_col], bl=bl[[value_col]],
                                           type='wors'))[1] + conf_idx[[1]] }
                 # Discard potential confirmation visits if these occur out of sustained interval:
                 if (!is.na(next_nonsust)) {
@@ -841,7 +860,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   valid_prog <- ifelse(check_intermediate,
                     is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
                                 data_id[change_idx,][[date_col]]) > require_sust_days, # worsening sustained up to end of follow-up, or for `require_sust_days`
-                    isevent_loc(data_id[sust_vis,][[value_col]], bl[[value_col]], type='wors') # worsening confirmed at last visit, or first visit after `require_sust_days`
+                    isevent_loc(data_id[sust_vis,][[value_col]], bl=bl[[value_col]], type='wors') # worsening confirmed at last visit, or first visit after `require_sust_days`
                   )
                 }
 
@@ -856,23 +875,23 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
                   if (data_id[change_idx,][['closest_rel_before']] <= relapse_assoc[1]
                       || data_id[change_idx,][['closest_rel_after']] <= relapse_assoc[2]) { # event is relapse-associated
-                    if (event=='firstPIRA' && baseline=='fixed') {
-                      search_idx <- change_idx + 1 # skip this event if only searching for PIRA with a fixed baseline
+                    if (event=='firstPIRA' && baseline %in% c('fixed', 'roving_impr')) {
+                      search_idx <- change_idx + 1 # skip this event if only searching for PIRA with no CDW-driven re-baseline
                       next
                     }
                     event_type <- c(event_type, 'RAW')
                     event_index <- c(event_index, change_idx)
                   } else if (data_id[change_idx,][['closest_rel_before']] > relapse_assoc[1]
                              && data_id[change_idx,][['closest_rel_after']] > relapse_assoc[2]) { # event is not relapse-associated
-                    if (event=='firstRAW' && baseline=='fixed') {
-                      search_idx <- change_idx + 1 # skip this event if only searching for RAW with a fixed baseline
+                    if (event=='firstRAW' && baseline %in% c('fixed', 'roving_impr')) {
+                      search_idx <- change_idx + 1 # skip this event if only searching for RAW with no CDW-driven re-baseline
                       next
                     }
 
                     # The detected CDW is not RAW. Let's check if it's PIRA.
 
                     if (is.null(renddate_col) # either relapse end dates are not provided
-                        || length(relapse_indep[['conf']]==2)) { # or they are provided but not used for PIRA (`use_end_dates=F` in `relapse_indep_from_bounds`)
+                        || length(relapse_indep[['event']]==2)) { # or they are provided but not used for PIRA (`use_end_dates=F` in `relapse_indep_from_bounds`)
 
                       # Compute intervals that must be relapse-free for PIRA definition
                       if (relapse_indep[['prec_type']]=='baseline') {
@@ -884,7 +903,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                         iref <- change_idx
                         while (iref>1 && !valid_ref) {
                           iref <- iref - 1
-                          valid_ref <- isevent_loc(data_id[change_idx,], baseline=data_id[iref,], type='wors')
+                          valid_ref <- isevent_loc(data_id[change_idx, value_col],
+                                              bl=data_id[iref, value_col], type='wors')
                         }
                         if (valid_ref) {prec <- data_id[iref,]} else {prec <- bl}   # last pre-worsening visit
                       }
@@ -1010,7 +1030,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     min(intersect(conf_t[[cm]], conf_idx))
                   }))
 
-                  if (baseline == 'roving') {
+                  if (baseline %in% c('roving', 'roving_wors')) {
                     # In a roving baseline setting, the baseline is moved after the confirmed event (even if it is not sustained):
                     newref <- ifelse(proceed_from=='firstconf', conf_idx[[1]], change_idx)
                     bl_idx <- newref
@@ -1030,9 +1050,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   next_change <- NA
                   if (newref<nvisits) {
                     for (x in (newref + 1):nvisits) {
-                      if (isevent_loc(data_id[x,][[value_col]],  data_id[bl_idx,][[value_col]],
+                      if (isevent_loc(data_id[x,][[value_col]],  bl=data_id[bl_idx,][[value_col]],
                                          type='change') # further change in any direction (from updated baseline)
-                          # || !isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='wors') # or worsening not sustained (from original baseline)
+                          # || !isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='wors') # or worsening not sustained (from original baseline)
                           ) {
                         next_change <- x
                         break
@@ -1041,7 +1061,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   }
                   # # Next valid change (in any direction!) starting from *event*:
                   # next_change_ev <- which(isevent_loc(data_id[(change_idx + 1):nvisits, value_col],
-                  #                         data_id[bl_idx,][[value_col]], type='change'))[1] + change_idx
+                  #                         bl=data_id[bl_idx,][[value_col]], type='change'))[1] + change_idx
 
                   # Move the search index.
                   search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
@@ -1063,12 +1083,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
        # Confirmed sub-threshold worsening: RE-BASELINE
        # ------------------------------------------------
       else if (length(conf_idx) > 0
-               && isevent_loc(data_id[change_idx,][[value_col]], bl[[value_col]], type='wors', st=T)
+               && isevent_loc(data_id[change_idx,][[value_col]], bl=bl[[value_col]], type='wors', st=T)
                && ifelse(check_intermediate,
                     all(sapply((change_idx + 1):conf_idx[[1]], function(x)
-                      isevent_loc(data_id[x,][[value_col]], bl[[value_col]], type='wors', st=T))), # (sub-threshold) worsening confirmed over (all visits up to) first valid date
-                    isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl[[value_col]], type='wors', st=T))  # (sub-threshold) worsening confirmed at first valid date
-               && baseline == 'roving'
+                      isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='wors', st=T))), # (sub-threshold) worsening confirmed over (all visits up to) first valid date
+                    isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl=bl[[value_col]], type='wors', st=T))  # (sub-threshold) worsening confirmed at first valid date
+               && baseline %in% c('roving', 'roving_wors')
                && sub_threshold_rebl %in% c('event', 'worsening')
                ) {
                   newref <- ifelse(proceed_from=='firstconf', conf_idx[[1]], change_idx)
@@ -1081,12 +1101,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     next_change <- NA
                     } else {
                     next_change <- which(!isevent_loc(data_id[(newref + 1):nvisits, value_col],
-                                          data_id[bl_idx,][[value_col]], type='wors', st=T))[1] + newref
+                                          bl=data_id[bl_idx,][[value_col]], type='wors', st=T))[1] + newref
                     }
                   search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
 
                   if (verbose == 2) {
-                    message("Confirmed sub-threshold", outcome, "worsening (visit no.", change_idx, ")")
+                    message("Confirmed sub-threshold ", outcome, " worsening (visit no.", change_idx, ")")
                     message("Baseline at visit no.", bl_idx,
                             ", searching for events from next change (visit no.",
                             ifelse(search_idx > nvisits, "-", search_idx), ") on")
@@ -1155,7 +1175,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                           }
                         }
 
-    } #while (proceed)
+    } # end while (proceed)
 
   #################################################################
 
@@ -1274,7 +1294,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
 
 
-  } #for (subjid in all_subj)
+  } # end for (subjid in all_subj)
 
   #################################################################
 

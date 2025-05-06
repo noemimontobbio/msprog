@@ -92,15 +92,17 @@ and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 \item{\code{'multiple'}}{ (all events in chronological order).}
 }}
 
-\item{baseline}{Specifies the baseline scheme. Must be one of the following:
+\item{baseline}{Specifies the baseline scheme. Must be one of the following.
 \itemize{
-\item{\code{'fixed'}}{ (first valid outcome value, default);}
-\item{\code{'roving_impr'}}{ (updated after every confirmed disability improvement to the visit determined by \code{proceed_from};
-suitable for a first-CDW setting to discard fluctuations around baseline);}
-\item{\code{'roving'}}{ (updated after each improvement or worsening event to the visit determined by \code{proceed_from};
-suitable for a multiple-event setting -- i.e., when \code{event} is set to \code{'multiple'},
-\code{'firsteach'}, or \code{'firstCDWtype'} -- or when searching for a specific type of CDW
--- i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}).}
+\item{\code{'fixed'}:}{ first valid outcome value, default;}
+\item{\code{'roving_impr'}:}{ updated after every confirmed disability improvement (to the visit determined by \code{proceed_from});
+suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for randomised data;}
+\item{\code{'roving_wors'}:}{ updated after every CDW (to the visit determined by \code{proceed_from});
+suitable when searching for a specific type of CDW (i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'});}
+\item{\code{'roving'}:}{ updated after each improvement or worsening event to the visit determined by \code{proceed_from};
+suitable for a multiple-event setting (i.e., when \code{event} is set to \code{'multiple'},
+\code{'firsteach'}, or \code{'firstCDWtype'}) or when searching for a specific type of CDW
+(i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}) -- not recommended for randomised data.}
 }}
 
 \item{proceed_from}{After detecting a confirmed disability event, continue searching:
@@ -108,14 +110,14 @@ suitable for a multiple-event setting -- i.e., when \code{event} is set to \code
 \item{}{from the next visit after the first qualifying confirmation visit if \code{proceed_from='firstconf'};}
 \item{}{from the next visit after the event if \code{proceed_from='event'}.}
 }
-If \code{baseline='roving'} or \code{baseline='roving_impr'}, when rebaselining after a confirmed disability event,
-the baseline is moved to:
+If \code{baseline} is set to \code{'roving'}, \code{'roving_impr'}, or \code{'roving_wors'},
+when rebaselining after a confirmed disability event, the baseline is moved to:
 \itemize{
 \item{}{the first qualifying confirmation visit if \code{proceed_from='firstconf'};}
 \item{}{the event visit if \code{proceed_from='event'}.}
 }}
 
-\item{sub_threshold_rebl}{This argument is only used if \code{baseline='roving'} or \code{baseline='roving_impr'}.
+\item{sub_threshold_rebl}{This argument is only used if \code{baseline} is not set to \code{'fixed'}.
 Must be one of the following:
 \itemize{
 \item{\code{'event'}:}{ any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
