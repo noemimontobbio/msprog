@@ -27,7 +27,6 @@ MSprog(
   validconf_col = NULL,
   conf_days = 12 * 7,
   conf_tol_days = c(7, 2 * 365.25),
-  conf_unbounded_right = F,
   require_sust_days = 0,
   check_intermediate = T,
   relapse_to_bl = 30,
@@ -159,10 +158,8 @@ If \code{validconf_col=NULL}, all visits are potentially used as confirmation vi
 
 \item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 or list-like of length 2 (different tolerance on left and right).
-In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}.}
-
-\item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right
-(regardless of the right end indicated by \code{conf_tol_days}).}
+The right end of the interval can be set to \code{Inf} (confirmation window unbounded on the right
+-- e.g., "confirmation at 12 \emph{or more} weeks").}
 
 \item{require_sust_days}{Minimum number of days over which a confirmed change must be sustained
 (i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
@@ -257,7 +254,7 @@ by the user and reported as a complement to the results to ensure reproducibilit
 \details{
 The events are detected sequentially by scanning the outcome values in chronological order.
 Valid time windows for confirmation visits are determined by arguments
-\code{conf_days}, \code{conf_tol_days}, \code{conf_unbounded_right}, \code{relapse_to_conf}.
+\code{conf_days}, \code{conf_tol_days}, \code{relapse_to_conf}.
 CDW events are classified as relapse-associated or relapse-independent based on their relative timing
 with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
 CDW events occurring within a specified interval (\code{relapse_assoc} argument) from a relapse;

@@ -144,13 +144,13 @@ head(toydata_relapses)
 
 <br />
 
-The following code detects, for each subject in the toy dataset, the first EDSS PIRA event (`event=firstPIRA`) confirmed over $\geq$ 12 or $\geq$ 24 weeks (`conf_days=c(7*12, 7*24)`, `conf_tol_days=0`, `conf_unbounded_right=TRUE`), for two different definitions of PIRA. We set `verbose=2` to print an extended log of the computations performed.
+The following code detects, for each subject in the toy dataset, the first EDSS PIRA event (`event=firstPIRA`) confirmed over $\geq$ 12 or $\geq$ 24 weeks (`conf_days=c(7*12, 7*24)`, `conf_tol_days=c(0, Inf)`), for two different definitions of PIRA. We set `verbose=2` to print an extended log of the computations performed.
 
 * Roving baseline, and absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation @muller2023:
   ```{r}
   output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
                  relapse=toydata_relapses, 
-                 conf_days=c(7*12, 7*24), conf_tol_days=0, conf_unbounded_right=TRUE,
+                 conf_days=c(7*12, 7*24), conf_tol_days=c(0, Inf),
                  event='firstPIRA', baseline='roving',
                  relapse_indep=relapse_indep_from_bounds(p0=0, p1=0, e0=90, e1=30, c0=90, c1=30),
                  verbose=2)
@@ -161,7 +161,7 @@ The following code detects, for each subject in the toy dataset, the first EDSS 
   ```{r}
   output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
                  relapse=toydata_relapses,
-                 conf_days=c(7*12, 7*24), conf_tol_days=0, conf_unbounded_right=TRUE,
+                 conf_days=c(7*12, 7*24), conf_tol_days=c(0, Inf), 
                  event='firstPIRA', baseline='fixed', relapse_rebl=TRUE,
                  relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=30, c0=30, c1=30),
                  verbose=2)

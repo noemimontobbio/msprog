@@ -10,7 +10,7 @@
 #'
 #' The events are detected sequentially by scanning the outcome values in chronological order.
 #' Valid time windows for confirmation visits are determined by arguments
-#' `conf_days`, `conf_tol_days`, `conf_unbounded_right`, `relapse_to_conf`.
+#' `conf_days`, `conf_tol_days`, `relapse_to_conf`.
 #' CDW events are classified as relapse-associated or relapse-independent based on their relative timing
 #' with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
 #' CDW events occurring within a specified interval (`relapse_assoc` argument) from a relapse;
@@ -112,9 +112,8 @@
 #' @param conf_days Period before confirmation (days). Can be a single value or list-like of any length if multiple windows are to be considered.
 #' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 #' or list-like of length 2 (different tolerance on left and right).
-#' In all cases, the right end of the interval is ignored if `conf_unbounded_right` is set to `TRUE`.
-#' @param conf_unbounded_right If `TRUE`, confirmation window is unbounded on the right
-#' (regardless of the right end indicated by `conf_tol_days`).
+#' The right end of the interval can be set to `Inf` (confirmation window unbounded on the right
+#' -- e.g., "confirmation at 12 \emph{or more} weeks").
 #' @param require_sust_days Minimum number of days over which a confirmed change must be sustained
 #' (i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
 #' Events sustained for the remainder of the follow-up period are always retained regardless of follow-up duration.
@@ -223,7 +222,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    subjects=NULL, delta_fun=NULL, worsening=NULL, event='firstCDW',
                    baseline='fixed', proceed_from='firstconf', sub_threshold_rebl='none',
                    bl_geq=F, relapse_rebl=F, skip_local_extrema='none',
-                   validconf_col=NULL, conf_days=12*7, conf_tol_days=c(7,2*365.25), conf_unbounded_right=F, require_sust_days=0, check_intermediate=T,
+                   validconf_col=NULL, conf_days=12*7, conf_tol_days=c(7,2*365.25), require_sust_days=0, check_intermediate=T,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30,
                    relapse_assoc=90, relapse_indep=NULL,
                    impute_last_visit=0, date_format=NULL, include_dates=F, include_value=F, include_stable=T, verbose=1
@@ -416,9 +415,6 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
 
   # Define a confirmation window for each value of conf_days
-  if (conf_unbounded_right) {
-    conf_tol_days[2] <- Inf
-  }
   conf_window <- lapply(conf_days, function(t) {
     lower <- as.integer(t) - conf_tol_days[1]
       upper <- as.integer(t) + conf_tol_days[2]
@@ -1325,7 +1321,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     if (verbose >= 1) {
       message(paste0("\n---\nOutcome: ", outcome, "\nConfirmation", ifelse(check_intermediate, " over: ", " at: "),
             paste(conf_days, collapse=", "), " days (-", conf_tol_days[1], " days, +",
-            ifelse(conf_unbounded_right, "Inf", conf_tol_days[2]), " days)\nBaseline: ", baseline,
+            conf_tol_days[2], " days)\nBaseline: ", baseline,
             ifelse(baseline!='fixed' && sub_threshold_rebl!='none',
                    paste0(" (include sub-threshold ", sub_threshold_rebl, "s)"), ""),
             ifelse(relapse_rebl, ", and post-relapse re-baseline", ""),
@@ -1407,7 +1403,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     settings <- list(outcome=outcome, event=event, baseline=baseline, proceed_from=proceed_from,
                   validconf_p=ifelse(is.null(validconf_col), 1, mean(data[[validconf_col]])),
                   skip_local_extrema=skip_local_extrema,
-                  conf_days=conf_days, conf_tol_days=conf_tol_days, conf_unbounded_right=conf_unbounded_right,
+                  conf_days=conf_days, conf_tol_days=conf_tol_days,
                   require_sust_days=require_sust_days, check_intermediate=check_intermediate,
                   relapse_to_bl=relapse_to_bl, relapse_to_event=relapse_to_event, relapse_to_conf=relapse_to_conf,
                   relapse_assoc=relapse_assoc, relapse_indep=relapse_indep, renddate_col=renddate_col,

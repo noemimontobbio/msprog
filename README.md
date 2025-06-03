@@ -82,7 +82,7 @@ output <- MSprog(toydata_visits,                                      # provide 
                  subj_col='id', value_col='EDSS', date_col='date',    # specify column names
                  outcome='edss',                                      # specify outcome type
                  event='multiple', baseline='roving',                 # modify default options
-                 conf_tol_days=0, conf_unbounded_right=T,             # modify default options
+                 conf_tol_days=c(0, Inf),                             # modify default options
                  relapse=toydata_relapses)                            # provide data on relapses
 #> 
 #> ---

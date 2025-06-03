@@ -253,11 +253,13 @@ An event is only validated if the change in the outcome value from the current b
 
 [^upto]: The value change from baseline must also be maintained at all intermediate visits between the event and the confirmation visit. This behaviour may be changed by setting the `check_intermediate` argument to `FALSE` (in this case, the change only needs to be confirmed **at** the designated confirmation visit). We do not recommend this, as it may lead to including random fluctuations as events. We included this option to provide the possibility of replicating the results from previous studies that used this rationale.
 
-The chosen confirmation period depends on the type of study and on the frequency of visits, and can be set in `MSprog()` by using the `conf_days` argument. A tolerance interval around `conf_days` can be specified using the `conf_tol_days` argument, given as a sequence of two integers (left and right tolerance)[^lrtol]. Further, the `conf_unbounded_right` argument allows event confirmation to occur at any visit *after* `conf_days` (i.e., right tolerance set to infinity). Let's see two examples.
+The chosen confirmation period depends on the type of study and on the frequency of visits, and can be set in `MSprog()` by using the `conf_days` argument. A tolerance interval around `conf_days` can be specified using the `conf_tol_days` argument, given as a sequence of two integers (left and right tolerance)[^lrtol]. Setting the right end of the interval to `Inf` allows event confirmation to occur at any visit *after* `conf_days`. Let's see two examples.
 
-i. A common setting for **clinical trial data** would be: `conf_days=7*12`, `conf_tol_days=0`, `conf_unbounded_right=T`, i.e., "confirmation over 12 or more weeks".
+i. A common setting for **clinical trial data** would be: `conf_days=7*12`, `conf_tol_days=c(0, Inf)`, 
+i.e., "confirmation over 12 or more weeks".
 
-ii. A common setting for **observational data** would be: `conf_days=7*24`, `conf_tol_days=c(0,7*12)`, `conf_unbounded_right=F`, i.e., the confirmation visit must lie between 24 weeks after the event, and 36 weeks after the event.
+ii. A common setting for **observational data** would be: `conf_days=7*24`, `conf_tol_days=c(0,7*12)`, 
+i.e., the confirmation visit must lie between 24 weeks after the event, and 36 weeks after the event.
 
 [^lrtol]: `conf_tol_days` can also be specified as a single integer if the same tolerance on left and right is desired.
 
@@ -290,7 +292,7 @@ In addition to event confirmation, some studies require events to be *sustained*
 
 The `require_sust_days` argument may be of use in the following scenarios.
 
-* Suppose the maximum follow-up in the population is 96 weeks excluding the baseline visit. If one wants to detect CDWs sustained over the whole follow-up, coding it as "worsening confirmed over 96 weeks or more" (`conf_days=7*96`, `conf_tol_days=0`, `conf_unbounded_right=T`) would discard CDWs of patients whose follow-up is shorter than 96 weeks. In a scenario where patients have different follow-up lengths, the `require_sust_days` argument offers a more reliable way of implementing this, e.g., as "worsening confirmed over 12 weeks or more and sustained for the whole follow-up period" (`conf_days=7*12`, `conf_tol_days=0`, `conf_unbounded_right=T`, `require_sust_days=Inf`). 
+* Suppose the maximum follow-up in the population is 96 weeks excluding the baseline visit. If one wants to detect CDWs sustained over the whole follow-up, coding it as "worsening confirmed over 96 weeks or more" (`conf_days=7*96`, `conf_tol_days=c(0, Inf)`) would discard CDWs of patients whose follow-up is shorter than 96 weeks. In a scenario where patients have different follow-up lengths, the `require_sust_days` argument offers a more reliable way of implementing this, e.g., as "worsening confirmed over 12 weeks or more and sustained for the whole follow-up period" (`conf_days=7*12`, `conf_tol_days=c(0, Inf)`, `require_sust_days=Inf`). 
 
 * In observational data with coarsely- and unevenly-spaced visits, the `require_sust_days` argument may be used to detect sustained CDW (e.g., `require_sust_days=7*96`) while still requiring the presence of a confirmation visit within a specified interval from the event (e.g., `conf_days=7*12`, `conf_tol_days=c(0,7*12)`). 
 
