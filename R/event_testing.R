@@ -7,16 +7,16 @@
 #' @param baseline Outcome value at baseline.
 #' @param outcome One of: \cr
 #' \itemize{
-##' \item{`'edss'`}{ (Extended Disability Status Scale, default);}
-#'  \item{`'nhpt'`}{ (Nine-Hole Peg Test);}
-#'  \item{`'t25fw'`}{ (Timed 25-Foot Walk);}
-#'  \item{`'sdmt'`}{ (Symbol Digit Modalities Test).}
+##' \item{`'edss'` (Extended Disability Status Scale, default);}
+#'  \item{`'nhpt'` (Nine-Hole Peg Test);}
+#'  \item{`'t25fw'` (Timed 25-Foot Walk);}
+#'  \item{`'sdmt'` (Symbol Digit Modalities Test).}
 #'  }
 #' @return Minimum shift corresponding to a valid change from the provided baseline value. Specifically:
 #' \itemize{
-#'  \item{EDSS: }{1.5 if `baseline==0`, 1 if `0<baseline<=5`, 0.5 if `baseline>=5.5`;}
-#'  \item{NHPT and T25FW: }{20`%` of `baseline`;}
-#'  \item{SDMT: }{either 3 points or 10`%` of `baseline`.}
+#'  \item{EDSS: 1.5 if `baseline==0`, 1 if `0<baseline<=5`, 0.5 if `baseline>=5.5`;}
+#'  \item{NHPT and T25FW: 20`%` of `baseline`;}
+#'  \item{SDMT: either 3 points or 10`%` of `baseline`.}
 #'  }
 #' @export compute_delta
 #' @examples
@@ -70,17 +70,17 @@ compute_delta <- function(baseline, outcome='edss') {
 #' @param baseline Outcome value at baseline.
 #' @param type One of: \cr
 #' \itemize{
-##' \item{`'wors'`}{ (worsening);}
-#'  \item{`'impr'`}{ (improvement);}
-#'  \item{`'change'`}{ (any valid change).}
+##' \item{`'wors'` (worsening);}
+#'  \item{`'impr'` (improvement);}
+#'  \item{`'change'` (any valid change).}
 #'  }
 #' @param outcome One of: \cr
 #' \itemize{
-##' \item{`'edss'`}{ (Extended Disability Status Scale, default);}
-#'  \item{`'nhpt'`}{ (Nine-Hole Peg Test);}
-#'  \item{`'t25fw'`}{ (Timed 25-Foot Walk);}
-#'  \item{`'sdmt'`}{ (Symbol Digit Modalities Test);}
-#'  \item{`NULL`}{ (only accepted when specifying the direction of worsening).}
+##' \item{`'edss'` (Extended Disability Status Scale, default);}
+#'  \item{`'nhpt'` (Nine-Hole Peg Test);}
+#'  \item{`'t25fw'` (Timed 25-Foot Walk);}
+#'  \item{`'sdmt'` (Symbol Digit Modalities Test);}
+#'  \item{`NULL` (only accepted when specifying the direction of worsening).}
 #'  }
 #' @param worsening The direction of worsening (`'increase'` if higher values correspond to worse disease course, `'decrease'` otherwise).
 #' This argument is only used when `outcome` is set to `NULL`.

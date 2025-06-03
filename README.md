@@ -84,10 +84,6 @@ output <- MSprog(toydata_visits,                                      # provide 
                  event='multiple', baseline='roving',                 # modify default options
                  conf_tol_days=0, conf_unbounded_right=T,             # modify default options
                  relapse=toydata_relapses)                            # provide data on relapses
-#> Warning: Setting row names on a tibble is deprecated.
-#> Setting row names on a tibble is deprecated.
-#> Setting row names on a tibble is deprecated.
-#> Setting row names on a tibble is deprecated.
 #> 
 #> ---
 #> Outcome: edss

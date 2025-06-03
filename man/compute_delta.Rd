@@ -11,18 +11,18 @@ compute_delta(baseline, outcome = "edss")
 
 \item{outcome}{One of: \cr
 \itemize{
-\item{\code{'edss'}}{ (Extended Disability Status Scale, default);}
-\item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
-\item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
-\item{\code{'sdmt'}}{ (Symbol Digit Modalities Test).}
+\item{\code{'edss'} (Extended Disability Status Scale, default);}
+\item{\code{'nhpt'} (Nine-Hole Peg Test);}
+\item{\code{'t25fw'} (Timed 25-Foot Walk);}
+\item{\code{'sdmt'} (Symbol Digit Modalities Test).}
 }}
 }
 \value{
 Minimum shift corresponding to a valid change from the provided baseline value. Specifically:
 \itemize{
-\item{EDSS: }{1.5 if \code{baseline==0}, 1 if \verb{0<baseline<=5}, 0.5 if \code{baseline>=5.5};}
-\item{NHPT and T25FW: }{20\verb{\%} of \code{baseline};}
-\item{SDMT: }{either 3 points or 10\verb{\%} of \code{baseline}.}
+\item{EDSS: 1.5 if \code{baseline==0}, 1 if \verb{0<baseline<=5}, 0.5 if \code{baseline>=5.5};}
+\item{NHPT and T25FW: 20\verb{\%} of \code{baseline};}
+\item{SDMT: either 3 points or 10\verb{\%} of \code{baseline}.}
 }
 }
 \description{

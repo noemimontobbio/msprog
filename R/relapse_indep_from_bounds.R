@@ -5,10 +5,10 @@
 #' into a named list to be given as argument `relapse_indep` to function [MSprog()].
 #' The relapse-free intervals may be anchored to (any subset of) the following three data-driven checkpoints.
 #' \itemize{
-#' \item{`'prec'`:}{ a visit preceding the event: can be (i) the current baseline, (ii) the last visit before the event,
+#' \item{`'prec'`: a visit preceding the event: can be (i) the current baseline, (ii) the last visit before the event,
 #' or (iii) the last pre-worsening visit (`i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`);}
-#' \item{`'event'`:}{ the disability worsening event;}
-#' \item{`'conf'`:}{ the (first) confirmation visit.}
+#' \item{`'event'`: the disability worsening event;}
+#' \item{`'conf'`: the (first) confirmation visit.}
 #' }
 #'
 #' If both ends of an interval are 0 (e.g., if both `p0=0` and `p1=0`), the checkpoint is ignored. If the right end is `NULL`, the interval is assumed to extend up to the left end of the next interval.
@@ -31,9 +31,9 @@
 #' @param c1 Days after confirmation (`>=0`).
 #' @param prec_type Which visit to use as "preceding visit". Must be one of:
 #' \itemize{
-#' \item{`'baseline'`:}{ the current baseline;}
-#' \item{`'last'`:}{ the last visit before the event;}
-#' \item{`'last_lower'`:}{ the last pre-worsening visit, i.e.,
+#' \item{`'baseline'`: the current baseline;}
+#' \item{`'last'`: the last visit before the event;}
+#' \item{`'last_lower'`: the last pre-worsening visit, i.e.,
 #' the last visit `i` where `outcome[event] - outcome[i] >= delta_fun(outcome[i])`.}
 #' }
 #' @param use_end_dates If `TRUE`, only the right bounds (`e1`, `c1`) are used,

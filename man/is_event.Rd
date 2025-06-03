@@ -21,18 +21,18 @@ is_event(
 
 \item{type}{One of: \cr
 \itemize{
-\item{\code{'wors'}}{ (worsening);}
-\item{\code{'impr'}}{ (improvement);}
-\item{\code{'change'}}{ (any valid change).}
+\item{\code{'wors'} (worsening);}
+\item{\code{'impr'} (improvement);}
+\item{\code{'change'} (any valid change).}
 }}
 
 \item{outcome}{One of: \cr
 \itemize{
-\item{\code{'edss'}}{ (Extended Disability Status Scale, default);}
-\item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
-\item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
-\item{\code{'sdmt'}}{ (Symbol Digit Modalities Test);}
-\item{\code{NULL}}{ (only accepted when specifying the direction of worsening).}
+\item{\code{'edss'} (Extended Disability Status Scale, default);}
+\item{\code{'nhpt'} (Nine-Hole Peg Test);}
+\item{\code{'t25fw'} (Timed 25-Foot Walk);}
+\item{\code{'sdmt'} (Symbol Digit Modalities Test);}
+\item{\code{NULL} (only accepted when specifying the direction of worsening).}
 }}
 
 \item{worsening}{The direction of worsening (\code{'increase'} if higher values correspond to worse disease course, \code{'decrease'} otherwise).

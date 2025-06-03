@@ -18,11 +18,11 @@
 #' @param date_col Name of data column with date of visit.
 #' @param outcome Specifies the outcome type. Must be one of the following:
 #' \itemize{
-#'  \item{`'edss'`}{ (Expanded Disability Status Scale);}
-#'  \item{`'nhpt'`}{ (Nine-Hole Peg Test);}
-#'  \item{`'t25fw'`}{ (Timed 25-Foot Walk);}
-#'  \item{`'sdmt'`}{ (Symbol Digit Modalities Test);}
-#'  \item{`NULL`}{ (only accepted when specifying argument `worsening`)}
+#'  \item{`'edss'` (Expanded Disability Status Scale);}
+#'  \item{`'nhpt'` (Nine-Hole Peg Test);}
+#'  \item{`'t25fw'` (Timed 25-Foot Walk);}
+#'  \item{`'sdmt'` (Symbol Digit Modalities Test);}
+#'  \item{`NULL` (only accepted when specifying argument `worsening`)}
 #'  }
 #' @param worsening The direction of worsening (`'increase'` if higher values correspond to worse disease course, `'decrease'` otherwise).<br />
 #' This argument is only used when `outcome` is set to `NULL`. Otherwise, `worsening` is automatically set to
@@ -267,7 +267,7 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
 
           if (valid) {
           results[subjid, date_col] <- as.character(global_start
-                + as.difftime(data_id[milestone_idx,][[date_col]], unit='days')) # date of reaching the milestone
+                + as.difftime(data_id[milestone_idx,][[date_col]], units='days')) # date of reaching the milestone
           results[subjid, value_col] <- data_id[milestone_idx, value_col] # first value >= milestone
           results[subjid, 'time2event'] <- data_id[milestone_idx, date_col] - data_id[1, date_col] # time to reach the milestone
           results[subjid, 'observed'] <- 1 # whether milestone was reached
@@ -305,7 +305,7 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
 
     if (is.na(results[subjid, date_col])) {
       results[subjid, date_col] <- as.character(global_start
-            + as.difftime(data_id[nvisits,][[date_col]], unit='days')) # end of FU
+            + as.difftime(data_id[nvisits,][[date_col]], units='days')) # end of FU
       results[subjid, 'time2event'] <- data_id[nvisits,][[date_col]] - data_id[1,][[date_col]] # total FU length
     }
   }

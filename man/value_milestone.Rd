@@ -38,11 +38,11 @@ value_milestone(
 
 \item{outcome}{Specifies the outcome type. Must be one of the following:
 \itemize{
-\item{\code{'edss'}}{ (Expanded Disability Status Scale);}
-\item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
-\item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
-\item{\code{'sdmt'}}{ (Symbol Digit Modalities Test);}
-\item{\code{NULL}}{ (only accepted when specifying argument \code{worsening})}
+\item{\code{'edss'} (Expanded Disability Status Scale);}
+\item{\code{'nhpt'} (Nine-Hole Peg Test);}
+\item{\code{'t25fw'} (Timed 25-Foot Walk);}
+\item{\code{'sdmt'} (Symbol Digit Modalities Test);}
+\item{\code{NULL} (only accepted when specifying argument \code{worsening})}
 }}
 
 \item{worsening}{The direction of worsening (\code{'increase'} if higher values correspond to worse disease course, \code{'decrease'} otherwise).\if{html}{\out{<br />}}

@@ -54,11 +54,11 @@ MSprog(
 
 \item{outcome}{Specifies the outcome type. Must be one of the following:
 \itemize{
-\item{\code{'edss'}}{ (Expanded Disability Status Scale);}
-\item{\code{'nhpt'}}{ (Nine-Hole Peg Test);}
-\item{\code{'t25fw'}}{ (Timed 25-Foot Walk);}
-\item{\code{'sdmt'}}{ (Symbol Digit Modalities Test);}
-\item{\code{NULL}}{ (only accepted when specifying a custom \code{delta_fun})}
+\item{\code{'edss'} (Expanded Disability Status Scale);}
+\item{\code{'nhpt'} (Nine-Hole Peg Test);}
+\item{\code{'t25fw'} (Timed 25-Foot Walk);}
+\item{\code{'sdmt'} (Symbol Digit Modalities Test);}
+\item{\code{NULL} (only accepted when specifying a custom \code{delta_fun})}
 }}
 
 \item{relapse}{\code{data.frame} containing longitudinal data, including: subject ID and relapse date.}
@@ -83,23 +83,23 @@ and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 
 \item{event}{Specifies which events to detect. Must be one of the following:
 \itemize{
-\item{\code{'firstCDW'}}{ (first confirmed disability worsening (CDW), default);}
-\item{\code{'first'}}{ (only the very first confirmed event -- improvement or worsening);}
-\item{\code{'firsteach'}}{ (first confirmed disability improvement and first CDW -- in chronological order);}
-\item{\code{'firstCDWtype'}}{ (first CDW of each kind -- PIRA, RAW, and undefined, in chronological order);}
-\item{\code{'firstPIRA'}}{ (first PIRA);}
-\item{\code{'firstRAW'}}{ (first RAW);}
-\item{\code{'multiple'}}{ (all events in chronological order).}
+\item{\code{'firstCDW'} (first confirmed disability worsening (CDW), default);}
+\item{\code{'first'} (only the very first confirmed event -- improvement or worsening);}
+\item{\code{'firsteach'} (first confirmed disability improvement and first CDW -- in chronological order);}
+\item{\code{'firstCDWtype'} (first CDW of each kind -- PIRA, RAW, and undefined, in chronological order);}
+\item{\code{'firstPIRA'} (first PIRA);}
+\item{\code{'firstRAW'} (first RAW);}
+\item{\code{'multiple'} (all events in chronological order).}
 }}
 
 \item{baseline}{Specifies the baseline scheme. Must be one of the following.
 \itemize{
-\item{\code{'fixed'}:}{ first valid outcome value, default;}
-\item{\code{'roving_impr'}:}{ updated after every confirmed disability improvement (to the visit determined by \code{proceed_from});
+\item{\code{'fixed'}: first valid outcome value, default;}
+\item{\code{'roving_impr'}: updated after every confirmed disability improvement (to the visit determined by \code{proceed_from});
 suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for randomised data;}
-\item{\code{'roving_wors'}:}{ updated after every CDW (to the visit determined by \code{proceed_from});
+\item{\code{'roving_wors'}: updated after every CDW (to the visit determined by \code{proceed_from});
 suitable when searching for a specific type of CDW (i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'});}
-\item{\code{'roving'}:}{ updated after each improvement or worsening event to the visit determined by \code{proceed_from};
+\item{\code{'roving'}: updated after each improvement or worsening event to the visit determined by \code{proceed_from};
 suitable for a multiple-event setting (i.e., when \code{event} is set to \code{'multiple'},
 \code{'firsteach'}, or \code{'firstCDWtype'}) or when searching for a specific type of CDW
 (i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}) -- not recommended for randomised data.}
@@ -107,26 +107,26 @@ suitable for a multiple-event setting (i.e., when \code{event} is set to \code{'
 
 \item{proceed_from}{After detecting a confirmed disability event, continue searching:
 \itemize{
-\item{}{from the next visit after the first qualifying confirmation visit if \code{proceed_from='firstconf'};}
-\item{}{from the next visit after the event if \code{proceed_from='event'}.}
+\item{from the next visit after the first qualifying confirmation visit if \code{proceed_from='firstconf'};}
+\item{from the next visit after the event if \code{proceed_from='event'}.}
 }
 If \code{baseline} is set to \code{'roving'}, \code{'roving_impr'}, or \code{'roving_wors'},
 when rebaselining after a confirmed disability event, the baseline is moved to:
 \itemize{
-\item{}{the first qualifying confirmation visit if \code{proceed_from='firstconf'};}
-\item{}{the event visit if \code{proceed_from='event'}.}
+\item{the first qualifying confirmation visit if \code{proceed_from='firstconf'};}
+\item{the event visit if \code{proceed_from='event'}.}
 }}
 
 \item{sub_threshold_rebl}{This argument is only used if \code{baseline} is not set to \code{'fixed'}.
 Must be one of the following:
 \itemize{
-\item{\code{'event'}:}{ any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
+\item{\code{'event'}: any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
 regardless of \code{delta_fun}) can potentially trigger a re-baseline;}
-\item{\code{'improvement'}:}{ any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
+\item{\code{'improvement'}: any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
 regardless of \code{delta_fun}) can potentially trigger a re-baseline;}
-\item{\code{'worsening'}:}{ any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
+\item{\code{'worsening'}: any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
 regardless of \code{delta_fun}) can potentially trigger a re-baseline;}
-\item{\code{'none'}:}{ only use valid confirmed events (as per \code{delta_fun}) for rebaseline.}
+\item{\code{'none'}: only use valid confirmed events (as per \code{delta_fun}) for rebaseline.}
 }}
 
 \item{bl_geq}{This argument is only used if the baseline is moved.
@@ -146,9 +146,9 @@ When \code{outcome[i]=outcome[i-2]}, visit \code{i} is \emph{not} considered a l
 This controls for cases where the outcome has an undulating course.\if{html}{\out{<br />}}
 The following argument values are accepted.
 \itemize{
-\item{\code{'none'}:}{ local extrema are always accepted as valid baseline values.}
-\item{\code{'delta'}:}{ the baseline cannot be placed at a \emph{strict} local minimum or maximum.}
-\item{\code{'all'}:}{ the baseline cannot be placed at a local minimum or maximum.}
+\item{\code{'none'}: local extrema are always accepted as valid baseline values.}
+\item{\code{'delta'}: the baseline cannot be placed at a \emph{strict} local minimum or maximum.}
+\item{\code{'all'}: the baseline cannot be placed at a local minimum or maximum.}
 }}
 
 \item{validconf_col}{Name of data column specifying which visits can (\code{T}) or cannot (\code{F}) be used as confirmation visits.
@@ -233,17 +233,17 @@ with \code{time2event} = total follow up.}
 
 \item{verbose}{One of:
 \itemize{
-\item{0}{ (print no info);}
-\item{1}{ (print concise info, default);}
-\item{2}{ (print extended info).}
+\item{0 (print no info);}
+\item{1 (print concise info, default);}
+\item{2 (print extended info).}
 }}
 }
 \value{
 An object of class \code{'MSprogOutput'} with the following attributes:
 \itemize{
-\item{\code{event_count}: }{a \code{data.frame} containing the event sequence detected for each subject, and the counts for each event type}
-\item{\code{results}: }{a \code{data.frame} with extended info on each event for all subjects}
-\item{\code{settings}: }{a list containing all the arguments used to compute the output.}
+\item{\code{event_count}: a \code{data.frame} containing the event sequence detected for each subject, and the counts for each event type}
+\item{\code{results}: a \code{data.frame} with extended info on each event for all subjects}
+\item{\code{settings}: a list containing all the arguments used to compute the output.}
 }
 }
 \description{

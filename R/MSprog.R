@@ -24,11 +24,11 @@
 #' @param date_col Name of data column with date of visit.
 #' @param outcome Specifies the outcome type. Must be one of the following:
 #' \itemize{
-#'  \item{`'edss'`}{ (Expanded Disability Status Scale);}
-#'  \item{`'nhpt'`}{ (Nine-Hole Peg Test);}
-#'  \item{`'t25fw'`}{ (Timed 25-Foot Walk);}
-#'  \item{`'sdmt'`}{ (Symbol Digit Modalities Test);}
-#'  \item{`NULL`}{ (only accepted when specifying a custom `delta_fun`)}
+#'  \item{`'edss'` (Expanded Disability Status Scale);}
+#'  \item{`'nhpt'` (Nine-Hole Peg Test);}
+#'  \item{`'t25fw'` (Timed 25-Foot Walk);}
+#'  \item{`'sdmt'` (Symbol Digit Modalities Test);}
+#'  \item{`NULL` (only accepted when specifying a custom `delta_fun`)}
 #'  }
 #' @param relapse `data.frame` containing longitudinal data, including: subject ID and relapse date.
 #' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data.
@@ -45,47 +45,47 @@
 #'  and to `'decrease'` if `outcome` is set to `'sdmt'`.
 #' @param event Specifies which events to detect. Must be one of the following:
 #' \itemize{
-#' \item{`'firstCDW'`}{ (first confirmed disability worsening (CDW), default);}
-#' \item{`'first'`}{ (only the very first confirmed event -- improvement or worsening);}
-#' \item{`'firsteach'`}{ (first confirmed disability improvement and first CDW -- in chronological order);}
-#' \item{`'firstCDWtype'`}{ (first CDW of each kind -- PIRA, RAW, and undefined, in chronological order);}
-#' \item{`'firstPIRA'`}{ (first PIRA);}
-#' \item{`'firstRAW'`}{ (first RAW);}
-#' \item{`'multiple'`}{ (all events in chronological order).}
+#' \item{`'firstCDW'` (first confirmed disability worsening (CDW), default);}
+#' \item{`'first'` (only the very first confirmed event -- improvement or worsening);}
+#' \item{`'firsteach'` (first confirmed disability improvement and first CDW -- in chronological order);}
+#' \item{`'firstCDWtype'` (first CDW of each kind -- PIRA, RAW, and undefined, in chronological order);}
+#' \item{`'firstPIRA'` (first PIRA);}
+#' \item{`'firstRAW'` (first RAW);}
+#' \item{`'multiple'` (all events in chronological order).}
 #' }
 #' @param baseline Specifies the baseline scheme. Must be one of the following.
 #' \itemize{
-#' \item{`'fixed'`:}{ first valid outcome value, default;}
-#' \item{`'roving_impr'`:}{ updated after every confirmed disability improvement (to the visit determined by `proceed_from`);
+#' \item{`'fixed'`: first valid outcome value, default;}
+#' \item{`'roving_impr'`: updated after every confirmed disability improvement (to the visit determined by `proceed_from`);
 #' suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for randomised data;}
-#' \item{`'roving_wors'`:}{ updated after every CDW (to the visit determined by `proceed_from`);
+#' \item{`'roving_wors'`: updated after every CDW (to the visit determined by `proceed_from`);
 #' suitable when searching for a specific type of CDW (i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`);}
-#' \item{`'roving'`:}{ updated after each improvement or worsening event to the visit determined by `proceed_from`;
+#' \item{`'roving'`: updated after each improvement or worsening event to the visit determined by `proceed_from`;
 #' suitable for a multiple-event setting (i.e., when `event` is set to `'multiple'`,
 #' `'firsteach'`, or `'firstCDWtype'`) or when searching for a specific type of CDW
 #' (i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`) -- not recommended for randomised data.}
 #' }
 #' @param proceed_from After detecting a confirmed disability event, continue searching:
 #' \itemize{
-#' \item{}{from the next visit after the first qualifying confirmation visit if `proceed_from='firstconf'`;}
-#'\item{}{from the next visit after the event if `proceed_from='event'`.}
+#' \item{from the next visit after the first qualifying confirmation visit if `proceed_from='firstconf'`;}
+#'\item{from the next visit after the event if `proceed_from='event'`.}
 #' }
 #' If `baseline` is set to `'roving'`, `'roving_impr'`, or `'roving_wors'`,
 #' when rebaselining after a confirmed disability event, the baseline is moved to:
 #' \itemize{
-#' \item{}{the first qualifying confirmation visit if `proceed_from='firstconf'`;}
-#'\item{}{the event visit if `proceed_from='event'`.}
+#' \item{the first qualifying confirmation visit if `proceed_from='firstconf'`;}
+#'\item{the event visit if `proceed_from='event'`.}
 #' }
 #' @param sub_threshold_rebl This argument is only used if `baseline` is not set to `'fixed'`.
 #' Must be one of the following:
 #' \itemize{
-#' \item{`'event'`:}{ any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
+#' \item{`'event'`: any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
 #' regardless of `delta_fun`) can potentially trigger a re-baseline;}
-#' \item{`'improvement'`:}{ any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
+#' \item{`'improvement'`: any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
 #' regardless of `delta_fun`) can potentially trigger a re-baseline;}
-#' \item{`'worsening'`:}{ any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
+#' \item{`'worsening'`: any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
 #' regardless of `delta_fun`) can potentially trigger a re-baseline;}
-#' \item{`'none'`:}{ only use valid confirmed events (as per `delta_fun`) for rebaseline.}
+#' \item{`'none'`: only use valid confirmed events (as per `delta_fun`) for rebaseline.}
 #' }
 #' @param bl_geq This argument is only used if the baseline is moved.
 #' If `TRUE`, the new reference value must always be greater or equal than the previous one;
@@ -102,9 +102,9 @@
 #' This controls for cases where the outcome has an undulating course.<br />
 #' The following argument values are accepted.
 #' \itemize{
-#' \item{`'none'`:}{ local extrema are always accepted as valid baseline values.}
-#' \item{`'delta'`:}{ the baseline cannot be placed at a \emph{strict} local minimum or maximum.}
-#' \item{`'all'`:}{ the baseline cannot be placed at a local minimum or maximum.}
+#' \item{`'none'`: local extrema are always accepted as valid baseline values.}
+#' \item{`'delta'`: the baseline cannot be placed at a \emph{strict} local minimum or maximum.}
+#' \item{`'all'`: the baseline cannot be placed at a local minimum or maximum.}
 #' }
 #' @param validconf_col Name of data column specifying which visits can (`T`) or cannot (`F`) be used as confirmation visits.
 #' The input data does not necessarily have to include such a column.
@@ -172,9 +172,9 @@
 #' with `time2event` = total follow up.
 #' @param verbose One of:
 #' \itemize{
-#'  \item{0}{ (print no info);}
-#'  \item{1}{ (print concise info, default);}
-#'  \item{2}{ (print extended info).}
+#'  \item{0 (print no info);}
+#'  \item{1 (print concise info, default);}
+#'  \item{2 (print extended info).}
 #'  }
 #'
 #' @references
@@ -189,12 +189,12 @@
 #'
 #' @return An object of class `'MSprogOutput'` with the following attributes:
 #' \itemize{
-#' \item{`event_count`: }{a `data.frame` containing the event sequence detected for each subject, and the counts for each event type}
-#' \item{`results`: }{a `data.frame` with extended info on each event for all subjects}
-#' \item{`settings`: }{a list containing all the arguments used to compute the output.}
+#' \item{`event_count`: a `data.frame` containing the event sequence detected for each subject, and the counts for each event type}
+#' \item{`results`: a `data.frame` with extended info on each event for all subjects}
+#' \item{`settings`: a list containing all the arguments used to compute the output.}
 #' }
 #'
-#' @importFrom stats na.omit setNames complete.cases
+#' @importFrom stats na.omit setNames complete.cases rbinom
 #' @importFrom dplyr %>% group_by_at vars slice n mutate across
 #' @export
 #' @examples
@@ -458,7 +458,6 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   for (subjid in all_subj) {
 
     data_id <- data[data[[subj_col]] == subjid, ]
-    rownames(data_id) <- 1:nrow(data_id)
 
     # If more than one visit occur on the same day, only keep last
     ucounts <- table(data_id[, date_col])
@@ -468,7 +467,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
     # Sort visits in chronological order
     order_tmp <- order(data_id[[date_col]])
-    if (any(order_tmp != rownames(data_id))) {
+    if (any(order_tmp != seq_len(nrow(data_id)))) {
       data_id <- data_id[order_tmp, ]
     }
 
@@ -489,7 +488,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       if (any(ucounts > 1)) {
         message("Found multiple visits in the same day: only keeping last.")
       }
-      if (any(order_tmp != rownames(data_id))) {
+      if (any(order_tmp != seq_len(nrow(data_id)))) {
         message("Visits not listed in chronological order: sorting them.")
       }
     }
