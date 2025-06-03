@@ -92,17 +92,19 @@
 #' when it is not, the old reference value is assigned to it \[2\].
 #' @param relapse_rebl If `TRUE`, re-baseline after every relapse.
 #' @param skip_local_extrema This argument is only used if the baseline is moved.
-#' It controls function behaviour in the presence of local minima or maxima.
-#' Must be one of the following.
+#' It controls function behaviour in the presence of local minima or maxima. <br />
+#' A visit `i` is a local minimum point for `outcome` if `outcome[i+1]>outcome[i]`
+#' and `outcome[i-1]>outcome[i]`; local maxima are defined similarly.<br />
+#' A visit `i` is a \emph{strict} local minimum point for `outcome` if <br /> `outcome[i+1]-outcome[i]>=delta_fun(outcome[i])`;
+#' <br /> `outcome[i-1]-outcome[i]>=delta_fun(outcome[i])`. <br />
+#' Strict local maxima are defined similarly. <br />
+#' When `outcome[i]=outcome[i-2]`, visit `i` is \emph{not} considered a local extremum point even if the above conditions hold.
+#' This controls for cases where the outcome has an undulating course.<br />
+#' The following argument values are accepted.
 #' \itemize{
 #' \item{`'none'`:}{ local extrema are always accepted as valid baseline values.}
-#' \item{`'delta'`:}{ the baseline cannot be placed at a \emph{strict} local minimum or maximum, where:
-#' visit `i` is a strict local minimum point for `outcome` if <br /> `outcome[i+1]-outcome[i]>=delta_fun(outcome[i])`;
-#' <br /> `outcome[i-1]-outcome[i]>=delta_fun(outcome[i])`. <br />
-#' Strict local maxima are defined similarly.}
-#' \item{`'all'`:}{ the baseline cannot be placed at a local minimum or maximum, where:
-#' visit `i` is a local minimum point for `outcome` if `outcome[i+1]>outcome[i]`
-#' and `outcome[i-1]>outcome[i]`; local maxima are defined similarly.}
+#' \item{`'delta'`:}{ the baseline cannot be placed at a \emph{strict} local minimum or maximum.}
+#' \item{`'all'`:}{ the baseline cannot be placed at a local minimum or maximum.}
 #' }
 #' @param validconf_col Name of data column specifying which visits can (`T`) or cannot (`F`) be used as confirmation visits.
 #' The input data does not necessarily have to include such a column.
@@ -150,8 +152,9 @@
 #' @param relapse_indep Specifies relapse-free intervals for PIRA definition.
 #' Must be given in the form produced by function [relapse_indep_from_bounds()] by calling
 #' \cr`relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1)`\cr
-#' to specify the intervals around preceding visit, e.g., baseline (`p0` and `p1`),
-#' event (`e0` and `e1`), and confirmation (`c0` and `c1`).
+#' to specify the intervals around (any subset of) three checkpoints:
+#' (i) a preceding visit, e.g., baseline or last visit before the event (`p0` and `p1`),
+#' (ii) the event (`e0` and `e1`), and (iii) the first available confirmation visit (`c0` and `c1`).
 #' If relapse end dates are available (`renddate_col`), it is possible to define PIRA based on those
 #' by setting `use_end_dates=T` in [relapse_indep_from_bounds()].
 #' @param impute_last_visit Imputation probability for worsening events occurring at last visit (i.e. with no confirmation).
@@ -455,6 +458,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   for (subjid in all_subj) {
 
     data_id <- data[data[[subj_col]] == subjid, ]
+    rownames(data_id) <- 1:nrow(data_id)
 
     # If more than one visit occur on the same day, only keep last
     ucounts <- table(data_id[, date_col])
@@ -549,12 +553,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       # Set baseline (skip if within relapse influence)
       if (skip_local_extrema!='none') {
         prec <- ifelse(bl_idx==1, data_id[bl_idx,][[value_col]], data_id[bl_idx-1,][[value_col]])
+        prec2 <- ifelse(bl_idx<=2, data_id[bl_idx,][[value_col]], data_id[bl_idx-2,][[value_col]])
         subs <- ifelse(bl_idx==nvisits, data_id[bl_idx,][[value_col]], data_id[bl_idx+1,][[value_col]])
         vis <- data_id[bl_idx,][[value_col]]
-        local_extr <- (isevent_loc(prec, bl=vis, type='wors', st=skip_local_extrema=='all')
+        local_extr <- ((isevent_loc(prec, bl=vis, type='wors', st=skip_local_extrema=='all')
                        && isevent_loc(subs, bl=vis, type='wors', st=skip_local_extrema=='all')) || (
                         isevent_loc(prec, bl=vis, type='impr', st=skip_local_extrema=='all')
                         && isevent_loc(subs, bl=vis, type='impr', st=skip_local_extrema=='all'))
+                      ) && (vis!=prec2)
       } else {
         local_extr <- F
       }
@@ -568,16 +574,17 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   "moved to visit no.", bl_idx + 1)
         }
         bl_idx <- bl_idx + 1
-        search_idx <- search_idx + 1
         #
         if (skip_local_extrema != 'none') {
           prec <- ifelse(bl_idx==1, data_id[bl_idx,][[value_col]], data_id[bl_idx-1,][[value_col]])
+          prec2 <- ifelse(bl_idx<=2, data_id[bl_idx,][[value_col]], data_id[bl_idx-2,][[value_col]])
           subs <- ifelse(bl_idx==nvisits, data_id[bl_idx,][[value_col]], data_id[bl_idx+1,][[value_col]])
           vis <- data_id[bl_idx,][[value_col]]
-          local_extr <- (isevent_loc(prec, bl=vis, type='wors', st=skip_local_extrema=='all')
+          local_extr <- ((isevent_loc(prec, bl=vis, type='wors', st=skip_local_extrema=='all')
                          && isevent_loc(subs, bl=vis, type='wors', st=skip_local_extrema=='all')) || (
                         isevent_loc(prec, bl=vis, type='impr', st=skip_local_extrema=='all')
                         && isevent_loc(subs, bl=vis, type='impr', st=skip_local_extrema=='all'))
+                        ) && (vis!=prec2)
         } else {
           local_extr <- F
         }
@@ -589,6 +596,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           }
         }
       }
+      search_idx <- ifelse(search_idx <= bl_idx, bl_idx + 1, search_idx)
+      if (verbose == 2) {
+        message("Searching for events from visit no.",
+                ifelse(search_idx > nvisits, "-", search_idx), " on")
+      }
+
 
       if (bl_idx > nvisits) {
         bl_idx <- nvisits
@@ -606,7 +619,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
       # Event detection
       change_idx <- NA
-      if (search_idx<=nvisits) {
+      if (search_idx <= nvisits) {
       for (x in search_idx:nvisits) {
           if (isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='change',
                           st=sub_threshold_rebl!='none') &
@@ -757,30 +770,28 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
               newref <- change_idx
             }
 
-          # Next change (in any direction!)
-          next_change <- NA
-          if (newref<nvisits) {
-            for (x in (newref + 1):nvisits) {
-              if (isevent_loc(data_id[x,][[value_col]], bl=data_id[bl_idx,][[value_col]],
-                                                            type='change') # further change in any direction (from updated baseline)
-                  # || !isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='impr') # or improvement not sustained (from original baseline)
-                  ) {
-                next_change <- x
-                break
-              }
-            }
+          if (verbose==2 & baseline!='fixed') {
+            message("Baseline at visit no.", bl_idx)
           }
-          # # Next valid change (in any direction!) starting from *event*:
-          # next_change_ev <- which(isevent_loc(data_id[(change_idx + 1):nvisits, value_col],
-          #                                   bl=data_id[bl_idx,][[value_col]], type='change'))[1] + change_idx
+
+          # # Next change (in any direction!)
+          # next_change <- NA
+          # if (newref<nvisits) {
+          #   for (x in (newref + 1):nvisits) {
+          #     if (isevent_loc(data_id[x,][[value_col]], bl=data_id[bl_idx,][[value_col]],
+          #                                                   type='change') # further change in any direction (from updated baseline)
+          #         # || !isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='impr') # or improvement not sustained (from original baseline)
+          #         ) {
+          #       next_change <- x
+          #       break
+          #     }
+          #   }
+          # }
+          # # Move the search index.
+          # search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
 
           # Move the search index.
-          search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
-
-          if (verbose==2) {
-          message("Baseline at visit no.", bl_idx, ", searching for events from visit no.",
-                  ifelse(search_idx > nvisits, "-", search_idx), " on")
-          }
+          search_idx <- newref + 1
 
         }
 
@@ -799,19 +810,21 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
               # Set new baseline after event:
               bl_idx <- newref
-              # Move search index at next change from baseline:
-              if (newref==nvisits) {
-                next_change <- NA
-              } else {
-                next_change <- which(!isevent_loc(data_id[(newref + 1):nvisits, value_col],
-                                      bl=data_id[bl_idx,][[value_col]], type='impr', st=T))[1] + newref
-              }
-              search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
+              # Move search index
+              search_idx <- newref + 1
+
+              # # Move search index at next change from baseline:
+              # if (newref==nvisits) {
+              #   next_change <- NA
+              # } else {
+              #   next_change <- which(!isevent_loc(data_id[(newref + 1):nvisits, value_col],
+              #                         bl=data_id[bl_idx,][[value_col]], type='impr', st=T))[1] + newref
+              # }
+              # search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
 
               if (verbose == 2) {
                 message("Confirmed sub-threshold ", outcome, " improvement (visit no.", change_idx, ")")
-                message("Baseline at visit no.", bl_idx, ", searching for events from next change (visit no.",
-                             ifelse(search_idx<=nvisits, search_idx, "-"), ") on")
+                message("Baseline at visit no.", bl_idx)
               }
             }
 
@@ -898,15 +911,32 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                         prec <- bl
                       } else if (relapse_indep[['prec_type']]=='last') {
                         prec <- data_id[change_idx - 1,]  # last visit before the event
-                      } else {
+                      } else if (relapse_indep[['prec_type']]=='last_lower') {
                         valid_ref <- F
                         iref <- change_idx
                         while (iref>1 && !valid_ref) {
                           iref <- iref - 1
+                          #
+                          if (skip_local_extrema != 'none') {
+                            prec <- ifelse(iref==1, data_id[iref,][[value_col]], data_id[iref-1,][[value_col]])
+                            prec2 <- ifelse(iref<=2, data_id[iref,][[value_col]], data_id[iref-2,][[value_col]])
+                            subs <- ifelse(iref==nvisits, data_id[iref,][[value_col]], data_id[iref+1,][[value_col]])
+                            vis <- data_id[iref,][[value_col]]
+                            local_extr <- ((isevent_loc(prec, bl=vis, type='wors', st=skip_local_extrema=='all')
+                                            && isevent_loc(subs, bl=vis, type='wors', st=skip_local_extrema=='all')) || (
+                                              isevent_loc(prec, bl=vis, type='impr', st=skip_local_extrema=='all')
+                                              && isevent_loc(subs, bl=vis, type='impr', st=skip_local_extrema=='all'))
+                            ) && (vis!=prec2)
+                          } else {
+                            local_extr <- F
+                          }
+                          #
                           valid_ref <- isevent_loc(data_id[change_idx, value_col],
-                                              bl=data_id[iref, value_col], type='wors')
+                                        bl=data_id[iref, value_col], type='wors') & !local_extr
                         }
                         if (valid_ref) {prec <- data_id[iref,]} else {prec <- bl}   # last pre-worsening visit
+                      } else {
+                        stop('\'', relapse_indep[['prec_type']], '\' is an invalid value for \'prec_type\' in `relapse_indep`')
                       }
                       left <- right <- list() # left/right borders of relapse-free intervals
                       for (iic in 1:length(conf_idx)) {
@@ -1046,35 +1076,32 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     newref <- ifelse(proceed_from=='firstconf', conf_idx[[1]], change_idx)
                   }
 
-                  # Next valid change (in any direction!)
-                  next_change <- NA
-                  if (newref<nvisits) {
-                    for (x in (newref + 1):nvisits) {
-                      if (isevent_loc(data_id[x,][[value_col]],  bl=data_id[bl_idx,][[value_col]],
-                                         type='change') # further change in any direction (from updated baseline)
-                          # || !isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='wors') # or worsening not sustained (from original baseline)
-                          ) {
-                        next_change <- x
-                        break
-                      }
-                    }
-                  }
-                  # # Next valid change (in any direction!) starting from *event*:
-                  # next_change_ev <- which(isevent_loc(data_id[(change_idx + 1):nvisits, value_col],
-                  #                         bl=data_id[bl_idx,][[value_col]], type='change'))[1] + change_idx
+                  # # Next valid change (in any direction!)
+                  # next_change <- NA
+                  # if (newref < nvisits) {
+                  #   for (x in (newref + 1):nvisits) {
+                  #     if (isevent_loc(data_id[x,][[value_col]],  bl=data_id[bl_idx,][[value_col]],
+                  #                        type='change') # further change in any direction (from updated baseline)
+                  #         # || !isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='wors') # or worsening not sustained (from original baseline)
+                  #         ) {
+                  #       next_change <- x
+                  #       break
+                  #     }
+                  #   }
+                  # }
+                  # # Move the search index.
+                  # search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
 
                   # Move the search index.
-                  search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
+                  search_idx <- newref + 1
 
                 } else { # worsening occurring at last visit (length(conf_t)==0)
                   search_idx <- change_idx + 1
                 }
 
 
-              if (verbose == 2) {
-                message("Baseline at visit no.", bl_idx,
-                        ", searching for events from next change (visit no.",
-                        ifelse(search_idx > nvisits, "-", search_idx), ") on")
+              if (verbose == 2 & baseline!='fixed') {
+                message("Baseline at visit no.", bl_idx)
               }
 
 
@@ -1095,21 +1122,21 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
                   # Set new baseline after the event:
                   bl_idx <- newref
+                  # Move search index
+                  search_idx <- newref + 1
 
-                  # Move search index to next change:
-                  if (newref==nvisits) {
-                    next_change <- NA
-                    } else {
-                    next_change <- which(!isevent_loc(data_id[(newref + 1):nvisits, value_col],
-                                          bl=data_id[bl_idx,][[value_col]], type='wors', st=T))[1] + newref
-                    }
-                  search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
+                  # # Move search index to next change:
+                  # if (newref==nvisits) {
+                  #   next_change <- NA
+                  #   } else {
+                  #   next_change <- which(!isevent_loc(data_id[(newref + 1):nvisits, value_col],
+                  #                         bl=data_id[bl_idx,][[value_col]], type='wors', st=T))[1] + newref
+                  #   }
+                  # search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
 
                   if (verbose == 2) {
                     message("Confirmed sub-threshold ", outcome, " worsening (visit no.", change_idx, ")")
-                    message("Baseline at visit no.", bl_idx,
-                            ", searching for events from next change (visit no.",
-                            ifelse(search_idx > nvisits, "-", search_idx), ") on")
+                    message("Baseline at visit no.", bl_idx)
                   }
                 }
 
@@ -1145,9 +1172,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           if (!is.na(bl_idx)) {
             search_idx <- bl_idx + 1
             if (verbose == 2) {
-              message("[post-relapse rebaseline] Baseline moved to visit no.", bl_idx,
-                      ", searching for events from visit no.",
-                      ifelse(search_idx > nvisits, "-", search_idx), " on")
+              message("[post-relapse rebaseline] Baseline moved to visit no.", bl_idx)
             }
           }
           # If no more rebaseline is possible, terminate search:

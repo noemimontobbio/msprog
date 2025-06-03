@@ -136,17 +136,19 @@ when it is not, the old reference value is assigned to it [2].}
 \item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse.}
 
 \item{skip_local_extrema}{This argument is only used if the baseline is moved.
-It controls function behaviour in the presence of local minima or maxima.
-Must be one of the following.
+It controls function behaviour in the presence of local minima or maxima. \if{html}{\out{<br />}}
+A visit \code{i} is a local minimum point for \code{outcome} if \code{outcome[i+1]>outcome[i]}
+and \code{outcome[i-1]>outcome[i]}; local maxima are defined similarly.\if{html}{\out{<br />}}
+A visit \code{i} is a \emph{strict} local minimum point for \code{outcome} if \if{html}{\out{<br />}} \code{outcome[i+1]-outcome[i]>=delta_fun(outcome[i])};
+\if{html}{\out{<br />}} \code{outcome[i-1]-outcome[i]>=delta_fun(outcome[i])}. \if{html}{\out{<br />}}
+Strict local maxima are defined similarly. \if{html}{\out{<br />}}
+When \code{outcome[i]=outcome[i-2]}, visit \code{i} is \emph{not} considered a local extremum point even if the above conditions hold.
+This controls for cases where the outcome has an undulating course.\if{html}{\out{<br />}}
+The following argument values are accepted.
 \itemize{
 \item{\code{'none'}:}{ local extrema are always accepted as valid baseline values.}
-\item{\code{'delta'}:}{ the baseline cannot be placed at a \emph{strict} local minimum or maximum, where:
-visit \code{i} is a strict local minimum point for \code{outcome} if \if{html}{\out{<br />}} \code{outcome[i+1]-outcome[i]>=delta_fun(outcome[i])};
-\if{html}{\out{<br />}} \code{outcome[i-1]-outcome[i]>=delta_fun(outcome[i])}. \if{html}{\out{<br />}}
-Strict local maxima are defined similarly.}
-\item{\code{'all'}:}{ the baseline cannot be placed at a local minimum or maximum, where:
-visit \code{i} is a local minimum point for \code{outcome} if \code{outcome[i+1]>outcome[i]}
-and \code{outcome[i-1]>outcome[i]}; local maxima are defined similarly.}
+\item{\code{'delta'}:}{ the baseline cannot be placed at a \emph{strict} local minimum or maximum.}
+\item{\code{'all'}:}{ the baseline cannot be placed at a local minimum or maximum.}
 }}
 
 \item{validconf_col}{Name of data column specifying which visits can (\code{T}) or cannot (\code{F}) be used as confirmation visits.
@@ -205,8 +207,9 @@ is overwritten by the relapse duration.}
 \item{relapse_indep}{Specifies relapse-free intervals for PIRA definition.
 Must be given in the form produced by function \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}} by calling
 \cr\code{relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1)}\cr
-to specify the intervals around preceding visit, e.g., baseline (\code{p0} and \code{p1}),
-event (\code{e0} and \code{e1}), and confirmation (\code{c0} and \code{c1}).
+to specify the intervals around (any subset of) three checkpoints:
+(i) a preceding visit, e.g., baseline or last visit before the event (\code{p0} and \code{p1}),
+(ii) the event (\code{e0} and \code{e1}), and (iii) the first available confirmation visit (\code{c0} and \code{c1}).
 If relapse end dates are available (\code{renddate_col}), it is possible to define PIRA based on those
 by setting \code{use_end_dates=T} in \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}}.}
 

@@ -43,13 +43,15 @@ library(msprog)
 Recent studies [@kappos2018; @silent2019; @kuhlmann2023] have highlighted the contribution of PIRA to overall disability worsening, generating growing interest in PIRA as a relevant endpoint. Classifying a confirmed disability worsening (CDW) event as relapse-independent requires careful observation of its relative timing with respect to relapses. Established definitions of PIRA [@kappos2020; @cagol2022; @muller2023] require the absence of relapses within appropriate intervals anchored to the dates of three main checkpoints:
 
 1. a visit preceding the event: can be (i) the current reference, (ii) the last visit before the event,
-or (iii) the last pre-worsening visit (`i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`);
+or (iii) the last pre-worsening visit (`i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`)[^extrema];
 2. the disability worsening event;
 3. the (first) confirmation visit.
 
+[^extrema]: if `skip_local_extrema` is not `none` in `msprog::MSprog()`, local extrema are not selected as "last pre-worsening visit".
+
 For example, in @kappos2020, an absence of relapses was required between the reference visit and 30 days after the event, and during the 30 days before and 30 days after the confirmation visit for a CDW event to be considered as PIRA; in @cagol2022, the authors required an absence of relapses during the 90 days before the event and between the event and the confirmation visit; in @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation visit; when a high specificity is desired, they recommend an absence of relapses in the whole period between the reference visit and the confirmation visit; in @muller2025, the authors recommend an absence of relapses since the last visit preceding the event (up to the event).
 
-Such an approach is easily integrated into the `msprog::MSprog` function through its argument `relapse_indep`, allowing to specify custom relapse-free intervals based on *any subset* of the checkpoints 1-3, thus allowing to replicate any of the above-mentioned definitions. The `relapse_indep` argument must be provided in the form produced by function `msprog::relapse_indep_from_bounds()`, as follows:
+Such an approach is easily integrated into the `msprog::MSprog()` function through its argument `relapse_indep`, allowing to specify custom relapse-free intervals based on *any subset* of the checkpoints 1-3, thus allowing to replicate any of the above-mentioned definitions. The `relapse_indep` argument must be provided in the form produced by function `msprog::relapse_indep_from_bounds()`, as follows:
 ``` {r, eval=FALSE}
 output <- MSprog(...
                  relapse_indep=relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1, prec_type, use_end_dates),

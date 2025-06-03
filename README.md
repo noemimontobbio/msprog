@@ -25,8 +25,8 @@ The package also provides two toy datasets for function testing:
   associated with the patients in `toydata_visits`.
 
 Please refer to the documentation for function usage (e.g. `?MSprog`)
-and data structure (e.g. `?toydata_visits`). The whole documentation is
-contained into the [reference manual (PDF)](msprog.pdf). Additionally, a
+and data structure (e.g. `?toydata_visits`). The whole documentation can
+be found in the [reference manual (PDF)](msprog.pdf). Additionally, a
 detailed tutorial providing examples and best-practice tips is available
 as a [package vignette](#vignette): *Analysing disability course in MS*.
 
@@ -84,6 +84,10 @@ output <- MSprog(toydata_visits,                                      # provide 
                  event='multiple', baseline='roving',                 # modify default options
                  conf_tol_days=0, conf_unbounded_right=T,             # modify default options
                  relapse=toydata_relapses)                            # provide data on relapses
+#> Warning: Setting row names on a tibble is deprecated.
+#> Setting row names on a tibble is deprecated.
+#> Setting row names on a tibble is deprecated.
+#> Setting row names on a tibble is deprecated.
 #> 
 #> ---
 #> Outcome: edss
