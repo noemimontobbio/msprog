@@ -17,7 +17,6 @@ value_milestone(
   rdate_col = NULL,
   conf_days = 24 * 7,
   conf_tol_days = c(7, 365),
-  conf_unbounded_right = F,
   require_sust_days = 0,
   relapse_to_event = 0,
   relapse_to_conf = 30,
@@ -60,10 +59,8 @@ and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 
 \item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 or list-like of length 2 (different tolerance on left and right).
-In all cases, the right end of the interval is ignored if \code{conf_unbounded_right} is set to \code{TRUE}.}
-
-\item{conf_unbounded_right}{If \code{TRUE}, confirmation window is unbounded on the right
-(regardless of the right end indicated by \code{conf_tol_days}).}
+The right end of the interval can be set to \code{Inf} (confirmation window unbounded on the right
+-- e.g., "confirmed over 12 \emph{or more} weeks").}
 
 \item{require_sust_days}{Minimum number of days over which the milestone must be sustained
 (i.e., confirmed at \emph{all} visits occurring in the specified period).
@@ -103,5 +100,5 @@ outcome measure (see arguments \code{outcome} and \code{worsening}).
 An event is only retained if \strong{confirmed}, i.e., if all values \emph{up to} the
 confirmation visit exceed the milestone.
 Valid time windows for confirmation visits are determined by arguments
-\code{conf_days}, \code{conf_tol_days}, \code{conf_unbounded_right}, \code{relapse_to_conf}.
+\code{conf_days}, \code{conf_tol_days}, \code{relapse_to_conf}.
 }

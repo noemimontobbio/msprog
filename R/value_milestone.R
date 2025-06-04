@@ -9,7 +9,7 @@
 #' An event is only retained if **confirmed**, i.e., if all values *up to* the
 #' confirmation visit exceed the milestone.
 #' Valid time windows for confirmation visits are determined by arguments
-#' `conf_days`, `conf_tol_days`, `conf_unbounded_right`, `relapse_to_conf`.
+#' `conf_days`, `conf_tol_days`, `relapse_to_conf`.
 #'
 #' @param data a `data.frame` containing longitudinal data, including: subject ID, outcome value, date of visit.
 #' @param milestone Disability milestone (outcome value to check data against).
@@ -34,9 +34,8 @@
 #' @param conf_days Period before confirmation (days).
 #' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 #' or list-like of length 2 (different tolerance on left and right).
-#' In all cases, the right end of the interval is ignored if `conf_unbounded_right` is set to `TRUE`.
-#' @param conf_unbounded_right If `TRUE`, confirmation window is unbounded on the right
-#' (regardless of the right end indicated by `conf_tol_days`).
+#' The right end of the interval can be set to `Inf` (confirmation window unbounded on the right
+#' -- e.g., "confirmed over 12 \emph{or more} weeks").
 #' @param require_sust_days Minimum number of days over which the milestone must be sustained
 #' (i.e., confirmed at \emph{all} visits occurring in the specified period).
 #' If the milestone is sustained for the remainder of the follow-up period, it is considered reached regardless of follow-up duration.
@@ -64,7 +63,7 @@
 
 value_milestone <- function(data, milestone, value_col, date_col, subj_col, outcome,
                             worsening=NULL, relapse=NULL, rsubj_col=NULL, rdate_col=NULL,
-                            conf_days=24*7, conf_tol_days=c(7, 365), conf_unbounded_right=F, require_sust_days=0,
+                            conf_days=24*7, conf_tol_days=c(7, 365), require_sust_days=0,
                             relapse_to_event=0, relapse_to_conf=30, impute_last_visit=F,
                             verbose=0) {
 
@@ -112,9 +111,6 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
   }
 
   # Define a confirmation window for each value of conf_days
-  if (conf_unbounded_right) {
-    conf_tol_days[2] <- Inf
-  }
   conf_window <- lapply(conf_days, function(t) {
     lower <- as.integer(t) - conf_tol_days[1]
     upper <- as.integer(t) + conf_tol_days[2]

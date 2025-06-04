@@ -6,7 +6,8 @@
 #' The relapse-free intervals may be anchored to (any subset of) the following three data-driven checkpoints.
 #' \itemize{
 #' \item{`'prec'`: a visit preceding the event: can be (i) the current baseline, (ii) the last visit before the event,
-#' or (iii) the last pre-worsening visit (`i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`);}
+#' or (iii) the last pre-worsening visit (`i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`,
+#' and same for the confirmation visit);}
 #' \item{`'event'`: the disability worsening event;}
 #' \item{`'conf'`: the (first) confirmation visit.}
 #' }

@@ -8,6 +8,10 @@
 [![R-CMD-check](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
+<p align="center">
+<img src="man/figures/logo.png" width="150"/>
+</p>
+
 `msprog` is an R package providing tools for exhaustive and reproducible
 analysis of disability course in multiple sclerosis (MS) from
 longitudinal data \[[1](#ref-msprog2024)\].

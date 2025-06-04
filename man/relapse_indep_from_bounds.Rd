@@ -49,7 +49,8 @@ into a named list to be given as argument \code{relapse_indep} to function \code
 The relapse-free intervals may be anchored to (any subset of) the following three data-driven checkpoints.
 \itemize{
 \item{\code{'prec'}: a visit preceding the event: can be (i) the current baseline, (ii) the last visit before the event,
-or (iii) the last pre-worsening visit (\code{i} such that \code{outcome[event] - outcome[i] >= delta_fun(outcome[i])});}
+or (iii) the last pre-worsening visit (\code{i} such that \code{outcome[event] - outcome[i] >= delta_fun(outcome[i])},
+and same for the confirmation visit);}
 \item{\code{'event'}: the disability worsening event;}
 \item{\code{'conf'}: the (first) confirmation visit.}
 }

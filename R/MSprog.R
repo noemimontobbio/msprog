@@ -14,8 +14,8 @@
 #' CDW events are classified as relapse-associated or relapse-independent based on their relative timing
 #' with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
 #' CDW events occurring within a specified interval (`relapse_assoc` argument) from a relapse;
-#' the definition of progression independent of relapse activity (PIRA) is established by specifying relapse-free intervals
-#' around the baseline, CDW event, and confirmation visits (`relapse_indep` argument).
+#' the definition of progression independent of relapse activity (PIRA) is established by specifying
+#' relapse-free intervals (`relapse_indep` argument).
 #'
 #'
 #' @param data `data.frame` containing longitudinal data, including: subject ID, outcome value, date of visit.
@@ -113,7 +113,7 @@
 #' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 #' or list-like of length 2 (different tolerance on left and right).
 #' The right end of the interval can be set to `Inf` (confirmation window unbounded on the right
-#' -- e.g., "confirmation at 12 \emph{or more} weeks").
+#' -- e.g., "confirmed over 12 \emph{or more} weeks").
 #' @param require_sust_days Minimum number of days over which a confirmed change must be sustained
 #' (i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
 #' Events sustained for the remainder of the follow-up period are always retained regardless of follow-up duration.
@@ -152,9 +152,10 @@
 #' Must be given in the form produced by function [relapse_indep_from_bounds()] by calling
 #' \cr`relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1)`\cr
 #' to specify the intervals around (any subset of) three checkpoints:
-#' (i) a preceding visit, e.g., baseline or last visit before the event (`p0` and `p1`),
+#' (i) a preceding visit, e.g., baseline or last visit before the worsening (`p0` and `p1`),
 #' (ii) the event (`e0` and `e1`), and (iii) the first available confirmation visit (`c0` and `c1`).
-#' If relapse end dates are available (`renddate_col`), it is possible to define PIRA based on those
+#' See [relapse_indep_from_bounds()] function docs for more details on how to define the intervals.
+#' If relapse end dates are available (`renddate_col`), it is possible to also define PIRA based on those
 #' by setting `use_end_dates=T` in [relapse_indep_from_bounds()].
 #' @param impute_last_visit Imputation probability for worsening events occurring at last visit (i.e. with no confirmation).
 #' Unconfirmed worsening events occurring at the last visit are never imputed if `impute_last_visit=0`;
@@ -548,7 +549,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       # Set baseline (skip if within relapse influence)
       if (skip_local_extrema!='none') {
         prec <- ifelse(bl_idx==1, data_id[bl_idx,][[value_col]], data_id[bl_idx-1,][[value_col]])
-        prec2 <- ifelse(bl_idx<=2, data_id[bl_idx,][[value_col]], data_id[bl_idx-2,][[value_col]])
+        prec2 <- ifelse(bl_idx<=2, -1, data_id[bl_idx-2,][[value_col]])
         subs <- ifelse(bl_idx==nvisits, data_id[bl_idx,][[value_col]], data_id[bl_idx+1,][[value_col]])
         vis <- data_id[bl_idx,][[value_col]]
         local_extr <- ((isevent_loc(prec, bl=vis, type='wors', st=skip_local_extrema=='all')
@@ -565,14 +566,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
              || local_extr)) {
         if (verbose == 2) {
           message("Baseline (visit no.", bl_idx, ") is ",
-                  ifelse(local_extr, "a local estremum: ", "within relapse influence: "),
+                  ifelse(local_extr, "a local extremum: ", "within relapse influence: "),
                   "moved to visit no.", bl_idx + 1)
         }
         bl_idx <- bl_idx + 1
         #
         if (skip_local_extrema != 'none') {
           prec <- ifelse(bl_idx==1, data_id[bl_idx,][[value_col]], data_id[bl_idx-1,][[value_col]])
-          prec2 <- ifelse(bl_idx<=2, data_id[bl_idx,][[value_col]], data_id[bl_idx-2,][[value_col]])
+          prec2 <- ifelse(bl_idx<=2, -1, data_id[bl_idx-2,][[value_col]])
           subs <- ifelse(bl_idx==nvisits, data_id[bl_idx,][[value_col]], data_id[bl_idx+1,][[value_col]])
           vis <- data_id[bl_idx,][[value_col]]
           local_extr <- ((isevent_loc(prec, bl=vis, type='wors', st=skip_local_extrema=='all')
@@ -828,14 +829,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       else if ( #data_id[change_idx,][[value_col]] >= min_value_ifany &&
          isevent_loc(data_id[change_idx,][[value_col]], bl=bl[[value_col]], type='wors')  # value worsened (>delta) from baseline
 
-         && ((length(conf_idx) > 0 && # confirmation visits available
-           ifelse(check_intermediate,
+         && ((length(conf_idx) > 0 # confirmation visits available
+           && ifelse(check_intermediate,
               all(sapply((change_idx + 1):conf_idx[[1]],
                function(x) isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='wors'))),  # worsening is confirmed at (all visits up to) first valid date
               isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl=bl[[value_col]], type='wors') # worsening is confirmed at first valid date
            )
-          # && all(sapply((change_idx + 1):conf_idx[[1]],
-          #     function(x) data_id[x,][[value_col]] >= min_value_ifany)) # confirmation above min_value too
           ) || (data_id[change_idx,][[date_col]] - data_id[1,][[date_col]] <= impute_max_fu
                 && rbinom(1,1,impute_last_visit)
                 && change_idx == nvisits)
@@ -914,7 +913,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                           #
                           if (skip_local_extrema != 'none') {
                             prec <- ifelse(iref==1, data_id[iref,][[value_col]], data_id[iref-1,][[value_col]])
-                            prec2 <- ifelse(iref<=2, data_id[iref,][[value_col]], data_id[iref-2,][[value_col]])
+                            prec2 <- ifelse(iref<=2, -1, data_id[iref-2,][[value_col]])
                             subs <- ifelse(iref==nvisits, data_id[iref,][[value_col]], data_id[iref+1,][[value_col]])
                             vis <- data_id[iref,][[value_col]]
                             local_extr <- ((isevent_loc(prec, bl=vis, type='wors', st=skip_local_extrema=='all')
@@ -926,8 +925,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                             local_extr <- F
                           }
                           #
-                          valid_ref <- isevent_loc(data_id[change_idx, value_col],
-                                        bl=data_id[iref, value_col], type='wors') & !local_extr
+                          event_ok <- isevent_loc(data_id[change_idx, value_col],
+                                                  bl=data_id[iref, value_col], type='wors')
+                          conf_ok <- ifelse(check_intermediate,
+                                all(sapply((change_idx + 1):conf_idx[[1]],
+                                    function(x) isevent_loc(data_id[x,][[value_col]], bl=data_id[iref,][[value_col]], type='wors'))),  # worsening is confirmed at (all visits up to) first valid date
+                                isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl=data_id[iref,][[value_col]], type='wors') # worsening is confirmed at first valid date
+                          )
+                          valid_ref <- event_ok & conf_ok & !local_extr
                         }
                         if (valid_ref) {prec <- data_id[iref,]} else {prec <- bl}   # last pre-worsening visit
                       } else {

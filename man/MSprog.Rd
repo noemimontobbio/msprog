@@ -159,7 +159,7 @@ If \code{validconf_col=NULL}, all visits are potentially used as confirmation vi
 \item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 or list-like of length 2 (different tolerance on left and right).
 The right end of the interval can be set to \code{Inf} (confirmation window unbounded on the right
--- e.g., "confirmation at 12 \emph{or more} weeks").}
+-- e.g., "confirmed over 12 \emph{or more} weeks").}
 
 \item{require_sust_days}{Minimum number of days over which a confirmed change must be sustained
 (i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
@@ -205,9 +205,10 @@ is overwritten by the relapse duration.}
 Must be given in the form produced by function \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}} by calling
 \cr\code{relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1)}\cr
 to specify the intervals around (any subset of) three checkpoints:
-(i) a preceding visit, e.g., baseline or last visit before the event (\code{p0} and \code{p1}),
+(i) a preceding visit, e.g., baseline or last visit before the worsening (\code{p0} and \code{p1}),
 (ii) the event (\code{e0} and \code{e1}), and (iii) the first available confirmation visit (\code{c0} and \code{c1}).
-If relapse end dates are available (\code{renddate_col}), it is possible to define PIRA based on those
+See \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}} function docs for more details on how to define the intervals.
+If relapse end dates are available (\code{renddate_col}), it is possible to also define PIRA based on those
 by setting \code{use_end_dates=T} in \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}}.}
 
 \item{impute_last_visit}{Imputation probability for worsening events occurring at last visit (i.e. with no confirmation).
@@ -258,8 +259,8 @@ Valid time windows for confirmation visits are determined by arguments
 CDW events are classified as relapse-associated or relapse-independent based on their relative timing
 with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
 CDW events occurring within a specified interval (\code{relapse_assoc} argument) from a relapse;
-the definition of progression independent of relapse activity (PIRA) is established by specifying relapse-free intervals
-around the baseline, CDW event, and confirmation visits (\code{relapse_indep} argument).
+the definition of progression independent of relapse activity (PIRA) is established by specifying
+relapse-free intervals (\code{relapse_indep} argument).
 }
 \examples{
 # 1. EDSS course
