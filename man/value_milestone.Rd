@@ -15,12 +15,13 @@ value_milestone(
   relapse = NULL,
   rsubj_col = NULL,
   rdate_col = NULL,
+  validconf_col = NULL,
   conf_days = 24 * 7,
   conf_tol_days = c(7, 365),
   require_sust_days = 0,
   relapse_to_event = 0,
   relapse_to_conf = 30,
-  impute_last_visit = F,
+  impute_last_visit = 0,
   verbose = 0
 )
 }
@@ -55,6 +56,10 @@ and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 
 \item{rdate_col}{Name of date column for relapse data, if different from outcome data.}
 
+\item{validconf_col}{Name of data column specifying which visits can (\code{T}) or cannot (\code{F}) be used as confirmation visits.
+The input data does not necessarily have to include such a column.
+If \code{validconf_col=NULL}, all visits are potentially used as confirmation visits.}
+
 \item{conf_days}{Period before confirmation (days).}
 
 \item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
@@ -67,12 +72,22 @@ The right end of the interval can be set to \code{Inf} (confirmation window unbo
 If the milestone is sustained for the remainder of the follow-up period, it is considered reached regardless of follow-up duration.
 Setting \code{require_sust_days=Inf}, values are retained only when sustained for the remainder of the follow-up period.}
 
-\item{relapse_to_event}{Minimum distance from a relapse (days) for the milestone to be considered reached.}
+\item{relapse_to_event}{Minimum distance from a relapse (days) for the milestone to be considered reached.
+Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
+(minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+Note that setting the distance to zero means retaining the event regardless of surrounding relapses.}
 
-\item{relapse_to_conf}{Minimum distance from a relapse (days) for a valid confirmation visit.}
+\item{relapse_to_conf}{Minimum distance from a relapse (days) for a visit to be a valid confirmation visit.
+Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
+(minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+Note that setting the distance to zero means using any visit for confirmation regardless of surrounding relapses.}
 
-\item{impute_last_visit}{If \code{TRUE}, impute milestone occurring at last visit (i.e. with no confirmation).
-If \code{FALSE}, censor it.}
+\item{impute_last_visit}{Imputation probability when the milestone is reached at the last visit (i.e. with no confirmation).
+Unconfirmed values exceeding the milestone at the last visit are never imputed if \code{impute_last_visit=0};
+they are always imputed if \code{impute_last_visit=1};
+they are imputed with probability \code{p}, \verb{0<p<1}, if \code{impute_last_visit=p}.
+If a value \code{N>1} is passed, unconfirmed values exceeding the milestone are imputed only if occurring within \code{N} days of follow-up
+(e.g., in case of early discontinuation).}
 
 \item{verbose, }{One of:
 \itemize{

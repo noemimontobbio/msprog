@@ -17,8 +17,8 @@ An object of class \code{data.frame}
 data(toydata_visits)
 }
 \description{
-Small, artificially generated toy data set providing Extended Disability Status Scale (EDSS)
-and Symbol Digit Modalities Test (SDMT) information on 4 example patients
+Artificially generated toy data set providing Extended Disability Status Scale (EDSS)
+and Symbol Digit Modalities Test (SDMT) scores in a small cohort of example patients
 to illustrate the use of the package.
 }
 \examples{

@@ -9,12 +9,14 @@
 <!-- badges: end -->
 
 <p align="center">
-<img src="man/figures/logo.png" width="150"/>
+<img src="man/figures/logo2.png" width="150"/>
 </p>
 
 `msprog` is an R package providing tools for exhaustive and reproducible
 analysis of disability course in multiple sclerosis (MS) from
-longitudinal data \[[1](#ref-msprog2024)\].
+longitudinal data \[[1](#ref-msprog2024)\]. A [**Python
+version**](https://github.com/noemimontobbio/pymsprog) of the package is
+available as well.
 
 Its core function, `MSprog()`, detects and characterises the evolution
 of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome
@@ -66,11 +68,7 @@ with respect to the relapses
 
 Several qualitative and quantitative options for event detection are
 given as arguments that can be set by the user and reported as a
-complement to the results to ensure reproducibility. These include the
-baseline scheme (fixed or roving), the events to be detected (first or
-multiple, worsening and/or improvement), the length of the relapse
-influence window and of the event confirmation period(s) with the
-relative tolerance.
+complement to the results to ensure reproducibility.
 
 The example below illustrates the function’s usage and output:
 

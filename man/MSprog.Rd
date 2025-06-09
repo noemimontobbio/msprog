@@ -68,7 +68,7 @@ MSprog(
 
 \item{renddate_col}{Name of end date column for relapse data (if present).}
 
-\item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in data are included.}
+\item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in \code{data} are included.}
 
 \item{delta_fun}{Custom function specifying the minimum shift in the outcome measure that counts as a valid change from the provided reference value.
 The function provided must take a numeric value (reference score) as input, and return a numeric value corresponding to the minimum shift from baseline, see example 3 below.

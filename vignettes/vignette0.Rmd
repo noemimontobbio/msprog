@@ -42,19 +42,20 @@ knit_hooks$set(output = function(x, options) {
 
 This vignette illustrates how to use the `msprog` package to study the evolution of disability in multiple sclerosis (MS) based on repeated assessments through time of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure). We'll start by illustrating the type of [input data](#input) needed, and by giving a [minimal working example](#example) to introduce the main function and facilitate the reading of the document. We'll then move on to a more detailed description of the different parameter configurations.
 
-```{r}
-library(msprog)
-```
-
 <!-- ```{r} -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R') -->
-<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData') -->
-<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData') -->
-<!-- library(dplyr) -->
+<!-- library(msprog) -->
 <!-- ``` -->
+
+```{r}
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R')
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/value_milestone.R')
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R')
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R')
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R')
+load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData')
+load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData')
+library(dplyr)
+```
 
 
 # Input data {#input}
@@ -67,7 +68,7 @@ The data must be organised in a `data.frame` object containing (at least) the fo
 
 The visits should be listed in chronological order (if they are not, `msprog::MSprog()` will sort them automatically before analysing them).
 
-The `msprog` package provides a toy dataset `toydata_visits` with artificially generated EDSS and SDMT assessments for four patients.
+The `msprog` package provides a toy dataset `toydata_visits` with artificially generated EDSS and SDMT assessments for a small cohort of patients.
 ```{r}
 head(toydata_visits)
 ```
@@ -211,28 +212,30 @@ As already mentioned above, extra caution should be used when applying any re-ba
 
 The `event` argument allows to specify which events to detect. By default, it is set to `'firstCDW'` (only detect the first CDW event). It can be set to `'multiple'` to sequentially detect all disability worsening or improvement events.
 
-For example, extracting multiple EDSS events for subject `4` from `toydata_visits` with a **fixed** baseline would result in the following.
+For example, extracting multiple EDSS events for subject `5` from `toydata_visits` with a **fixed** baseline would result in the following.
 ```{r}
-print(toydata_visits[toydata_visits$id==4, c('date', 'EDSS')]) # EDSS visits
+print(toydata_visits[toydata_visits$id==5, c('date', 'EDSS')]) # EDSS visits
 
 output <- MSprog(data=toydata_visits, 
                  subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
-                 subjects=4,
-                 relapse=toydata_relapses, conf_days=7*12, event='multiple', baseline='fixed', 
+                 subjects=5,
+                 relapse=toydata_relapses, conf_days=7*12, proceed_from='firstconf',
+                 event='multiple', baseline='fixed',
                  include_dates=TRUE, verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
 
-Since the reference value was kept fixed at the first visit (EDSS=4.5), the EDSS worsening at visit 4 (EDSS=5) was not detected. On the other hand, with a **roving** baseline scheme, the baseline is moved to visit 3 after the confirmed improvement and the worsening event is correctly detected:
+With these settings, the EDSS worsening at visit 3 (EDSS=5, confirmed at visit 4) does not trigger a re-baseline. The algorithm keeps searching for events from after the confirmation visit (`proceed_from='firstconf'`), evaluating the changes **relative to the original baseline** (EDSS=4). This results in two more "worsening events" detected at visits 5 (EDSS=5) and visit 8 (EDSS=5), when in reality the EDSS score is stable. This mistake is avoided by adopting a **roving** baseline scheme:
 ```{r}
 output <- MSprog(data=toydata_visits, 
                  subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
-                 relapse=toydata_relapses, subjects=4,
-                conf_days=7*12, event='multiple', baseline='roving', 
+                 subjects=5,
+                 relapse=toydata_relapses, conf_days=7*12, proceed_from='firstconf', 
+                 event='multiple', baseline='roving', 
                 include_dates=TRUE, verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
-
+The baseline is now moved to the confirmation visit of the first worsening event (visit 4, EDSS=5.5). No further confirmed changes are detected with respect to this baseline.
 <br />
 
 Other valid values for the `event` argument are:
@@ -349,7 +352,7 @@ A more detailed report of the event detection process in each of the three cases
 
 
 
-# Relapse-based classification of disability worsening events
+# Classification of CDW events
 
 When relevant, relapse data is to be provided using the optional `relapse` argument in `MSprog()`. It should be given as a `data.frame` containing subject IDs and relapse onset dates (see ["Input data"](#input))[^rnames].
 

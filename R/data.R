@@ -1,7 +1,7 @@
 #' Synthetic Longitudinal EDSS and SDMT Data
 #'
-#' Small, artificially generated toy data set providing Extended Disability Status Scale (EDSS)
-#' and Symbol Digit Modalities Test (SDMT) information on 4 example patients
+#' Artificially generated toy data set providing Extended Disability Status Scale (EDSS)
+#' and Symbol Digit Modalities Test (SDMT) scores in a small cohort of example patients
 #' to illustrate the use of the package.
 #'
 #' @name toydata_visits
@@ -29,7 +29,8 @@ NULL
 
 #' Synthetic Relapse Data
 #'
-#' Artificially generated relapse dates for some example patients in [toydata_visits] to illustrate the use of the package.
+#' Artificially generated relapse dates for some example patients in [toydata_visits]
+#' to illustrate the use of the package.
 #'
 #' @name toydata_relapses
 #'

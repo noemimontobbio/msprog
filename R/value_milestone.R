@@ -31,6 +31,9 @@
 #' @param relapse `data.frame` containing longitudinal data, including: subject ID and relapse date.
 #' @param rsubj_col Name of subject column for relapse data, if different from outcome data.
 #' @param rdate_col Name of date column for relapse data, if different from outcome data.
+#' @param validconf_col Name of data column specifying which visits can (`T`) or cannot (`F`) be used as confirmation visits.
+#' The input data does not necessarily have to include such a column.
+#' If `validconf_col=NULL`, all visits are potentially used as confirmation visits.
 #' @param conf_days Period before confirmation (days).
 #' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
 #' or list-like of length 2 (different tolerance on left and right).
@@ -41,9 +44,19 @@
 #' If the milestone is sustained for the remainder of the follow-up period, it is considered reached regardless of follow-up duration.
 #' Setting `require_sust_days=Inf`, values are retained only when sustained for the remainder of the follow-up period.
 #' @param relapse_to_event Minimum distance from a relapse (days) for the milestone to be considered reached.
-#' @param relapse_to_conf Minimum distance from a relapse (days) for a valid confirmation visit.
-#' @param impute_last_visit If `TRUE`, impute milestone occurring at last visit (i.e. with no confirmation).
-#' If `FALSE`, censor it.
+#' Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
+#' (minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+#' Note that setting the distance to zero means retaining the event regardless of surrounding relapses.
+#' @param relapse_to_conf Minimum distance from a relapse (days) for a visit to be a valid confirmation visit.
+#' Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
+#' (minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+#' Note that setting the distance to zero means using any visit for confirmation regardless of surrounding relapses.
+#' @param impute_last_visit Imputation probability when the milestone is reached at the last visit (i.e. with no confirmation).
+#' Unconfirmed values exceeding the milestone at the last visit are never imputed if `impute_last_visit=0`;
+#' they are always imputed if `impute_last_visit=1`;
+#' they are imputed with probability `p`, `0<p<1`, if `impute_last_visit=p`.
+#' If a value `N>1` is passed, unconfirmed values exceeding the milestone are imputed only if occurring within `N` days of follow-up
+#' (e.g., in case of early discontinuation).
 #' @param verbose, One of:
 #' \itemize{
 #'  \item{0}{ (print no info);}
@@ -63,14 +76,36 @@
 
 value_milestone <- function(data, milestone, value_col, date_col, subj_col, outcome,
                             worsening=NULL, relapse=NULL, rsubj_col=NULL, rdate_col=NULL,
-                            conf_days=24*7, conf_tol_days=c(7, 365), require_sust_days=0,
-                            relapse_to_event=0, relapse_to_conf=30, impute_last_visit=F,
+                            validconf_col=NULL, conf_days=24*7, conf_tol_days=c(7, 365), require_sust_days=0,
+                            relapse_to_event=0, relapse_to_conf=30, impute_last_visit=0,
                             verbose=0) {
+
+  ###########################
+  # CHECKS ON ARGUMENT VALUES
 
   # If conf_tol_days is a single value, duplicate it (equal left and right tolerance)
   if (length(conf_tol_days)==1) {
     conf_tol_days <- c(conf_tol_days, conf_tol_days)
   }
+
+  # If relapse_to_event is a single value, set right bound to zero
+  if (length(relapse_to_event)==1) {
+    relapse_to_event <- c(relapse_to_event, 0)
+  }
+  # If relapse_to_conf is a single value, set right bound to zero
+  if (length(relapse_to_conf)==1) {
+    relapse_to_conf <- c(relapse_to_conf, 0)
+  }
+
+  if (is.null(outcome) ||
+      !(tolower(outcome) %in% c('edss', 'nhpt', 't25fw', 'sdmt'))) {
+    outcome <- 'outcome'
+  } else {
+    outcome <- tolower(outcome)
+  }
+
+  # end of checks
+  ###########################
 
   # If no column names are specified for the relapse file, use the main ones
   if (is.null(rsubj_col)) {
@@ -80,14 +115,22 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
     rdate_col <- date_col
   }
 
-
+  # Create empty relapse file if none is provided
   if (is.null(relapse)) {
     relapse <- data.frame(matrix(nrow=0, ncol=2))
     names(relapse) <- c(rsubj_col, rdate_col)
   }
 
+  # If no `validconf_col` is specified, create a dummy one
+  if (is.null(validconf_col)) {
+    validconf_col <- 'validconf'
+    data$validconf <- T
+  } else {
+    data[[validconf_col]] <- as.logical(data[[validconf_col]])
+  }
+
   # Remove missing values from columns of interest
-  data <- data[complete.cases(data[ , c(subj_col, value_col, date_col)]), ]
+  data <- data[complete.cases(data[ , c(subj_col, value_col, date_col, validconf_col)]), ]
   relapse <- relapse[complete.cases(relapse[, c(rsubj_col, rdate_col)]), ]
 
   # Convert dates to Date format
@@ -100,6 +143,17 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
   } else {global_start <- min(data[[date_col]])}
   data[[date_col]] <- as.numeric(difftime(data[[date_col]], global_start), units='days')
   relapse[[rdate_col]] <- as.numeric(difftime(relapse[[rdate_col]], global_start), units='days')
+
+  if (impute_last_visit<0) {
+    stop('`impute_last_visit` must be nonnegative')
+  } else if (impute_last_visit<=1) {
+    # If impute_last_visit is a probability, set no limit to follow-up length (Inf)
+    impute_max_fu <- Inf
+  } else {
+    # If impute_last_visit is a follow-up time, save the value and set probability to 1
+    impute_max_fu <- impute_last_visit
+    impute_last_visit <- 1
+  }
 
   # Set direction of worsening
   if (outcome %in% c('edss', 'nhpt', 't25fw')) {
@@ -117,9 +171,13 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
     return(c(lower, upper))
   })
 
+  #################################################################
+  # Assess time to milestone
+
   all_subj <- unique(data[[subj_col]])
   nsub <- length(all_subj)
 
+  # Initialize results data.frame
   results <- data.frame(matrix(NA, ncol = 3, nrow = nsub))
   colnames(results) <- c(date_col, value_col, 'time2event')
   rownames(results) <- all_subj
@@ -137,14 +195,14 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
 
     # Sort visits in chronological order
     order_tmp <- order(data_id[[date_col]])
-    if (any(order_tmp != rownames(data_id))) {
+    if (any(order_tmp != seq_len(nrow(data_id)))) {
       data_id <- data_id[order_tmp, ]
     }
 
     nvisits <- nrow(data_id)
     first_visit <- min(data_id[[date_col]])
     relapse_id <- relapse[relapse[[rsubj_col]] == subjid, ]
-    relapse_id <- relapse_id[relapse_id[[rdate_col]] >= first_visit - relapse_to_event, ] #as.difftime(relapse_to_bl, units="days") #_d_#
+    relapse_id <- relapse_id[relapse_id[[rdate_col]] >= first_visit - relapse_to_event[1], ]
     relapse_dates <- relapse_id[[rdate_col]]
     nrel <- length(relapse_dates)
 
@@ -155,7 +213,7 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
       if (any(ucounts > 1)) {
         message("Found multiple visits in the same day: only keeping last.")
       }
-      if (any(order_tmp != rownames(data_id))) {
+      if (any(order_tmp != seq_len(nrow(data_id)))) {
         message("Visits not listed in chronological order: sorting them.")
       }
     }
@@ -166,7 +224,7 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
                                      rep(1:length(relapse_dates), each=nrow(data_id))))
       relapse_df$visit <- data_id[,][[date_col]]
       dist <- (relapse_df %>% mutate(across(1:length(relapse_dates),
-                                            ~ as.numeric(.x - visit))))[1:length(relapse_dates)]
+                                ~ as.numeric(.x - visit))))[1:length(relapse_dates)]
       distm <- - dist
       distp <- dist
       distm[distm<0] <- Inf
@@ -182,7 +240,7 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
     search_idx <- 1 # Index of where we are in the search
     while (proceed) {
 
-      if (search_idx>nvisits) {
+      if (search_idx > nvisits) {
         milestone_idx <- NA
       } else {
         milestone_idx <- NA
@@ -191,7 +249,8 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
             if (ifelse(worsening=='increase',
                        data_id[x, value_col] >= milestone,
                        data_id[x, value_col] <= milestone) # first value reaching milestone
-                && data_id[x, 'closest_rel_before'] >= relapse_to_event) # or further valid change from confirmation
+                && data_id[x, 'closest_rel_before'] >= relapse_to_event[1]
+                && data_id[x, 'closest_rel_after'] >= relapse_to_event[2])
               {
               milestone_idx <- x
               break
@@ -215,8 +274,9 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
             for (x in (milestone_idx + 1):nvisits) {
               if (data_id[x,][[date_col]] - data_id[milestone_idx,][[date_col]] >= t[1]
                   && data_id[x,][[date_col]] - data_id[milestone_idx,][[date_col]] <= t[2]  # date in confirmation range
-                  && data_id[x,][['closest_rel_before']] >= relapse_to_conf  # occurring at least `relapse_to_conf` days from last relapse
-                  # && data_id[x,][[validconf_col]]
+                  && data_id[x,][['closest_rel_before']] >= relapse_to_conf[1]  # occurring out of influence of last relapse
+                  && data_id[x,][['closest_rel_after']] >= relapse_to_conf[2]  # occurring out of influence of next relapse
+                  && data_id[x,][[validconf_col]]  # can be used as confirmation
               ) {
                 match_idx <- append(match_idx, x)
               }
@@ -230,17 +290,21 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
                   " at visit no.", milestone_idx, " (",
                   global_start + as.difftime(data_id[milestone_idx,][[date_col]], units="days"),
                   "); potential confirmation visits available: ", ifelse(length(conf_idx)>0,
-                                        paste0("no. ", paste(conf_idx, collapse=", ")), "none")
-                  )
+                                        paste0("no. ", paste(conf_idx, collapse=", ")), "none"))
         }
 
-        if ((length(conf_idx) > 0
+        if (
+          (length(conf_idx) > 0  # confirmation visits available
             && ifelse(worsening=='increase',
                       all(data_id[(milestone_idx + 1):conf_idx[[1]], value_col] >= milestone),
-                      all(data_id[(milestone_idx + 1):conf_idx[[1]], value_col] <= milestone)))
-            || (impute_last_visit && milestone_idx == nvisits)) {
+                      all(data_id[(milestone_idx + 1):conf_idx[[1]], value_col] <= milestone))   # milestone is confirmed at (all visits up to) first valid date
+            ) || (milestone_idx == nvisits  # milestone reached at last visit
+                  && data_id[milestone_idx,][[date_col]] - data_id[1,][[date_col]] <= impute_max_fu  # visit below follow-up threshold
+                  && rbinom(1, 1, impute_last_visit)  # impute with probability `impute_last_visit`
+                  )
+            ) {
 
-          if (milestone_idx == nvisits) { # i.e., when imputing event at last visit
+          if (milestone_idx == nvisits) {  # i.e., when imputing event at last visit
             conf_idx <- c(nvisits)
           }
 
@@ -255,10 +319,10 @@ value_milestone <- function(data, milestone, value_col, date_col, subj_col, outc
               next_nonsust <- which(ifelse(worsening=='increase',
                                            data_id[(conf_idx[[1]] + 1):nvisits, value_col] < milestone,
                                            data_id[(conf_idx[[1]] + 1):nvisits, value_col] > milestone)
-              )[1] + conf_idx[[1]]
+                                    )[1] + conf_idx[[1]]
             }
             valid <- is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
-                                               data_id[change_idx,][[date_col]]) > require_sust_days # worsening sustained up to end of follow-up, or for `require_sust_days`
+                                data_id[change_idx,][[date_col]]) >= require_sust_days # worsening sustained up to end of follow-up, or for `require_sust_days`
           }
 
           if (valid) {
