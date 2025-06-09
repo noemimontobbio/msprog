@@ -42,20 +42,20 @@ knit_hooks$set(output = function(x, options) {
 
 This vignette illustrates how to use the `msprog` package to study the evolution of disability in multiple sclerosis (MS) based on repeated assessments through time of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure). We'll start by illustrating the type of [input data](#input) needed, and by giving a [minimal working example](#example) to introduce the main function and facilitate the reading of the document. We'll then move on to a more detailed description of the different parameter configurations.
 
-<!-- ```{r} -->
-<!-- library(msprog) -->
-<!-- ``` -->
-
 ```{r}
-source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R')
-source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/value_milestone.R')
-source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R')
-source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R')
-source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R')
-load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData')
-load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData')
-library(dplyr)
+library(msprog)
 ```
+
+<!-- ```{r} -->
+<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R') -->
+<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/value_milestone.R') -->
+<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R') -->
+<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R') -->
+<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R') -->
+<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData') -->
+<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData') -->
+<!-- library(dplyr) -->
+<!-- ``` -->
 
 
 # Input data {#input}
