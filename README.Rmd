@@ -17,6 +17,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+<br />
+
+> 🚧 **This repository is under active development. Please make sure you are using the latest version of the package (check by running `utils::packageVersion('msprog')`) -- or at least v0.2.0, which is functionally stable, though some minor aspects may still change ahead of a full stable release on CRAN.** 🚧
+
 # msprog: reproducible assessment of disability course in MS 
 
 <!-- badges: start -->
@@ -30,11 +34,11 @@ knitr::opts_chunk$set(
 `msprog` is an R package providing tools for exhaustive and reproducible analysis of disability course in multiple sclerosis (MS) from longitudinal data [@msprog2024]. 
 A [**Python version**](https://github.com/noemimontobbio/pymsprog) of the package is available as well.
 
-Its core function, `MSprog()`, detects and characterises the evolution of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes (if any).
+Its core function, `MSprog()`, detects and characterises the evolution of an outcome measure (Expanded Disability Status Scale, EDSS; Nine-Hole Peg Test, NHPT; Timed 25-Foot Walk, T25FW; Symbol Digit Modalities Test, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes (if any).
 
 The package also provides two toy datasets for function testing:
 
-* `toydata_visits`: artificially generated EDSS and SDMT assessments for four patients;
+* `toydata_visits`: artificially generated EDSS and SDMT assessments for a small cohort of patients;
 * `toydata_relapses`: artificially generated relapse onset dates associated with the patients in `toydata_visits`.
 
 Please refer to the documentation for function usage (e.g. `?MSprog`) and data structure (e.g. `?toydata_visits`). The whole documentation can be found in the [reference manual (PDF)](msprog.pdf). Additionally, a detailed tutorial providing examples and best-practice tips is available as a [package vignette](#vignette): *Analysing disability course in MS*. 
@@ -43,7 +47,7 @@ Please refer to the documentation for function usage (e.g. `?MSprog`) and data s
 
 **If you use this package in your work, please cite it [as below](#citation)**.
 
-For any questions, requests for new features, or bug reporting, please contact: noemi.montobbio\@unige.it.<br /> Any feedback is highly appreciated!
+For any questions, requests for new features, or bug reporting, please contact: **noemi.montobbio\@unige.it**. Any feedback is highly appreciated!
 
 <a id="install"></a>
 
@@ -57,13 +61,12 @@ If using RStudio, please make sure to restart the R session right before running
 devtools::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
 ```
 
-## Usage
+## Getting started
 
-`MSprog()` detects the events sequentially by scanning the outcome values in chronological order, and classifies worsening events as relapse-associated or relapse-independent based on their relative timing with respect to the relapses [@lublin2014; @kappos2018; @silent2019].
+The `MSprog()` function detects the events sequentially by scanning the outcome values in chronological order.
 
-Several qualitative and quantitative options for event detection are given as arguments that can be set by the user and reported as a complement to the results to ensure reproducibility.
-
-The example below illustrates the function's usage and output:
+The example below illustrates how to import toy data and apply `MSprog()` to analyse EDSS course with 
+the default settings.
 
 ```{r}
 library(msprog)
@@ -76,10 +79,23 @@ data(toydata_relapses)
 output <- MSprog(toydata_visits,                                      # provide data on visits
                  subj_col='id', value_col='EDSS', date_col='date',    # specify column names
                  outcome='edss',                                      # specify outcome type
-                 event='multiple', baseline='roving',                 # modify default options
-                 conf_tol_days=c(0, Inf),                             # modify default options
                  relapse=toydata_relapses)                            # provide data on relapses
 ```
+
+Several qualitative and quantitative options for event detection are given as arguments that 
+can be set by the user and reported as a complement to the results to ensure reproducibility. 
+For example, instead of only detecting the first confirmed disability worsening (CDW) event for 
+each subject, we can detect *all* disability events sequentially by moving the baseline after
+each event (`event='multiple', baseline='roving'`)`:
+
+```{r}
+output <- MSprog(toydata_visits,                                      # provide data on visits
+                 subj_col='id', value_col='EDSS', date_col='date',    # specify column names
+                 outcome='edss',                                      # specify outcome type
+                 event='multiple', baseline='roving',                 # modify default options
+                 relapse=toydata_relapses)                            # provide data on relapses
+```
+
 The function prints out a concise report of the results, and of the options used to obtain them. Complete results are stored in an object of class `MSprogOutput` with the following attributes.
 
 1. `event_count`: a `data.frame` containing the event sequence detected for each subject, and the counts for each event type.

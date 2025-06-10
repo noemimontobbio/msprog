@@ -1,6 +1,14 @@
 
 <!-- README.md is generated from README.Rmd. Please only edit README.Rmd -->
 
+<br />
+
+> 🚧 **This repository is under active development. Please make sure you
+> are using the latest version of the package (check by running
+> `utils::packageVersion('msprog')`) – or at least v0.2.0, which is
+> functionally stable, though some minor aspects may still change ahead
+> of a full stable release on CRAN.** 🚧
+
 # msprog: reproducible assessment of disability course in MS
 
 <!-- badges: start -->
@@ -19,14 +27,16 @@ version**](https://github.com/noemimontobbio/pymsprog) of the package is
 available as well.
 
 Its core function, `MSprog()`, detects and characterises the evolution
-of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome
-measure) for one or more subjects, based on repeated assessments through
-time and on the dates of acute episodes (if any).
+of an outcome measure (Expanded Disability Status Scale, EDSS; Nine-Hole
+Peg Test, NHPT; Timed 25-Foot Walk, T25FW; Symbol Digit Modalities Test,
+SDMT; or any custom outcome measure) for one or more subjects, based on
+repeated assessments through time and on the dates of acute episodes (if
+any).
 
 The package also provides two toy datasets for function testing:
 
 - `toydata_visits`: artificially generated EDSS and SDMT assessments for
-  four patients;
+  a small cohort of patients;
 - `toydata_relapses`: artificially generated relapse onset dates
   associated with the patients in `toydata_visits`.
 
@@ -42,7 +52,7 @@ as a [package vignette](#vignette): *Analysing disability course in MS*.
 below](#citation)**.
 
 For any questions, requests for new features, or bug reporting, please
-contact: noemi.montobbio@unige.it.<br /> Any feedback is highly
+contact: **noemi.montobbio@unige.it**. Any feedback is highly
 appreciated!
 
 <a id="install"></a>
@@ -58,19 +68,13 @@ the R session right before running the installation.
 devtools::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
 ```
 
-## Usage
+## Getting started
 
-`MSprog()` detects the events sequentially by scanning the outcome
-values in chronological order, and classifies worsening events as
-relapse-associated or relapse-independent based on their relative timing
-with respect to the relapses
-\[[2](#ref-lublin2014)–[4](#ref-silent2019)\].
+The `MSprog()` function detects the events sequentially by scanning the
+outcome values in chronological order.
 
-Several qualitative and quantitative options for event detection are
-given as arguments that can be set by the user and reported as a
-complement to the results to ensure reproducibility.
-
-The example below illustrates the function’s usage and output:
+The example below illustrates how to import toy data and apply
+`MSprog()` to analyse EDSS course with the default settings.
 
 ``` r
 library(msprog)
@@ -83,13 +87,43 @@ data(toydata_relapses)
 output <- MSprog(toydata_visits,                                      # provide data on visits
                  subj_col='id', value_col='EDSS', date_col='date',    # specify column names
                  outcome='edss',                                      # specify outcome type
-                 event='multiple', baseline='roving',                 # modify default options
-                 conf_tol_days=c(0, Inf),                             # modify default options
                  relapse=toydata_relapses)                            # provide data on relapses
 #> 
 #> ---
 #> Outcome: edss
-#> Confirmation over: 84 days (-0 days, +Inf days)
+#> Confirmation over: 84 days (-7 days, +730.5 days)
+#> Baseline: fixed
+#> Baseline skipped if: <30 days from last relapse
+#> Event skipped if: -
+#> Confirmation visit skipped if: <30 days from last relapse
+#> Events detected: firstCDW
+#> 
+#> *Please use `print(output)` to display full info on event detection criteria*
+#> 
+#> ---
+#> Total subjects: 6
+#> ---
+#> Subjects with disability worsening: 3 (PIRA: 2; RAW: 1)
+```
+
+Several qualitative and quantitative options for event detection are
+given as arguments that can be set by the user and reported as a
+complement to the results to ensure reproducibility. For example,
+instead of only detecting the first confirmed disability worsening (CDW)
+event for each subject, we can detect *all* disability events
+sequentially by moving the baseline after each event
+(`event='multiple', baseline='roving'`)\`:
+
+``` r
+output <- MSprog(toydata_visits,                                      # provide data on visits
+                 subj_col='id', value_col='EDSS', date_col='date',    # specify column names
+                 outcome='edss',                                      # specify outcome type
+                 event='multiple', baseline='roving',                 # modify default options
+                 relapse=toydata_relapses)                            # provide data on relapses
+#> 
+#> ---
+#> Outcome: edss
+#> Confirmation over: 84 days (-7 days, +730.5 days)
 #> Baseline: roving
 #> Baseline skipped if: <30 days from last relapse
 #> Event skipped if: -
@@ -99,13 +133,13 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> *Please use `print(output)` to display full info on event detection criteria*
 #> 
 #> ---
-#> Total subjects: 4
+#> Total subjects: 6
 #> ---
-#> Subjects with disability worsening: 3 (PIRA: 3; RAW: 1)
-#> Subjects with disability improvement: 1
+#> Subjects with disability worsening: 4 (PIRA: 4; RAW: 1)
+#> Subjects with disability improvement: 2
 #> ---
-#> CDW events: 4 (PIRA: 3; RAW: 1)
-#> Improvement events: 1
+#> CDW events: 5 (PIRA: 4; RAW: 1)
+#> Improvement events: 2
 ```
 
 The function prints out a concise report of the results, and of the
@@ -122,6 +156,8 @@ class `MSprogOutput` with the following attributes.
     #> 2      RAW, PIRA           0   2   1    1              0
     #> 3                          0   0   0    0              0
     #> 4     impr, PIRA           1   1   0    1              0
+    #> 5           PIRA           0   1   0    1              0
+    #> 6           impr           1   0   0    0              0
     ```
 
     where: `event_sequence` specifies the order of the events; the other
@@ -138,6 +174,8 @@ class `MSprogOutput` with the following attributes.
     #>   3      0                 491        491       NA     NA          NA        NA
     #>   4      1       impr      586         77       77      1          NA        98
     #>   4      2       PIRA      586        304      129      1           1       282
+    #>   5      1       PIRA      637        140      140      1           1       497
+    #>   6      1       impr      491        120      120      1          NA       232
     #>  sust_last
     #>          1
     #>          0
@@ -145,6 +183,8 @@ class `MSprogOutput` with the following attributes.
     #>         NA
     #>          0
     #>          1
+    #>          1
+    #>          0
     ```
 
     where: `nevent` is the cumulative event count for each subject;
@@ -162,7 +202,7 @@ complete reproducibility**:
 
 ``` r
 print(output)
-#> For each subject, we detected all EDSS changes (in chronological order) confirmed over 84 days or more. A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first available confirmation visit. Whenever the current baseline fell within 30 days after the onset of a relapse, , it was moved to the next available visit. A confirmed EDSS worsening event was labelled as RAW if occurring within 90 days after the onset of a relapse. A confirmed EDSS worsening event was labelled as PIRA if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
+#> For each subject, we detected all EDSS changes (in chronological order) confirmed over 84 days (with a tolerance of 7 days on the left and 730.5 days on the right). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first available confirmation visit. Whenever the current baseline fell within 30 days after the onset of a relapse, , it was moved to the next available visit. A confirmed EDSS worsening event was labelled as RAW if occurring within 90 days after the onset of a relapse. A confirmed EDSS worsening event was labelled as PIRA if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
 ```
 
 <br />
@@ -222,36 +262,6 @@ Bovis F, et al. [Creating an automated tool for a consistent and
 repeatable evaluation of disability progression in clinical studies for
 multiple sclerosis.](https://doi.org/10.1177/13524585241243157) Mult
 Scler. 2024;30:1185–92.
-
-</div>
-
-<div id="ref-lublin2014" class="csl-entry">
-
-2\. Lublin FD, Reingold SC, Cohen JA, Cutter GR, Sørensen PS, Thompson
-AJ, et al. Defining the clinical course of multiple sclerosis. Neurology
-\[Internet\]. 2014;83:278–86. Available from:
-<https://n.neurology.org/content/83/3/278>
-
-</div>
-
-<div id="ref-kappos2018" class="csl-entry">
-
-3\. Kappos L, Butzkueven H, Wiendl H, Spelman T, Pellegrini F, Chen Y,
-et al. Greater sensitivity to multiple sclerosis disability worsening
-and progression events using a roving versus a fixed reference value in
-a prospective cohort study. Multiple Sclerosis Journal \[Internet\].
-2018;24:963–73. Available from:
-<https://doi.org/10.1177/1352458517709619>
-
-</div>
-
-<div id="ref-silent2019" class="csl-entry">
-
-4\. University of California SFM-ET, Cree BAC, Hollenbach JA, Bove R,
-Kirkish G, Sacco S, et al. Silent progression in disease activity–free
-relapsing multiple sclerosis. Annals of Neurology \[Internet\].
-2019;85:653–66. Available from:
-<https://onlinelibrary.wiley.com/doi/abs/10.1002/ana.25463>
 
 </div>
 
