@@ -76,7 +76,7 @@ If none is specified (default), the user must provide a non-\code{NULL} value fo
 the built-in function \code{\link[=compute_delta]{compute_delta()}}.}
 
 \item{worsening}{The direction of worsening (\code{'increase'} if higher values correspond to worse disease course, \code{'decrease'} otherwise).\if{html}{\out{<br />}}
-This argument is only used when \code{outcome} is set to \code{NULL}. Otherwise, \code{worsening} is automatically set to
+The given value is only used when \code{outcome} is set to \code{NULL}. Otherwise, \code{worsening} is automatically set to
 \code{'increase'} if \code{outcome} is set to \code{'edss'}, \code{'nhpt'}, \code{'t25fw'},
 and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 
@@ -164,7 +164,7 @@ The right end of the interval can be set to \code{Inf} (confirmation window unbo
 \item{require_sust_days}{Minimum number of days over which a confirmed change must be sustained
 (i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
 Events sustained for the remainder of the follow-up period are always retained regardless of follow-up duration.
-Setting \code{require_sust_days=Inf}, events are retained only when sustained for the remainder of the follow-up period.\if{html}{\out{<br />}}
+If \code{require_sust_days=Inf}, events are retained only when sustained for the remainder of the follow-up period.\if{html}{\out{<br />}}
 (Warning: if \code{check_intermediate} is set to \code{FALSE}, sustained change will be established based \emph{only on the end} of the specified period.)}
 
 \item{check_intermediate}{If \code{TRUE} (default), events are confirmed \emph{over all intermediate visits}
@@ -241,7 +241,9 @@ An object of class \code{'MSprogOutput'} with the following attributes:
 \itemize{
 \item{\code{event_count}: a \code{data.frame} containing the event sequence detected for each subject, and the counts for each event type}
 \item{\code{results}: a \code{data.frame} with extended info on each event for all subjects}
-\item{\code{settings}: a list containing all the arguments used to compute the output.}
+\item{\code{settings}: a list containing all the arguments used to compute the output}
+\item{\code{unconfirmed}: a \code{data.frame} with info on unconfirmed events (initial change from baseline, but no confirmation)
+for all subjects.}
 }
 }
 \description{

@@ -8,6 +8,13 @@
 > `utils::packageVersion('msprog')`) – or at least v0.2.0, which is
 > functionally stable, though some minor aspects may still change ahead
 > of a full stable release on CRAN.** 🚧
+>
+> **Latest version:**
+>
+> ``` r
+> utils::packageVersion('msprog')
+> #> [1] '0.2.1'
+> ```
 
 # msprog: reproducible assessment of disability course in MS
 
@@ -17,7 +24,7 @@
 <!-- badges: end -->
 
 <p align="center">
-<img src="man/figures/logo2.png" width="150"/>
+<img src="man/figures/logo_R.png" width="150"/>
 </p>
 
 `msprog` is an R package providing tools for exhaustive and reproducible
@@ -151,13 +158,13 @@ class `MSprogOutput` with the following attributes.
 
     ``` r
     print(output$event_count)
-    #>   event_sequence improvement CDW RAW PIRA undefined_prog
-    #> 1           PIRA           0   1   0    1              0
-    #> 2      RAW, PIRA           0   2   1    1              0
-    #> 3                          0   0   0    0              0
-    #> 4     impr, PIRA           1   1   0    1              0
-    #> 5           PIRA           0   1   0    1              0
-    #> 6           impr           1   0   0    0              0
+    #>   event_sequence improvement CDW RAW PIRA undef_CDW
+    #> 1           PIRA           0   1   0    1         0
+    #> 2      RAW, PIRA           0   2   1    1         0
+    #> 3                          0   0   0    0         0
+    #> 4     impr, PIRA           1   1   0    1         0
+    #> 5           PIRA           0   1   0    1         0
+    #> 6           impr           1   0   0    0         0
     ```
 
     where: `event_sequence` specifies the order of the events; the other
@@ -169,18 +176,18 @@ class `MSprogOutput` with the following attributes.
     print(output$results, row.names=FALSE)
     #>  id nevent event_type total_fu time2event bl2event conf84 PIRA_conf84 sust_days
     #>   1      1       PIRA      534        292      292      1           1       242
-    #>   2      1        RAW      730        198      198      1          NA        84
+    #>   2      1        RAW      730        198      198      1           0        84
     #>   2      2       PIRA      730        539      257      1           1       191
-    #>   3      0                 491        491       NA     NA          NA        NA
-    #>   4      1       impr      586         77       77      1          NA        98
+    #>   3      0                 491        491      NaN      0           0         0
+    #>   4      1       impr      586         77       77      1           0        98
     #>   4      2       PIRA      586        304      129      1           1       282
     #>   5      1       PIRA      637        140      140      1           1       497
-    #>   6      1       impr      491        120      120      1          NA       232
+    #>   6      1       impr      491        120      120      1           0       232
     #>  sust_last
     #>          1
     #>          0
     #>          1
-    #>         NA
+    #>          0
     #>          0
     #>          1
     #>          1

@@ -7,9 +7,9 @@
 value_milestone(
   data,
   milestone,
+  subj_col,
   value_col,
   date_col,
-  subj_col,
   outcome,
   worsening = NULL,
   relapse = NULL,
@@ -17,7 +17,7 @@ value_milestone(
   rdate_col = NULL,
   validconf_col = NULL,
   conf_days = 24 * 7,
-  conf_tol_days = c(7, 365),
+  conf_tol_days = c(7, 2 * 365.25),
   require_sust_days = 0,
   relapse_to_event = 0,
   relapse_to_conf = 30,
@@ -30,11 +30,11 @@ value_milestone(
 
 \item{milestone}{Disability milestone (outcome value to check data against).}
 
+\item{subj_col}{Name of data column with subject ID.}
+
 \item{value_col}{Name of data column with outcome value.}
 
 \item{date_col}{Name of data column with date of visit.}
-
-\item{subj_col}{Name of data column with subject ID.}
 
 \item{outcome}{Specifies the outcome type. Must be one of the following:
 \itemize{
@@ -46,7 +46,7 @@ value_milestone(
 }}
 
 \item{worsening}{The direction of worsening (\code{'increase'} if higher values correspond to worse disease course, \code{'decrease'} otherwise).\if{html}{\out{<br />}}
-This argument is only used when \code{outcome} is set to \code{NULL}. Otherwise, \code{worsening} is automatically set to
+The given value is only used when \code{outcome} is set to \code{NULL}. Otherwise, \code{worsening} is automatically set to
 \code{'increase'} if \code{outcome} is set to \code{'edss'}, \code{'nhpt'}, \code{'t25fw'},
 and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 
@@ -70,7 +70,7 @@ The right end of the interval can be set to \code{Inf} (confirmation window unbo
 \item{require_sust_days}{Minimum number of days over which the milestone must be sustained
 (i.e., confirmed at \emph{all} visits occurring in the specified period).
 If the milestone is sustained for the remainder of the follow-up period, it is considered reached regardless of follow-up duration.
-Setting \code{require_sust_days=Inf}, values are retained only when sustained for the remainder of the follow-up period.}
+If \code{require_sust_days=Inf}, values are retained only when sustained for the remainder of the follow-up period.}
 
 \item{relapse_to_event}{Minimum distance from a relapse (days) for the milestone to be considered reached.
 Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
@@ -99,9 +99,9 @@ If a value \code{N>1} is passed, unconfirmed values exceeding the milestone are 
 \value{
 A \code{data.frame} containing the following columns:
 \itemize{
-\item{\code{date_col}: }{the date of first reaching a value >= milestone (or last date of follow-up if milestone is not reached);}
-\item{\code{value_col}: }{the first value >= milestone, if present, otherwise no value;}
-\item{\code{'time2event'}: }{the time to reach a value >= milestone (or total follow-up length if milestone is not reached);}
+\item{\code{date_col}: }{the date of first reaching or exceeding the milestone (or last date of follow-up if milestone is not reached);}
+\item{\code{value_col}: }{the first value  reaching orexceeding the milestone, if present, otherwise no value;}
+\item{\code{'time2event'}: }{the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached);}
 \item{\code{'observed'}: }{whether the milestone was reached (1) or not (0).}
 }
 }

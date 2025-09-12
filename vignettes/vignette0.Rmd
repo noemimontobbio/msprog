@@ -136,7 +136,7 @@ Several qualitative and quantitative options for analysing disability evolution 
 
 # Outcome {#outcome}
 
-The `MSprog()` function detects the events sequentially by scanning the outcome values in chronological order, and each value is tested for its difference from the current reference value. Such difference is typically required to be larger than a threshold $\delta$, depending on outcome type and on the reference value $x$. If the `outcome` argument in `MSprog()` is set to `edss`, `nhpt`, `t25fw`, or `sdmt`, the following default settings are implemented (see [@lorscheider2016; @bosma2010; @kalinowski2022; @strober2019]):
+The `MSprog()` function detects the events sequentially by scanning the outcome values in chronological order, and each value is tested for its difference from the current reference value. Such difference is typically required to be larger than a threshold $\delta$, depending on outcome type and on the reference value $x$. If the `outcome` argument in `MSprog()` is set to `'edss'`, `'nhpt'`, `'t25fw'`, or `'sdmt'`, the following default settings are implemented (see [@lorscheider2016; @bosma2010; @kalinowski2022; @strober2019]):
 
 * `outcome='edss'`: Expanded Disability Status Scale (EDSS). $\delta(x)=\begin{cases} 1.5 \quad \text{ if } x=0\\1 \quad\;\;\; \text{ if } 0 < x \leq 5\\0.5 \quad \text{ if } 5<x\leq 10\end{cases}$;
 
@@ -192,7 +192,8 @@ The assessment of the disability evolution strongly depends on the choices made 
 
 * **Roving baseline** (`baseline='roving'`): the baseline visit is initially set as the first available assessment, then updated after each event. **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below), **but not recommended for clinical trial data as it may break the randomisation**. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='event'`, for instance,  moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold events are used to move the baseline, but not listed in the event sequence.
 
-**NOTE.** If the baseline data is stored in a separate file, the user should merge it with the main `data.frame` containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the beginning of the `data.frame` (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). <span style="color: red;">The possibility to directly input a separate file for baseline data may be added in the future.</span>
+**NOTE.** If the baseline data is stored in a separate file, the user should merge it with the main `data.frame` containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the beginning of the `data.frame` (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). 
+<!-- <span style="color: red;">The possibility to directly input a separate file for baseline data may be added in the future.</span> -->
 
 <br />
 
@@ -320,7 +321,12 @@ output <- MSprog(data=toydata_visits,
                  conf_days=c(7*12,7*24), verbose=0)
 print(output$results, row.names=FALSE) # results
 ```
-The `relapse_indep` argument specifies the relapse-free intervals for a CDW event to be classified as PIRA, see [the relevant section](#pira)[^pira]. In this case, a high-specificity definition of PIRA is used [@muller2023] that requires an absence of relapses between baseline and confirmation. The resulting events are a 12-week-confirmed RAW and a 12-week-confirmed PIRA. The RAW event was not confirmed over 24 weeks, i.e., 168 days (`conf168` is `0`). The PIRA event was also confirmed over 24 weeks (`conf168` is `1`). However, since a relapse occurred before the 24-week confirmation, the event cannot be classified as a 24-week-confirmed PIRA (`PIRA_conf168` is `0`) but only as a 24-week-confirmed *CDW*.
+The `relapse_indep` argument specifies the relapse-free intervals for a CDW event to be classified as PIRA, see [the relevant section](#pira)[^pira]. In this case, a high-specificity definition of PIRA is used [@muller2023] that requires an absence of relapses between baseline and confirmation. The resulting events are 
+
+1. a 12-week-confirmed RAW;
+2. a 12-week-confirmed PIRA.
+
+Event #1 was confirmed over 12 weeks but not over 24 weeks, i.e., 168 days (`conf168` is `0`). Event #2 was also confirmed over 24 weeks (`conf168` is `1`) as a CDW. However, since a relapse occurred before the 24-week confirmation, it is not confirmed as PIRA over 24 weeks (`PIRA_conf168` is `0`).
 
 [^pira]: See also `relapse_indep_from_bounds()` function documentation, and the dedicated package vignette *Assessing progression independent of relapse activity (PIRA) in MS*.
 
@@ -335,20 +341,20 @@ output <- MSprog(data=toydata_visits,
 print(output$results, row.names=FALSE) # results
 ```
 
-In this context, as the transient EDSS accumulation was not classified as an event, it did not trigger a re-baseline according to the roving baseline scheme. As a consequence, the PIRA event is classified as an undefined CDW due to the onset of a relapse between baseline and confirmation. This behaviour can be changed by enabling *post-relapse re-baseline* @kappos2020 (`relapse_rebl=TRUE`) to force a re-baseline after each relapse:
-```{r}
-output <- MSprog(data=toydata_visits,
-                 subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
-                relapse=toydata_relapses, subjects=2,
-                event='multiple', baseline='roving', 
-                relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=NULL, c0=NULL, c1=0),
-                relapse_rebl=TRUE,
-                conf_days=c(7*12,7*24), require_sust_days=7*48, verbose=0)
-print(output$results, row.names=FALSE) # results
-```
-The event is now classified as PIRA.
+<!-- In this context, as the transient EDSS accumulation was not classified as an event, it did not trigger a re-baseline according to the roving baseline scheme. As a consequence, the PIRA event is classified as an undefined CDW due to the onset of a relapse between baseline and confirmation. This behaviour can be changed by enabling *post-relapse re-baseline* @kappos2020 (`relapse_rebl=TRUE`) to force a re-baseline after each relapse: -->
+<!-- ```{r} -->
+<!-- output <- MSprog(data=toydata_visits, -->
+<!--                  subj_col='id', value_col='EDSS', date_col='date', outcome='edss',  -->
+<!--                 relapse=toydata_relapses, subjects=2, -->
+<!--                 event='multiple', baseline='roving',  -->
+<!--                 relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=NULL, c0=NULL, c1=0), -->
+<!--                 relapse_rebl=TRUE, -->
+<!--                 conf_days=c(7*12,7*24), require_sust_days=7*48, verbose=0) -->
+<!-- print(output$results, row.names=FALSE) # results -->
+<!-- ``` -->
+<!-- The event is now classified as PIRA. -->
 
-A more detailed report of the event detection process in each of the three cases examined may be visualized by re-running the above code snippets with `verbose=2`, see ["Printing progress info"](#progressinfo).
+A more detailed report of the event detection process in each of the cases examined above may be visualized by re-running the above code snippets with `verbose=2`, see ["Printing progress info"](#progressinfo).
 
 
 
@@ -400,12 +406,12 @@ The `results` attribute provides extended info on each event for all subjects. T
 
 For example:
 ```{r}
-output_edss <- MSprog(data=toydata_visits, 
+output <- MSprog(data=toydata_visits, 
                       subj_col='id', value_col='EDSS', date_col='date', 
                       outcome='edss', relapse=toydata_relapses, verbose=0,
                       include_dates=T, include_value=T, include_stable=F) # <---- !
 
-print(output_edss$results, row.names=FALSE)
+print(output$results, row.names=FALSE)
 ```
 
 
@@ -418,6 +424,11 @@ output <- MSprog(data=toydata_visits,
                  subj_col='id', value_col='EDSS', date_col='date', outcome='edss',
                  event='multiple', baseline='roving', 
                  relapse=toydata_relapses, verbose=2)
+```
+
+For further insight into the event detection process, all score changes from baseline that were not identified as valid events (e.g., not confirmed) are stored in `output$unconfirmed`. In this example, this looks like:
+```{r}
+print(output$unconfirmed, row.names=FALSE)
 ```
 
 
