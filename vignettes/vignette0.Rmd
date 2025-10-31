@@ -118,7 +118,7 @@ print(output_edss$results, row.names=FALSE)
     where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^timeto]; `bl2event` is the number of days from current baseline to event; `conf84` reports whether the event was confirmed over 84 days (12 weeks); `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
 
-Additionally, by applying the `print` method to the `MSprog()` output, the user can print out a short paragraph describing the complete set of criteria used to obtain the results, to be reported along with the results to ensure complete reproducibility. In our example:
+Additionally, by applying the `print` method to the `MSprog()` output, the user can print out the full list of function arguments, as well as a short paragraph describing the complete set of applied criteria, to be reported to ensure complete reproducibility. In our example:
 ```{r, linewidth=90}
 print(output_edss)
 ```
@@ -136,9 +136,9 @@ Several qualitative and quantitative options for analysing disability evolution 
 
 # Outcome {#outcome}
 
-The `MSprog()` function detects the events sequentially by scanning the outcome values in chronological order, and each value is tested for its difference from the current reference value. Such difference is typically required to be larger than a threshold $\delta$, depending on outcome type and on the reference value $x$. If the `outcome` argument in `MSprog()` is set to `'edss'`, `'nhpt'`, `'t25fw'`, or `'sdmt'`, the following default settings are implemented (see [@lorscheider2016; @bosma2010; @kalinowski2022; @strober2019]):
+The `MSprog()` function detects the events sequentially by scanning the outcome values in chronological order, and each value is tested for its difference from the current reference value. Such difference is typically required to be larger than a clinically meaningful threshold $\delta$, depending on outcome type and on the reference value $x$. If the `outcome` argument in `MSprog()` is set to `'edss'`, `'nhpt'`, `'t25fw'`, or `'sdmt'`, the following default settings are implemented (see [@lorscheider2016; @bosma2010; @kalinowski2022; @strober2019]):
 
-* `outcome='edss'`: Expanded Disability Status Scale (EDSS). $\delta(x)=\begin{cases} 1.5 \quad \text{ if } x=0\\1 \quad\;\;\; \text{ if } 0 < x \leq 5\\0.5 \quad \text{ if } 5<x\leq 10\end{cases}$;
+* `outcome='edss'`: Expanded Disability Status Scale (EDSS). $\delta(x)=\begin{cases} 1.5 \quad \text{ if } x=0\\1 \quad\;\;\; \text{ if } 0 < x \leq 5\\0.5 \quad \text{ if } x>5\end{cases}$;
 
 * `outcome='nhpt'`: Nine-Hole Peg Test (NHPT), for either the dominant or the non-dominant hand. $\delta=$ 20% of reference score;
 
@@ -146,18 +146,18 @@ The `MSprog()` function detects the events sequentially by scanning the outcome 
 
 * `outcome='sdmt'`: Symbol Digit Modalities Test (SDMT). $\delta=$ either 3 points or 10% of reference score.
 
-These default options are internally implemented by the `compute_delta()` function. For example, if the baseline EDSS score is 4, a valid worsening will correspond to an increase by (at least):
+These default options are internally implemented by the `compute_delta()` function. For example, if the baseline EDSS score is 4, by default a clinically meaningful worsening will correspond to an increase by (at least):
 ```{r}
-print(compute_delta(4)) # default outcome measure is 'edss'
+print(compute_delta(4, outcome='edss'))
 ```
-If the baseline T25FW score is 10, the minimum shift that is considered as a valid change will be:
+If the baseline T25FW score is 10, the minimum clinically relevant change will be:
 ```{r}
 print(compute_delta(10, outcome='t25fw'))
 ```
 
-## Custom threshold values
+## Customising "clinically relevant change"
 
-The user can provide their own function to customise the computation of the threshold values, using the `delta_fun` argument of `MSprog()`. The provided function must take the baseline value as argument, and return the corresponding threshold. This applies to two scenarios.
+The user can provide their own function to customise the computation of clinically relevant thresholds, using the `delta_fun` argument of `MSprog()`. The user-defined function must take the baseline value as argument, and return the corresponding threshold. This applies to two scenarios.
 
 1. **The outcome of interest is among the ones listed above, but we want to define the thresholds differently.** For example, we want to change the minimum $\delta$ for SDMT to, say, "either 4 points or 20% of the reference value". In this case, we would define:
     ```{r}
@@ -168,7 +168,7 @@ The user can provide their own function to customise the computation of the thre
     print(my_sdmt_delta(50)) # my delta
     print(compute_delta(50, outcome='sdmt')) # default delta
     ```
-    We then compute:
+    We can then compute:
     ``` {r, eval=FALSE}
     output <- MSprog(...
                     outcome='sdmt', delta_fun=my_sdmt_delta,
@@ -176,7 +176,7 @@ The user can provide their own function to customise the computation of the thre
     ```
     Specifying `outcome='sdmt'`, the outcomes values will be checked internally to verify that they are in the correct range for SDMT.
 
-2. **The outcome of interest is not among the ones listed above.** In this case, we set `outcome=NULL`, and `delta_fun` as our desired custom-defined function. By default, higher values of a custom outcome are interpreted as a worsening. If the opposite direction of worsening is desired, set the `worsening` argument to `'decrease'`. Note that the `worsening` argument is only used by `MSprog()` when `outcome` is set to `NULL`. Otherwise, `worsening` is automatically set to `'increase'` if `outcome` is set to `'edss'`, `'nhpt'`, `'t25fw'`, and to `'decrease'` if `outcome` is set to `'sdmt'`.
+2. **The outcome of interest is not among the ones listed above.** In this case, we set `outcome=NULL`, and `delta_fun` as our desired custom-defined function. For custom outcomes, the direction of worsening must be specified as well (i.e., whether increasing or decreasing values of the outcome are interpreted as a worsening). This can be done by setting the `worsening` argument to either `'increase'` or `'decrease'`. Note that the provided `worsening` argument is only used by `MSprog()` when `outcome` is set to `NULL`. Otherwise, `worsening` is automatically set to `'increase'` if `outcome` is set to `'edss'`, `'nhpt'`, `'t25fw'`, and to `'decrease'` if `outcome` is set to `'sdmt'`.
 
 
 
@@ -186,11 +186,11 @@ The assessment of the disability evolution strongly depends on the choices made 
 
 * **Fixed baseline** (`baseline='fixed'`, default): the baseline visit is set to be the first available assessment.
 
-* **Improvement-based roving baseline** (`baseline='roving_impr'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed improvement. **This scheme is suitable for a first-CDW setting to discard fluctuations around the baseline [@muller2023], but not recommended for clinical trial data as it may break the randomisation**. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='improvement'`, for instance, moves the reference value after *any* confirmed improvement, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold improvement events are used to move the baseline, but not listed in the event sequence.
+* **Improvement-based roving baseline** (`baseline='roving_impr'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed improvement. **This scheme is suitable for a first-CDW setting to discard fluctuations around the baseline [@muller2023], but not recommended for clinical trial data as it may break the randomisation**. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='improvement'`, for instance, moves the reference value after *any* confirmed improvement, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold improvement events are used to move the baseline, but not listed in the event sequence.
 
-* **Worsening-based roving baseline** (`baseline='roving_wors'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed worsening. **This scheme is suitable when the endpoint of interest is a specific type of CDW**: for instance, when searching specifically for PIRA events, the reference should be moved after any previous RAW event; when searching specifically for RAW events, the reference should be moved after any previous PIRA event. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='worsening'`, for instance, moves the reference value after *any* confirmed worsening, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold worsening events are used to move the baseline, but not listed in the event sequence.
+* **Worsening-based roving baseline** (`baseline='roving_wors'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed worsening. **This scheme is suitable when the endpoint of interest is a specific type of CDW**: for instance, when searching specifically for PIRA events, the reference should be moved after any previous RAW event; when searching specifically for RAW events, the reference should be moved after any previous PIRA event. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='worsening'`, for instance, moves the reference value after *any* confirmed worsening, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold worsening events are used to move the baseline, but not listed in the event sequence.
 
-* **Roving baseline** (`baseline='roving'`): the baseline visit is initially set as the first available assessment, then updated after each event. **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below), **but not recommended for clinical trial data as it may break the randomisation**. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='event'`, for instance,  moves the reference value after *any* confirmed change, even if the difference from the current reference is smaller than the minimum $\delta$. In this case, the sub-threshold events are used to move the baseline, but not listed in the event sequence.
+* **Roving baseline** (`baseline='roving'`): the baseline visit is initially set as the first available assessment, then updated after each event. **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below), **but not recommended for clinical trial data as it may break the randomisation**. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='event'`, for instance,  moves the reference value after *any* confirmed change, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold events are used to move the baseline, but not listed in the event sequence.
 
 **NOTE.** If the baseline data is stored in a separate file, the user should merge it with the main `data.frame` containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the beginning of the `data.frame` (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). 
 <!-- <span style="color: red;">The possibility to directly input a separate file for baseline data may be added in the future.</span> -->

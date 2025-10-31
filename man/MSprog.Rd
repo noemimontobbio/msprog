@@ -70,8 +70,8 @@ MSprog(
 
 \item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in \code{data} are included.}
 
-\item{delta_fun}{Custom function specifying the minimum shift in the outcome measure that counts as a valid change from the provided reference value.
-The function provided must take a numeric value (reference score) as input, and return a numeric value corresponding to the minimum shift from baseline, see example 3 below.
+\item{delta_fun}{Custom function specifying the minimum clinically meaningful change in the outcome measure from the provided reference value.
+The function provided must take a numeric value (reference score) as input, and return a numeric value corresponding to the minimum shift from baseline, see example below.
 If none is specified (default), the user must provide a non-\code{NULL} value for the \code{outcome} argument (see above) in order to use
 the built-in function \code{\link[=compute_delta]{compute_delta()}}.}
 
@@ -94,14 +94,14 @@ and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 \item{baseline}{Specifies the baseline scheme. Must be one of the following.
 \itemize{
 \item{\code{'fixed'}: first valid outcome value, default;}
-\item{\code{'roving_impr'}: updated after every confirmed disability improvement (to the visit determined by \code{proceed_from});
-suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for randomised data;}
-\item{\code{'roving_wors'}: updated after every CDW (to the visit determined by \code{proceed_from});
-suitable when searching for a specific type of CDW (i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'});}
 \item{\code{'roving'}: updated after each improvement or worsening event to the visit determined by \code{proceed_from};
 suitable for a multiple-event setting (i.e., when \code{event} is set to \code{'multiple'},
 \code{'firsteach'}, or \code{'firstCDWtype'}) or when searching for a specific type of CDW
-(i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}) -- not recommended for randomised data.}
+(i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}) -- not recommended for randomised data;}
+\item{\code{'roving_impr'}: updated after every confirmed disability improvement (to the visit determined by \code{proceed_from});
+suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for multiple events, or for randomised data;}
+\item{\code{'roving_wors'}: updated after every CDW (to the visit determined by \code{proceed_from});
+suitable when searching for a specific type of CDW (i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}).}
 }}
 
 \item{proceed_from}{After detecting a confirmed disability event, continue searching:
@@ -120,12 +120,13 @@ when rebaselining after a confirmed disability event, the baseline is moved to:
 Must be one of the following:
 \itemize{
 \item{\code{'event'}: any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
-regardless of \code{delta_fun}) can potentially trigger a re-baseline;}
+possibly below clinically meaningful threshold) can potentially trigger a re-baseline;}
 \item{\code{'improvement'}: any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
-regardless of \code{delta_fun}) can potentially trigger a re-baseline;}
+possibly below clinically meaningful threshold) can potentially trigger a re-baseline;}
 \item{\code{'worsening'}: any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
-regardless of \code{delta_fun}) can potentially trigger a re-baseline;}
-\item{\code{'none'}: only use valid confirmed events (as per \code{delta_fun}) for rebaseline.}
+possibly below clinically meaningful threshold) can potentially trigger a re-baseline;}
+\item{\code{'none'}: only use clinically meaningful confirmed changes for rebaseline.}
+See \code{delta_fun} argument and \code{\link[=compute_delta]{compute_delta()}} function for more details.
 }}
 
 \item{bl_geq}{This argument is only used if the baseline is moved.
@@ -146,7 +147,7 @@ This controls for cases where the outcome has an undulating course.\if{html}{\ou
 The following argument values are accepted.
 \itemize{
 \item{\code{'none'}: local extrema are always accepted as valid baseline values.}
-\item{\code{'delta'}: the baseline cannot be placed at a \emph{strict} local minimum or maximum.}
+\item{\code{'strict'}: the baseline cannot be placed at a \emph{strict} local minimum or maximum.}
 \item{\code{'all'}: the baseline cannot be placed at a local minimum or maximum.}
 }}
 

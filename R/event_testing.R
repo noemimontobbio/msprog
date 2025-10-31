@@ -1,8 +1,8 @@
 
 #' Definition of minimum valid shift for different tests.
 #'
-#' `compute_delta()` returns the minimum delta to be considered as a valid change
-#' from baseline of an outcome measure (EDSS, NHPT, T25FW, or SDMT).
+#' `compute_delta()` computes the default minimum clinically meaningful change
+#' from baseline in the outcome measure (EDSS, NHPT, T25FW, or SDMT).
 #'
 #' @param baseline Outcome value at baseline.
 #' @param outcome One of: \cr
@@ -12,9 +12,9 @@
 #'  \item{`'t25fw'` (Timed 25-Foot Walk);}
 #'  \item{`'sdmt'` (Symbol Digit Modalities Test).}
 #'  }
-#' @return Minimum shift corresponding to a valid change from the provided baseline value. Specifically:
+#' @return Minimum clinically meaningful change from the provided baseline value. Specifically:
 #' \itemize{
-#'  \item{EDSS: 1.5 if `baseline==0`, 1 if `0<baseline<=5`, 0.5 if `baseline>=5.5`;}
+#'  \item{EDSS: 1.5 if `baseline`=0, 1 if 0<`baseline`<=5.0, 0.5 if `baseline`>5.0;}
 #'  \item{NHPT and T25FW: 20`%` of `baseline`;}
 #'  \item{SDMT: either 3 points or 10`%` of `baseline`.}
 #'  }
@@ -25,11 +25,11 @@
 compute_delta <- function(baseline, outcome='edss') {
 
   if (outcome == 'edss') {
-    if (baseline >= 0 & baseline < 0.5) {
+    if (baseline == 0) {
       return(1.5)
-    } else if (baseline >= 0.5 & baseline < 5.5) {
+    } else if (baseline > 0 & baseline <= 5) {
       return(1.0)
-    } else if (baseline >= 5.5 & baseline <= 10) {
+    } else if (baseline > 5 & baseline <= 10) {
       return(0.5)
     } else {
       stop('invalid EDSS score')

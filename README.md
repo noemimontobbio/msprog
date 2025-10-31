@@ -13,7 +13,7 @@
 >
 > ``` r
 > utils::packageVersion('msprog')
-> #> [1] '0.2.1'
+> #> [1] '0.2.2'
 > ```
 
 # msprog: reproducible assessment of disability course in MS
@@ -24,6 +24,7 @@
 <!-- badges: end -->
 
 <p align="center">
+
 <img src="man/figures/logo_R.png" width="150"/>
 </p>
 
@@ -203,13 +204,24 @@ class `MSprogOutput` with the following attributes.
     reports whether the event was sustained until the last visit.
 
 Additionally, applying the `print` method to an object of class
-`MSprogOutput` prints out a short paragraph describing the complete set
-of criteria used to obtain the output, **to be reported to ensure
-complete reproducibility**:
+`MSprogOutput` prints out the full list of function arguments, as well
+as a short paragraph describing the complete set of criteria used to
+obtain the output, **to be reported to ensure complete
+reproducibility**:
 
 ``` r
 print(output)
-#> For each subject, we detected all EDSS changes (in chronological order) confirmed over 84 days (with a tolerance of 7 days on the left and 730.5 days on the right). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first available confirmation visit. Whenever the current baseline fell within 30 days after the onset of a relapse, , it was moved to the next available visit. A confirmed EDSS worsening event was labelled as RAW if occurring within 90 days after the onset of a relapse. A confirmed EDSS worsening event was labelled as PIRA if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation.
+#> ---
+#> msprog version: 0.2.2 
+#> ---
+#> MSprog() arguments:
+#> outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7, 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
+#> delta_fun=NULL
+#> 
+#> Textual description of applied criteria:
+#> The endpoint of interest was all EDSS changes (in chronological order) confirmed over 84 days (with a lower tolerance of 7 days and an upper tolerance of 730.5 days). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first available confirmation visit for the event that triggered the re-baseline. Whenever the current baseline fell within 30 days after the onset of a relapse, it was moved to the next eligible visit. A confirmed EDSS worsening event was labelled as RAW if occurring within 90 days after the onset of a relapse. A confirmed EDSS worsening event was labelled as PIRA if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation. 
+#> ---
+#> Clinically meaningful threshold for EDSS change (delta function): default for EDSS (check by typing ?compute_delta).
 ```
 
 <br />
@@ -265,10 +277,11 @@ citation('msprog')
 <div id="ref-msprog2024" class="csl-entry">
 
 1\. Montobbio N, Carmisciano L, Signori A, Ponzano M, Schiavetti I,
-Bovis F, et al. [Creating an automated tool for a consistent and
+Bovis F, et al. Creating an automated tool for a consistent and
 repeatable evaluation of disability progression in clinical studies for
-multiple sclerosis.](https://doi.org/10.1177/13524585241243157) Mult
-Scler. 2024;30:1185–92.
+multiple sclerosis. Mult Scler. Department of Health Sciences (DISSAL),
+University of Genoa, Genoa, Italy.; 2024;30:1185–92.
+<https://doi.org/10.1177/13524585241243157>
 
 </div>
 

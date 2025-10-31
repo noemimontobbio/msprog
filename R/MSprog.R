@@ -35,8 +35,8 @@
 #' @param rdate_col Name of onset date column for relapse data, if different from outcome data.
 #' @param renddate_col Name of end date column for relapse data (if present).
 #' @param subjects Subset of subjects (list of IDs). If none is specified, all subjects listed in `data` are included.
-#' @param delta_fun Custom function specifying the minimum shift in the outcome measure that counts as a valid change from the provided reference value.
-#' The function provided must take a numeric value (reference score) as input, and return a numeric value corresponding to the minimum shift from baseline, see example 3 below.
+#' @param delta_fun Custom function specifying the minimum clinically meaningful change in the outcome measure from the provided reference value.
+#' The function provided must take a numeric value (reference score) as input, and return a numeric value corresponding to the minimum shift from baseline, see example below.
 #' If none is specified (default), the user must provide a non-`NULL` value for the `outcome` argument (see above) in order to use
 #' the built-in function [compute_delta()].
 #' @param worsening The direction of worsening (`'increase'` if higher values correspond to worse disease course, `'decrease'` otherwise).<br />
@@ -56,14 +56,14 @@
 #' @param baseline Specifies the baseline scheme. Must be one of the following.
 #' \itemize{
 #' \item{`'fixed'`: first valid outcome value, default;}
-#' \item{`'roving_impr'`: updated after every confirmed disability improvement (to the visit determined by `proceed_from`);
-#' suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for randomised data;}
-#' \item{`'roving_wors'`: updated after every CDW (to the visit determined by `proceed_from`);
-#' suitable when searching for a specific type of CDW (i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`);}
 #' \item{`'roving'`: updated after each improvement or worsening event to the visit determined by `proceed_from`;
 #' suitable for a multiple-event setting (i.e., when `event` is set to `'multiple'`,
 #' `'firsteach'`, or `'firstCDWtype'`) or when searching for a specific type of CDW
-#' (i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`) -- not recommended for randomised data.}
+#' (i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`) -- not recommended for randomised data;}
+#' \item{`'roving_impr'`: updated after every confirmed disability improvement (to the visit determined by `proceed_from`);
+#' suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for multiple events, or for randomised data;}
+#' \item{`'roving_wors'`: updated after every CDW (to the visit determined by `proceed_from`);
+#' suitable when searching for a specific type of CDW (i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`).}
 #' }
 #' @param proceed_from After detecting a confirmed disability event, continue searching:
 #' \itemize{
@@ -80,12 +80,13 @@
 #' Must be one of the following:
 #' \itemize{
 #' \item{`'event'`: any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
-#' regardless of `delta_fun`) can potentially trigger a re-baseline;}
+#' possibly below clinically meaningful threshold) can potentially trigger a re-baseline;}
 #' \item{`'improvement'`: any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
-#' regardless of `delta_fun`) can potentially trigger a re-baseline;}
+#' possibly below clinically meaningful threshold) can potentially trigger a re-baseline;}
 #' \item{`'worsening'`: any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
-#' regardless of `delta_fun`) can potentially trigger a re-baseline;}
-#' \item{`'none'`: only use valid confirmed events (as per `delta_fun`) for rebaseline.}
+#' possibly below clinically meaningful threshold) can potentially trigger a re-baseline;}
+#' \item{`'none'`: only use clinically meaningful confirmed changes for rebaseline.}
+#' See `delta_fun` argument and [compute_delta()] function for more details.
 #' }
 #' @param bl_geq This argument is only used if the baseline is moved.
 #' If `TRUE`, the new reference value must always be greater or equal than the previous one;
@@ -103,7 +104,7 @@
 #' The following argument values are accepted.
 #' \itemize{
 #' \item{`'none'`: local extrema are always accepted as valid baseline values.}
-#' \item{`'delta'`: the baseline cannot be placed at a \emph{strict} local minimum or maximum.}
+#' \item{`'strict'`: the baseline cannot be placed at a \emph{strict} local minimum or maximum.}
 #' \item{`'all'`: the baseline cannot be placed at a local minimum or maximum.}
 #' }
 #' @param validconf_col Name of data column specifying which visits can (`T`) or cannot (`F`) be used as confirmation visits.
@@ -285,8 +286,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     stop('Invalid value for `sub_threshold_rebl` argument. Valid values: \'event\', \'improvement\', \'worsening\', \'none\'.')
   }
 
-  if (!skip_local_extrema %in% c('none', 'delta', 'all')) {
-    stop('Invalid value for `skip_local_extrema` argument. Valid values: \'none\', \'delta\', \'all\'.')
+  if (!skip_local_extrema %in% c('none', 'strict', 'all')) {
+    stop('Invalid value for `skip_local_extrema` argument. Valid values: \'none\', \'strict\', \'all\'.')
   }
 
   # end of checks
@@ -403,7 +404,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   } else if (outcome=='sdmt') {
     worsening <- 'decrease'
   } else if (is.null(worsening)) {
-    stop('Either specify an outcome type, or specify the direction of worsening (\'increase\' or \'decrease\')')
+    stop('Provided `outcome` is not one of the default outcome types (\'edss\', \'nhpt\', \'t25fw\', \'sdmt\'). If using a custom outcome measure, please specify the direction of worsening (`worsening` argument, \'increase\' or \'decrease\').')
+  } else if (is.null(delta_fun)) {
+    stop('Provided `outcome` is not one of the default outcome types (\'edss\', \'nhpt\', \'t25fw\', \'sdmt\'). If using a custom outcome measure, please provide a custom delta function (`delta_fun` argument).')
   }
 
   # Define local is_event() function
@@ -1484,13 +1487,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
     settings <- list(outcome=outcome, event=event, baseline=baseline, proceed_from=proceed_from,
                   validconf_p=ifelse(is.null(validconf_col), 1, mean(data[[validconf_col]])),
-                  skip_local_extrema=skip_local_extrema,
+                  validconf_col=validconf_col, skip_local_extrema=skip_local_extrema,
                   conf_days=conf_days, conf_tol_days=conf_tol_days,
                   require_sust_days=require_sust_days, check_intermediate=check_intermediate,
                   relapse_to_bl=relapse_to_bl, relapse_to_event=relapse_to_event, relapse_to_conf=relapse_to_conf,
                   relapse_assoc=relapse_assoc, relapse_indep=relapse_indep, renddate_col=renddate_col,
-                  sub_threshold_rebl=sub_threshold_rebl, bl_geq=bl_geq, relapse_rebl=relapse_rebl, #min_value=min_value,
-                  impute_last_visit=impute_last_visit, delta_fun=delta_fun)
+                  sub_threshold_rebl=sub_threshold_rebl, bl_geq=bl_geq, relapse_rebl=relapse_rebl,
+                  impute_last_visit=impute_last_visit, delta_fun=delta_fun,
+                  worsening=worsening, bl_geq=bl_geq)
 
     output <- list(event_count=summary, results=results_df, settings=settings, unconfirmed=unconfirmed)
     class(output) <- 'MSprogOutput'

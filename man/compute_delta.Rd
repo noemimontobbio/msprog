@@ -18,16 +18,16 @@ compute_delta(baseline, outcome = "edss")
 }}
 }
 \value{
-Minimum shift corresponding to a valid change from the provided baseline value. Specifically:
+Minimum clinically meaningful change from the provided baseline value. Specifically:
 \itemize{
-\item{EDSS: 1.5 if \code{baseline==0}, 1 if \verb{0<baseline<=5}, 0.5 if \code{baseline>=5.5};}
+\item{EDSS: 1.5 if \code{baseline}=0, 1 if 0<\code{baseline}<=5.0, 0.5 if \code{baseline}>5.0;}
 \item{NHPT and T25FW: 20\verb{\%} of \code{baseline};}
 \item{SDMT: either 3 points or 10\verb{\%} of \code{baseline}.}
 }
 }
 \description{
-\code{compute_delta()} returns the minimum delta to be considered as a valid change
-from baseline of an outcome measure (EDSS, NHPT, T25FW, or SDMT).
+\code{compute_delta()} computes the default minimum clinically meaningful change
+from baseline in the outcome measure (EDSS, NHPT, T25FW, or SDMT).
 }
 \examples{
 compute_delta(4.5) # default outcome is 'edss'
