@@ -7,3 +7,5 @@
 ^\.github$
 ^msprog.pdf$
 ^\.Rd2pdf.*$
+^doc$
+^Meta$
