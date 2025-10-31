@@ -4,7 +4,8 @@
 #'
 #' `print` method for class `'MSprogOutput'`.
 #'
-#' The method prints out a short paragraph describing the set of criteria used to
+#' The method prints out (1) the package version, (2) a full list of function arguments,
+#' and (3) a short paragraph describing the full set of criteria used to
 #' obtain the output.
 #'
 #' @param x An object of class `'MSprogOutput'` (result of a call to [MSprog()]).
@@ -65,7 +66,7 @@ print.MSprogOutput <- function(x, ...) {
   } else if (s$relapse_to_conf[1]>0) {relintervals <- c(relintervals, paste0(s$relapse_to_conf[1], ' days after'))}
   if (s$relapse_to_conf[2]>0) {relintervals <- c(relintervals, paste0(s$relapse_to_conf[2], ' days before'))}
   # Full conf text
-  conf_text <- paste0('The endpoint of interest was ', event_text, ' confirmed', ifelse(s$check_intermediate, ' over ', ' at '),
+  conf_text <- paste0('We detected ', event_text, ' confirmed', ifelse(s$check_intermediate, ' over ', ' at '),
                       paste0(paste0(s$conf_days, ifelse(s$conf_tol_days[2]==Inf, ' or more', '')), collapse=", or "), ' days',
                       # Tolerance
                       ifelse(no_tolerance, '', ' (with '),

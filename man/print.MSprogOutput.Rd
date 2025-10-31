@@ -15,7 +15,8 @@
 \code{print} method for class \code{'MSprogOutput'}.
 }
 \details{
-The method prints out a short paragraph describing the set of criteria used to
+The method prints out (1) the package version, (2) a full list of function arguments,
+and (3) a short paragraph describing the full set of criteria used to
 obtain the output.
 }
 \examples{
