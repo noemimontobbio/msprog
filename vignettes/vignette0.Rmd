@@ -75,7 +75,7 @@ head(toydata_visits)
 
 <br />
 
-For relapsing MS patients, an additional `data.frame` object with the onset dates of relapses is needed to correctly assess disease course, and to characterise confirmed disability worsening (CDW) events as relapse-associated or relapse-independent. The dataset should contain (at least) the following columns:
+For relapsing MS patients, an additional `data.frame` object with the onset dates of relapses is needed to correctly assess disease course, and to characterise worsening events as relapse-associated or relapse-independent. The dataset should contain (at least) the following columns:
 
 * Subject IDs;
 * Relapse onset dates.
@@ -88,7 +88,7 @@ head(toydata_relapses)
 
 # Minimal example {#example}
 
-The core block of `msprog` is the `MSprog()` function. Given data on visits and relapses in the form specified above, `MSprog()` analyses the disability evolution for each subject for the outcome of interest. We can test it on the EDSS toy data:
+The core block of `msprog` is the `MSprog()` function. Given data on visits and relapses in the form specified above, `MSprog()` detects the confirmed disability worsening (CDW) or improvement (CDI) events for each subject for the outcome of interest. We can test it on the EDSS toy data:
 ```{r}
 output_edss <- MSprog(data=toydata_visits, # data on visits
                  subj_col='id', value_col='EDSS', date_col='date', # specify column names
@@ -109,7 +109,7 @@ The function prints out concise info (the `verbose` argument can be used to cont
 ```{r, indent="     "}
 print(output_edss$event_count)
 ```
-    where: `event_sequence`[^seq] specifies the order of the events; the other columns count the events of each kind (improvement; relapse-associated worsening, [RAW](#raw); progression independent of relapse activity, [PIRA](#pira); and worsening that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent2019].
+    where: `event_sequence`[^seq] specifies the order of the events; the other columns count the events of each kind (CDW; relapse-associated worsening, [RAW](#raw); progression independent of relapse activity, [PIRA](#pira); and "undefined CDW" that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent2019].
 
 2. `results`: extended info on each event for all subjects. In our example:
 ```{r, indent="     "}
@@ -211,7 +211,7 @@ As already mentioned above, extra caution should be used when applying any re-ba
 
 ## Multiple events {#multiple}
 
-The `event` argument allows to specify which events to detect. By default, it is set to `'firstCDW'` (only detect the first CDW event). It can be set to `'multiple'` to sequentially detect all disability worsening or improvement events.
+The `event` argument allows to specify which events to detect. By default, it is set to `'firstCDW'` (only detect the first CDW event). It can be set to `'multiple'` to sequentially detect all CDW or CDI events.
 
 For example, extracting multiple EDSS events for subject `5` from `toydata_visits` with a **fixed** baseline would result in the following.
 ```{r}
@@ -241,9 +241,8 @@ The baseline is now moved to the confirmation visit of the first worsening event
 
 Other valid values for the `event` argument are:
 
-* `'first'`: only the very first event -- improvement or worsening;
-* `'firsteach'`: first improvement *and* first worsening, in chronological order;
-* `'firstCDWtype'`: first CDW of each kind -- PIRA, RAW, and undefined, in chronological order;
+* `'first'`: only the very first confirmed event -- CDI or CDW;
+* `'firstCDI'`: first CDI event;
 * `'firstPIRA'`: first PIRA event;
 * `'firstRAW'`: first RAW event.
 
@@ -290,7 +289,7 @@ i.e., the confirmation visit must lie between 24 weeks after the event, and 36 w
                      ...)
     ```
 
-## Sustained worsening or improvement {#sustained}
+## Sustained CDW or CDI {#sustained}
 
 In addition to event confirmation, some studies require events to be *sustained* for a specified period of time. The `require_sust_days` argument allows to specify, if desired, the length of such period. For example, if `require_sust_days=7*48`, an event is only retained if the change in the outcome measure from the current baseline is confirmed at *all* visits falling within the following 48 weeks. If the event is sustained for the entire follow-up, it is retained even if the follow-up period ends <48 weeks after the event. Setting `require_sust_days=Inf`, events are retained only when sustained for the entire follow-up duration.
 

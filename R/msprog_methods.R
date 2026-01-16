@@ -32,22 +32,18 @@ print.MSprogOutput <- function(x, ...) {
   # EVENT
   # %%%%%%%%%%%%%
 
-  if (startsWith(s$event, 'firstCDW')) {
-    event_text <- paste0('the first ', outcome, ' worsening event')
+  if (s$event == 'firstCDW') {
+    event_text <- paste0('the first ', outcome, ' CDW event')
   } else if (s$event=='first') {
-    event_text <- paste0('the first ', outcome, ' worsening or improvement event')
-  } else if (s$event=='firsteach') {
-    event_text <- paste0('the first ', outcome, ' worsening and the first ',
-                         outcome, ' improvement event (in chronological order) -')
-  } else if (s$event=='firstCDWtype') {
-    event_text <- paste0('the first ', outcome,
-                         ' worsening event of each kind - PIRA, RAW, and undefined (in chronological order) -')
+    event_text <- paste0('the first ', outcome, ' CDW or CDI event')
+  } else if (s$event == 'firstCDI') {
+    event_text <- paste0('the first ', outcome, ' CDI event')
   } else if (s$event=='firstPIRA') {
     event_text <- paste0('the first ', outcome,' PIRA event')
   } else if (s$event=='firstRAW') {
     event_text <- paste0('the first ', outcome, ' RAW event')
   } else if (s$event=='multiple') {
-    event_text <- paste0('all ', outcome, ' changes (in chronological order)')
+    event_text <- paste0('all confirmed ', outcome, ' changes (in chronological order)')
   }
 
   # %%%%%%%%%%%%%
@@ -219,7 +215,8 @@ print.MSprogOutput <- function(x, ...) {
     cat('\n---\nDirection of worsening: ', s$worsening)
   }
   cat('\n---\nClinically meaningful threshold for', outcome, 'change (delta function):',
-      ifelse(is.null(s$delta_fun), paste('default for', outcome, '(check by typing ?compute_delta).'),
+      ifelse(is.null(s$delta_fun), paste('default for', outcome,
+            '(as per function msprog::compute_delta(), see package docs).'),
              'user-specified (`delta_fun` argument above).'))
 
 }

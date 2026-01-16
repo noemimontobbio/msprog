@@ -2,14 +2,14 @@
 #' Assess multiple sclerosis disability course from longitudinal data.
 #'
 #' `MSprog()` detects and characterises the confirmed disability worsening (CDW)
-#' or improvement events of an outcome measure (EDSS, NHPT, T25FW, or SDMT; or any custom outcome)
+#' or improvement (CDI) events of an outcome measure (EDSS, NHPT, T25FW, or SDMT; or any custom outcome)
 #' for one or more subjects, based on repeated assessments
 #' through time (and on the dates of acute episodes, if any).
 #' Several qualitative and quantitative options are given as arguments that can be set
 #' by the user and reported as a complement to the results to ensure reproducibility.
 #'
 #' The events are detected sequentially by scanning the outcome values in chronological order.
-#' Valid time windows for confirmation visits are determined by arguments
+#' Time windows for confirmation visits are determined by arguments
 #' `conf_days`, `conf_tol_days`, `relapse_to_conf`.
 #' CDW events are classified as relapse-associated or relapse-independent based on their relative timing
 #' with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
@@ -30,37 +30,42 @@
 #'  \item{`'sdmt'` (Symbol Digit Modalities Test);}
 #'  \item{`NULL` (only accepted when specifying a custom `delta_fun`)}
 #'  }
-#' @param relapse `data.frame` containing longitudinal data, including: subject ID and relapse date.
+#'  Outcome type determines a default direction of worsening (see `worsening`argument)
+#'  and default definition of clinically meaningful change given the reference value
+#'  (using the built-in function [compute_delta()]).
+#'  This can be replaced by a custom function using the `delta_fun` argument.
+#' @param relapse Optional `data.frame` containing longitudinal data, including: subject ID and relapse date.
 #' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data.
 #' @param rdate_col Name of onset date column for relapse data, if different from outcome data.
 #' @param renddate_col Name of end date column for relapse data (if present).
 #' @param subjects Subset of subjects (list of IDs). If none is specified, all subjects listed in `data` are included.
-#' @param delta_fun Custom function specifying the minimum clinically meaningful change in the outcome measure from the provided reference value.
-#' The function provided must take a numeric value (reference score) as input, and return a numeric value corresponding to the minimum shift from baseline, see example below.
-#' If none is specified (default), the user must provide a non-`NULL` value for the `outcome` argument (see above) in order to use
-#' the built-in function [compute_delta()].
+#' @param delta_fun Custom function specifying the minimum clinically meaningful
+#' change in the outcome measure from the provided reference value.
+#' The function provided must take a numeric value (reference score) as input,
+#' and return a numeric value corresponding to the minimum shift from baseline, see example below.
+#' If none is specified (default), the user must provide a non-`NULL` value for
+#' the `outcome` argument (see above) in order to use the built-in function [compute_delta()].
 #' @param worsening The direction of worsening (`'increase'` if higher values correspond to worse disease course, `'decrease'` otherwise).<br />
 #' The given value is only used when `outcome` is set to `NULL`. Otherwise, `worsening` is automatically set to
 #' `'increase'` if `outcome` is set to `'edss'`, `'nhpt'`, `'t25fw'`,
 #'  and to `'decrease'` if `outcome` is set to `'sdmt'`.
 #' @param event Specifies which events to detect. Must be one of the following:
 #' \itemize{
-#' \item{`'firstCDW'` (first confirmed disability worsening (CDW), default);}
-#' \item{`'first'` (only the very first confirmed event -- improvement or worsening);}
-#' \item{`'firsteach'` (first confirmed disability improvement and first CDW -- in chronological order);}
-#' \item{`'firstCDWtype'` (first CDW of each kind -- PIRA, RAW, and undefined, in chronological order);}
-#' \item{`'firstPIRA'` (first PIRA);}
-#' \item{`'firstRAW'` (first RAW);}
-#' \item{`'multiple'` (all events in chronological order).}
+#' \item{`'firstCDW'` (first CDW, default)}
+#' \item{`'firstCDI'` (first CDI)}
+#' \item{`'multiple'` (all confirmed events in chronological order)}
+#' \item{`'firstPIRA'` (first PIRA)}
+#' \item{`'firstRAW'` (first RAW)}
+#' \item{`'first'` (only the very first confirmed event -- CDI or CDW).}
 #' }
 #' @param baseline Specifies the baseline scheme. Must be one of the following.
 #' \itemize{
 #' \item{`'fixed'`: first valid outcome value, default;}
-#' \item{`'roving'`: updated after each improvement or worsening event to the visit determined by `proceed_from`;
-#' suitable for a multiple-event setting (i.e., when `event` is set to `'multiple'`,
-#' `'firsteach'`, or `'firstCDWtype'`) or when searching for a specific type of CDW
+#' \item{`'roving'`: updated after each CDI or CDW event to the visit determined by `proceed_from`;
+#' suitable for a multiple-event setting (i.e., when `event` is set to `'multiple'`)
+#' or when searching for a specific type of CDW
 #' (i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`) -- not recommended for randomised data;}
-#' \item{`'roving_impr'`: updated after every confirmed disability improvement (to the visit determined by `proceed_from`);
+#' \item{`'roving_impr'`: updated after every CDI (to the visit determined by `proceed_from`);
 #' suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for multiple events, or for randomised data;}
 #' \item{`'roving_wors'`: updated after every CDW (to the visit determined by `proceed_from`);
 #' suitable when searching for a specific type of CDW (i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`).}
@@ -68,7 +73,7 @@
 #' @param proceed_from After detecting a confirmed disability event, continue searching:
 #' \itemize{
 #' \item{from the next visit after the first qualifying confirmation visit if `proceed_from='firstconf'`;}
-#'\item{from the next visit after the event if `proceed_from='event'`.}
+#'\item{from the next visit after the event onset if `proceed_from='event'`.}
 #' }
 #' If `baseline` is set to `'roving'`, `'roving_impr'`, or `'roving_wors'`,
 #' when rebaselining after a confirmed disability event, the baseline is moved to:
@@ -226,10 +231,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    subjects=NULL, delta_fun=NULL, worsening=NULL, event='firstCDW',
                    baseline='fixed', proceed_from='firstconf', sub_threshold_rebl='none',
                    bl_geq=F, relapse_rebl=F, skip_local_extrema='none',
-                   validconf_col=NULL, conf_days=12*7, conf_tol_days=c(7,2*365.25), require_sust_days=0, check_intermediate=T,
+                   validconf_col=NULL, conf_days=12*7, conf_tol_days=c(7,2*365.25),
+                   require_sust_days=0, check_intermediate=T,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30,
                    relapse_assoc=90, relapse_indep=NULL,
-                   impute_last_visit=0, date_format=NULL, include_dates=F, include_value=F, include_stable=T,
+                   impute_last_visit=0, date_format=NULL,
+                   include_dates=F, include_value=F, include_stable=T,
                    verbose=1
                    ) {
 
@@ -269,9 +276,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     outcome <- tolower(outcome)
   }
 
-  if (!event %in% c('firstCDW', 'first', 'firsteach', 'firstCDWtype',
-                    'firstPIRA', 'firstRAW', 'multiple')) {
-    stop('Invalid value for `event` argument. Valid values: \'firstCDW\', \'first\', \'firsteach\', \'firstCDWtype\', \'firstPIRA\', \'multiple\'.')
+  if (!event %in% c('firstCDW', 'first','firstPIRA', 'firstRAW', 'multiple', 'firstCDI')) {
+    stop('Invalid value for `event` argument. Valid values: \'firstCDW\', \'first\', \'firstCDI\', \'firstPIRA\', \'firstRAW\', \'multiple\'.')
   }
 
   if (!baseline %in% c('fixed', 'roving_impr', 'roving_wors', 'roving')) {
@@ -309,7 +315,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
 
   # If no `validconf_col` is specified, create a dummy one
-  if (is.null(validconf_col)) {
+  if (is.null(validconf_col) || !validconf_col %in% names(data)) {
     validconf_col <- 'validconf'
     data$validconf <- T
   } else {
@@ -463,10 +469,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   results_df$sust_last <- 0
 
   summary <- data.frame(matrix(nrow=nsub, ncol=6))
-  colnames(summary) <- c('event_sequence', 'improvement', 'CDW', 'RAW', 'PIRA', 'undef_CDW')
+  colnames(summary) <- c('event_sequence', 'CDI', 'CDW', 'RAW', 'PIRA', 'undef_CDW')
   rownames(summary) <- all_subj
   summary$event_sequence <- ''
-  summary$improvement <- 0
+  summary$CDI <- 0
   summary$CDW <- 0
   summary$RAW <- 0
   summary$PIRA <- 0
@@ -726,7 +732,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             all(sapply((change_idx + 1):conf_idx[[1]], function(x) isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]],
                        type='impr'))),  # improvement is confirmed at (all visits up to) first valid date
             isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl=bl[[value_col]], type='impr'))  # improvement is confirmed at first valid date
-            && !((event %in% c('firstCDW', 'firstCDWtype', 'firstPIRA', 'firstRAW')) && baseline %in% c('fixed', 'roving_wors'))
+            && !((event %in% c('firstCDW', 'firstPIRA', 'firstRAW')) && baseline %in% c('fixed', 'roving_wors'))
             ) {
 
           # First visit at which improvement is not sustained:
@@ -763,7 +769,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           # If the event is retained (as per `require_sust_days`), we store the info:
           if (valid_ev) {
             sust_idx <- ifelse(is.na(next_nonsust), nvisits, next_nonsust - 1)
-            event_type <- c(event_type, "impr")
+            event_type <- c(event_type, "CDI")
             event_index <- c(event_index, change_idx)
             bldate <- c(bldate, as.character(global_start + as.difftime(bl[[date_col]], units='days')))
             blvalue <- c(blvalue, bl[[value_col]])
@@ -1274,9 +1280,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
         # In a first-event setting, stop search if specified event was already found:
         if (proceed && ((event == "first" && length(event_type) > 1) ||
-                        (event == "firsteach" && ("impr" %in% event_type) && ("CDW" %in% event_type)) ||
+                        (event == "firstCDI" && ("CDI" %in% event_type)) ||
                         (event == "firstCDW" && (("RAW" %in% event_type) || ("PIRA" %in% event_type) || ("CDW" %in% event_type))) ||
-                        (event == "firstCDWtype" && ("RAW" %in% event_type) && ("PIRA" %in% event_type) && ("CDW" %in% event_type)) ||
                         (event == "firstPIRA" && ("PIRA" %in% event_type)) ||
                         (event == "firstRAW" && ("RAW" %in% event_type)))
             ) {
@@ -1313,18 +1318,16 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     event_type <- event_type[event_order]
 
     if (startsWith(event, "first")) {
-      impr_idx <- which(event_type == "impr")[1]
+      impr_idx <- which(event_type == "CDI")[1]
       prog_idx <- which(event_type %in% c("CDW", "RAW", "PIRA"))[1]
       raw_idx <- which(event_type == "RAW")[1]
       pira_idx <- which(event_type == "PIRA")[1]
       undef_prog_idx <- which(event_type == "CDW")[1]
 
-      if (event == "firsteach") {
-        first_events <- c(impr_idx, prog_idx)
+      if (event == "firstCDI") {
+        first_events <- c(impr_idx)
       } else if (event == "firstCDW") {
         first_events <- c(prog_idx)
-      } else if (event == "firstCDWtype") {
-        first_events <- c(raw_idx, pira_idx, undef_prog_idx)
       } else if (event == "firstPIRA") {
         first_events <- pira_idx
       } else if (event == "firstRAW") {
@@ -1384,20 +1387,20 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     rownames(results_df) <- NULL # reset column names
   }
 
-  improvement <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "impr")
+  CDI <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "CDI")
   CDW <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] %in% c("CDW", "RAW", "PIRA"))
   undef_CDW <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "CDW")
   RAW <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "RAW")
   PIRA <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "PIRA")
 
-  summary[subjid, c('improvement', 'CDW', 'RAW', 'PIRA', 'undef_CDW'
-          )] <- c(improvement, CDW, RAW, PIRA, undef_CDW)
+  summary[subjid, c('CDI', 'CDW', 'RAW', 'PIRA', 'undef_CDW'
+          )] <- c(CDI, CDW, RAW, PIRA, undef_CDW)
 
   summary[subjid, 'event_sequence'] <- paste(event_type, collapse=", ")
 
-  if (startsWith(event, "firstCDW")) {
-    summary <- summary[, !colnames(summary) %in% "improvement"]
-  }
+  # if (startsWith(event, "firstCDW")) {
+  #   summary <- summary[, colnames(summary) != "CDI"]
+  # }
 
   if (verbose == 2) {
     message("Event sequence: ", ifelse(event_type[1]!="",
@@ -1441,18 +1444,16 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       if (is.null(subjects) || length(subjects)>1) {
           message("\n---\nTotal subjects: ", nsub,
               "\n---\nSubjects with ",
-              ifelse(event=='firstPIRA', "PIRA: ", ifelse(event=='firstRAW', "RAW: ", "disability worsening: ")),
+              ifelse(event=='firstPIRA', "PIRA: ", ifelse(event=='firstRAW', "RAW: ", "CDW: ")),
                 sum(summary$CDW > 0), ifelse(event %in% c('firstPIRA','firstRAW'), "", paste0(" (PIRA: ", sum(summary$PIRA > 0),
               "; RAW: ", sum(summary$RAW > 0), ")")))
-          if (!(event %in% c('firstCDW', 'firstCDWtype', 'firstPIRA', 'firstRAW'))) {
-          message("Subjects with disability improvement: ", sum(summary$improvement > 0))
+          if (!(event %in% c('firstCDW', 'firstPIRA', 'firstRAW'))) {
+          message("Subjects with CDI: ", sum(summary$CDI > 0))
           }
-          if (event %in% c('multiple', 'firstCDWtype')) {
-          message("---\nCDW events: ",
+          if (event == 'multiple') {
+            message("---\nCDW events: ",
               sum(summary$CDW), " (PIRA: ", sum(summary$PIRA), "; RAW: ", sum(summary$RAW), ")")
-          }
-          if (event %in% c('multiple','firsteach')) {
-            message("Improvement events: ", sum(summary$improvement))
+            message("CDI events: ", sum(summary$CDI))
           }
         }
 
@@ -1472,8 +1473,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     } else if (event=='firstRAW') {
       scolumns <- c('RAW')
       columns <- columns[!startsWith(columns, "PIRA")]
-    } else if (event %in% c('firstCDW', 'firstCDWtype')) {
-      scolumns <- scolumns[scolumns!='improvement']
+    } else if (event == 'firstCDW') {
+      scolumns <- scolumns[scolumns!='CDI']
+    } else if (event == 'firstCDI') {
+      scolumns <- c('CDI')
+    }
+
+    if (event %in% c('firstRAW', 'firstCDI')) {
+      columns <- columns[!startsWith(columns, "PIRA")]  # remove PIRA confirmation columns from extended results
     }
 
     summary <- summary[scolumns]

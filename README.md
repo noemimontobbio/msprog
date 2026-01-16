@@ -13,7 +13,7 @@
 >
 > ``` r
 > utils::packageVersion('msprog')
-> #> [1] '0.2.2'
+> #> [1] '0.2.3'
 > ```
 
 # msprog: reproducible assessment of disability course in MS
@@ -54,7 +54,9 @@ be found in the [reference manual (PDF)](msprog.pdf). Additionally, a
 detailed tutorial providing examples and best-practice tips is available
 as a [package vignette](#vignette): *Analysing disability course in MS*.
 
-<!-- The outcome computation can be run locally on any computer with R version $\geq$ 3.5.0 (see installation instructions below), or online via a user-friendly [web application](https://msprog.shinyapps.io/msprog/). -->
+The outcome computation can be run locally in R (see installation
+instructions below), or online via a user-friendly [web
+application](https://msprog.shinyapps.io/msprog/).
 
 **If you use this package in your work, please cite it [as
 below](#citation)**.
@@ -111,7 +113,7 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> ---
 #> Total subjects: 6
 #> ---
-#> Subjects with disability worsening: 3 (PIRA: 2; RAW: 1)
+#> Subjects with CDW: 3 (PIRA: 2; RAW: 1)
 ```
 
 Several qualitative and quantitative options for event detection are
@@ -143,11 +145,11 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> ---
 #> Total subjects: 6
 #> ---
-#> Subjects with disability worsening: 4 (PIRA: 4; RAW: 1)
-#> Subjects with disability improvement: 2
+#> Subjects with CDW: 4 (PIRA: 4; RAW: 1)
+#> Subjects with CDI: 2
 #> ---
 #> CDW events: 5 (PIRA: 4; RAW: 1)
-#> Improvement events: 2
+#> CDI events: 2
 ```
 
 The function prints out a concise report of the results, and of the
@@ -159,13 +161,13 @@ class `MSprogOutput` with the following attributes.
 
     ``` r
     print(output$event_count)
-    #>   event_sequence improvement CDW RAW PIRA undef_CDW
-    #> 1           PIRA           0   1   0    1         0
-    #> 2      RAW, PIRA           0   2   1    1         0
-    #> 3                          0   0   0    0         0
-    #> 4     impr, PIRA           1   1   0    1         0
-    #> 5           PIRA           0   1   0    1         0
-    #> 6           impr           1   0   0    0         0
+    #>   event_sequence CDI CDW RAW PIRA undef_CDW
+    #> 1           PIRA   0   1   0    1         0
+    #> 2      RAW, PIRA   0   2   1    1         0
+    #> 3                  0   0   0    0         0
+    #> 4      CDI, PIRA   1   1   0    1         0
+    #> 5           PIRA   0   1   0    1         0
+    #> 6            CDI   1   0   0    0         0
     ```
 
     where: `event_sequence` specifies the order of the events; the other
@@ -180,10 +182,10 @@ class `MSprogOutput` with the following attributes.
     #>   2      1        RAW      730        198      198      1           0        84
     #>   2      2       PIRA      730        539      257      1           1       191
     #>   3      0                 491        491      NaN      0           0         0
-    #>   4      1       impr      586         77       77      1           0        98
+    #>   4      1        CDI      586         77       77      1           0        98
     #>   4      2       PIRA      586        304      129      1           1       282
     #>   5      1       PIRA      637        140      140      1           1       497
-    #>   6      1       impr      491        120      120      1           0       232
+    #>   6      1        CDI      491        120      120      1           0       232
     #>  sust_last
     #>          1
     #>          0
@@ -212,16 +214,16 @@ reproducibility**:
 ``` r
 print(output)
 #> ---
-#> msprog version: 0.2.2 
+#> msprog version: 0.2.3 
 #> ---
 #> MSprog() arguments:
 #> outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7, 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
 #> delta_fun=NULL
 #> 
 #> Textual description of applied criteria:
-#> We detected all EDSS changes (in chronological order) confirmed over 84 days (with a lower tolerance of 7 days and an upper tolerance of 730.5 days). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first available confirmation visit for the event that triggered the re-baseline. Whenever the current baseline fell within 30 days after the onset of a relapse, it was moved to the next eligible visit. A confirmed EDSS worsening event was labelled as RAW if occurring within 90 days after the onset of a relapse. A confirmed EDSS worsening event was labelled as PIRA if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation. 
+#> We detected all confirmed EDSS changes (in chronological order) confirmed over 84 days (with a lower tolerance of 7 days and an upper tolerance of 730.5 days). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first available confirmation visit for the event that triggered the re-baseline. Whenever the current baseline fell within 30 days after the onset of a relapse, it was moved to the next eligible visit. A confirmed EDSS worsening event was labelled as RAW if occurring within 90 days after the onset of a relapse. A confirmed EDSS worsening event was labelled as PIRA if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation. 
 #> ---
-#> Clinically meaningful threshold for EDSS change (delta function): default for EDSS (check by typing ?compute_delta).
+#> Clinically meaningful threshold for EDSS change (delta function): default for EDSS (as per function msprog::compute_delta(), see package docs).
 ```
 
 <br />

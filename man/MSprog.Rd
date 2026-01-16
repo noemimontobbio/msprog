@@ -58,9 +58,13 @@ MSprog(
 \item{\code{'t25fw'} (Timed 25-Foot Walk);}
 \item{\code{'sdmt'} (Symbol Digit Modalities Test);}
 \item{\code{NULL} (only accepted when specifying a custom \code{delta_fun})}
-}}
+}
+Outcome type determines a default direction of worsening (see \code{worsening}argument)
+and default definition of clinically meaningful change given the reference value
+(using the built-in function \code{\link[=compute_delta]{compute_delta()}}).
+This can be replaced by a custom function using the \code{delta_fun} argument.}
 
-\item{relapse}{\code{data.frame} containing longitudinal data, including: subject ID and relapse date.}
+\item{relapse}{Optional \code{data.frame} containing longitudinal data, including: subject ID and relapse date.}
 
 \item{rsubj_col}{Name of subject ID column for relapse data, if different from outcome data.}
 
@@ -70,10 +74,12 @@ MSprog(
 
 \item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in \code{data} are included.}
 
-\item{delta_fun}{Custom function specifying the minimum clinically meaningful change in the outcome measure from the provided reference value.
-The function provided must take a numeric value (reference score) as input, and return a numeric value corresponding to the minimum shift from baseline, see example below.
-If none is specified (default), the user must provide a non-\code{NULL} value for the \code{outcome} argument (see above) in order to use
-the built-in function \code{\link[=compute_delta]{compute_delta()}}.}
+\item{delta_fun}{Custom function specifying the minimum clinically meaningful
+change in the outcome measure from the provided reference value.
+The function provided must take a numeric value (reference score) as input,
+and return a numeric value corresponding to the minimum shift from baseline, see example below.
+If none is specified (default), the user must provide a non-\code{NULL} value for
+the \code{outcome} argument (see above) in order to use the built-in function \code{\link[=compute_delta]{compute_delta()}}.}
 
 \item{worsening}{The direction of worsening (\code{'increase'} if higher values correspond to worse disease course, \code{'decrease'} otherwise).\if{html}{\out{<br />}}
 The given value is only used when \code{outcome} is set to \code{NULL}. Otherwise, \code{worsening} is automatically set to
@@ -82,23 +88,22 @@ and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 
 \item{event}{Specifies which events to detect. Must be one of the following:
 \itemize{
-\item{\code{'firstCDW'} (first confirmed disability worsening (CDW), default);}
-\item{\code{'first'} (only the very first confirmed event -- improvement or worsening);}
-\item{\code{'firsteach'} (first confirmed disability improvement and first CDW -- in chronological order);}
-\item{\code{'firstCDWtype'} (first CDW of each kind -- PIRA, RAW, and undefined, in chronological order);}
-\item{\code{'firstPIRA'} (first PIRA);}
-\item{\code{'firstRAW'} (first RAW);}
-\item{\code{'multiple'} (all events in chronological order).}
+\item{\code{'firstCDW'} (first CDW, default)}
+\item{\code{'firstCDI'} (first CDI)}
+\item{\code{'multiple'} (all confirmed events in chronological order)}
+\item{\code{'firstPIRA'} (first PIRA)}
+\item{\code{'firstRAW'} (first RAW)}
+\item{\code{'first'} (only the very first confirmed event -- CDI or CDW).}
 }}
 
 \item{baseline}{Specifies the baseline scheme. Must be one of the following.
 \itemize{
 \item{\code{'fixed'}: first valid outcome value, default;}
-\item{\code{'roving'}: updated after each improvement or worsening event to the visit determined by \code{proceed_from};
-suitable for a multiple-event setting (i.e., when \code{event} is set to \code{'multiple'},
-\code{'firsteach'}, or \code{'firstCDWtype'}) or when searching for a specific type of CDW
+\item{\code{'roving'}: updated after each CDI or CDW event to the visit determined by \code{proceed_from};
+suitable for a multiple-event setting (i.e., when \code{event} is set to \code{'multiple'})
+or when searching for a specific type of CDW
 (i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}) -- not recommended for randomised data;}
-\item{\code{'roving_impr'}: updated after every confirmed disability improvement (to the visit determined by \code{proceed_from});
+\item{\code{'roving_impr'}: updated after every CDI (to the visit determined by \code{proceed_from});
 suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for multiple events, or for randomised data;}
 \item{\code{'roving_wors'}: updated after every CDW (to the visit determined by \code{proceed_from});
 suitable when searching for a specific type of CDW (i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}).}
@@ -107,7 +112,7 @@ suitable when searching for a specific type of CDW (i.e., when \code{event} is s
 \item{proceed_from}{After detecting a confirmed disability event, continue searching:
 \itemize{
 \item{from the next visit after the first qualifying confirmation visit if \code{proceed_from='firstconf'};}
-\item{from the next visit after the event if \code{proceed_from='event'}.}
+\item{from the next visit after the event onset if \code{proceed_from='event'}.}
 }
 If \code{baseline} is set to \code{'roving'}, \code{'roving_impr'}, or \code{'roving_wors'},
 when rebaselining after a confirmed disability event, the baseline is moved to:
@@ -249,7 +254,7 @@ for all subjects.}
 }
 \description{
 \code{MSprog()} detects and characterises the confirmed disability worsening (CDW)
-or improvement events of an outcome measure (EDSS, NHPT, T25FW, or SDMT; or any custom outcome)
+or improvement (CDI) events of an outcome measure (EDSS, NHPT, T25FW, or SDMT; or any custom outcome)
 for one or more subjects, based on repeated assessments
 through time (and on the dates of acute episodes, if any).
 Several qualitative and quantitative options are given as arguments that can be set
@@ -257,7 +262,7 @@ by the user and reported as a complement to the results to ensure reproducibilit
 }
 \details{
 The events are detected sequentially by scanning the outcome values in chronological order.
-Valid time windows for confirmation visits are determined by arguments
+Time windows for confirmation visits are determined by arguments
 \code{conf_days}, \code{conf_tol_days}, \code{relapse_to_conf}.
 CDW events are classified as relapse-associated or relapse-independent based on their relative timing
 with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
