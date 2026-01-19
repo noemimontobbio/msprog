@@ -1,13 +1,13 @@
 Package: msprog
 Type: Package
-Title: Compute MS Progression from Longitudinal Data
+Title: Reproducible assessment of disability course in MS
 Version: 0.2.3
 Authors@R: c(
     person("Noemi", "Montobbio", , "noemi.montobbio@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0302-393X")),
     person("Francesca", "Bovis", role = c("rev")),
     person("Luca", "Carmisciano", role = c("rev")))
-Description: msprog provides tools for exhaustive and reproducible analysis of disability progression in multiple sclerosis (MS) from longitudinal data.
+Description: msprog provides tools for exhaustive and reproducible analysis of disability course in multiple sclerosis (MS) from longitudinal data
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
