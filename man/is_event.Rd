@@ -32,7 +32,11 @@ is_event(
 \item{\code{'nhpt'} (Nine-Hole Peg Test);}
 \item{\code{'t25fw'} (Timed 25-Foot Walk);}
 \item{\code{'sdmt'} (Symbol Digit Modalities Test);}
-\item{\code{NULL} (only accepted when specifying the direction of worsening).}
+\item{\code{NULL} (only accepted when specifying custom \code{worsening} -- and \code{delta_fun} as well, if \code{sub_threshold=F}).}
+Outcome type determines a default direction of worsening (see \code{worsening}argument)
+and default definition of clinically meaningful change given the reference value
+(using the built-in function \code{\link[=compute_delta]{compute_delta()}}).
+This can be replaced by a custom function using the \code{delta_fun} argument.
 }}
 
 \item{worsening}{The direction of worsening (\code{'increase'} if higher values correspond to worse disease course, \code{'decrease'} otherwise).
@@ -40,9 +44,13 @@ This argument is only used when \code{outcome} is set to \code{NULL}.
 If \code{outcome} is specified, \code{worsening} is automatically set to \code{'increase'} for EDSS, NHPT, T25FW,
 and to \code{'decrease'} for SDMT.}
 
-\item{delta_fun}{Custom function specifying the minimum shift corresponding
-to a valid change from the provided baseline value. If none is specified (default),
-\code{\link[=compute_delta]{compute_delta()}} for the specified outcome is used.}
+\item{delta_fun}{Custom function specifying the minimum clinically meaningful
+change in the outcome measure from the provided reference value.
+The function provided must take a numeric value (reference score) as input,
+and return a numeric value corresponding to the minimum shift from baseline, see example below.
+If none is specified (default), the user must provide a non-\code{NULL} value for
+the \code{outcome} argument (see above) in order to use the built-in function \code{\link[=compute_delta]{compute_delta()}}.
+The argument is ignored if `sub_threshold=T.}
 
 \item{sub_threshold}{If \code{TRUE}, any confirmed worsening, or improvement, or change in the outcome measure is valid,
 regardless of \code{delta_fun}.}

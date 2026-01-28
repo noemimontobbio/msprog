@@ -88,14 +88,14 @@ head(toydata_relapses)
 
 # Minimal example {#example}
 
-The core block of `msprog` is the `MSprog()` function. Given data on visits and relapses in the form specified above, `MSprog()` detects the confirmed disability worsening (CDW) or improvement (CDI) events for each subject for the outcome of interest. We can test it on the EDSS toy data:
+The core block of `msprog` is the `MSprog()` function. Given data on visits and relapses in the form specified above, `MSprog()` detects the confirmed disability worsening (CDW) or improvement (CDI) events for each subject for the outcome of interest. We can test it to detect the first CDW in the EDSS toy data...
 ```{r}
 output_edss <- MSprog(data=toydata_visits, # data on visits
                  subj_col='id', value_col='EDSS', date_col='date', # specify column names
                  outcome='edss', # specify outcome type
                  relapse=toydata_relapses) # data on relapses
 ```
-...or on the SDMT toy data:
+...or in the SDMT toy data:
 ```{r}
 output_sdmt <- MSprog(data=toydata_visits, # data on visits
                  subj_col='id', value_col='SDMT', date_col='date', # specify column names
@@ -241,9 +241,9 @@ The baseline is now moved to the confirmation visit of the first worsening event
 
 Other valid values for the `event` argument are:
 
-* `'first'`: only the very first confirmed event -- CDI or CDW;
-* `'firstCDI'`: first CDI event;
-* `'firstPIRA'`: first PIRA event;
+* `'first'`: only the very first confirmed event -- CDI or CDW
+* `'firstCDI'`: first CDI event
+* `'firstPIRA'`: first PIRA event
 * `'firstRAW'`: first RAW event.
 
 Note: if, for example, `'event=firstPIRA'`, all non-PIRA events *preceding* the first PIRA are actually detected -- although not reported. This allows to combine this scenario with a roving baseline scheme, where the baseline is moved after every confirmed non-PIRA event. For instance, if a RAW event occurs first, the subsequent worsening would be counted from the re-baselined outcome value after the RAW.

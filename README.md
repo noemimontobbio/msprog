@@ -61,9 +61,8 @@ application](https://msprog.shinyapps.io/msprog/).
 **If you use this package in your work, please cite it [as
 below](#citation)**.
 
-For any questions, requests for new features, or bug reporting, please
-contact: **noemi.montobbio@unige.it**. Any feedback is highly
-appreciated!
+**For any questions, requests for new features, or bug reporting, please
+contact: noemi.montobbio@unige.it**. Any feedback is highly appreciated!
 
 <a id="install"></a>
 
@@ -72,6 +71,23 @@ appreciated!
 You can install the development version of `msprog` from GitHub by
 running the command below. If using RStudio, please make sure to restart
 the R session right before running the installation.
+
+<!-- When package is live on CRAN:  -->
+
+<!-- 1) Add CRAN instructions -->
+
+<!-- 2) Specify branch for development version (e.g., dev branch) -->
+
+<!-- 3) No vignette building for dev version (?) -->
+
+Using `remotes`:
+
+``` r
+# install.packages("remotes") # if not already installed
+remotes::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
+```
+
+or using `devtools`:
 
 ``` r
 # install.packages("devtools") # if not already installed
@@ -221,9 +237,9 @@ print(output)
 #> delta_fun=NULL
 #> 
 #> Textual description of applied criteria:
-#> We detected all confirmed EDSS changes (in chronological order) confirmed over 84 days (with a lower tolerance of 7 days and an upper tolerance of 730.5 days). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first available confirmation visit for the event that triggered the re-baseline. Whenever the current baseline fell within 30 days after the onset of a relapse, it was moved to the next eligible visit. A confirmed EDSS worsening event was labelled as RAW if occurring within 90 days after the onset of a relapse. A confirmed EDSS worsening event was labelled as PIRA if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation. 
+#> We detected all confirmed EDSS changes (in chronological order) confirmed over 84 days (with a lower tolerance of 7 days and an upper tolerance of 730.5 days). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first eligible confirmation visit for the event that triggered the re-baseline. Whenever the current baseline fell within 30 days after the onset of a relapse, it was moved to the next eligible visit. A confirmed EDSS worsening event was labelled as relapse-associated worsening (RAW) if occurring within 90 days after the onset of a relapse. A confirmed EDSS worsening event was labelled as progression independent of relapse activity (PIRA) if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation. 
 #> ---
-#> Clinically meaningful threshold for EDSS change (delta function): default for EDSS (as per function msprog::compute_delta(), see package docs).
+#> Clinically meaningful threshold for EDSS change (delta function): default for EDSS (check by typing ?compute_delta).
 ```
 
 <br />

@@ -5,10 +5,11 @@
 #' into a named list to be given as argument `relapse_indep` to function [MSprog()].
 #' The relapse-free intervals may be anchored to (any subset of) the following three data-driven checkpoints.
 #' \itemize{
-#' \item{`'prec'`: a visit preceding the event: can be (i) the current baseline, (ii) the last visit before the event,
-#' or (iii) the last pre-worsening visit (`i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`,
+#' \item{`'prec'`: a visit preceding the event: can be (i) the current baseline, (ii) the last visit before event onset,
+#' or (iii) the last visit before event onset with a clinically meaningful score distance from the event score
+#' (i.e., `i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`,
 #' and same for the confirmation visit);}
-#' \item{`'event'`: the disability worsening event;}
+#' \item{`'event'`: the disability worsening event onset;}
 #' \item{`'conf'`: the (first) confirmation visit.}
 #' }
 #'
@@ -26,15 +27,16 @@
 #'
 #' @param p0 Days before preceding visit (`>=0`).
 #' @param p1 Days after preceding visit (`>=0`), or `NULL`.
-#' @param e0 Days before event (`>=0`), or `NULL`.
-#' @param e1 Days after event (`>=0`), or `NULL`.
+#' @param e0 Days before event onset (`>=0`), or `NULL`.
+#' @param e1 Days after event onset (`>=0`), or `NULL`.
 #' @param c0 Days before confirmation (`>=0`), or `NULL`.
 #' @param c1 Days after confirmation (`>=0`).
 #' @param prec_type Which visit to use as "preceding visit". Must be one of:
 #' \itemize{
 #' \item{`'baseline'`: the current baseline;}
-#' \item{`'last'`: the last visit before the event;}
-#' \item{`'last_lower'`: the last pre-worsening visit, i.e.,
+#' \item{`'last'`: the last visit before event onset;}
+#' \item{`'last_lower'`: the last visit before event onset with a clinically
+#' meaningful score distance from the event score, i.e.,
 #' the last visit `i` where `outcome[event] - outcome[i] >= delta_fun(outcome[i])`.}
 #' }
 #' @param use_end_dates If `TRUE`, only the right bounds (`e1`, `c1`) are used,

@@ -20,9 +20,9 @@ relapse_indep_from_bounds(
 
 \item{p1}{Days after preceding visit (\verb{>=0}), or \code{NULL}.}
 
-\item{e0}{Days before event (\verb{>=0}), or \code{NULL}.}
+\item{e0}{Days before event onset (\verb{>=0}), or \code{NULL}.}
 
-\item{e1}{Days after event (\verb{>=0}), or \code{NULL}.}
+\item{e1}{Days after event onset (\verb{>=0}), or \code{NULL}.}
 
 \item{c0}{Days before confirmation (\verb{>=0}), or \code{NULL}.}
 
@@ -31,8 +31,9 @@ relapse_indep_from_bounds(
 \item{prec_type}{Which visit to use as "preceding visit". Must be one of:
 \itemize{
 \item{\code{'baseline'}: the current baseline;}
-\item{\code{'last'}: the last visit before the event;}
-\item{\code{'last_lower'}: the last pre-worsening visit, i.e.,
+\item{\code{'last'}: the last visit before event onset;}
+\item{\code{'last_lower'}: the last visit before event onset with a clinically
+meaningful score distance from the event score, i.e.,
 the last visit \code{i} where \code{outcome[event] - outcome[i] >= delta_fun(outcome[i])}.}
 }}
 
@@ -48,10 +49,11 @@ A named list to be given as argument \code{relapse_indep} to function \code{\lin
 into a named list to be given as argument \code{relapse_indep} to function \code{\link[=MSprog]{MSprog()}}.
 The relapse-free intervals may be anchored to (any subset of) the following three data-driven checkpoints.
 \itemize{
-\item{\code{'prec'}: a visit preceding the event: can be (i) the current baseline, (ii) the last visit before the event,
-or (iii) the last pre-worsening visit (\code{i} such that \code{outcome[event] - outcome[i] >= delta_fun(outcome[i])},
+\item{\code{'prec'}: a visit preceding the event: can be (i) the current baseline, (ii) the last visit before event onset,
+or (iii) the last visit before event onset with a clinically meaningful score distance from the event score
+(i.e., \code{i} such that \code{outcome[event] - outcome[i] >= delta_fun(outcome[i])},
 and same for the confirmation visit);}
-\item{\code{'event'}: the disability worsening event;}
+\item{\code{'event'}: the disability worsening event onset;}
 \item{\code{'conf'}: the (first) confirmation visit.}
 }
 }

@@ -212,7 +212,7 @@ Must be given in the form produced by function \code{\link[=relapse_indep_from_b
 \cr\code{relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1)}\cr
 to specify the intervals around (any subset of) three checkpoints:
 (i) a preceding visit, e.g., baseline or last visit before the worsening (\code{p0} and \code{p1}),
-(ii) the event (\code{e0} and \code{e1}), and (iii) the first available confirmation visit (\code{c0} and \code{c1}).
+(ii) the event onset (\code{e0} and \code{e1}), and (iii) the first available confirmation visit (\code{c0} and \code{c1}).
 See \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}} function docs for more details on how to define the intervals.
 If relapse end dates are available (\code{renddate_col}), it is possible to also define PIRA based on those
 by setting \code{use_end_dates=T} in \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}}.}

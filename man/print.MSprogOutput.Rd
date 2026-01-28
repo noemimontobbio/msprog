@@ -4,10 +4,12 @@
 \alias{print.MSprogOutput}
 \title{Textual description of criteria used to assess disability course.}
 \usage{
-\method{print}{MSprogOutput}(x, ...)
+\method{print}{MSprogOutput}(x, web = F, ...)
 }
 \arguments{
 \item{x}{An object of class \code{'MSprogOutput'} (result of a call to \code{\link[=MSprog]{MSprog()}}).}
+
+\item{web}{Adapt for printing in web app.}
 
 \item{...}{Optional arguments for \code{print} methods. They are ignored in this function.}
 }

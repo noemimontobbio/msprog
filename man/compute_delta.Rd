@@ -2,7 +2,7 @@
 % Please edit documentation in R/event_testing.R
 \name{compute_delta}
 \alias{compute_delta}
-\title{Definition of minimum valid shift for different tests.}
+\title{Definition of minimum clinically meaningful shift for different scales.}
 \usage{
 compute_delta(baseline, outcome = "edss")
 }
@@ -20,14 +20,16 @@ compute_delta(baseline, outcome = "edss")
 \value{
 Minimum clinically meaningful change from the provided baseline value. Specifically:
 \itemize{
-\item{EDSS: 1.5 if \code{baseline}=0, 1 if 0<\code{baseline}<=5.0, 0.5 if \code{baseline}>5.0;}
-\item{NHPT and T25FW: 20\verb{\%} of \code{baseline};}
+\item{EDSS: 1.5 if \code{baseline}=0, 1 if 0<\code{baseline}<=5.0, 0.5 if \code{baseline}>5.0}
+\item{NHPT and T25FW: 20\verb{\%} of \code{baseline}}
 \item{SDMT: either 3 points or 10\verb{\%} of \code{baseline}.}
 }
 }
 \description{
 \code{compute_delta()} computes the default minimum clinically meaningful change
 from baseline in the outcome measure (EDSS, NHPT, T25FW, or SDMT).
+Note: default thresholds are meant to apply to all versions of each test (e.g.,
+dominant or non-dominant hand for NHPT, best time or median of two trials, etc.).
 }
 \examples{
 compute_delta(4.5) # default outcome is 'edss'

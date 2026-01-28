@@ -1,8 +1,10 @@
 
-#' Definition of minimum valid shift for different tests.
+#' Definition of minimum clinically meaningful shift for different scales.
 #'
 #' `compute_delta()` computes the default minimum clinically meaningful change
 #' from baseline in the outcome measure (EDSS, NHPT, T25FW, or SDMT).
+#' Note: default thresholds are meant to apply to all versions of each test (e.g.,
+#' dominant or non-dominant hand for NHPT, best time or median of two trials, etc.).
 #'
 #' @param baseline Outcome value at baseline.
 #' @param outcome One of: \cr
@@ -14,8 +16,8 @@
 #'  }
 #' @return Minimum clinically meaningful change from the provided baseline value. Specifically:
 #' \itemize{
-#'  \item{EDSS: 1.5 if `baseline`=0, 1 if 0<`baseline`<=5.0, 0.5 if `baseline`>5.0;}
-#'  \item{NHPT and T25FW: 20`%` of `baseline`;}
+#'  \item{EDSS: 1.5 if `baseline`=0, 1 if 0<`baseline`<=5.0, 0.5 if `baseline`>5.0}
+#'  \item{NHPT and T25FW: 20`%` of `baseline`}
 #'  \item{SDMT: either 3 points or 10`%` of `baseline`.}
 #'  }
 #' @export compute_delta
@@ -80,15 +82,23 @@ compute_delta <- function(baseline, outcome='edss') {
 #'  \item{`'nhpt'` (Nine-Hole Peg Test);}
 #'  \item{`'t25fw'` (Timed 25-Foot Walk);}
 #'  \item{`'sdmt'` (Symbol Digit Modalities Test);}
-#'  \item{`NULL` (only accepted when specifying the direction of worsening).}
+#'  \item{`NULL` (only accepted when specifying custom `worsening` -- and `delta_fun` as well, if `sub_threshold=F`).}
+#'  Outcome type determines a default direction of worsening (see `worsening`argument)
+#'  and default definition of clinically meaningful change given the reference value
+#'  (using the built-in function [compute_delta()]).
+#'  This can be replaced by a custom function using the `delta_fun` argument.
 #'  }
 #' @param worsening The direction of worsening (`'increase'` if higher values correspond to worse disease course, `'decrease'` otherwise).
 #' This argument is only used when `outcome` is set to `NULL`.
 #' If `outcome` is specified, `worsening` is automatically set to `'increase'` for EDSS, NHPT, T25FW,
 #'  and to `'decrease'` for SDMT.
-#' @param delta_fun Custom function specifying the minimum shift corresponding
-#' to a valid change from the provided baseline value. If none is specified (default),
-#' [compute_delta()] for the specified outcome is used.
+#' @param delta_fun Custom function specifying the minimum clinically meaningful
+#' change in the outcome measure from the provided reference value.
+#' The function provided must take a numeric value (reference score) as input,
+#' and return a numeric value corresponding to the minimum shift from baseline, see example below.
+#' If none is specified (default), the user must provide a non-`NULL` value for
+#' the `outcome` argument (see above) in order to use the built-in function [compute_delta()].
+#' The argument is ignored if `sub_threshold=T.
 #' @param sub_threshold If `TRUE`, any confirmed worsening, or improvement, or change in the outcome measure is valid,
 #'  regardless of `delta_fun`.
 #' @return A boolean value specifying if a valid event was found.
@@ -104,6 +114,8 @@ is_event <- function(x, baseline, type, outcome='edss', worsening=NULL,
     worsening <- 'decrease'
   } else if (is.null(worsening)) {
     stop('Either specify a valid outcome type (`outcome` argument), or specify worsening direction.')
+  } else if (is.null(delta_fun)) {
+    stop('Either specify a valid outcome type (`outcome` argument), or specify a delta function (`delta_fun` argument).')
   }
 
   improvement <- ifelse(worsening == 'decrease', 'increase', 'decrease')

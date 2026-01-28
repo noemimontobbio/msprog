@@ -159,7 +159,7 @@
 #' \cr`relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1)`\cr
 #' to specify the intervals around (any subset of) three checkpoints:
 #' (i) a preceding visit, e.g., baseline or last visit before the worsening (`p0` and `p1`),
-#' (ii) the event (`e0` and `e1`), and (iii) the first available confirmation visit (`c0` and `c1`).
+#' (ii) the event onset (`e0` and `e1`), and (iii) the first available confirmation visit (`c0` and `c1`).
 #' See [relapse_indep_from_bounds()] function docs for more details on how to define the intervals.
 #' If relapse end dates are available (`renddate_col`), it is possible to also define PIRA based on those
 #' by setting `use_end_dates=T` in [relapse_indep_from_bounds()].
@@ -1477,6 +1477,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       scolumns <- scolumns[scolumns!='CDI']
     } else if (event == 'firstCDI') {
       scolumns <- c('CDI')
+      columns <- columns[!startsWith(columns, "PIRA")]
     }
 
     if (event %in% c('firstRAW', 'firstCDI')) {

@@ -9,6 +9,7 @@
 #' obtain the output.
 #'
 #' @param x An object of class `'MSprogOutput'` (result of a call to [MSprog()]).
+#' @param web Adapt for printing in web app.
 #' @param ... Optional arguments for `print` methods. They are ignored in this function.
 #'
 #' @export
@@ -17,7 +18,7 @@
 #'     relapse=toydata_relapses, conf_days=7*12, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=2)
 #' print(output) # textual description of parameters used to obtain output
-print.MSprogOutput <- function(x, ...) {
+print.MSprogOutput <- function(x, web=F, ...) {
 
   cat('---\nmsprog version:', as.character(utils::packageVersion('msprog')), '\n---')
 
@@ -103,7 +104,7 @@ print.MSprogOutput <- function(x, ...) {
                                           ' worsening or improvement event. ')),
                             # Proceed from
                             'The new baseline was set at ', ifelse(s$proceed_from=='event', 'the event',
-                              'the first available confirmation visit for the event'), ' that triggered the re-baseline. ',
+                              'the first eligible confirmation visit for the event'), ' that triggered the re-baseline. ',
                             # Sub-threshold
                             ifelse(s$sub_threshold_rebl!='none',
                                    paste0('Rebaseline was also triggered by confirmed \"sub-threshold\" ', s$sub_threshold_rebl,
@@ -162,7 +163,8 @@ print.MSprogOutput <- function(x, ...) {
   # %%%%%%%%%%%%%
 
   # RAW
-  raw_text <- paste0('A confirmed ', outcome, ' worsening event was labelled as RAW if occurring within ',
+  raw_text <- paste0('A confirmed ', outcome,
+                     ' worsening event was labelled as relapse-associated worsening (RAW) if occurring within ',
                      ifelse(is.null(s$renddate_col), paste0(s$relapse_assoc[1], ' days after the onset of a relapse'),
                             'a relapse (between onset and end)'),
                      ifelse(s$relapse_assoc[2]>0, paste0(', or within ', s$relapse_assoc[2], ' days before the onset of a relapse'), ''),
@@ -192,7 +194,8 @@ print.MSprogOutput <- function(x, ...) {
     pira_def <- gsub('.{5}$', '', pira_def)
   }
   # Full PIRA text
-  pira_text <- paste0('A confirmed ', outcome, ' worsening event was labelled as PIRA if ',
+  pira_text <- paste0('A confirmed ', outcome,
+                      ' worsening event was labelled as progression independent of relapse activity (PIRA) if ',
                       ifelse(length(s$relapse_indep[['event']])==2, paste0('no relapses started in the interval ', pira_def, '. '),
                              paste0('it did not occur within a relapse (onset to end)', ifelse(s$relapse_indep[['event']]>0,
                                                                                                paste0(', or less than ', s$relapse_indep[['event']], ' days before a relapse')),
@@ -216,7 +219,7 @@ print.MSprogOutput <- function(x, ...) {
   }
   cat('\n---\nClinically meaningful threshold for', outcome, 'change (delta function):',
       ifelse(is.null(s$delta_fun), paste('default for', outcome,
-            '(as per function msprog::compute_delta(), see package docs).'),
+            ifelse(web, '(see \"Outcome definition\" section)', '(check by typing ?compute_delta).')),
              'user-specified (`delta_fun` argument above).'))
 
 }

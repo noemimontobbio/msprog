@@ -52,7 +52,7 @@ The outcome computation can be run locally in R (see installation instructions b
 
 **If you use this package in your work, please cite it [as below](#citation)**.
 
-For any questions, requests for new features, or bug reporting, please contact: **noemi.montobbio\@unige.it**. Any feedback is highly appreciated!
+**For any questions, requests for new features, or bug reporting, please contact: noemi.montobbio\@unige.it**. Any feedback is highly appreciated!
 
 <a id="install"></a>
 
@@ -61,6 +61,18 @@ For any questions, requests for new features, or bug reporting, please contact: 
 You can install the development version of `msprog` from GitHub by running the command below.
 If using RStudio, please make sure to restart the R session right before running the installation.
 
+<!-- When package is live on CRAN:  -->
+<!-- 1) Add CRAN instructions -->
+<!-- 2) Specify branch for development version (e.g., dev branch) -->
+<!-- 3) No vignette building for dev version (?) -->
+
+Using `remotes`:
+``` r
+# install.packages("remotes") # if not already installed
+remotes::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
+```
+
+or using `devtools`:
 ``` r
 # install.packages("devtools") # if not already installed
 devtools::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
