@@ -42,7 +42,7 @@ jobs:
           use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v2
-        continue-on-error: true  # REMOVE THIS AFTER RUNNING DIAGNOSTICS!!!!
+        #continue-on-error: true  # ONLY FOR DIAGNOSTICS
         with:
           extra-packages: any::rcmdcheck
           needs: check
