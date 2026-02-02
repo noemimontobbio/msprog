@@ -24,11 +24,11 @@
 #' @param date_col Name of data column with date of visit.
 #' @param outcome Specifies the outcome type. Must be one of the following:
 #' \itemize{
-#'  \item{`'edss'` (Expanded Disability Status Scale);}
-#'  \item{`'nhpt'` (Nine-Hole Peg Test);}
-#'  \item{`'t25fw'` (Timed 25-Foot Walk);}
-#'  \item{`'sdmt'` (Symbol Digit Modalities Test);}
-#'  \item{`NULL` (only accepted when specifying a custom `delta_fun`)}
+#'  \item `'edss'` (Expanded Disability Status Scale)
+#'  \item `'nhpt'` (Nine-Hole Peg Test)
+#'  \item `'t25fw'` (Timed 25-Foot Walk)
+#'  \item `'sdmt'` (Symbol Digit Modalities Test)
+#'  \item `NULL` (only accepted when specifying a custom `delta_fun`)
 #'  }
 #'  Outcome type determines a default direction of worsening (see `worsening`argument)
 #'  and default definition of clinically meaningful change given the reference value
@@ -51,48 +51,48 @@
 #'  and to `'decrease'` if `outcome` is set to `'sdmt'`.
 #' @param event Specifies which events to detect. Must be one of the following:
 #' \itemize{
-#' \item{`'firstCDW'` (first CDW, default)}
-#' \item{`'firstCDI'` (first CDI)}
-#' \item{`'multiple'` (all confirmed events in chronological order)}
-#' \item{`'firstPIRA'` (first PIRA)}
-#' \item{`'firstRAW'` (first RAW)}
-#' \item{`'first'` (only the very first confirmed event -- CDI or CDW).}
+#' \item `'firstCDW'` (first CDW, default)
+#' \item `'firstCDI'` (first CDI)
+#' \item `'multiple'` (all confirmed events in chronological order)
+#' \item `'firstPIRA'` (first PIRA)
+#' \item `'firstRAW'` (first RAW)
+#' \item `'first'` (only the very first confirmed event -- CDI or CDW).
 #' }
 #' @param baseline Specifies the baseline scheme. Must be one of the following.
 #' \itemize{
-#' \item{`'fixed'`: first valid outcome value, default;}
-#' \item{`'roving'`: updated after each CDI or CDW event to the visit determined by `proceed_from`;
+#' \item `'fixed'`: first valid outcome value, default.
+#' \item `'roving'`: updated after each CDI or CDW event to the visit determined by `proceed_from`;
 #' suitable for a multiple-event setting (i.e., when `event` is set to `'multiple'`)
 #' or when searching for a specific type of CDW
-#' (i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`) -- not recommended for randomised data;}
-#' \item{`'roving_impr'`: updated after every CDI (to the visit determined by `proceed_from`);
-#' suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for multiple events, or for randomised data;}
-#' \item{`'roving_wors'`: updated after every CDW (to the visit determined by `proceed_from`);
-#' suitable when searching for a specific type of CDW (i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`).}
+#' (i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`) -- not recommended for randomised data.
+#' \item `'roving_impr'`: updated after every CDI (to the visit determined by `proceed_from`);
+#' suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for multiple events, or for randomised data.
+#' \item `'roving_wors'`: updated after every CDW (to the visit determined by `proceed_from`);
+#' suitable when searching for a specific type of CDW (i.e., when `event` is set to `'firstPIRA'` or `'firstRAW'`).
 #' }
 #' @param proceed_from After detecting a confirmed disability event, continue searching:
 #' \itemize{
-#' \item{from the next visit after the first qualifying confirmation visit if `proceed_from='firstconf'`;}
-#'\item{from the next visit after the event onset if `proceed_from='event'`.}
+#' \item from the next visit after the first qualifying confirmation visit if `proceed_from='firstconf'`
+#' \item from the next visit after the event onset if `proceed_from='event'`.
 #' }
 #' If `baseline` is set to `'roving'`, `'roving_impr'`, or `'roving_wors'`,
 #' when rebaselining after a confirmed disability event, the baseline is moved to:
 #' \itemize{
-#' \item{the first qualifying confirmation visit if `proceed_from='firstconf'`;}
-#'\item{the event visit if `proceed_from='event'`.}
+#' \item the first qualifying confirmation visit if `proceed_from='firstconf'`
+#' \item the event visit if `proceed_from='event'`.
 #' }
 #' @param sub_threshold_rebl This argument is only used if `baseline` is not set to `'fixed'`.
-#' Must be one of the following:
+#' Must be one of the following.
 #' \itemize{
-#' \item{`'event'`: any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
-#' possibly below clinically meaningful threshold) can potentially trigger a re-baseline;}
-#' \item{`'improvement'`: any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
-#' possibly below clinically meaningful threshold) can potentially trigger a re-baseline;}
-#' \item{`'worsening'`: any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
-#' possibly below clinically meaningful threshold) can potentially trigger a re-baseline;}
-#' \item{`'none'`: only use clinically meaningful confirmed changes for rebaseline.}
-#' See `delta_fun` argument and [compute_delta()] function for more details.
+#' \item `'event'`: any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
+#' possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
+#' \item `'improvement'`: any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
+#' possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
+#' \item `'worsening'`: any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
+#' possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
+#' \item `'none'`: only use clinically meaningful confirmed changes for re-baseline.
 #' }
+#' See `delta_fun` argument and [compute_delta()] function for more details.
 #' @param bl_geq This argument is only used if the baseline is moved.
 #' If `TRUE`, the new reference value must always be greater or equal than the previous one;
 #' when it is not, the old reference value is assigned to it \[2\].
@@ -108,9 +108,9 @@
 #' This controls for cases where the outcome has an undulating course.<br />
 #' The following argument values are accepted.
 #' \itemize{
-#' \item{`'none'`: local extrema are always accepted as valid baseline values.}
-#' \item{`'strict'`: the baseline cannot be placed at a \emph{strict} local minimum or maximum.}
-#' \item{`'all'`: the baseline cannot be placed at a local minimum or maximum.}
+#' \item `'none'`: local extrema are always accepted as valid baseline values.
+#' \item `'strict'`: the baseline cannot be placed at a \emph{strict} local minimum or maximum.
+#' \item `'all'`: the baseline cannot be placed at a local minimum or maximum.
 #' }
 #' @param validconf_col Name of data column specifying which visits can (`T`) or cannot (`F`) be used as confirmation visits.
 #' The input data does not necessarily have to include such a column.
@@ -169,7 +169,13 @@
 #' they are imputed with probability `p`, `0<p<1`, if `impute_last_visit=p`.
 #' If a value `N>1` is passed, unconfirmed worsening events are imputed only if occurring within `N` days of follow-up
 #' (e.g., in case of early discontinuation).
-#' @param date_format Format of dates in the input data. If not specified, it will be inferred by function [as.Date()].
+#' @param date_format Format of dates in the input data. Can be:
+#' \itemize{
+#' \item `'day'` if dates are given as "days from start" (the starting point can be different for each subject
+#' -- e.g., days from randomisation in a clinical trial); negative values are accepted.
+#' \item Standard format for dates (e.g., \code{"\%d-\%m-\%Y"}; see [strptime()] docs for correct syntax).
+#' }
+#' If not specified, function [as.Date()] will try to infer it automatically.
 #' @param include_dates If `TRUE`, `output$results` will include the date of each event (`'date'` column)
 #' and the date of the corresponding baseline (`'bldate'` column).
 #' @param include_value If `TRUE`,  `output$results` will include the outcome value at each event (`'value'` column)
@@ -340,17 +346,48 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
   # Convert dates to Date format
   if (is.null(date_format)) {
+    tryCatch({
     data[[date_col]] <- as.Date(data[[date_col]])
     relapse[[rdate_col]] <- as.Date(relapse[[rdate_col]])
     if (!is.null(renddate_col)) {
       relapse[[renddate_col]] <- as.Date(relapse[[renddate_col]])
     }
+    }, error=function(e) {
+      message("Failed to infer format for date columns; please provide correct format via `date_format` argument.")
+      NULL
+    }
+    )
+  } else if (date_format == 'day') {
+    tryCatch({
+    data[[date_col]] <- as.numeric(data[[date_col]])
+    relapse[[rdate_col]] <- as.numeric(relapse[[rdate_col]])
+    if (!is.null(renddate_col)) {
+      relapse[[renddate_col]] <- as.numeric(relapse[[renddate_col]])
+    }
+    }, error=function(e) {
+      message("Failed to intepret date columns as numeric (as per `date_format='day'`)")
+      NULL
+    }
+    )
   } else {
+  tryCatch({
   data[[date_col]] <- as.Date(data[[date_col]], format=date_format)
   relapse[[rdate_col]] <- as.Date(relapse[[rdate_col]], format=date_format)
   if (!is.null(renddate_col)) {
     relapse[[renddate_col]] <- as.Date(relapse[[renddate_col]], format=date_format)
-    }
+  }
+  }, error=function(e) {
+    message("Failed to intepret date columns as \'", date_format, "\'; please provide correct format via `date_format` argument.")
+    NULL
+  }
+  )
+  }
+
+  # Local function to display dates
+  display_date <- function(day, start, print=T) {
+    ifelse(!is.null(date_format) && date_format == 'day',
+                   ifelse(print, paste("day", day), day),
+                   as.character(start + as.difftime(data_id[change_idx,][[date_col]], units="days")))
   }
 
   # Restrict to subset of subjects
@@ -360,6 +397,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
 
   # Convert dates to days from global minimum
+  if (is.null(date_format) || date_format != 'day') {
   if (nrow(relapse)>0) {
     global_start <- min(min(data[[date_col]]), min(relapse[[rdate_col]]))
   } else {global_start <- min(data[[date_col]])}
@@ -367,6 +405,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   relapse[[rdate_col]] <- as.numeric(difftime(relapse[[rdate_col]], global_start), units='days')
   if (!is.null(renddate_col)) {
     relapse[[renddate_col]] <- as.numeric(difftime(relapse[[renddate_col]], global_start), units='days')
+  }
+  } else {
+    global_start <- NULL
   }
 
   if (nrow(data)==0) {
@@ -454,9 +495,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   results_df[[subj_col]] <- rep(all_subj, each=max_nevents)
   results_df$nevent <- rep(1:max_nevents, times=nsub)
   results_df$event_type <- ''  # character
-  results_df$bldate <- as.Date(NA)  # Date
+  if (!is.null(date_format) && date_format == 'day') {
+  results_df$bldate <- NaN # numeric
+  results_df$date <- NaN # numeric
+  } else {
+    results_df$bldate <- as.Date(NA)  # Date
+    results_df$date <- as.Date(NA)  # Date
+  }
   results_df$blvalue <- NaN # numeric
-  results_df$date <- as.Date(NA)  # Date
   results_df$value <- NaN  # numeric
   results_df$total_fu <- 0  # numeric
   results_df$time2event <- NaN  # numeric
@@ -716,7 +762,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         }
         if (verbose == 2) {
           message(outcome, " change at visit no.", change_idx, " (",
-                  global_start + as.difftime(data_id[change_idx,][[date_col]], units="days"),
+                  display_date(data_id[change_idx,][[date_col]], global_start),
                        "); potential confirmation visits available: no.", paste(conf_idx, collapse=", "))
         }
 
@@ -771,9 +817,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             sust_idx <- ifelse(is.na(next_nonsust), nvisits, next_nonsust - 1)
             event_type <- c(event_type, "CDI")
             event_index <- c(event_index, change_idx)
-            bldate <- c(bldate, as.character(global_start + as.difftime(bl[[date_col]], units='days')))
+            bldate <- c(bldate, display_date(bl[[date_col]], global_start, print=F))
             blvalue <- c(blvalue, bl[[value_col]])
-            edate <- c(edate, as.character(global_start + as.difftime(data_id[change_idx,][[date_col]], units='days')))
+            edate <- c(edate, display_date(data_id[change_idx,][[date_col]], global_start, print=F))
             evalue <- c(evalue, data_id[change_idx,][[value_col]])
             bl2event <- c(bl2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
             time2event <- c(time2event, data_id[change_idx,][[date_col]] - data_id[1,][[date_col]])
@@ -789,9 +835,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             # Print progress info
             if (verbose == 2) {
               message(outcome, " improvement (visit no.", change_idx, ", ",
-                      global_start + as.difftime(data_id[change_idx,][[date_col]], units='days'),
+                      display_date(data_id[change_idx,][[date_col]], global_start),
                            ") confirmed at ", paste(names(conf_t), collapse=", "), " days, sustained up to visit no.", sust_idx,
-                           " (", global_start + as.difftime(data_id[sust_idx,][[date_col]], units='days'), ")")
+                           " (", display_date(data_id[sust_idx,][[date_col]], global_start), ")")
             }
           } else {
             # If the event is NOT retained (as per `require_sust_days`), we proceed.
@@ -801,9 +847,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                              "entire follow-up"), ": proceed with search")
             }
             unconf[[unconf_idx]] <- setNames(list(subjid,
-                                                  as.character(global_start + as.difftime(data_id[change_idx,][[date_col]], units='days')),
+                                                  display_date(data_id[change_idx,][[date_col]], global_start, print=F),
                                                   data_id[change_idx,][[value_col]],
-                                                  as.character(global_start + as.difftime(bl[[date_col]], units='days')),
+                                                  display_date(bl[[date_col]], global_start, print=F),
                                                   bl[[value_col]],
                                                   data_id[change_idx,][['closest_rel_before']],
                                                   data_id[change_idx,][['closest_rel_after']]),
@@ -1075,9 +1121,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     for (m in conf_days) {
                         pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], 0)}
                   }
-                  bldate <- c(bldate, as.character(global_start + as.difftime(bl[[date_col]], units='days')))
+                  bldate <- c(bldate, display_date(bl[[date_col]], global_start, print=F))
                   blvalue <- c(blvalue, bl[[value_col]])
-                  edate <- c(edate, as.character(global_start + as.difftime(data_id[change_idx,][[date_col]], units='days')))
+                  edate <- c(edate, display_date(data_id[change_idx,][[date_col]], global_start, print=F))
                   evalue <- c(evalue, data_id[change_idx,][[value_col]])
                   bl2event <- c(bl2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
                   time2event <- c(time2event, data_id[change_idx,][[date_col]] - data_id[1,][[date_col]])
@@ -1095,11 +1141,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   if (verbose == 2) {
                     message(outcome, " ", event_type[length(event_type)],
                                  " (visit no.", change_idx, ", ",
-                                global_start + as.difftime(data_id[change_idx,][[date_col]], units='days'),
+                            display_date(data_id[change_idx,][[date_col]], global_start),
                             ifelse(length(conf_t)>0, paste0(") confirmed at ",
                             paste(ifelse(event_type[length(event_type)]=='PIRA', names(pconf_t), names(conf_t)), collapse=", "),
                                 " days, sustained up to visit no.", sust_idx,
-                                 " (", global_start + as.difftime(data_id[sust_idx,][[date_col]], units='days'), ")"),
+                                 " (", display_date(data_id[sust_idx,][[date_col]], global_start), ")"),
                             ") occurring at last assessment (no confirmation)")
                             )
                   }
@@ -1118,9 +1164,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                                      "entire follow-up"), ": proceed with search")
                     }
                     unconf[[unconf_idx]] <- setNames(list(subjid,
-                                                          as.character(global_start + as.difftime(data_id[change_idx,][[date_col]], units='days')),
+                                                          display_date(data_id[change_idx,][[date_col]], global_start, print=F),
                                                           data_id[change_idx,][[value_col]],
-                                                          as.character(global_start + as.difftime(bl[[date_col]], units='days')),
+                                                          display_date(bl[[date_col]], global_start, print=F),
                                                           bl[[value_col]],
                                                           data_id[change_idx,][['closest_rel_before']],
                                                           data_id[change_idx,][['closest_rel_after']]),
@@ -1225,9 +1271,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         }
         if (!is.na(change_idx)) {
           unconf[[unconf_idx]] <- setNames(list(subjid,
-                                                as.character(global_start + as.difftime(data_id[change_idx,][[date_col]], units='days')),
+                                                display_date(data_id[change_idx,][[date_col]], global_start, print=F),
                                                 data_id[change_idx,][[value_col]],
-                                                as.character(global_start + as.difftime(bl[[date_col]], units='days')),
+                                                display_date(bl[[date_col]], global_start, print=F),
                                                 bl[[value_col]],
                                                 data_id[change_idx,][['closest_rel_before']],
                                                 data_id[change_idx,][['closest_rel_after']]),
@@ -1346,7 +1392,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       results_df[results_df[[subj_col]]==subjid, 'nevent'] <- 0
       results_df[results_df[[subj_col]]==subjid, 'total_fu'] <- total_fu[subjid]
       results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
-      results_df[results_df[[subj_col]] == subjid, 'date'] <- as.character(global_start + as.difftime(data_id[nvisits,][[date_col]], units='days'))
+      results_df[results_df[[subj_col]] == subjid, 'date'] <- display_date(data_id[nvisits,][[date_col]], global_start, print=F)
       results_df[results_df[[subj_col]]==subjid, 'event_type'] <- ''
     }
     else if (length(event_type)==0) {
@@ -1380,7 +1426,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     results_df[results_df[[subj_col]]==subjid, 'nevent'] <- 0
     results_df[results_df[[subj_col]]==subjid, 'total_fu'] <- total_fu[subjid]
     results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
-    results_df[results_df[[subj_col]] == subjid, 'date'] <- as.character(global_start + as.difftime(data_id[nvisits,][[date_col]], units='days'))
+    results_df[results_df[[subj_col]] == subjid, 'date'] <- display_date(data_id[nvisits,][[date_col]], global_start, print=F)
     results_df[results_df[[subj_col]]==subjid, 'event_type'] <- ''
   } else {
     results_df <- results_df[-subj_index, ]

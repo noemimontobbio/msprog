@@ -53,11 +53,11 @@ MSprog(
 
 \item{outcome}{Specifies the outcome type. Must be one of the following:
 \itemize{
-\item{\code{'edss'} (Expanded Disability Status Scale);}
-\item{\code{'nhpt'} (Nine-Hole Peg Test);}
-\item{\code{'t25fw'} (Timed 25-Foot Walk);}
-\item{\code{'sdmt'} (Symbol Digit Modalities Test);}
-\item{\code{NULL} (only accepted when specifying a custom \code{delta_fun})}
+\item \code{'edss'} (Expanded Disability Status Scale)
+\item \code{'nhpt'} (Nine-Hole Peg Test)
+\item \code{'t25fw'} (Timed 25-Foot Walk)
+\item \code{'sdmt'} (Symbol Digit Modalities Test)
+\item \code{NULL} (only accepted when specifying a custom \code{delta_fun})
 }
 Outcome type determines a default direction of worsening (see \code{worsening}argument)
 and default definition of clinically meaningful change given the reference value
@@ -88,51 +88,51 @@ and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
 
 \item{event}{Specifies which events to detect. Must be one of the following:
 \itemize{
-\item{\code{'firstCDW'} (first CDW, default)}
-\item{\code{'firstCDI'} (first CDI)}
-\item{\code{'multiple'} (all confirmed events in chronological order)}
-\item{\code{'firstPIRA'} (first PIRA)}
-\item{\code{'firstRAW'} (first RAW)}
-\item{\code{'first'} (only the very first confirmed event -- CDI or CDW).}
+\item \code{'firstCDW'} (first CDW, default)
+\item \code{'firstCDI'} (first CDI)
+\item \code{'multiple'} (all confirmed events in chronological order)
+\item \code{'firstPIRA'} (first PIRA)
+\item \code{'firstRAW'} (first RAW)
+\item \code{'first'} (only the very first confirmed event -- CDI or CDW).
 }}
 
 \item{baseline}{Specifies the baseline scheme. Must be one of the following.
 \itemize{
-\item{\code{'fixed'}: first valid outcome value, default;}
-\item{\code{'roving'}: updated after each CDI or CDW event to the visit determined by \code{proceed_from};
+\item \code{'fixed'}: first valid outcome value, default.
+\item \code{'roving'}: updated after each CDI or CDW event to the visit determined by \code{proceed_from};
 suitable for a multiple-event setting (i.e., when \code{event} is set to \code{'multiple'})
 or when searching for a specific type of CDW
-(i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}) -- not recommended for randomised data;}
-\item{\code{'roving_impr'}: updated after every CDI (to the visit determined by \code{proceed_from});
-suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for multiple events, or for randomised data;}
-\item{\code{'roving_wors'}: updated after every CDW (to the visit determined by \code{proceed_from});
-suitable when searching for a specific type of CDW (i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}).}
+(i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}) -- not recommended for randomised data.
+\item \code{'roving_impr'}: updated after every CDI (to the visit determined by \code{proceed_from});
+suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for multiple events, or for randomised data.
+\item \code{'roving_wors'}: updated after every CDW (to the visit determined by \code{proceed_from});
+suitable when searching for a specific type of CDW (i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}).
 }}
 
 \item{proceed_from}{After detecting a confirmed disability event, continue searching:
 \itemize{
-\item{from the next visit after the first qualifying confirmation visit if \code{proceed_from='firstconf'};}
-\item{from the next visit after the event onset if \code{proceed_from='event'}.}
+\item from the next visit after the first qualifying confirmation visit if \code{proceed_from='firstconf'}
+\item from the next visit after the event onset if \code{proceed_from='event'}.
 }
 If \code{baseline} is set to \code{'roving'}, \code{'roving_impr'}, or \code{'roving_wors'},
 when rebaselining after a confirmed disability event, the baseline is moved to:
 \itemize{
-\item{the first qualifying confirmation visit if \code{proceed_from='firstconf'};}
-\item{the event visit if \code{proceed_from='event'}.}
+\item the first qualifying confirmation visit if \code{proceed_from='firstconf'}
+\item the event visit if \code{proceed_from='event'}.
 }}
 
 \item{sub_threshold_rebl}{This argument is only used if \code{baseline} is not set to \code{'fixed'}.
-Must be one of the following:
+Must be one of the following.
 \itemize{
-\item{\code{'event'}: any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
-possibly below clinically meaningful threshold) can potentially trigger a re-baseline;}
-\item{\code{'improvement'}: any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
-possibly below clinically meaningful threshold) can potentially trigger a re-baseline;}
-\item{\code{'worsening'}: any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
-possibly below clinically meaningful threshold) can potentially trigger a re-baseline;}
-\item{\code{'none'}: only use clinically meaningful confirmed changes for rebaseline.}
-See \code{delta_fun} argument and \code{\link[=compute_delta]{compute_delta()}} function for more details.
-}}
+\item \code{'event'}: any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
+possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
+\item \code{'improvement'}: any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
+possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
+\item \code{'worsening'}: any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
+possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
+\item \code{'none'}: only use clinically meaningful confirmed changes for re-baseline.
+}
+See \code{delta_fun} argument and \code{\link[=compute_delta]{compute_delta()}} function for more details.}
 
 \item{bl_geq}{This argument is only used if the baseline is moved.
 If \code{TRUE}, the new reference value must always be greater or equal than the previous one;
@@ -151,9 +151,9 @@ When \code{outcome[i]=outcome[i-2]}, visit \code{i} is \emph{not} considered a l
 This controls for cases where the outcome has an undulating course.\if{html}{\out{<br />}}
 The following argument values are accepted.
 \itemize{
-\item{\code{'none'}: local extrema are always accepted as valid baseline values.}
-\item{\code{'strict'}: the baseline cannot be placed at a \emph{strict} local minimum or maximum.}
-\item{\code{'all'}: the baseline cannot be placed at a local minimum or maximum.}
+\item \code{'none'}: local extrema are always accepted as valid baseline values.
+\item \code{'strict'}: the baseline cannot be placed at a \emph{strict} local minimum or maximum.
+\item \code{'all'}: the baseline cannot be placed at a local minimum or maximum.
 }}
 
 \item{validconf_col}{Name of data column specifying which visits can (\code{T}) or cannot (\code{F}) be used as confirmation visits.
@@ -224,7 +224,13 @@ they are imputed with probability \code{p}, \verb{0<p<1}, if \code{impute_last_v
 If a value \code{N>1} is passed, unconfirmed worsening events are imputed only if occurring within \code{N} days of follow-up
 (e.g., in case of early discontinuation).}
 
-\item{date_format}{Format of dates in the input data. If not specified, it will be inferred by function \code{\link[=as.Date]{as.Date()}}.}
+\item{date_format}{Format of dates in the input data. Can be:
+\itemize{
+\item \code{'day'} if dates are given as "days from start" (the starting point can be different for each subject
+-- e.g., days from randomisation in a clinical trial); negative values are accepted.
+\item Standard format for dates (e.g., \code{"\%d-\%m-\%Y"}; see \code{\link[=strptime]{strptime()}} docs for correct syntax).
+}
+If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer it automatically.}
 
 \item{include_dates}{If \code{TRUE}, \code{output$results} will include the date of each event (\code{'date'} column)
 and the date of the corresponding baseline (\code{'bldate'} column).}
