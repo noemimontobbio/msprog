@@ -48,7 +48,7 @@ jobs:
           needs: check
 
       # -----------------------
-      # Safe macOS diagnostics (each R command is a single -e invocation)
+      # macOS diagnostics
       # -----------------------
       - name: macos-info-and-pak
         if: ${{ runner.os == 'macOS' }}
