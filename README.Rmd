@@ -59,7 +59,7 @@ The outcome computation can be run locally in R (see installation instructions b
 ## Installation
 
 You can install the development version of `msprog` from GitHub by running the command below.
-If using RStudio, please make sure to restart the R session right before running the installation.
+If using RStudio, please make sure to restart the R session right before running the installation. 
 
 <!-- When package is live on CRAN:  -->
 <!-- 1) Add CRAN instructions -->

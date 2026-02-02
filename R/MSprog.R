@@ -387,7 +387,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   display_date <- function(day, start, print=T) {
     ifelse(!is.null(date_format) && date_format == 'day',
                    ifelse(print, paste("day", day), day),
-                   as.character(start + as.difftime(data_id[change_idx,][[date_col]], units="days")))
+                   as.character(start + as.difftime(day, units="days")))
   }
 
   # Restrict to subset of subjects
@@ -1386,20 +1386,20 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       event_order <- event_order[first_events]
     }
 
-    if ((length(event_type)==0) && include_stable) {
-      results_df <- results_df[-subj_index[2:length(subj_index)], ]
-      rownames(results_df) <- NULL # reset column names
-      results_df[results_df[[subj_col]]==subjid, 'nevent'] <- 0
-      results_df[results_df[[subj_col]]==subjid, 'total_fu'] <- total_fu[subjid]
-      results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
-      results_df[results_df[[subj_col]] == subjid, 'date'] <- display_date(data_id[nvisits,][[date_col]], global_start, print=F)
-      results_df[results_df[[subj_col]]==subjid, 'event_type'] <- ''
-    }
-    else if (length(event_type)==0) {
-      results_df <- results_df[-subj_index, ]
-      rownames(results_df) <- NULL # reset column names
-      }
-    else {
+    # if ((length(event_type)==0) && include_stable) {
+    #   results_df <- results_df[-subj_index[2:length(subj_index)], ]
+    #   rownames(results_df) <- NULL # reset column names
+    #   results_df[results_df[[subj_col]]==subjid, 'nevent'] <- 0
+    #   results_df[results_df[[subj_col]]==subjid, 'total_fu'] <- total_fu[subjid]
+    #   results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
+    #   results_df[results_df[[subj_col]] == subjid, 'date'] <- display_date(data_id[nvisits,][[date_col]], global_start, print=F)
+    #   results_df[results_df[[subj_col]]==subjid, 'event_type'] <- ''
+    # }
+    # else if (length(event_type)==0) {
+    #   results_df <- results_df[-subj_index, ]
+    #   rownames(results_df) <- NULL # reset column names
+    #   }
+    # else {
     results_df <- results_df[-subj_index[(length(event_type) + 1):length(subj_index)], ]
     rownames(results_df) <- NULL # reset column names
     results_df[results_df[[subj_col]] == subjid, "event_type"] <- event_type
@@ -1416,10 +1416,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     results_df[results_df[[subj_col]] == subjid, "sust_days"] <- sustd[event_order]
     results_df[results_df[[subj_col]] == subjid, "sust_last"] <- sustl[event_order]
     for (m in conf_days) {
-      # if (m!=conf_days[1]) {
       results_df[results_df[[subj_col]] == subjid, paste0("PIRA_conf", m)] <- pira_conf[[as.character(m)]][event_order]}
-      # }
-    }
+    # }
   } else if (include_stable) {
     results_df <- results_df[-subj_index[2:length(subj_index)], ]
     rownames(results_df) <- NULL # reset column names
