@@ -48,12 +48,10 @@ jobs:
 
 
 
-
-
       # -----------------------
       # macOS-only diagnostics
       # -----------------------
-      - name: macOS: environment & pak diagnostics
+      - name: macOS: environment and pak diagnostics
         if: runner.os == 'macOS'
         run: |
           R -e 'cat("R version: ", R.version$version.string, "\n"); cat("Platform: ", R.version$platform, "\n"); print(Sys.info()); cat("machine:", Sys.info()[["machine"]], "\n")'
