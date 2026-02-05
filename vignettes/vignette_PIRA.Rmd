@@ -42,12 +42,12 @@ library(msprog)
 
 Recent studies [@kappos2018; @silent2019; @kuhlmann2023] have highlighted the contribution of PIRA to overall disability worsening, generating growing interest in PIRA as a relevant endpoint. Classifying a confirmed disability worsening (CDW) event as relapse-independent requires careful observation of its relative timing with respect to relapses. Established definitions of PIRA [@kappos2020; @cagol2022; @muller2023] require the absence of relapses within appropriate intervals anchored to the dates of three main checkpoints:
 
-1. a visit preceding the event: can be (i) the current reference, (ii) the last visit before the event,
-or (iii) the last pre-worsening visit (`i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`)[^extrema];
-2. the disability worsening event;
+1. a visit preceding the event: can be (i) the current reference, (ii) the last visit before event onset,
+or (iii) the last visit before event onset with a clinically meaningful score distance from it (`i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`)[^extrema];
+2. the initial disability worsening (event onset);
 3. the (first) confirmation visit.
 
-[^extrema]: if `skip_local_extrema` is not `none` in `msprog::MSprog()`, local extrema are not selected as "last pre-worsening visit".
+[^extrema]: if `skip_local_extrema` is not `none` in `msprog::MSprog()`, local extrema are excluded from (iii).
 
 For example, in @kappos2020, an absence of relapses was required between the reference visit and 30 days after the event, and during the 30 days before and 30 days after the confirmation visit for a CDW event to be considered as PIRA; in @cagol2022, the authors required an absence of relapses during the 90 days before the event and between the event and the confirmation visit; in @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation visit; when a high specificity is desired, they recommend an absence of relapses in the whole period between the reference visit and the confirmation visit; in @muller2025, the authors recommend an absence of relapses since the last visit preceding the event (up to the event).
 
@@ -168,7 +168,7 @@ The following code detects, for each subject in the toy dataset, the first EDSS 
   print(output$results, row.names=FALSE) # results
   ```
 
-Here, `nevent` is the cumulative event count for each subject, and `event_type` characterises the event (since `event` is set to `firstPIRA`, the count is either 0 or 1 and the event type, when present, is always `PIRA`); `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf84` and `conf168` report whether the event was confirmed over 12 or 24 weeks (84 or 168 days); `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
+Here, `nevent` is the cumulative event count for each subject, and `event_type` characterises the event (since `event` is set to `firstPIRA`, the count is either 0 or 1 and the event type, when present, is always `PIRA`); `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf84` and `conf168` report whether the event was confirmed as a CDW over 12 or 24 weeks (84 or 168 days); `PIRAconf84` and `PIRAconf168` report whether the event was confirmed as PIRA over 12 or 24 weeks (84 or 168 days); `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
 ## References
 

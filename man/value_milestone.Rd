@@ -22,6 +22,7 @@ value_milestone(
   relapse_to_event = 0,
   relapse_to_conf = 30,
   impute_last_visit = 0,
+  date_format = NULL,
   verbose = 0
 )
 }
@@ -88,6 +89,14 @@ they are always imputed if \code{impute_last_visit=1};
 they are imputed with probability \code{p}, \verb{0<p<1}, if \code{impute_last_visit=p}.
 If a value \code{N>1} is passed, unconfirmed values exceeding the milestone are imputed only if occurring within \code{N} days of follow-up
 (e.g., in case of early discontinuation).}
+
+\item{date_format}{Format of dates in the input data. Can be:
+\itemize{
+\item \code{'day'} if dates are given as "days from start" (the starting point can be different for each subject
+-- e.g., days from randomisation in a clinical trial); negative values are accepted.
+\item Standard format for dates (e.g., \code{"\%d-\%m-\%Y"}; see \code{\link[=strptime]{strptime()}} docs for correct syntax).
+}
+If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer it automatically.}
 
 \item{verbose, }{One of:
 \itemize{

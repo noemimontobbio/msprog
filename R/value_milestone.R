@@ -57,6 +57,13 @@
 #' they are imputed with probability `p`, `0<p<1`, if `impute_last_visit=p`.
 #' If a value `N>1` is passed, unconfirmed values exceeding the milestone are imputed only if occurring within `N` days of follow-up
 #' (e.g., in case of early discontinuation).
+#' @param date_format Format of dates in the input data. Can be:
+#' \itemize{
+#' \item `'day'` if dates are given as "days from start" (the starting point can be different for each subject
+#' -- e.g., days from randomisation in a clinical trial); negative values are accepted.
+#' \item Standard format for dates (e.g., \code{"\%d-\%m-\%Y"}; see [strptime()] docs for correct syntax).
+#' }
+#' If not specified, function [as.Date()] will try to infer it automatically.
 #' @param verbose, One of:
 #' \itemize{
 #'  \item{0}{ (print no info);}
@@ -77,7 +84,7 @@
 value_milestone <- function(data, milestone, subj_col, value_col, date_col, outcome,
                             worsening=NULL, relapse=NULL, rsubj_col=NULL, rdate_col=NULL,
                             validconf_col=NULL, conf_days=24*7, conf_tol_days=c(7, 2*365.25), require_sust_days=0,
-                            relapse_to_event=0, relapse_to_conf=30, impute_last_visit=0,
+                            relapse_to_event=0, relapse_to_conf=30, impute_last_visit=0, date_format=NULL,
                             verbose=0) {
 
   ###########################
@@ -134,15 +141,52 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
   relapse <- relapse[complete.cases(relapse[, c(rsubj_col, rdate_col)]), ]
 
   # Convert dates to Date format
-  data[[date_col]] <- as.Date(data[[date_col]])
-  relapse[[rdate_col]] <- as.Date(relapse[[rdate_col]])
+  if (is.null(date_format)) {
+    tryCatch({
+      data[[date_col]] <- as.Date(data[[date_col]])
+      relapse[[rdate_col]] <- as.Date(relapse[[rdate_col]])
+    }, error=function(e) {
+      message("Failed to infer format for date columns; please provide correct format via `date_format` argument.")
+      NULL
+    }
+    )
+  } else if (date_format == 'day') {
+    tryCatch({
+      data[[date_col]] <- as.numeric(data[[date_col]])
+      relapse[[rdate_col]] <- as.numeric(relapse[[rdate_col]])
+    }, error=function(e) {
+      message("Failed to intepret date columns as numeric (number of days, as per `date_format='day'`)")
+      NULL
+    }
+    )
+  } else {
+    tryCatch({
+      data[[date_col]] <- as.Date(data[[date_col]], format=date_format)
+      relapse[[rdate_col]] <- as.Date(relapse[[rdate_col]], format=date_format)
+    }, error=function(e) {
+      message("Failed to intepret date columns as \"", date_format, "\"; please provide correct format via `date_format` argument.")
+      NULL
+    }
+    )
+  }
+
+  # Local function to display dates/days
+  display_date <- function(day, start, to_print=T) {
+    ifelse(!is.null(date_format) && date_format == 'day',
+           ifelse(to_print, paste("day", day), day),
+           as.character(start + as.difftime(day, units="days")))
+  }
 
   # Convert dates to days from global minimum
-  if (nrow(relapse)>0) {
-    global_start <- min(min(data[[date_col]]), min(relapse[[rdate_col]]))
-  } else {global_start <- min(data[[date_col]])}
-  data[[date_col]] <- as.numeric(difftime(data[[date_col]], global_start), units='days')
-  relapse[[rdate_col]] <- as.numeric(difftime(relapse[[rdate_col]], global_start), units='days')
+  if (is.null(date_format) || date_format != 'day') {
+    if (nrow(relapse)>0) {
+      global_start <- min(min(data[[date_col]]), min(relapse[[rdate_col]]))
+    } else {global_start <- min(data[[date_col]])}
+    data[[date_col]] <- as.numeric(difftime(data[[date_col]], global_start), units='days')
+    relapse[[rdate_col]] <- as.numeric(difftime(relapse[[rdate_col]], global_start), units='days')
+  } else {
+    global_start <- NULL
+  }
 
   if (impute_last_visit<0) {
     stop('`impute_last_visit` must be nonnegative')
@@ -180,11 +224,15 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
   all_subj <- unique(data[[subj_col]])
   nsub <- length(all_subj)
 
-  # Initialize results data.frame
+  # Initialise results data.frame
   results <- data.frame(matrix(ncol = 4, nrow = nsub))
   colnames(results) <- c(date_col, value_col, 'time2event', 'observed')
   rownames(results) <- all_subj
-  results[[date_col]] <- as.Date(NA)
+  if (!is.null(date_format) && date_format == 'day') {
+    results[[date_col]] <- NaN  # numeric
+  } else {
+    results[[date_col]] <- as.Date(NA)  # Date
+  }
   results[[value_col]] <- NaN
   results$time2event <- NaN
   results$observed <- 0
@@ -262,8 +310,7 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
         }
 
       if (is.na(milestone_idx)) {
-        results[subjid, date_col] <- as.character(global_start
-                              + as.difftime(data_id[nvisits,][[date_col]], units='days')) # end of FU
+        results[subjid, date_col] <- display_date(data_id[nvisits,][[date_col]], global_start) # end of FU
         results[subjid, 'time2event'] <- data_id[nvisits, date_col] - data_id[1, date_col] # FU length
         proceed <- FALSE
         if (verbose == 2) {
@@ -293,7 +340,7 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
         if (verbose == 2) {
           message("Found value", ifelse(worsening=='increase', '>=', '<='), milestone,
                   " at visit no.", milestone_idx, " (",
-                  global_start + as.difftime(data_id[milestone_idx,][[date_col]], units="days"),
+                  display_date(data_id[milestone_idx,][[date_col]], global_start, to_print=T),
                   "); potential confirmation visits available: ", ifelse(length(conf_idx)>0,
                                         paste0("no. ", paste(conf_idx, collapse=", ")), "none"))
         }
@@ -332,8 +379,7 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
           }
 
           if (valid) {
-          results[subjid, date_col] <- as.character(global_start
-                + as.difftime(data_id[milestone_idx,][[date_col]], units='days')) # date of reaching the milestone
+          results[subjid, date_col] <- display_date(data_id[milestone_idx,][[date_col]], global_start) # date of reaching the milestone
           results[subjid, value_col] <- data_id[milestone_idx, value_col] # first value >= milestone
           results[subjid, 'time2event'] <- data_id[milestone_idx, date_col] - data_id[1, date_col] # time to reach the milestone
           results[subjid, 'observed'] <- 1 # whether milestone was reached
@@ -341,7 +387,7 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
           if (verbose == 2) message(ifelse(milestone_idx == nvisits, "Imputed", "Confirmed"), " value",
                                     ifelse(worsening=='increase', '>=', '<='), milestone,
                                     ifelse(milestone_idx == nvisits, " (last visit", paste0(" (visit no.", milestone_idx, ", ",
-                                    global_start + as.difftime(data_id[milestone_idx,][[date_col]], units="days"))),
+                                    display_date(data_id[milestone_idx,][[date_col]], global_start, to_print=T))),
                                     "): end process\n")
           } else {
             # (not sustained)

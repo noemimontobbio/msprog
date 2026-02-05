@@ -365,7 +365,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       relapse[[renddate_col]] <- as.numeric(relapse[[renddate_col]])
     }
     }, error=function(e) {
-      message("Failed to intepret date columns as numeric (as per `date_format='day'`)")
+      message("Failed to intepret date columns as numeric (number of days, as per `date_format='day'`)")
       NULL
     }
     )
@@ -377,16 +377,16 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     relapse[[renddate_col]] <- as.Date(relapse[[renddate_col]], format=date_format)
   }
   }, error=function(e) {
-    message("Failed to intepret date columns as \'", date_format, "\'; please provide correct format via `date_format` argument.")
+    message("Failed to intepret date columns as \"", date_format, "\"; please provide correct format via `date_format` argument.")
     NULL
   }
   )
   }
 
-  # Local function to display dates
-  display_date <- function(day, start, print=T) {
+  # Local function to display dates/days
+  display_date <- function(day, start, to_print=T) {
     ifelse(!is.null(date_format) && date_format == 'day',
-                   ifelse(print, paste("day", day), day),
+                   ifelse(to_print, paste("day", day), day),
                    as.character(start + as.difftime(day, units="days")))
   }
 
@@ -394,6 +394,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   if (!is.null(subjects)) {
   data <- data[data[[subj_col]] %in% subjects,]
   relapse <- relapse[relapse[[rsubj_col]] %in% subjects,]
+  }
+
+  if (nrow(data)==0) {
+    stop('Empty data. Did you pass an empty/invalid `subjects` argument?')
   }
 
   # Convert dates to days from global minimum
@@ -408,10 +412,6 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
   } else {
     global_start <- NULL
-  }
-
-  if (nrow(data)==0) {
-    stop('Empty data. Did you pass an empty/invalid `subjects` argument?')
   }
 
   # Check if values are in correct range
@@ -762,7 +762,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         }
         if (verbose == 2) {
           message(outcome, " change at visit no.", change_idx, " (",
-                  display_date(data_id[change_idx,][[date_col]], global_start),
+                  display_date(data_id[change_idx,][[date_col]], global_start, to_print=T),
                        "); potential confirmation visits available: no.", paste(conf_idx, collapse=", "))
         }
 
@@ -817,9 +817,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             sust_idx <- ifelse(is.na(next_nonsust), nvisits, next_nonsust - 1)
             event_type <- c(event_type, "CDI")
             event_index <- c(event_index, change_idx)
-            bldate <- c(bldate, display_date(bl[[date_col]], global_start, print=F))
+            bldate <- c(bldate, display_date(bl[[date_col]], global_start))
             blvalue <- c(blvalue, bl[[value_col]])
-            edate <- c(edate, display_date(data_id[change_idx,][[date_col]], global_start, print=F))
+            edate <- c(edate, display_date(data_id[change_idx,][[date_col]], global_start))
             evalue <- c(evalue, data_id[change_idx,][[value_col]])
             bl2event <- c(bl2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
             time2event <- c(time2event, data_id[change_idx,][[date_col]] - data_id[1,][[date_col]])
@@ -837,7 +837,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
               message(outcome, " improvement (visit no.", change_idx, ", ",
                       display_date(data_id[change_idx,][[date_col]], global_start),
                            ") confirmed at ", paste(names(conf_t), collapse=", "), " days, sustained up to visit no.", sust_idx,
-                           " (", display_date(data_id[sust_idx,][[date_col]], global_start), ")")
+                           " (", display_date(data_id[sust_idx,][[date_col]], global_start, to_print=T), ")")
             }
           } else {
             # If the event is NOT retained (as per `require_sust_days`), we proceed.
@@ -847,9 +847,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                              "entire follow-up"), ": proceed with search")
             }
             unconf[[unconf_idx]] <- setNames(list(subjid,
-                                                  display_date(data_id[change_idx,][[date_col]], global_start, print=F),
+                                                  display_date(data_id[change_idx,][[date_col]], global_start),
                                                   data_id[change_idx,][[value_col]],
-                                                  display_date(bl[[date_col]], global_start, print=F),
+                                                  display_date(bl[[date_col]], global_start),
                                                   bl[[value_col]],
                                                   data_id[change_idx,][['closest_rel_before']],
                                                   data_id[change_idx,][['closest_rel_after']]),
@@ -1121,9 +1121,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     for (m in conf_days) {
                         pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], 0)}
                   }
-                  bldate <- c(bldate, display_date(bl[[date_col]], global_start, print=F))
+                  bldate <- c(bldate, display_date(bl[[date_col]], global_start))
                   blvalue <- c(blvalue, bl[[value_col]])
-                  edate <- c(edate, display_date(data_id[change_idx,][[date_col]], global_start, print=F))
+                  edate <- c(edate, display_date(data_id[change_idx,][[date_col]], global_start))
                   evalue <- c(evalue, data_id[change_idx,][[value_col]])
                   bl2event <- c(bl2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
                   time2event <- c(time2event, data_id[change_idx,][[date_col]] - data_id[1,][[date_col]])
@@ -1141,11 +1141,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   if (verbose == 2) {
                     message(outcome, " ", event_type[length(event_type)],
                                  " (visit no.", change_idx, ", ",
-                            display_date(data_id[change_idx,][[date_col]], global_start),
+                            display_date(data_id[change_idx,][[date_col]], global_start, to_print=T),
                             ifelse(length(conf_t)>0, paste0(") confirmed at ",
                             paste(ifelse(event_type[length(event_type)]=='PIRA', names(pconf_t), names(conf_t)), collapse=", "),
                                 " days, sustained up to visit no.", sust_idx,
-                                 " (", display_date(data_id[sust_idx,][[date_col]], global_start), ")"),
+                                 " (", display_date(data_id[sust_idx,][[date_col]], global_start, to_print=T), ")"),
                             ") occurring at last assessment (no confirmation)")
                             )
                   }
@@ -1164,9 +1164,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                                      "entire follow-up"), ": proceed with search")
                     }
                     unconf[[unconf_idx]] <- setNames(list(subjid,
-                                                          display_date(data_id[change_idx,][[date_col]], global_start, print=F),
+                                                          display_date(data_id[change_idx,][[date_col]], global_start),
                                                           data_id[change_idx,][[value_col]],
-                                                          display_date(bl[[date_col]], global_start, print=F),
+                                                          display_date(bl[[date_col]], global_start),
                                                           bl[[value_col]],
                                                           data_id[change_idx,][['closest_rel_before']],
                                                           data_id[change_idx,][['closest_rel_after']]),
@@ -1271,9 +1271,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         }
         if (!is.na(change_idx)) {
           unconf[[unconf_idx]] <- setNames(list(subjid,
-                                                display_date(data_id[change_idx,][[date_col]], global_start, print=F),
+                                                display_date(data_id[change_idx,][[date_col]], global_start),
                                                 data_id[change_idx,][[value_col]],
-                                                display_date(bl[[date_col]], global_start, print=F),
+                                                display_date(bl[[date_col]], global_start),
                                                 bl[[value_col]],
                                                 data_id[change_idx,][['closest_rel_before']],
                                                 data_id[change_idx,][['closest_rel_after']]),
@@ -1392,7 +1392,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     #   results_df[results_df[[subj_col]]==subjid, 'nevent'] <- 0
     #   results_df[results_df[[subj_col]]==subjid, 'total_fu'] <- total_fu[subjid]
     #   results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
-    #   results_df[results_df[[subj_col]] == subjid, 'date'] <- display_date(data_id[nvisits,][[date_col]], global_start, print=F)
+    #   results_df[results_df[[subj_col]] == subjid, 'date'] <- display_date(data_id[nvisits,][[date_col]], global_start)
     #   results_df[results_df[[subj_col]]==subjid, 'event_type'] <- ''
     # }
     # else if (length(event_type)==0) {
@@ -1424,7 +1424,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     results_df[results_df[[subj_col]]==subjid, 'nevent'] <- 0
     results_df[results_df[[subj_col]]==subjid, 'total_fu'] <- total_fu[subjid]
     results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
-    results_df[results_df[[subj_col]] == subjid, 'date'] <- display_date(data_id[nvisits,][[date_col]], global_start, print=F)
+    results_df[results_df[[subj_col]] == subjid, 'date'] <- display_date(data_id[nvisits,][[date_col]], global_start)
     results_df[results_df[[subj_col]]==subjid, 'event_type'] <- ''
   } else {
     results_df <- results_df[-subj_index, ]
