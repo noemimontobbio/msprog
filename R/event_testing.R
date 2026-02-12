@@ -18,7 +18,7 @@
 #' \itemize{
 #'  \item{EDSS: 1.5 if `baseline`=0, 1 if 0<`baseline`<=5.0, 0.5 if `baseline`>5.0}
 #'  \item{NHPT and T25FW: 20`%` of `baseline`}
-#'  \item{SDMT: either 3 points or 10`%` of `baseline`.}
+#'  \item{SDMT: either 4 points or 20`%` of `baseline`.}
 #'  }
 #' @export compute_delta
 #' @examples
@@ -51,7 +51,7 @@ compute_delta <- function(baseline, outcome='edss') {
     if (baseline<0 || baseline>110) {
       stop('invalid SDMT score')
     }
-    return(min(unlist(c(baseline/10, 3))))
+    return(min(unlist(c(baseline/5, 4))))
   } else {
   stop('invalid outcome type')
     }

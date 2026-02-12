@@ -146,9 +146,9 @@ The `MSprog()` function detects the events sequentially by scanning the outcome 
 
 * `outcome='nhpt'`: Nine-Hole Peg Test (NHPT), for either the dominant or the non-dominant hand. $\delta=$ 20% of reference score;
 
-* `outcome='t25fw'`: Timed 25-Foot Walk (T25FW). $\delta=$ 20% of reference score;
+* `outcome='t25fw'`: Timed 25-Foot Walk (T25FW). $\delta=$ 20% of the reference score;
 
-* `outcome='sdmt'`: Symbol Digit Modalities Test (SDMT). $\delta=$ either 3 points or 10% of reference score.
+* `outcome='sdmt'`: Symbol Digit Modalities Test (SDMT). $\delta=$ either 4 points or 20% of the reference score.
 
 These default options are internally implemented by the `compute_delta()` function. For example, if the baseline EDSS score is 4, by default a clinically meaningful worsening will correspond to an increase by (at least):
 ```{r}
@@ -163,11 +163,11 @@ print(compute_delta(10, outcome='t25fw'))
 
 The user can provide their own function to customise the computation of clinically relevant thresholds, using the `delta_fun` argument of `MSprog()`. The user-defined function must take the baseline value as argument, and return the corresponding threshold. This applies to two scenarios.
 
-1. **The outcome of interest is among the ones listed above, but we want to define the thresholds differently.** For example, we want to change the minimum $\delta$ for SDMT to, say, "either 4 points or 20% of the reference value". In this case, we would define:
+1. **The outcome of interest is among the ones listed above, but we want to define the thresholds differently.** For example, we want to change the minimum $\delta$ for SDMT to, say, "either 3 points or 10% of the reference value". In this case, we would define:
     ```{r}
-    my_sdmt_delta <- function(x) {min(c(x/5, 4))}
+    my_sdmt_delta <- function(x) {min(c(x/10, 3))}
     ```
-    Comparing it with the default function, we get:
+    Let's compute the minimum clinically relevant change in SDMT score starting from a baseline of 50 using our custom function, and compare it with the default function:
     ```{r}
     print(my_sdmt_delta(50)) # my delta
     print(compute_delta(50, outcome='sdmt')) # default delta

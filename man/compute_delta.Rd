@@ -22,7 +22,7 @@ Minimum clinically meaningful change from the provided baseline value. Specifica
 \itemize{
 \item{EDSS: 1.5 if \code{baseline}=0, 1 if 0<\code{baseline}<=5.0, 0.5 if \code{baseline}>5.0}
 \item{NHPT and T25FW: 20\verb{\%} of \code{baseline}}
-\item{SDMT: either 3 points or 10\verb{\%} of \code{baseline}.}
+\item{SDMT: either 4 points or 20\verb{\%} of \code{baseline}.}
 }
 }
 \description{
