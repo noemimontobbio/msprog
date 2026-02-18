@@ -224,11 +224,12 @@ they are imputed with probability \code{p}, \verb{0<p<1}, if \code{impute_last_v
 If a value \code{N>1} is passed, unconfirmed worsening events are imputed only if occurring within \code{N} days of follow-up
 (e.g., in case of early discontinuation).}
 
-\item{date_format}{Format of dates in the input data. Can be:
+\item{date_format}{Format of dates in the \code{date_col} and \code{rdate_col} columns of the input data.
+Can be specified as:
 \itemize{
-\item \code{'day'} if dates are given as "days from start" (the starting point can be different for each subject
--- e.g., days from randomisation in a clinical trial); negative values are accepted.
 \item Standard format for dates (e.g., \code{"\%d-\%m-\%Y"}; see \code{\link[=strptime]{strptime()}} docs for correct syntax).
+\item \code{'day'} if dates in are given as "days from start" (the starting point can be different for each subject
+-- e.g., days from randomisation in a clinical trial); negative values are accepted.
 }
 If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer it automatically.}
 

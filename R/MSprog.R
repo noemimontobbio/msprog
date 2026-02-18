@@ -169,11 +169,12 @@
 #' they are imputed with probability `p`, `0<p<1`, if `impute_last_visit=p`.
 #' If a value `N>1` is passed, unconfirmed worsening events are imputed only if occurring within `N` days of follow-up
 #' (e.g., in case of early discontinuation).
-#' @param date_format Format of dates in the input data. Can be:
+#' @param date_format Format of dates in the `date_col` and `rdate_col` columns of the input data.
+#' Can be specified as:
 #' \itemize{
-#' \item `'day'` if dates are given as "days from start" (the starting point can be different for each subject
-#' -- e.g., days from randomisation in a clinical trial); negative values are accepted.
 #' \item Standard format for dates (e.g., \code{"\%d-\%m-\%Y"}; see [strptime()] docs for correct syntax).
+#' \item `'day'` if dates in are given as "days from start" (the starting point can be different for each subject
+#' -- e.g., days from randomisation in a clinical trial); negative values are accepted.
 #' }
 #' If not specified, function [as.Date()] will try to infer it automatically.
 #' @param include_dates If `TRUE`, `output$results` will include the date of each event (`'date'` column)

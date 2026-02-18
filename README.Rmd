@@ -37,7 +37,7 @@ knitr::opts_chunk$set(
 </p>
 
 `msprog` is an R package providing tools for exhaustive and reproducible analysis of disability course in multiple sclerosis (MS) from longitudinal data [@msprog2024]. 
-A [**Python version**](https://github.com/noemimontobbio/pymsprog) of the package is available as well.
+A [**Python version**](https://github.com/noemimontobbio/pymsprog) of the package is available as well. 
 
 Its core function, `MSprog()`, detects and characterises the evolution of an outcome measure (Expanded Disability Status Scale, EDSS; Nine-Hole Peg Test, NHPT; Timed 25-Foot Walk, T25FW; Symbol Digit Modalities Test, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes (if any).
 
