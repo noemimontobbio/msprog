@@ -1344,6 +1344,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
   subj_index <- as.numeric(row.names(results_df[results_df[subj_col] == subjid, ]))
 
+  # Possibly reduce event_type to a subset (based on `event` argument)
   if (length(event_type) > 1) {
 
     event_type <- event_type[2:length(event_type)]  # remove first empty event
@@ -1360,7 +1361,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     }
 
     event_order <- order(event_index)
-    event_order <- event_order[(diff+1):length(event_order)] # eliminate duplicates (those marked with 0)
+    event_order <- event_order[(diff + 1):length(event_order)] # eliminate duplicates (those marked with 0)
 
     event_type <- event_type[event_order]
 
@@ -1372,35 +1373,32 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       undef_prog_idx <- which(event_type == "CDW")[1]
 
       if (event == "firstCDI") {
-        first_events <- c(impr_idx)
+        first_events <- impr_idx
       } else if (event == "firstCDW") {
-        first_events <- c(prog_idx)
+        first_events <- prog_idx
       } else if (event == "firstPIRA") {
         first_events <- pira_idx
       } else if (event == "firstRAW") {
         first_events <- raw_idx
       }
 
-      if (event=='first') {first_events <- 1} else {first_events <- unique(na.omit(first_events))}
+      if (event=='first') {
+        first_events <- 1
+      } else {
+        first_events <- unique(na.omit(first_events))
+      }
 
       event_type <- event_type[first_events]
       event_order <- event_order[first_events]
     }
+  } else {
+    event_type <- c() # remove first empty event
+    }
 
-    # if ((length(event_type)==0) && include_stable) {
-    #   results_df <- results_df[-subj_index[2:length(subj_index)], ]
-    #   rownames(results_df) <- NULL # reset column names
-    #   results_df[results_df[[subj_col]]==subjid, 'nevent'] <- 0
-    #   results_df[results_df[[subj_col]]==subjid, 'total_fu'] <- total_fu[subjid]
-    #   results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
-    #   results_df[results_df[[subj_col]] == subjid, 'date'] <- display_date(data_id[nvisits,][[date_col]], global_start)
-    #   results_df[results_df[[subj_col]]==subjid, 'event_type'] <- ''
-    # }
-    # else if (length(event_type)==0) {
-    #   results_df <- results_df[-subj_index, ]
-    #   rownames(results_df) <- NULL # reset column names
-    #   }
-    # else {
+  # Build results with updated event_type
+  if (length(event_type) > 0) {
+  # 1. subject has events
+
     results_df <- results_df[-subj_index[(length(event_type) + 1):length(subj_index)], ]
     rownames(results_df) <- NULL # reset column names
     results_df[results_df[[subj_col]] == subjid, "event_type"] <- event_type
@@ -1418,8 +1416,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     results_df[results_df[[subj_col]] == subjid, "sust_last"] <- sustl[event_order]
     for (m in conf_days) {
       results_df[results_df[[subj_col]] == subjid, paste0("PIRA_conf", m)] <- pira_conf[[as.character(m)]][event_order]}
-    # }
+
   } else if (include_stable) {
+    # 2. subject has no events but is included
+
     results_df <- results_df[-subj_index[2:length(subj_index)], ]
     rownames(results_df) <- NULL # reset column names
     results_df[results_df[[subj_col]]==subjid, 'nevent'] <- 0
@@ -1427,7 +1427,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
     results_df[results_df[[subj_col]] == subjid, 'date'] <- display_date(data_id[nvisits,][[date_col]], global_start)
     results_df[results_df[[subj_col]]==subjid, 'event_type'] <- ''
-  } else {
+
+    } else {
+    # 3. subject has no events and is excluded
+
     results_df <- results_df[-subj_index, ]
     rownames(results_df) <- NULL # reset column names
   }

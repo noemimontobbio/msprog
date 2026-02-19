@@ -371,8 +371,9 @@ When relevant, relapse data is to be provided using the optional `relapse` argum
 
 RAW events are typically defined as CDW events occurring within a specified interval from the onset of a relapse. The length (in days) of such interval can be specified using the `relapse_assoc` argument in `MSprog()`. Common values are 30 or 90 days. Additionally, one may also provide a maximum distance from relapses whose onset is *after* the event. The logic is that the reported onset date of a relapse may be slightly delayed. The examples below illustrate the usage of the `relapse_assoc` argument:
 
-* `relapse_assoc=90` (equivalent to `relapse_assoc=c(90, 0)`): RAW = "a CDW event occurring within 90 days after the onset of a relapse";
-* `relapse_assoc=c(90, 7)`: RAW = "a CDW event occurring no more than 90 days after and no more than 7 days before the onset of a relapse".
+* `relapse_assoc=90` (equivalent to `relapse_assoc=c(90, 0)`): RAW = "a CDW event occurring within 90 days after the onset of a relapse"
+
+* `relapse_assoc=c(90, 7)`: RAW = "a CDW event occurring within 90 days after or within 7 days before the onset of a relapse".
 
 ## Progression independent of relapse activity (PIRA) {#pira}
 

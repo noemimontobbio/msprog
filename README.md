@@ -54,8 +54,8 @@ be found in the [reference manual (PDF)](msprog.pdf). Additionally, a
 detailed tutorial providing examples and best-practice tips is available
 as a [package vignette](#vignette): *Analysing disability course in MS*.
 
-The outcome computation can be run locally in R (see installation
-instructions below), or online via a user-friendly [web
+The computation can be run locally in R (see installation instructions
+below), or online via a user-friendly [web
 application](https://msprog.shinyapps.io/msprog/).
 
 **If you use this package in your work, please cite it [as
