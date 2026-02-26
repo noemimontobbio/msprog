@@ -39,9 +39,9 @@ knit_hooks$set(output = function(x, options) {
 
 This vignette demonstrates how to use the `msprog` package to analyse the disability course in multiple sclerosis (MS) in a time-to-event setting (e.g., to compute survival times for survival analysis).
 
-We shall use the toy datasets `toydata_visits` and `toydata_relapses` provided in `msprog`.
-
 For a more general introduction on `msprog` package usage for disability course assessment, please refer to the vignette *Analysing disability course in MS*. 
+
+We shall use the toy datasets `toydata_visits` and `toydata_relapses` provided in `msprog`.
 
 ```{r}
 library(msprog)
@@ -79,13 +79,19 @@ print(output_edss)
 To access the time-to-event data, we need to extract the `results` attribute from the function output.
 ```{r}
 res <- output_edss$results
-print(res, row.names=FALSE)
+# print(res, row.names=FALSE)
+DT::datatable(res, rownames=F,
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
+              )
 ```
 
 If we were to conduct a survival analysis with censoring, we would be interested in the `'time2event'` column (time to CDW, in days) and in the `'nevent'` column (1 if the event occurred, 0 otherwise):
 ```{r}
 survival_data <- res[c('id', 'time2event', 'nevent')]
-print(survival_data, row.names=FALSE)
+# print(survival_data, row.names=FALSE)
+DT::datatable(survival_data, rownames=F,
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
+              )
 ```
 Note that, in a more general multiple-event setting, the `'nevent'` column would contain the count of events for each subject. Here, since we're stopping at the first event, this number can only be 0 (no event) or 1 (event).
 
@@ -108,7 +114,7 @@ survfit2(Surv(time2event, nevent) ~ 1, data=survival_data) %>%
 <!-- library(dplyr) -->
 <!-- ``` -->
 
-Instead of studying disability worsening with respect to a baseline value, one can focus on the time taken to reach a specific disability milestone (e.g., EDSS $\geq$ 6). This can be computed using `msprog::value_milestone()`.
+Instead of studying disability worsening with respect to a baseline value, one can focus on the time taken to reach a specific disability milestone. This can be computed using `msprog::value_milestone()`.
 
 The following code detects the time to EDSS $\geq$ 4.5 for all subjects in our toy data. Similar to `MSprog()`, we can set `verbose=2` to display progress info.
 ```{r}
@@ -130,7 +136,10 @@ print(toydata_visits[toydata_visits$id==4, c('date', 'EDSS')], row.names=FALSE)
 
 The function returned the following `data.frame`:
 ```{r}
-print(vm)
+# print(vm)
+DT::datatable(vm,
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
+              )
 ```
 where: `'date'` contains the date of the first confirmed EDSS $\geq$ 4.5 (or last date of follow-up if milestone was not reached or not confirmed); `'EDSS'` contains the first EDSS value $\geq$ 4.5, if present, otherwise no value; `'time2event'` contains the time to reach EDSS $\geq$ 4.5 (or total follow-up length if not reached or not confirmed); `'observed'` indicates whether EDSS $\geq$ 4.5 was reached (1) or not (0).
 
@@ -145,10 +154,13 @@ In studies with longer follow-ups, it can be informative to analyse *recurrent e
 The following code extracts multiple EDSS events from our toy data with a **roving baseline** scheme (i.e., the baseline is updated after each event to the first available confirmation visit).
 ```{r}
 output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', relapse=toydata_relapses,
-                event='multiple', baseline='roving',  # <--- detect multiple event with a roving baseline
+                event='multiple', baseline='roving',  # <--- detect multiple events with a roving baseline
                 verbose=0)
 survival_data <- output$results[c('id', 'nevent', 'time2event')]
-print(survival_data, row.names=FALSE)
+# print(survival_data, row.names=FALSE)
+DT::datatable(survival_data, rownames=F,
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
+              )
 ```
-Note that the `event` argument is set to `multiple`, and that the results can contain more than one row for the same subject, with the `'nevent'` column keeping track of event count.
+Note that the `event` argument is set to `multiple`, and that the results can contain more than one row for the same subject, with the `'nevent'` column keeping track of cumulative event count.
 

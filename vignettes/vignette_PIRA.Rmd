@@ -43,7 +43,7 @@ library(msprog)
 Recent studies [@kappos2018; @silent2019; @kuhlmann2023] have highlighted the contribution of PIRA to overall disability worsening, generating growing interest in PIRA as a relevant endpoint. Classifying a confirmed disability worsening (CDW) event as relapse-independent requires careful observation of its relative timing with respect to relapses. Established definitions of PIRA [@kappos2020; @cagol2022; @muller2023] require the absence of relapses within appropriate intervals anchored to the dates of three main checkpoints:
 
 1. a visit preceding the event: can be (i) the current reference, (ii) the last visit before event onset,
-or (iii) the last visit before event onset with a clinically meaningful score distance from it (`i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`)[^extrema];
+or (iii) the last visit before event onset with a clinically meaningful score distance from it [^extrema];
 2. the initial disability worsening (event onset);
 3. the (first) confirmation visit.
 
@@ -57,7 +57,7 @@ output <- MSprog(...
                  relapse_indep=relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1, prec_type, use_end_dates),
                  ...)
 ```
-where: `p0` and `p1` specify the interval around the preceding visit; `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If the right end (`p1` or `e1`) is `NULL`, the interval is assumed to extend up to the left end of the next interval. If the left end is `NULL`  (`e0` or `c0`), the interval is assumed to extend up to the right end of the previous interval. The `prec_type` argument specifies which preceding visit to take into account (`'baseline'` for current reference, `'last'` for last visit preceding the event, `'last_lower'` for last visit `i` such that `outcome[event] - outcome[i] >= delta_fun(outcome[i])`).[^enddates]
+where: `p0` and `p1` specify the interval around the preceding visit; `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If the right end (`p1` or `e1`) is `NULL`, the interval is assumed to extend up to the left end of the next interval. If the left end is `NULL`  (`e0` or `c0`), the interval is assumed to extend up to the right end of the previous interval. The `prec_type` argument specifies which preceding visit to take into account (`'baseline'` for current reference, `'last'` for last visit preceding event onset, `'last_lower'` for last visit preceding event onset with a clinically meaningful score distance from it).[^enddates]
 
 [^enddates]: If **end dates** of relapses are available (may be provided as an additional column in the relapse file whose name is specified by argument `renddate_col` in `MSprog()`), the `use_end_dates` argument in `relapse_indep_from_bounds()` controls whether they are used for PIRA or not. The default is `use_end_dates=F`. If `use_end_dates=T`, the provided intervals are ignored and PIRA is defined by the event or the confirmation not falling within the duration (onset to end) of a relapse. 
 
@@ -136,37 +136,42 @@ The requirement of relapse-free periods is often coupled with a non-fixed baseli
 
 To illustrate how to apply the above definitions when assessing disability course from patient data, we use the toy data provided in the `msprog` package. These include artificially generated EDSS and SDMT assessments (`toydata_visits`) and relapse dates (`toydata_relapses`) for four patients:
 ```{r}
-data(toydata_visits)
-data(toydata_relapses)
 head(toydata_visits)
 head(toydata_relapses)
 ```
 
 <br />
 
-The following code detects, for each subject in the toy dataset, the first EDSS PIRA event (`event=firstPIRA`) confirmed over $\geq$ 12 or $\geq$ 24 weeks (`conf_days=c(7*12, 7*24)`, `conf_tol_days=c(0, Inf)`), for two different definitions of PIRA. We set `verbose=2` to print an extended log of the computations performed.
+The following code detects, for each subject in the toy dataset, the first EDSS PIRA event (`event='firstPIRA'`) confirmed over $\geq$ 12 or $\geq$ 24 weeks (`conf_days=c(7*12, 7*24)`, `conf_tol_days=c(0, Inf)`), for two different definitions of PIRA. We set `verbose=2` to print an extended log of the computations performed.
 
-* Roving baseline, and absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation @muller2023:
-  ```{r}
-  output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
-                 relapse=toydata_relapses, 
-                 conf_days=c(7*12, 7*24), conf_tol_days=c(0, Inf),
-                 event='firstPIRA', baseline='roving',
-                 relapse_indep=relapse_indep_from_bounds(p0=0, p1=0, e0=90, e1=30, c0=90, c1=30),
-                 verbose=2)
-  print(output$results, row.names=FALSE) # results
-  ```
-
-* Post-relapse re-baseline, and absence of relapses between the reference visit and 30 days after the event, and during the 30 days before and 30 days after the confirmation @kappos2020:
-  ```{r}
-  output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
-                 relapse=toydata_relapses,
-                 conf_days=c(7*12, 7*24), conf_tol_days=c(0, Inf), 
-                 event='firstPIRA', baseline='fixed', relapse_rebl=TRUE,
-                 relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=30, c0=30, c1=30),
-                 verbose=2)
-  print(output$results, row.names=FALSE) # results
-  ```
+1. Roving baseline, and absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation @muller2023:
+```{r, indent="    "}
+output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
+               relapse=toydata_relapses, 
+               conf_days=c(7*12, 7*24), conf_tol_days=c(0, Inf),
+               event='firstPIRA', baseline='roving',
+               relapse_indep=relapse_indep_from_bounds(p0=0, p1=0, e0=90, e1=30, c0=90, c1=30),
+               verbose=2)
+# print(output$results, row.names=FALSE) # results
+DT::datatable(output$results, rownames=F,
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
+              )
+```
+    <br>
+    
+2. Post-relapse re-baseline, and absence of relapses between the reference visit and 30 days after the event, and during the 30 days before and 30 days after the confirmation @kappos2020:
+```{r, indent="    "}
+output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
+               relapse=toydata_relapses,
+               conf_days=c(7*12, 7*24), conf_tol_days=c(0, Inf), 
+               event='firstPIRA', baseline='fixed', relapse_rebl=TRUE,
+               relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=30, c0=30, c1=30),
+               verbose=2)
+# print(output$results, row.names=FALSE) # results
+DT::datatable(output$results, rownames=F,
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
+              )
+```
 
 Here, `nevent` is the cumulative event count for each subject, and `event_type` characterises the event (since `event` is set to `firstPIRA`, the count is either 0 or 1 and the event type, when present, is always `PIRA`); `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf84` and `conf168` report whether the event was confirmed as a CDW over 12 or 24 weeks (84 or 168 days); `PIRAconf84` and `PIRAconf168` report whether the event was confirmed as PIRA over 12 or 24 weeks (84 or 168 days); `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
