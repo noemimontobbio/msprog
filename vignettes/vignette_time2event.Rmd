@@ -79,19 +79,13 @@ print(output_edss)
 To access the time-to-event data, we need to extract the `results` attribute from the function output.
 ```{r}
 res <- output_edss$results
-# print(res, row.names=FALSE)
-DT::datatable(res, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
-              )
+print(res, row.names=FALSE)
 ```
 
 If we were to conduct a survival analysis with censoring, we would be interested in the `'time2event'` column (time to CDW, in days) and in the `'nevent'` column (1 if the event occurred, 0 otherwise):
 ```{r}
 survival_data <- res[c('id', 'time2event', 'nevent')]
-# print(survival_data, row.names=FALSE)
-DT::datatable(survival_data, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
-              )
+print(survival_data, row.names=FALSE)
 ```
 Note that, in a more general multiple-event setting, the `'nevent'` column would contain the count of events for each subject. Here, since we're stopping at the first event, this number can only be 0 (no event) or 1 (event).
 
@@ -136,10 +130,7 @@ print(toydata_visits[toydata_visits$id==4, c('date', 'EDSS')], row.names=FALSE)
 
 The function returned the following `data.frame`:
 ```{r}
-# print(vm)
-DT::datatable(vm,
-              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
-              )
+print(vm)
 ```
 where: `'date'` contains the date of the first confirmed EDSS $\geq$ 4.5 (or last date of follow-up if milestone was not reached or not confirmed); `'EDSS'` contains the first EDSS value $\geq$ 4.5, if present, otherwise no value; `'time2event'` contains the time to reach EDSS $\geq$ 4.5 (or total follow-up length if not reached or not confirmed); `'observed'` indicates whether EDSS $\geq$ 4.5 was reached (1) or not (0).
 
@@ -157,10 +148,7 @@ output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', relapse=toydata_r
                 event='multiple', baseline='roving',  # <--- detect multiple events with a roving baseline
                 verbose=0)
 survival_data <- output$results[c('id', 'nevent', 'time2event')]
-# print(survival_data, row.names=FALSE)
-DT::datatable(survival_data, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
-              )
+print(survival_data, row.names=FALSE)
 ```
 Note that the `event` argument is set to `multiple`, and that the results can contain more than one row for the same subject, with the `'nevent'` column keeping track of cumulative event count.
 

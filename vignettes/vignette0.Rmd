@@ -114,19 +114,13 @@ Full tabulation of the results can be accessed via the following attributes of t
 
 1. `results`: detailed info on each event for all subjects. In our example:
 ```{r, indent="     "}
-# print(output_edss$results, row.names=FALSE)
-DT::datatable(output_edss$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
-              )
+print(output_edss$results, row.names=FALSE)
 ```
     where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^timeto]; `bl2event` is the number of days from current baseline to event; `conf84` reports whether the event was confirmed over 84 days (12 weeks); `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
 2. `event_count`: a `data.frame` summarising event counts for each subject, and the event sequence (where relevant). Here's what it looks like for the EDSS-based computation above:
 ```{r, indent="     "}
-# print(output_edss$event_count)
-DT::datatable(output_edss$event_count,
-              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
-              )
+print(output_edss$event_count)
 ```
     where: `event_sequence`[^seq] specifies the order of the events; the other columns count the events of each kind (CDW; relapse-associated worsening, [RAW](#raw); progression independent of relapse activity, [PIRA](#pira); and "undefined CDW" that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent2019].
 
@@ -241,10 +235,7 @@ output <- MSprog(data=toydata_visits,
                  relapse=toydata_relapses, 
                  event='multiple', baseline='fixed',  # <---
                  verbose=0)
-# print(output$results, row.names=FALSE) # results
-DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
-              )
+print(output$results, row.names=FALSE) # results
 ```
 
 With these settings, the EDSS improvement at visit 2 (EDSS=3.5, confirmed at visit 3) does not trigger a re-baseline. The algorithm keeps searching for events from after the confirmation visit, evaluating the changes **relative to the original baseline** (EDSS=4.5). The subsequent EDSS worsening is therefore not detected. On the other hand, adopting a **roving** baseline scheme we get:
@@ -255,10 +246,7 @@ output <- MSprog(data=toydata_visits,
                  relapse=toydata_relapses, 
                  event='multiple', baseline='roving',  # <---
                  verbose=0)
-# print(output$results, row.names=FALSE) # results
-DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
-              )
+print(output$results, row.names=FALSE) # results
 ```
 The baseline has now been moved to the confirmation visit of the first CDI event (visit 3, EDSS=3.5). With respect to this baseline, a PIRA event is detected at visit 4 (EDSS=5), confirmed at visit 5.
 
@@ -345,10 +333,7 @@ output <- MSprog(data=toydata_visits,
                  event='multiple', baseline='roving', 
                  relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=NULL, c0=NULL, c1=0),
                  conf_days=c(7*12,7*24), verbose=0)
-# print(output$results, row.names=FALSE) # results
-DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
-              )
+print(output$results, row.names=FALSE) # results
 ```
 The `relapse_indep` argument specifies the relapse-free intervals for a CDW event to be classified as PIRA, see [the relevant section](#pira)[^pira]. In this case, a high-specificity definition of PIRA is used [@muller2023] that requires an absence of relapses between baseline and confirmation. The resulting events are 
 
@@ -367,10 +352,7 @@ output <- MSprog(data=toydata_visits,
                  event='multiple', baseline='roving', 
                  relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=NULL, c0=NULL, c1=0),
                  conf_days=c(7*12,7*24), require_sust_days=7*48, verbose=0)
-# print(output$results, row.names=FALSE) # results
-DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
-              )
+print(output$results, row.names=FALSE) # results
 ```
 
 A more detailed report of the event detection process in each of the cases examined above may be visualized by re-running the above code snippets with `verbose=2`, see ["Printing progress info"](#progressinfo).
@@ -438,10 +420,7 @@ output <- MSprog(data=toydata_visits,
                       outcome='edss', relapse=toydata_relapses, verbose=0,
                       include_dates=T, include_value=T, include_stable=F) # <---- !
 
-# print(output$results, row.names=FALSE)
-DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
-              )
+print(output$results, row.names=FALSE)
 ```
 
 
@@ -458,10 +437,7 @@ output <- MSprog(data=toydata_visits,
 
 For further insight into the event detection process, all score changes from baseline that were not identified as valid events (e.g., not confirmed) are stored in `output$unconfirmed`. In this example, this looks like:
 ```{r}
-# print(output$unconfirmed, row.names=FALSE)
-DT::datatable(output$unconfirmed, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
-              )
+print(output$unconfirmed, row.names=FALSE)
 ```
 
 
