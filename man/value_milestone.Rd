@@ -39,17 +39,17 @@ value_milestone(
 
 \item{outcome}{Specifies the outcome type. Must be one of the following:
 \itemize{
-\item{\code{'edss'} (Expanded Disability Status Scale);}
-\item{\code{'nhpt'} (Nine-Hole Peg Test);}
-\item{\code{'t25fw'} (Timed 25-Foot Walk);}
-\item{\code{'sdmt'} (Symbol Digit Modalities Test);}
-\item{\code{NULL} (only accepted when specifying argument \code{worsening})}
+\item \code{"edss"} (Expanded Disability Status Scale)
+\item \code{"nhpt"} (Nine-Hole Peg Test)
+\item \code{"t25fw"} (Timed 25-Foot Walk)
+\item \code{"sdmt"} (Symbol Digit Modalities Test)
+\item \code{"custom"} (only accepted when specifying argument \code{worsening}).
 }}
 
-\item{worsening}{The direction of worsening (\code{'increase'} if higher values correspond to worse disease course, \code{'decrease'} otherwise).\if{html}{\out{<br />}}
-The given value is only used when \code{outcome} is set to \code{NULL}. Otherwise, \code{worsening} is automatically set to
-\code{'increase'} if \code{outcome} is set to \code{'edss'}, \code{'nhpt'}, \code{'t25fw'},
-and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
+\item{worsening}{The direction of worsening (\code{"increase"} if higher values correspond to worse disease course, \code{"decrease"} otherwise).\if{html}{\out{<br />}}
+The given value is only used when \code{outcome} is set to \code{"custom"}. Otherwise, \code{worsening} is automatically set to
+\code{"increase"} if \code{outcome} is set to \code{"edss"}, \code{"nhpt"}, \code{"t25fw"},
+and to \code{"decrease"} if \code{outcome} is set to \code{"sdmt"}.}
 
 \item{relapse}{\code{data.frame} containing longitudinal data, including: subject ID and relapse date.}
 
@@ -92,7 +92,7 @@ If a value \code{N>1} is passed, unconfirmed values exceeding the milestone are 
 
 \item{date_format}{Format of dates in the input data. Can be:
 \itemize{
-\item \code{'day'} if dates are given as "days from start" (the starting point can be different for each subject
+\item \code{"day"} if dates are given as "days from start" (the starting point can be different for each subject
 -- e.g., days from randomisation in a clinical trial); negative values are accepted.
 \item Standard format for dates (e.g., \code{"\%d-\%m-\%Y"}; see \code{\link[=strptime]{strptime()}} docs for correct syntax).
 }
@@ -100,18 +100,18 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 
 \item{verbose, }{One of:
 \itemize{
-\item{0}{ (print no info);}
-\item{1}{ (print concise info, default);}
-\item{2}{ (print extended info).}
+\item 0 (print no info)
+\item 1 (print concise info, default)
+\item 2 (print extended info).
 }}
 }
 \value{
 A \code{data.frame} containing the following columns:
 \itemize{
-\item{\code{date_col}: }{the date of first reaching or exceeding the milestone (or last date of follow-up if milestone is not reached);}
-\item{\code{value_col}: }{the first value  reaching orexceeding the milestone, if present, otherwise no value;}
-\item{\code{'time2event'}: }{the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached);}
-\item{\code{'observed'}: }{whether the milestone was reached (1) or not (0).}
+\item \code{date_col}: the date of first reaching or exceeding the milestone (or last date of follow-up if milestone is not reached)
+\item \code{value_col}: the first value  reaching orexceeding the milestone, if present, otherwise no value
+\item \code{"time2event"}: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached)
+\item \code{"observed"}: whether the milestone was reached (1) or not (0).
 }
 }
 \description{

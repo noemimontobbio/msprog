@@ -1,0 +1,13 @@
+MSprog                  Assess multiple sclerosis disability course
+                        from longitudinal data.
+compute_delta           Definition of minimum clinically meaningful
+                        shift for different scales.
+is_event                Compare value to reference.
+print.MSprogOutput      Textual description of criteria used to assess
+                        disability course.
+relapse_indep_from_bounds
+                        Define relapse-free intervals for PIRA
+                        definition.
+toydata_relapses        Synthetic Relapse Data
+toydata_visits          Synthetic Longitudinal EDSS and SDMT Data
+value_milestone         Time to disability milestone.

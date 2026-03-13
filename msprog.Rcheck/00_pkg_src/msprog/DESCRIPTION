@@ -1,0 +1,25 @@
+Package: msprog
+Type: Package
+Title: Reproducible Assessment of Disability Course in MS
+Version: 0.2.4
+Authors@R: c(
+    person(given="Noemi", family="Montobbio", , email="noemi.montobbio@gmail.com", role=c("aut", "cre"),
+           comment=c(ORCID = "0000-0003-0302-393X")),
+    person(given="Francesca", family="Bovis", role = c("rev")),
+    person(given="Luca", family="Carmisciano", role = c("rev")))
+Description: Perform exhaustive and reproducible analysis of disability course in multiple sclerosis (MS) from longitudinal data.
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports: stats, dplyr
+Depends: R (>= 3.5.0)
+VignetteBuilder: knitr
+Suggests: knitr, rmarkdown, xfun, DT
+License: MIT + file LICENSE
+NeedsCompilation: no
+Packaged: 2026-02-27 12:01:01 UTC; nmontobbio
+Author: Noemi Montobbio [aut, cre] (<https://orcid.org/0000-0003-0302-393X>),
+  Francesca Bovis [rev],
+  Luca Carmisciano [rev]
+Maintainer: Noemi Montobbio <noemi.montobbio@gmail.com>

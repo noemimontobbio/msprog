@@ -18,16 +18,16 @@
 #' @param date_col Name of data column with date of visit.
 #' @param outcome Specifies the outcome type. Must be one of the following:
 #' \itemize{
-#'  \item{`'edss'` (Expanded Disability Status Scale);}
-#'  \item{`'nhpt'` (Nine-Hole Peg Test);}
-#'  \item{`'t25fw'` (Timed 25-Foot Walk);}
-#'  \item{`'sdmt'` (Symbol Digit Modalities Test);}
-#'  \item{`NULL` (only accepted when specifying argument `worsening`)}
+#'  \item `"edss"` (Expanded Disability Status Scale)
+#'  \item `"nhpt"` (Nine-Hole Peg Test)
+#'  \item `"t25fw"` (Timed 25-Foot Walk)
+#'  \item `"sdmt"` (Symbol Digit Modalities Test)
+#'  \item `"custom"` (only accepted when specifying argument `worsening`).
 #'  }
-#' @param worsening The direction of worsening (`'increase'` if higher values correspond to worse disease course, `'decrease'` otherwise).<br />
-#' The given value is only used when `outcome` is set to `NULL`. Otherwise, `worsening` is automatically set to
-#' `'increase'` if `outcome` is set to `'edss'`, `'nhpt'`, `'t25fw'`,
-#'  and to `'decrease'` if `outcome` is set to `'sdmt'`.
+#' @param worsening The direction of worsening (`"increase"` if higher values correspond to worse disease course, `"decrease"` otherwise).<br />
+#' The given value is only used when `outcome` is set to `"custom"`. Otherwise, `worsening` is automatically set to
+#' `"increase"` if `outcome` is set to `"edss"`, `"nhpt"`, `"t25fw"`,
+#'  and to `"decrease"` if `outcome` is set to `"sdmt"`.
 #' @param relapse `data.frame` containing longitudinal data, including: subject ID and relapse date.
 #' @param rsubj_col Name of subject column for relapse data, if different from outcome data.
 #' @param rdate_col Name of date column for relapse data, if different from outcome data.
@@ -59,23 +59,23 @@
 #' (e.g., in case of early discontinuation).
 #' @param date_format Format of dates in the input data. Can be:
 #' \itemize{
-#' \item `'day'` if dates are given as "days from start" (the starting point can be different for each subject
+#' \item `"day"` if dates are given as "days from start" (the starting point can be different for each subject
 #' -- e.g., days from randomisation in a clinical trial); negative values are accepted.
 #' \item Standard format for dates (e.g., \code{"\%d-\%m-\%Y"}; see [strptime()] docs for correct syntax).
 #' }
 #' If not specified, function [as.Date()] will try to infer it automatically.
 #' @param verbose, One of:
 #' \itemize{
-#'  \item{0}{ (print no info);}
-#'  \item{1}{ (print concise info, default);}
-#'  \item{2}{ (print extended info).}
+#'  \item 0 (print no info)
+#'  \item 1 (print concise info, default)
+#'  \item 2 (print extended info).
 #'  }
 #' @return A `data.frame` containing the following columns:
 #' \itemize{
-#' \item{`date_col`: }{the date of first reaching or exceeding the milestone (or last date of follow-up if milestone is not reached);}
-#' \item{`value_col`: }{the first value  reaching orexceeding the milestone, if present, otherwise no value;}
-#' \item{`'time2event'`: }{the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached);}
-#' \item{`'observed'`: }{whether the milestone was reached (1) or not (0).}
+#' \item `date_col`: the date of first reaching or exceeding the milestone (or last date of follow-up if milestone is not reached)
+#' \item `value_col`: the first value  reaching orexceeding the milestone, if present, otherwise no value
+#' \item `"time2event"`: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached)
+#' \item `"observed"`: whether the milestone was reached (1) or not (0).
 #' }
 #' @importFrom stats complete.cases
 #' @importFrom dplyr %>% group_by_at vars slice n mutate across
@@ -104,12 +104,10 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
     relapse_to_conf <- c(relapse_to_conf, 0)
   }
 
-  if (is.null(outcome) ||
-      !(tolower(outcome) %in% c('edss', 'nhpt', 't25fw', 'sdmt'))) {
-    outcome <- 'outcome'
-  } else {
-    outcome <- tolower(outcome)
-  }
+  outcome <- match.arg(
+    tolower(outcome),
+    c("edss", "nhpt", "t25fw", "sdmt", "custom")
+  )
 
   # end of checks
   ###########################
@@ -155,7 +153,7 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
       data[[date_col]] <- as.numeric(data[[date_col]])
       relapse[[rdate_col]] <- as.numeric(relapse[[rdate_col]])
     }, error=function(e) {
-      message("Failed to intepret date columns as numeric (number of days, as per `date_format='day'`)")
+      message('Failed to intepret date columns as numeric (number of days, as per `date_format="day"`)')
       NULL
     }
     )
@@ -204,8 +202,10 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
     worsening <- 'increase'
   } else if (outcome=='sdmt') {
     worsening <- 'decrease'
-  } else if (is.null(worsening) | !(worsening %in% c('increase', 'decrease'))) {
-    stop('Either specify an outcome type, or specify the direction of worsening (\'increase\' or \'decrease\')')
+  } else if (is.null(worsening)) {
+    stop('Either specify an outcome type, or specify the direction of worsening (\"increase\" or \"decrease\")')
+  } else {
+    worsening <- match.arg(worsening, c('increase', 'decrease'))
   }
 
   # Define a confirmation window for each value of conf_days
@@ -436,7 +436,7 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
            ifelse(relapse_to_conf[1]==0 && relapse_to_conf[2]==0, '-', '')
            ))
     message("\n---\nTotal subjects: ", nsub, "\n",
-            sum(results[['observed']]), " reached the milestone ", outcome, "=", milestone, ".")
+            sum(results[['observed']]), " reached the milestone ", ifelse(outcome != "custom", outcome, "outcome"), "=", milestone, ".")
 
   }
 

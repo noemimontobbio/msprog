@@ -57,7 +57,7 @@ output <- MSprog(...
                  relapse_indep=relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1, prec_type, use_end_dates),
                  ...)
 ```
-where: `p0` and `p1` specify the interval around the preceding visit; `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If the right end (`p1` or `e1`) is `NULL`, the interval is assumed to extend up to the left end of the next interval. If the left end is `NULL`  (`e0` or `c0`), the interval is assumed to extend up to the right end of the previous interval. The `prec_type` argument specifies which preceding visit to take into account (`'baseline'` for current reference, `'last'` for last visit preceding event onset, `'last_lower'` for last visit preceding event onset with a clinically meaningful score distance from it).[^enddates]
+where: `p0` and `p1` specify the interval around the preceding visit; `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If the right end (`p1` or `e1`) is `NULL`, the interval is assumed to extend up to the left end of the next interval. If the left end is `NULL`  (`e0` or `c0`), the interval is assumed to extend up to the right end of the previous interval. The `prec_type` argument specifies which preceding visit to take into account (`'baseline'` for current reference, `'last'` for last visit preceding event onset, `'last_delta'` for last visit preceding event onset with a clinically meaningful score distance from it).[^enddates]
 
 [^enddates]: If **end dates** of relapses are available (may be provided as an additional column in the relapse file whose name is specified by argument `renddate_col` in `MSprog()`), the `use_end_dates` argument in `relapse_indep_from_bounds()` controls whether they are used for PIRA or not. The default is `use_end_dates=F`. If `use_end_dates=T`, the provided intervals are ignored and PIRA is defined by the event or the confirmation not falling within the duration (onset to end) of a relapse. 
 
@@ -152,7 +152,10 @@ output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
                event='firstPIRA', baseline='roving',
                relapse_indep=relapse_indep_from_bounds(p0=0, p1=0, e0=90, e1=30, c0=90, c1=30),
                verbose=2)
-print(output$results, row.names=FALSE) # results
+# print(output$results, row.names=FALSE) # results
+DT::datatable(output$results, rownames=F,
+              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              )
 ```
     <br>
     
@@ -164,7 +167,10 @@ output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
                event='firstPIRA', baseline='fixed', relapse_rebl=TRUE,
                relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=30, c0=30, c1=30),
                verbose=2)
-print(output$results, row.names=FALSE) # results
+# print(output$results, row.names=FALSE) # results
+DT::datatable(output$results, rownames=F,
+              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              )
 ```
 
 Here, `nevent` is the cumulative event count for each subject, and `event_type` characterises the event (since `event` is set to `firstPIRA`, the count is either 0 or 1 and the event type, when present, is always `PIRA`); `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf84` and `conf168` report whether the event was confirmed as a CDW over 12 or 24 weeks (84 or 168 days); `PIRAconf84` and `PIRAconf168` report whether the event was confirmed as PIRA over 12 or 24 weeks (84 or 168 days); `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.

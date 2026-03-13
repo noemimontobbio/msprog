@@ -32,7 +32,7 @@ relapse_indep_from_bounds(
 \itemize{
 \item{\code{'baseline'}: the current baseline;}
 \item{\code{'last'}: the last visit before event onset;}
-\item{\code{'last_lower'}: the last visit before event onset with a clinically
+\item{\code{'last_delta'}: the last visit before event onset with a clinically
 meaningful score distance from the event score, i.e.,
 the last visit \code{i} where \code{outcome[event] - outcome[i] >= delta_fun(outcome[i])}.}
 }}
@@ -71,11 +71,11 @@ Here are some examples:
 }
 }
 \references{
-[1] Müller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli Ö, et al.
+[1] M\"uller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli \"O, et al.
 Harmonizing definitions for progression independent of relapse activity in multiple sclerosis: A systematic review.
-JAMA Neurol. 2023;80:1232–45. \cr\cr
+JAMA Neurol. 2023;80:1232--45. \cr\cr
 [2] Kappos L, Wolinsky JS, Giovannoni G, Arnold DL, Wang Q, Bernasconi C, et al.
 Contribution of relapse-independent progression vs relapse-associated worsening to overall confirmed disability
 accumulation in typical relapsing multiple sclerosis in a pooled analysis of 2 randomized clinical trials.
-JAMA Neurol. 2020;77:1132–40.
+JAMA Neurol. 2020;77:1132--40.
 }

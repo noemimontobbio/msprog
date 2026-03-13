@@ -35,7 +35,7 @@
 #' \itemize{
 #' \item{`'baseline'`: the current baseline;}
 #' \item{`'last'`: the last visit before event onset;}
-#' \item{`'last_lower'`: the last visit before event onset with a clinically
+#' \item{`'last_delta'`: the last visit before event onset with a clinically
 #' meaningful score distance from the event score, i.e.,
 #' the last visit `i` where `outcome[event] - outcome[i] >= delta_fun(outcome[i])`.}
 #' }
@@ -44,19 +44,19 @@
 #' This option is only relevant when relapse \emph{end} dates are available.
 #'
 #' @references
-#' \[1\] Müller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli Ö, et al.
+#' \[1\] M\"uller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli \"O, et al.
 #' Harmonizing definitions for progression independent of relapse activity in multiple sclerosis: A systematic review.
-#' JAMA Neurol. 2023;80:1232–45. \cr\cr
+#' JAMA Neurol. 2023;80:1232--45. \cr\cr
 #' \[2\] Kappos L, Wolinsky JS, Giovannoni G, Arnold DL, Wang Q, Bernasconi C, et al.
 #' Contribution of relapse-independent progression vs relapse-associated worsening to overall confirmed disability
 #' accumulation in typical relapsing multiple sclerosis in a pooled analysis of 2 randomized clinical trials.
-#' JAMA Neurol. 2020;77:1132–40.
+#' JAMA Neurol. 2020;77:1132--40.
 #'
 #' @return A named list to be given as argument `relapse_indep` to function [MSprog()]
 #' @export relapse_indep_from_bounds
 relapse_indep_from_bounds <- function(p0=0, p1=0, e0=0, e1=0, c0=0, c1=0, prec_type='baseline', use_end_dates=F) {
-  if (!(prec_type %in% c('baseline', 'last', 'last_lower'))) {
-    stop('invalid value for `prec_type` argument, please provide one of: \'baseline\', \'last\', \'last_lower\'')
+  if (!(prec_type %in% c('baseline', 'last', 'last_delta'))) {
+    stop('invalid value for `prec_type` argument, please provide one of: \'baseline\', \'last\', \'last_delta\'')
   }
   for (p in c(p0, p1, e0, e1, c0, c1)) {
     if (!is.null(p) & p<0) {

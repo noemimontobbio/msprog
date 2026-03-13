@@ -1,0 +1,492 @@
+
+R version 4.4.0 (2024-04-24) -- "Puppy Cup"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin20
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "msprog"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> base::assign(".ExTimings", "msprog-Ex.timings", pos = 'CheckExEnv')
+> base::cat("name\tuser\tsystem\telapsed\n", file=base::get(".ExTimings", pos = 'CheckExEnv'))
+> base::assign(".format_ptime",
++ function(x) {
++   if(!is.na(x[4L])) x[1L] <- x[1L] + x[4L]
++   if(!is.na(x[5L])) x[2L] <- x[2L] + x[5L]
++   options(OutDec = '.')
++   format(x[1L:3L], digits = 7L)
++ },
++ pos = 'CheckExEnv')
+> 
+> ### * </HEADER>
+> library('msprog')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("MSprog")
+> ### * MSprog
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: MSprog
+> ### Title: Assess multiple sclerosis disability course from longitudinal
+> ###   data.
+> ### Aliases: MSprog
+> 
+> ### ** Examples
+> 
+> # 1. EDSS course
+> output <- MSprog(toydata_visits, subj_col='id', value_col='EDSS', date_col='date', outcome='edss',
++     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
++     event='multiple', baseline='roving', verbose=1)
+
+---
+Outcome: edss
+Confirmation over: 84 days (-30 days, +30 days)
+Baseline: roving
+Baseline skipped if: <30 days from last relapse
+Event skipped if: -
+Confirmation visit skipped if: <30 days from last relapse
+Events detected: multiple
+
+*Please use `print(output)` to display full info on event detection criteria*
+
+---
+Total subjects: 7
+---
+Subjects with CDW: 6 (PIRA: 5; RAW: 2)
+Subjects with CDI: 1
+---
+CDW events: 7 (PIRA: 5; RAW: 2)
+CDI events: 1
+> print(output$results) # extended info on each event for all subjects
+  id nevent event_type total_fu time2event bl2event conf84 PIRA_conf84
+1  1      1       PIRA      534        443      443      1           1
+2  2      1        RAW      730        198      198      1           0
+3  2      2       PIRA      730        539      257      1           1
+4  3      0                 491        491      NaN      0           0
+5  4      1        CDI      586         77       77      1           0
+6  4      2       PIRA      586        304      129      1           1
+7  5      1       PIRA      637        140      140      1           1
+8  6      1        RAW      491        430      430      1           0
+9  7      1       PIRA      779        499      499      1           1
+  sust_days sust_last
+1        91         1
+2        84         0
+3       191         1
+4         0         0
+5        98         0
+6       282         1
+7       497         1
+8        61         1
+9       280         1
+> print(output$event_count) # summary of event sequence for each subject
+  event_sequence CDI CDW RAW PIRA undef_CDW
+1           PIRA   0   1   0    1         0
+2      RAW, PIRA   0   2   1    1         0
+3                  0   0   0    0         0
+4      CDI, PIRA   1   1   0    1         0
+5           PIRA   0   1   0    1         0
+6            RAW   0   1   1    0         0
+7           PIRA   0   1   0    1         0
+> # 2. SDMT course
+> output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
++     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
++     event='multiple', baseline='roving', verbose=1)
+
+---
+Outcome: sdmt
+Confirmation over: 84 days (-30 days, +30 days)
+Baseline: roving
+Baseline skipped if: <30 days from last relapse
+Event skipped if: -
+Confirmation visit skipped if: <30 days from last relapse
+Events detected: multiple
+
+*Please use `print(output)` to display full info on event detection criteria*
+
+---
+Total subjects: 7
+---
+Subjects with CDW: 5 (PIRA: 4; RAW: 0)
+Subjects with CDI: 0
+---
+CDW events: 5 (PIRA: 4; RAW: 0)
+CDI events: 0
+> print(output$results) # extended info on each event for all subjects
+  id nevent event_type total_fu time2event bl2event conf84 PIRA_conf84
+1  1      1       PIRA      534        443      443      1           1
+2  2      1        CDW      730        640      640      1           0
+3  3      0                 491        491      NaN      0           0
+4  4      1       PIRA      586         77       77      1           1
+5  5      1       PIRA      637        549      549      1           1
+6  6      0                 491        491      NaN      0           0
+7  7      1       PIRA      779        674      674      1           1
+  sust_days sust_last
+1        91         1
+2        90         1
+3         0         0
+4       509         1
+5        88         1
+6         0         0
+7       105         1
+> print(output$event_count) # summary of event sequence for each subject
+  event_sequence CDI CDW RAW PIRA undef_CDW
+1           PIRA   0   1   0    1         0
+2            CDW   0   1   0    0         1
+3                  0   0   0    0         0
+4           PIRA   0   1   0    1         0
+5           PIRA   0   1   0    1         0
+6                  0   0   0    0         0
+7           PIRA   0   1   0    1         0
+> # 3. SDMT course, with a custom delta function
+> my_sdmt_delta <- function(reference_value) {min(c(reference_value/5, 4))}
+> output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
++     delta_fun=my_sdmt_delta,
++     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
++     event='multiple', baseline='roving', verbose=1)
+
+---
+Outcome: sdmt
+Confirmation over: 84 days (-30 days, +30 days)
+Baseline: roving
+Baseline skipped if: <30 days from last relapse
+Event skipped if: -
+Confirmation visit skipped if: <30 days from last relapse
+Events detected: multiple
+
+*Please use `print(output)` to display full info on event detection criteria*
+
+---
+Total subjects: 7
+---
+Subjects with CDW: 5 (PIRA: 4; RAW: 0)
+Subjects with CDI: 0
+---
+CDW events: 5 (PIRA: 4; RAW: 0)
+CDI events: 0
+> print(output$results) # extended info on each event for all subjects
+  id nevent event_type total_fu time2event bl2event conf84 PIRA_conf84
+1  1      1       PIRA      534        443      443      1           1
+2  2      1        CDW      730        640      640      1           0
+3  3      0                 491        491      NaN      0           0
+4  4      1       PIRA      586         77       77      1           1
+5  5      1       PIRA      637        549      549      1           1
+6  6      0                 491        491      NaN      0           0
+7  7      1       PIRA      779        674      674      1           1
+  sust_days sust_last
+1        91         1
+2        90         1
+3         0         0
+4       509         1
+5        88         1
+6         0         0
+7       105         1
+> print(output$event_count) # summary of event sequence for each subject
+  event_sequence CDI CDW RAW PIRA undef_CDW
+1           PIRA   0   1   0    1         0
+2            CDW   0   1   0    0         1
+3                  0   0   0    0         0
+4           PIRA   0   1   0    1         0
+5           PIRA   0   1   0    1         0
+6                  0   0   0    0         0
+7           PIRA   0   1   0    1         0
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("MSprog", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("compute_delta")
+> ### * compute_delta
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: compute_delta
+> ### Title: Definition of minimum clinically meaningful shift for different
+> ###   scales.
+> ### Aliases: compute_delta
+> 
+> ### ** Examples
+> 
+> compute_delta(4.5) # default outcome is 'edss'
+[1] 1
+> compute_delta(55, outcome='sdmt')
+[1] 4
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("compute_delta", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("is_event")
+> ### * is_event
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: is_event
+> ### Title: Compare value to reference.
+> ### Aliases: is_event
+> 
+> ### ** Examples
+> 
+> is_event(x=4.5, baseline=4, type='wors', outcome='edss')
+[1] FALSE
+> is_event(x=50, baseline=57, type='wors', outcome='sdmt')
+[1] TRUE
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("is_event", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("print.MSprogOutput")
+> ### * print.MSprogOutput
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: print.MSprogOutput
+> ### Title: Textual description of criteria used to assess disability
+> ###   course.
+> ### Aliases: print.MSprogOutput
+> 
+> ### ** Examples
+> 
+> output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
++     relapse=toydata_relapses, conf_days=7*12, conf_tol_days=30,
++     event='multiple', baseline='roving', verbose=2)
+
+Subject #1: 8 visits, 0 relapses
+Baseline at visit no.1
+Searching for events from visit no.2 on
+edss change at visit no.5 (2022-07-12); potential confirmation visits available: no.
+Change not confirmed: proceed with search
+Searching for events from visit no.6 on
+edss change at visit no.6 (2022-11-06); potential confirmation visits available: no.
+Change not confirmed: proceed with search
+Searching for events from visit no.7 on
+edss change at visit no.7 (2022-12-10); potential confirmation visits available: no.8
+edss PIRA (visit no.7, 2022-12-10) confirmed at 84 days, sustained up to visit no.8 (2023-03-11)
+Baseline at visit no.8
+Searching for events from visit no.- on
+No edss change in any subsequent visit: end process
+Event sequence: PIRA
+
+Subject #2: 10 visits, 2 relapses
+Baseline at visit no.1
+Searching for events from visit no.2 on
+edss change at visit no.4 (2021-06-12); potential confirmation visits available: no.5
+edss RAW (visit no.4, 2021-06-12) confirmed at 84 days, sustained up to visit no.5 (2021-09-04)
+Baseline at visit no.5
+Searching for events from visit no.6 on
+edss change at visit no.8 (2022-05-19); potential confirmation visits available: no.9
+edss PIRA (visit no.8, 2022-05-19) confirmed at 84 days, sustained up to visit no.10 (2022-11-26)
+Baseline at visit no.9
+Searching for events from visit no.10 on
+No edss change in any subsequent visit: end process
+Event sequence: RAW, PIRA
+
+Subject #3: 7 visits, 1 relapse
+Baseline at visit no.1
+Searching for events from visit no.2 on
+edss change at visit no.2 (2021-12-01); potential confirmation visits available: no.3
+Change not confirmed: proceed with search
+Searching for events from visit no.3 on
+No edss change in any subsequent visit: end process
+Event sequence: 
+
+Subject #4: 7 visits, 0 relapses
+Baseline at visit no.1
+Searching for events from visit no.2 on
+edss change at visit no.2 (2021-12-04); potential confirmation visits available: no.3
+edss improvement (visit no.2, 2021-12-04) confirmed at 84 days, sustained up to visit no.3 (2022-03-12)
+Baseline at visit no.3
+Searching for events from visit no.4 on
+edss change at visit no.4 (2022-07-19); potential confirmation visits available: no.5
+edss PIRA (visit no.4, 2022-07-19) confirmed at 84 days, sustained up to visit no.7 (2023-04-27)
+Baseline at visit no.5
+Searching for events from visit no.6 on
+No edss change in any subsequent visit: end process
+Event sequence: CDI, PIRA
+
+Subject #5: 9 visits, 0 relapses
+Baseline at visit no.1
+Searching for events from visit no.2 on
+edss change at visit no.3 (2021-11-01); potential confirmation visits available: no.4
+edss PIRA (visit no.3, 2021-11-01) confirmed at 84 days, sustained up to visit no.9 (2023-03-13)
+Baseline at visit no.4
+Searching for events from visit no.5 on
+edss change at visit no.5 (2022-04-30); potential confirmation visits available: no.6
+Change not confirmed: proceed with search
+Searching for events from visit no.6 on
+edss change at visit no.8 (2022-12-15); potential confirmation visits available: no.9
+Change not confirmed: proceed with search
+Searching for events from visit no.9 on
+No edss change in any subsequent visit: end process
+Event sequence: PIRA
+
+Subject #6: 7 visits, 1 relapse
+Baseline at visit no.1
+Searching for events from visit no.2 on
+edss change at visit no.3 (2022-02-15); potential confirmation visits available: no.
+Change not confirmed: proceed with search
+Searching for events from visit no.4 on
+edss change at visit no.4 (2022-09-03); potential confirmation visits available: no.
+Change not confirmed: proceed with search
+Searching for events from visit no.5 on
+edss change at visit no.5 (2022-10-05); potential confirmation visits available: no.
+Change not confirmed: proceed with search
+Searching for events from visit no.6 on
+edss change at visit no.6 (2022-12-22); potential confirmation visits available: no.7
+edss RAW (visit no.6, 2022-12-22) confirmed at 84 days, sustained up to visit no.7 (2023-02-21)
+Baseline at visit no.7
+Searching for events from visit no.- on
+No edss change in any subsequent visit: end process
+Event sequence: RAW
+
+Subject #7: 9 visits, 1 relapse
+Baseline at visit no.1
+Searching for events from visit no.2 on
+edss change at visit no.3 (2021-09-11); potential confirmation visits available: no.4
+Change not confirmed: proceed with search
+Searching for events from visit no.4 on
+edss change at visit no.5 (2022-03-17); potential confirmation visits available: no.
+Change not confirmed: proceed with search
+Searching for events from visit no.6 on
+edss change at visit no.6 (2022-07-22); potential confirmation visits available: no.7
+edss PIRA (visit no.6, 2022-07-22) confirmed at 84 days, sustained up to visit no.9 (2023-04-28)
+Baseline at visit no.7
+Searching for events from visit no.8 on
+No edss change in any subsequent visit: end process
+Event sequence: PIRA
+
+---
+Outcome: edss
+Confirmation over: 84 days (-30 days, +30 days)
+Baseline: roving
+Baseline skipped if: <30 days from last relapse
+Event skipped if: -
+Confirmation visit skipped if: <30 days from last relapse
+Events detected: multiple
+
+*Please use `print(output)` to display full info on event detection criteria*
+
+---
+Total subjects: 7
+---
+Subjects with CDW: 6 (PIRA: 5; RAW: 2)
+Subjects with CDI: 1
+---
+CDW events: 7 (PIRA: 5; RAW: 2)
+CDI events: 1
+> print(output) # textual description of parameters used to obtain output
+---
+msprog version: 0.2.4 
+---
+MSprog() arguments:
+outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(30, 30), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
+delta_fun=NULL
+
+Textual description of applied criteria:
+We detected all confirmed EDSS changes (in chronological order) confirmed over 84 days (with a lower tolerance of 30 days and an upper tolerance of 30 days). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first eligible confirmation visit for the event that triggered the re-baseline. Whenever the current baseline fell within 30 days after the onset of a relapse, it was moved to the next eligible visit. A confirmed EDSS worsening event was labelled as relapse-associated worsening (RAW) if occurring within 90 days after the onset of a relapse. A confirmed EDSS worsening event was labelled as progression independent of relapse activity (PIRA) if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation. 
+---
+Clinically meaningful threshold for EDSS change (delta function): default for EDSS (check by typing ?compute_delta).> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("print.MSprogOutput", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("toydata_relapses")
+> ### * toydata_relapses
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: toydata_relapses
+> ### Title: Synthetic Relapse Data
+> ### Aliases: toydata_relapses
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> 
+> data(toydata_relapses)
+> head(toydata_relapses)
+# A tibble: 5 × 3
+  id    date       visit_day
+  <chr> <date>         <dbl>
+1 2     2021-06-12       198
+2 2     2022-10-25       698
+3 3     2022-12-01       409
+4 6     2022-12-18       426
+5 7     2021-09-11       185
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("toydata_relapses", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("toydata_visits")
+> ### * toydata_visits
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: toydata_visits
+> ### Title: Synthetic Longitudinal EDSS and SDMT Data
+> ### Aliases: toydata_visits
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> 
+> head(toydata_visits)
+# A tibble: 6 × 5
+  id    date       visit_day  EDSS  SDMT
+  <chr> <date>         <dbl> <dbl> <dbl>
+1 1     2021-09-23         0   5.5    54
+2 1     2021-11-03        41   5.5    54
+3 1     2022-01-19       118   5.5    57
+4 1     2022-04-27       216   5.5    55
+5 1     2022-07-12       292   6      57
+6 1     2022-11-06       409   6      51
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("toydata_visits", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> ### * <FOOTER>
+> ###
+> cleanEx()
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  0.432 0.015 0.45 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')

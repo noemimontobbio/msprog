@@ -1,0 +1,7 @@
+name	user	system	elapsed
+MSprog	0.095	0.004	0.101	
+compute_delta	0	0	0	
+is_event	0	0	0	
+print.MSprogOutput	0.038	0.001	0.039	
+toydata_relapses	0.014	0.002	0.016	
+toydata_visits	0.004	0.000	0.005	

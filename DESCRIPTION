@@ -1,13 +1,13 @@
 Package: msprog
 Type: Package
-Title: Reproducible assessment of disability course in MS
+Title: Reproducible Assessment of Disability Course in MS
 Version: 0.2.4
 Authors@R: c(
-    person("Noemi", "Montobbio", , "noemi.montobbio@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-0302-393X")),
-    person("Francesca", "Bovis", role = c("rev")),
-    person("Luca", "Carmisciano", role = c("rev")))
-Description: msprog provides tools for exhaustive and reproducible analysis of disability course in multiple sclerosis (MS) from longitudinal data
+    person(given="Noemi", family="Montobbio", , email="noemi.montobbio@gmail.com", role=c("aut", "cre"),
+           comment=c(ORCID = "0000-0003-0302-393X")),
+    person(given="Francesca", family="Bovis", role = c("rev")),
+    person(given="Luca", family="Carmisciano", role = c("rev")))
+Description: Perform exhaustive and reproducible analysis of disability course in multiple sclerosis (MS) from longitudinal data.
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
@@ -15,5 +15,5 @@ RoxygenNote: 7.3.3
 Imports: stats, dplyr
 Depends: R (>= 3.5.0)
 VignetteBuilder: knitr
-Suggests: knitr, rmarkdown
+Suggests: knitr, rmarkdown, xfun, DT
 License: MIT + file LICENSE
