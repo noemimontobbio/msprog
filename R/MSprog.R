@@ -179,7 +179,7 @@
 #' If not specified, function [as.Date()] will try to infer it automatically.
 #' @param include_dates If `TRUE`, `output$results` will include the date of each event (`'date'` column)
 #' and the date of the corresponding baseline (`'bl_date'` column).
-#' @param include_value If `TRUE`,  `output$results` will include the outcome value at each event (`'value'` column)
+#' @param include_values If `TRUE`,  `output$results` will include the outcome value at each event (`'value'` column)
 #' and at the corresponding baseline (`'bl_value'` column).
 #' @param include_stable If `TRUE`, subjects with no confirmed events are included in `output$results`,
 #' with `time2event` = total follow up.
@@ -226,7 +226,7 @@
 #' print(output$results) # extended info on each event for all subjects
 #' print(output$event_count) # summary of event sequence for each subject
 #' # 3. SDMT course, with a custom delta function
-#' my_sdmt_delta <- function(reference_value) {min(c(reference_value/5, 4))}
+#' my_sdmt_delta <- function(reference_value) {min(c(reference_value/10, 3))}
 #' output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
 #'     delta_fun=my_sdmt_delta,
 #'     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
@@ -246,7 +246,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30,
                    relapse_assoc=90, relapse_indep=NULL,
                    impute_last_visit=0, date_format=NULL,
-                   include_dates=F, include_value=F, include_stable=T,
+                   include_dates=F, include_values=F, include_stable=T,
                    verbose=1
                    ) {
 
@@ -475,15 +475,17 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       } else {
         local_extr <- F
       }
-      #
-      event_ok <- isevent_loc(data_id[change_idx, value_col],
-                              bl=data_id[iref, value_col], type='wors')
-      conf_ok <- ifelse(is.na(conf_idx), T,
-                        ifelse(check_intermediate,
-              all(sapply((change_idx + 1):conf_idx[[1]],
-                         function(x) isevent_loc(data_id[x,][[value_col]], bl=data_id[iref,][[value_col]], type='wors'))),  # worsening is confirmed at (all visits up to) first valid date
-              isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl=data_id[iref,][[value_col]], type='wors') # worsening is confirmed at first valid date
-                        ))
+      event_ok <- isevent_loc(data_id[[value_col]][change_idx],
+                              bl=data_id[[value_col]][iref], type='wors')
+      if (is.na(conf_idx)) {
+        conf_ok <- T
+      } else {
+        conf_ok <- ifelse(check_intermediate,
+                      all(sapply((change_idx + 1):conf_idx[[1]],
+                                 function(x) isevent_loc(data_id[x,][[value_col]], bl=data_id[iref,][[value_col]], type='wors'))),  # worsening is confirmed at (all visits up to) first valid date
+                      isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl=data_id[iref,][[value_col]], type='wors') # worsening is confirmed at first valid date
+        )
+      }
       valid_ref <- event_ok && conf_ok && !local_extr
     }
     ifelse(valid_ref, iref, 1)
@@ -848,7 +850,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           valid_ev <- 1
           if (require_sust_days>0) {
               if ((!check_intermediate)
-                  && data_id[nvisits, date_col] - data_id[change_idx, date_col] >= require_sust_days # if follow-up lasts at least require_sust_days
+                  && data_id[[date_col]][nvisits] - data_id[[date_col]][change_idx] >= require_sust_days # if follow-up lasts at least require_sust_days
                   ) {
                 sust_vis <- which(data_id[(change_idx + 1):nvisits, date_col]
                       - data_id[change_idx,][[date_col]] >= require_sust_days)[1] + change_idx  # first visit occurring at least `require_sust_days` from event
@@ -857,7 +859,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                 }
             valid_ev <- ifelse(check_intermediate,
                 is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]]
-                          - data_id[change_idx, date_col]) >= require_sust_days,  # improvement sustained up to end of follow-up, or for `require_sust_days`
+                          - data_id[[date_col]][change_idx]) >= require_sust_days,  # improvement sustained up to end of follow-up, or for `require_sust_days`
                 isevent_loc(data_id[sust_vis,][[value_col]], bl=bl[[value_col]], type='impr')  # improvement confirmed at `sust_vis` (last visit, or first visit after `require_sust_days`)
             )
           }
@@ -1029,7 +1031,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                 valid_ev <- 1
                 if (require_sust_days>0) {
                   if ((!check_intermediate)
-                      && data_id[nvisits, date_col] - data_id[change_idx, date_col] >= require_sust_days) { # follow-up lasts at least `require_sust_days`
+                      && data_id[[date_col]][nvisits] - data_id[[date_col]][change_idx] >= require_sust_days) { # follow-up lasts at least `require_sust_days`
                     sust_vis <- which(data_id[(change_idx + 1):nvisits, date_col]
                                       - data_id[change_idx,][[date_col]] >= require_sust_days)[1] + change_idx
                     } else {sust_vis <- nvisits}
@@ -1561,7 +1563,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     if (!include_dates) {
       columns <- columns[!endsWith(columns, "date")]
     }
-    if (!include_value) {
+    if (!include_values) {
       columns <- columns[!endsWith(columns, "value")]
     }
 

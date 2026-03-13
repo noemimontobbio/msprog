@@ -37,7 +37,7 @@ MSprog(
   impute_last_visit = 0,
   date_format = NULL,
   include_dates = F,
-  include_value = F,
+  include_values = F,
   include_stable = T,
   verbose = 1
 )
@@ -236,7 +236,7 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 \item{include_dates}{If \code{TRUE}, \code{output$results} will include the date of each event (\code{'date'} column)
 and the date of the corresponding baseline (\code{'bl_date'} column).}
 
-\item{include_value}{If \code{TRUE},  \code{output$results} will include the outcome value at each event (\code{'value'} column)
+\item{include_values}{If \code{TRUE},  \code{output$results} will include the outcome value at each event (\code{'value'} column)
 and at the corresponding baseline (\code{'bl_value'} column).}
 
 \item{include_stable}{If \code{TRUE}, subjects with no confirmed events are included in \code{output$results},
@@ -291,7 +291,7 @@ output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date
 print(output$results) # extended info on each event for all subjects
 print(output$event_count) # summary of event sequence for each subject
 # 3. SDMT course, with a custom delta function
-my_sdmt_delta <- function(reference_value) {min(c(reference_value/5, 4))}
+my_sdmt_delta <- function(reference_value) {min(c(reference_value/10, 3))}
 output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
     delta_fun=my_sdmt_delta,
     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
