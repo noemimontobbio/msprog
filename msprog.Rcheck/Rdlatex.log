@@ -102,24 +102,22 @@ Overfull \hbox (16.30835pt too wide) in paragraph at lines 141--145
 T1/ptm/m/n/10 is au-to-mat-i-cally set to []\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 inc
 rease\TS1/zi4/m/n/10 '
 [3] [4]
+Overfull \hbox (14.51942pt too wide) in paragraph at lines 239--240
+[]\T1/zi4/m/n/10 "custom" []\T1/ptm/m/n/10 (only ac-cepted when spec-i-fy-ing c
+us-tom []\T1/zi4/m/n/10 delta_fun []\T1/ptm/m/n/10 and []\T1/zi4/m/n/10 worseni
+ng[]\T1/ptm/m/n/10 ). 
+
 Overfull \hbox (16.478pt too wide) in paragraph at lines 243--247
 []\T1/ptm/m/n/10 Outcome type de-ter-mines a de-fault di-rec-tion of wors-en-in
 g (see []\T1/zi4/m/n/10 worsening[]\T1/ptm/m/n/10 argument)
 
-Overfull \hbox (4.72852pt too wide) in paragraph at lines 265--269
-[]\T1/zi4/m/n/10 outcome []\T1/ptm/m/n/10 is set to []\T1/zi4/m/n/10 NULL[]\T1/
-ptm/m/n/10 . Oth-er-wise, []\T1/zi4/m/n/10 worsening []\T1/ptm/m/n/10 is au-to-
-mat-i-cally set to []\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 increase\TS1/zi4/m/n/10 '
-
 Overfull \hbox (39.09814pt too wide) in paragraph at lines 291--293
-[]\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 roving_impr\TS1/zi4/m/n/10 '[]\T1/ptm/m/n/10 
-: up-dated af-ter ev-ery CDI (to the visit de-ter-mined by []\T1/zi4/m/n/10 pro
-ceed_from[]\T1/ptm/m/n/10 );
+[]\T1/zi4/m/n/10 "roving_impr"[]\T1/ptm/m/n/10 : up-dated af-ter ev-ery CDI (to
+ the visit de-ter-mined by []\T1/zi4/m/n/10 proceed_from[]\T1/ptm/m/n/10 );
 [5]
 Overfull \hbox (69.26788pt too wide) in paragraph at lines 302--303
 []\T1/ptm/m/n/10 from the next visit af-ter the first qual-i-fy-ing con-fir-ma-
-tion visit if []\T1/zi4/m/n/10 proceed_from=\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 fir
-stconf\TS1/zi4/m/n/10 ' 
+tion visit if []\T1/zi4/m/n/10 proceed_from="firstconf" 
 
 Overfull \hbox (14.0004pt too wide) in paragraph at lines 339--349
 \T1/ptm/m/n/10 point for []\T1/zi4/m/n/10 outcome []\T1/ptm/m/n/10 if []\T1/zi4
@@ -151,56 +149,51 @@ Overfull \hbox (44.94855pt too wide) in paragraph at lines 460--468
 ents []\T1/zi4/m/n/10 conf_days[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 conf_tol_day
 s[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 relapse_to_conf[]\T1/ptm/m/n/10 .
 [8]
-Underfull \hbox (badness 10000) in paragraph at lines 485--492
+Underfull \hbox (badness 10000) in paragraph at lines 486--493
 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 497--497
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 498--498
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
 zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
 /n/9 EDSS\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
  date\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , outcome=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 edss
 \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ,[] 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 503--503
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 504--504
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
 zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
 /n/9 SDMT\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
  date\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , outcome=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 sdmt
 \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ,[] 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 510--510
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 511--511
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
 zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
 /n/9 SDMT\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
  date\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , outcome=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 sdmt
 \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ,[] 
-[9]
-Overfull \hbox (24.99966pt too wide) in paragraph at lines 563--567
+[9] [10]
+Overfull \hbox (24.99966pt too wide) in paragraph at lines 634--638
 \T1/ptm/m/n/10 from the event score (i.e., []\T1/zi4/m/n/10 i []\T1/ptm/m/n/10 
 such that []\T1/zi4/m/n/10 outcome[event] - outcome[i] >= delta_fun(outcome[i])
 []\T1/ptm/m/n/10 ,
-[10]
-Overfull \hbox (11.66826pt too wide) in paragraph at lines 608--611
+[11]
+Overfull \hbox (11.66826pt too wide) in paragraph at lines 679--682
 \T1/ptm/m/n/10 score dis-tance from the event score, i.e., the last visit []\T1
 /zi4/m/n/10 i []\T1/ptm/m/n/10 where []\T1/zi4/m/n/10 outcome[event]
 
-Underfull \hbox (badness 10000) in paragraph at lines 643--650
+Underfull \hbox (badness 10000) in paragraph at lines 714--721
 
-[11] [12] [13]
-Overfull \hbox (4.72852pt too wide) in paragraph at lines 786--790
-[]\T1/zi4/m/n/10 outcome []\T1/ptm/m/n/10 is set to []\T1/zi4/m/n/10 NULL[]\T1/
-ptm/m/n/10 . Oth-er-wise, []\T1/zi4/m/n/10 worsening []\T1/ptm/m/n/10 is au-to-
-mat-i-cally set to []\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 increase\TS1/zi4/m/n/10 '
-
-Overfull \hbox (51.34917pt too wide) in paragraph at lines 823--829
+[12] [13] [14] [15]
+Overfull \hbox (51.34917pt too wide) in paragraph at lines 894--900
 \T1/ptm/m/n/10 never im-puted if []\T1/zi4/m/n/10 impute_last_visit=0[]\T1/ptm/
 m/n/10 ; they are al-ways im-puted if []\T1/zi4/m/n/10 impute_last_visit=1[]\T1
 /ptm/m/n/10 ;
-[14]
+[16]
 No file Rd2.ind.
-[15]
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzTgiK7/Rd2pdf432a
-327be28a/Rd2.aux)
+[17]
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
+46332204/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -220,12 +213,12 @@ zi4r.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb><
 /usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local
 /texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2
 024/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (15 pages, 116162 bytes).
+Output written on Rd2.pdf (17 pages, 120633 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.17 [TeX Live 2024] (kpathsea + Thai support).
-Scanning input file Rd2.idx....done (26 entries accepted, 0 rejected).
-Sorting entries....done (134 comparisons).
-Generating output file Rd2.ind....done (52 lines written, 1 warning).
+Scanning input file Rd2.idx....done (31 entries accepted, 0 rejected).
+Sorting entries....done (178 comparisons).
+Generating output file Rd2.ind....done (55 lines written, 0 warnings).
 Output written in Rd2.ind.
 Transcript written in Rd2.ilg.
 This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex)
@@ -296,21 +289,21 @@ ty (/usr/local/texlive/2024/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
 Writing index file Rd2.idx
 (/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzTgiK7/Rd2pdf432a
-327be28a/Rd2.aux)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
+46332204/Rd2.aux)
 (/usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 )
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzTgiK7/Rd2pdf432a
-327be28a/Rd2.out)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzTgiK7/Rd2pdf432a
-327be28a/Rd2.out)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
+46332204/Rd2.out)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
+46332204/Rd2.out)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/jknapltx/ursfs.fd)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzTgiK7/Rd2pdf432a
-327be28a/Rd2.toc) [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
+46332204/Rd2.toc) [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/
 pdftex.map}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc}{/us
 r/local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}]
 Underfull \hbox (badness 10000) in paragraph at lines 57--58
@@ -335,24 +328,22 @@ Overfull \hbox (16.30835pt too wide) in paragraph at lines 141--145
 T1/ptm/m/n/10 is au-to-mat-i-cally set to []\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 inc
 rease\TS1/zi4/m/n/10 '
 [3] [4]
+Overfull \hbox (14.51942pt too wide) in paragraph at lines 239--240
+[]\T1/zi4/m/n/10 "custom" []\T1/ptm/m/n/10 (only ac-cepted when spec-i-fy-ing c
+us-tom []\T1/zi4/m/n/10 delta_fun []\T1/ptm/m/n/10 and []\T1/zi4/m/n/10 worseni
+ng[]\T1/ptm/m/n/10 ). 
+
 Overfull \hbox (16.478pt too wide) in paragraph at lines 243--247
 []\T1/ptm/m/n/10 Outcome type de-ter-mines a de-fault di-rec-tion of wors-en-in
 g (see []\T1/zi4/m/n/10 worsening[]\T1/ptm/m/n/10 argument)
-
-Overfull \hbox (4.72852pt too wide) in paragraph at lines 265--269
-[]\T1/zi4/m/n/10 outcome []\T1/ptm/m/n/10 is set to []\T1/zi4/m/n/10 NULL[]\T1/
-ptm/m/n/10 . Oth-er-wise, []\T1/zi4/m/n/10 worsening []\T1/ptm/m/n/10 is au-to-
-mat-i-cally set to []\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 increase\TS1/zi4/m/n/10 '
 [5]
 Overfull \hbox (39.09814pt too wide) in paragraph at lines 291--293
-[]\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 roving_impr\TS1/zi4/m/n/10 '[]\T1/ptm/m/n/10 
-: up-dated af-ter ev-ery CDI (to the visit de-ter-mined by []\T1/zi4/m/n/10 pro
-ceed_from[]\T1/ptm/m/n/10 );
+[]\T1/zi4/m/n/10 "roving_impr"[]\T1/ptm/m/n/10 : up-dated af-ter ev-ery CDI (to
+ the visit de-ter-mined by []\T1/zi4/m/n/10 proceed_from[]\T1/ptm/m/n/10 );
 
 Overfull \hbox (69.26788pt too wide) in paragraph at lines 302--303
 []\T1/ptm/m/n/10 from the next visit af-ter the first qual-i-fy-ing con-fir-ma-
-tion visit if []\T1/zi4/m/n/10 proceed_from=\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 fir
-stconf\TS1/zi4/m/n/10 ' 
+tion visit if []\T1/zi4/m/n/10 proceed_from="firstconf" 
 
 Overfull \hbox (14.0004pt too wide) in paragraph at lines 339--349
 \T1/ptm/m/n/10 point for []\T1/zi4/m/n/10 outcome []\T1/ptm/m/n/10 if []\T1/zi4
@@ -384,56 +375,51 @@ Overfull \hbox (44.94855pt too wide) in paragraph at lines 460--468
 ents []\T1/zi4/m/n/10 conf_days[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 conf_tol_day
 s[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 relapse_to_conf[]\T1/ptm/m/n/10 .
 [8]
-Underfull \hbox (badness 10000) in paragraph at lines 485--492
+Underfull \hbox (badness 10000) in paragraph at lines 486--493
 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 497--497
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 498--498
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
 zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
 /n/9 EDSS\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
  date\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , outcome=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 edss
 \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ,[] 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 503--503
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 504--504
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
 zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
 /n/9 SDMT\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
  date\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , outcome=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 sdmt
 \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ,[] 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 510--510
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 511--511
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
 zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
 /n/9 SDMT\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
  date\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , outcome=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 sdmt
 \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ,[] 
-[9]
-Overfull \hbox (24.99966pt too wide) in paragraph at lines 563--567
+[9] [10] [11]
+Overfull \hbox (24.99966pt too wide) in paragraph at lines 634--638
 \T1/ptm/m/n/10 from the event score (i.e., []\T1/zi4/m/n/10 i []\T1/ptm/m/n/10 
 such that []\T1/zi4/m/n/10 outcome[event] - outcome[i] >= delta_fun(outcome[i])
 []\T1/ptm/m/n/10 ,
-[10]
-Overfull \hbox (11.66826pt too wide) in paragraph at lines 608--611
+
+Overfull \hbox (11.66826pt too wide) in paragraph at lines 679--682
 \T1/ptm/m/n/10 score dis-tance from the event score, i.e., the last visit []\T1
 /zi4/m/n/10 i []\T1/ptm/m/n/10 where []\T1/zi4/m/n/10 outcome[event]
+[12]
+Underfull \hbox (badness 10000) in paragraph at lines 714--721
 
-Underfull \hbox (badness 10000) in paragraph at lines 643--650
-
-[11] [12] [13]
-Overfull \hbox (4.72852pt too wide) in paragraph at lines 786--790
-[]\T1/zi4/m/n/10 outcome []\T1/ptm/m/n/10 is set to []\T1/zi4/m/n/10 NULL[]\T1/
-ptm/m/n/10 . Oth-er-wise, []\T1/zi4/m/n/10 worsening []\T1/ptm/m/n/10 is au-to-
-mat-i-cally set to []\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 increase\TS1/zi4/m/n/10 '
-[14]
-Overfull \hbox (51.34917pt too wide) in paragraph at lines 823--829
+[13] [14] [15]
+Overfull \hbox (51.34917pt too wide) in paragraph at lines 894--900
 \T1/ptm/m/n/10 never im-puted if []\T1/zi4/m/n/10 impute_last_visit=0[]\T1/ptm/
 m/n/10 ; they are al-ways im-puted if []\T1/zi4/m/n/10 impute_last_visit=1[]\T1
 /ptm/m/n/10 ;
-[15]
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzTgiK7/Rd2pdf432a
-327be28a/Rd2.ind [16] [17])
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzTgiK7/Rd2pdf432a
-327be28a/Rd2.aux)
+[16]
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
+46332204/Rd2.ind [17] [18])
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
+46332204/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -454,12 +440,12 @@ y10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></
 usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/
 texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/20
 24/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (17 pages, 128407 bytes).
+Output written on Rd2.pdf (18 pages, 133170 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.17 [TeX Live 2024] (kpathsea + Thai support).
-Scanning input file Rd2.idx....done (26 entries accepted, 0 rejected).
-Sorting entries....done (134 comparisons).
-Generating output file Rd2.ind....done (52 lines written, 0 warnings).
+Scanning input file Rd2.idx....done (31 entries accepted, 0 rejected).
+Sorting entries....done (180 comparisons).
+Generating output file Rd2.ind....done (55 lines written, 0 warnings).
 Output written in Rd2.ind.
 Transcript written in Rd2.ilg.
 This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex)
@@ -530,21 +516,21 @@ ty (/usr/local/texlive/2024/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
 Writing index file Rd2.idx
 (/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzTgiK7/Rd2pdf432a
-327be28a/Rd2.aux)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
+46332204/Rd2.aux)
 (/usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 )
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzTgiK7/Rd2pdf432a
-327be28a/Rd2.out)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzTgiK7/Rd2pdf432a
-327be28a/Rd2.out)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
+46332204/Rd2.out)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
+46332204/Rd2.out)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/jknapltx/ursfs.fd)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzTgiK7/Rd2pdf432a
-327be28a/Rd2.toc) [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
+46332204/Rd2.toc) [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/
 pdftex.map}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc}{/us
 r/local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}]
 Underfull \hbox (badness 10000) in paragraph at lines 57--58
@@ -569,24 +555,22 @@ Overfull \hbox (16.30835pt too wide) in paragraph at lines 141--145
 T1/ptm/m/n/10 is au-to-mat-i-cally set to []\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 inc
 rease\TS1/zi4/m/n/10 '
 [3] [4]
+Overfull \hbox (14.51942pt too wide) in paragraph at lines 239--240
+[]\T1/zi4/m/n/10 "custom" []\T1/ptm/m/n/10 (only ac-cepted when spec-i-fy-ing c
+us-tom []\T1/zi4/m/n/10 delta_fun []\T1/ptm/m/n/10 and []\T1/zi4/m/n/10 worseni
+ng[]\T1/ptm/m/n/10 ). 
+
 Overfull \hbox (16.478pt too wide) in paragraph at lines 243--247
 []\T1/ptm/m/n/10 Outcome type de-ter-mines a de-fault di-rec-tion of wors-en-in
 g (see []\T1/zi4/m/n/10 worsening[]\T1/ptm/m/n/10 argument)
-
-Overfull \hbox (4.72852pt too wide) in paragraph at lines 265--269
-[]\T1/zi4/m/n/10 outcome []\T1/ptm/m/n/10 is set to []\T1/zi4/m/n/10 NULL[]\T1/
-ptm/m/n/10 . Oth-er-wise, []\T1/zi4/m/n/10 worsening []\T1/ptm/m/n/10 is au-to-
-mat-i-cally set to []\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 increase\TS1/zi4/m/n/10 '
 [5]
 Overfull \hbox (39.09814pt too wide) in paragraph at lines 291--293
-[]\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 roving_impr\TS1/zi4/m/n/10 '[]\T1/ptm/m/n/10 
-: up-dated af-ter ev-ery CDI (to the visit de-ter-mined by []\T1/zi4/m/n/10 pro
-ceed_from[]\T1/ptm/m/n/10 );
+[]\T1/zi4/m/n/10 "roving_impr"[]\T1/ptm/m/n/10 : up-dated af-ter ev-ery CDI (to
+ the visit de-ter-mined by []\T1/zi4/m/n/10 proceed_from[]\T1/ptm/m/n/10 );
 
 Overfull \hbox (69.26788pt too wide) in paragraph at lines 302--303
 []\T1/ptm/m/n/10 from the next visit af-ter the first qual-i-fy-ing con-fir-ma-
-tion visit if []\T1/zi4/m/n/10 proceed_from=\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 fir
-stconf\TS1/zi4/m/n/10 ' 
+tion visit if []\T1/zi4/m/n/10 proceed_from="firstconf" 
 
 Overfull \hbox (14.0004pt too wide) in paragraph at lines 339--349
 \T1/ptm/m/n/10 point for []\T1/zi4/m/n/10 outcome []\T1/ptm/m/n/10 if []\T1/zi4
@@ -618,56 +602,51 @@ Overfull \hbox (44.94855pt too wide) in paragraph at lines 460--468
 ents []\T1/zi4/m/n/10 conf_days[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 conf_tol_day
 s[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 relapse_to_conf[]\T1/ptm/m/n/10 .
 [8]
-Underfull \hbox (badness 10000) in paragraph at lines 485--492
+Underfull \hbox (badness 10000) in paragraph at lines 486--493
 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 497--497
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 498--498
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
 zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
 /n/9 EDSS\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
  date\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , outcome=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 edss
 \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ,[] 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 503--503
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 504--504
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
 zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
 /n/9 SDMT\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
  date\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , outcome=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 sdmt
 \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ,[] 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 510--510
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 511--511
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
 zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
 /n/9 SDMT\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
  date\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , outcome=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 sdmt
 \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ,[] 
-[9]
-Overfull \hbox (24.99966pt too wide) in paragraph at lines 563--567
+[9] [10] [11]
+Overfull \hbox (24.99966pt too wide) in paragraph at lines 634--638
 \T1/ptm/m/n/10 from the event score (i.e., []\T1/zi4/m/n/10 i []\T1/ptm/m/n/10 
 such that []\T1/zi4/m/n/10 outcome[event] - outcome[i] >= delta_fun(outcome[i])
 []\T1/ptm/m/n/10 ,
-[10]
-Overfull \hbox (11.66826pt too wide) in paragraph at lines 608--611
+
+Overfull \hbox (11.66826pt too wide) in paragraph at lines 679--682
 \T1/ptm/m/n/10 score dis-tance from the event score, i.e., the last visit []\T1
 /zi4/m/n/10 i []\T1/ptm/m/n/10 where []\T1/zi4/m/n/10 outcome[event]
+[12]
+Underfull \hbox (badness 10000) in paragraph at lines 714--721
 
-Underfull \hbox (badness 10000) in paragraph at lines 643--650
-
-[11] [12] [13]
-Overfull \hbox (4.72852pt too wide) in paragraph at lines 786--790
-[]\T1/zi4/m/n/10 outcome []\T1/ptm/m/n/10 is set to []\T1/zi4/m/n/10 NULL[]\T1/
-ptm/m/n/10 . Oth-er-wise, []\T1/zi4/m/n/10 worsening []\T1/ptm/m/n/10 is au-to-
-mat-i-cally set to []\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 increase\TS1/zi4/m/n/10 '
-[14]
-Overfull \hbox (51.34917pt too wide) in paragraph at lines 823--829
+[13] [14] [15]
+Overfull \hbox (51.34917pt too wide) in paragraph at lines 894--900
 \T1/ptm/m/n/10 never im-puted if []\T1/zi4/m/n/10 impute_last_visit=0[]\T1/ptm/
 m/n/10 ; they are al-ways im-puted if []\T1/zi4/m/n/10 impute_last_visit=1[]\T1
 /ptm/m/n/10 ;
-[15]
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzTgiK7/Rd2pdf432a
-327be28a/Rd2.ind [16] [17])
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzTgiK7/Rd2pdf432a
-327be28a/Rd2.aux) )
+[16]
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
+46332204/Rd2.ind [17] [18])
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
+46332204/Rd2.aux) )
 (see the transcript file for additional information)
 pdfTeX warning (dest): name{Rfn.as.Date} has been referenced but does not exist
 , replaced by a fixed one
@@ -682,8 +661,8 @@ y10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></
 usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/
 texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/20
 24/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (17 pages, 128723 bytes).
+Output written on Rd2.pdf (18 pages, 133561 bytes).
 Transcript written on Rd2.log.
 Saving output to ‘msprog-manual.pdf’ ...
 Done
-You may want to clean up by 'rm -Rf /var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T//RtmpzTgiK7/Rd2pdf432a327be28a'
+You may want to clean up by 'rm -Rf /var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T//Rtmpkgjrvc/Rd2pdf17c046332204'

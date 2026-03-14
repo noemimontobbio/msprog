@@ -155,7 +155,7 @@ CDI events: 0
 6                  0   0   0    0         0
 7           PIRA   0   1   0    1         0
 > # 3. SDMT course, with a custom delta function
-> my_sdmt_delta <- function(reference_value) {min(c(reference_value/5, 4))}
+> my_sdmt_delta <- function(reference_value) {min(c(reference_value/10, 3))}
 > output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
 +     delta_fun=my_sdmt_delta,
 +     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
@@ -175,37 +175,41 @@ Events detected: multiple
 ---
 Total subjects: 7
 ---
-Subjects with CDW: 5 (PIRA: 4; RAW: 0)
-Subjects with CDI: 0
+Subjects with CDW: 5 (PIRA: 4; RAW: 1)
+Subjects with CDI: 1
 ---
-CDW events: 5 (PIRA: 4; RAW: 0)
-CDI events: 0
+CDW events: 6 (PIRA: 4; RAW: 1)
+CDI events: 1
 > print(output$results) # extended info on each event for all subjects
   id nevent event_type total_fu time2event bl2event conf84 PIRA_conf84
 1  1      1       PIRA      534        443      443      1           1
-2  2      1        CDW      730        640      640      1           0
-3  3      0                 491        491      NaN      0           0
-4  4      1       PIRA      586         77       77      1           1
-5  5      1       PIRA      637        549      549      1           1
-6  6      0                 491        491      NaN      0           0
-7  7      1       PIRA      779        674      674      1           1
+2  2      1        CDI      730        198      198      1           0
+3  2      2       PIRA      730        371       89      1           1
+4  2      3        CDW      730        640      186      1           0
+5  3      0                 491        491      NaN      0           0
+6  4      1       PIRA      586         77       77      1           1
+7  5      1       PIRA      637        549      549      1           1
+8  6      0                 491        491      NaN      0           0
+9  7      1        RAW      779        185      185      1           0
   sust_days sust_last
 1        91         1
-2        90         1
-3         0         0
-4       509         1
-5        88         1
-6         0         0
-7       105         1
+2        84         0
+3       359         1
+4        90         1
+5         0         0
+6       509         1
+7        88         1
+8         0         0
+9       187         0
 > print(output$event_count) # summary of event sequence for each subject
   event_sequence CDI CDW RAW PIRA undef_CDW
 1           PIRA   0   1   0    1         0
-2            CDW   0   1   0    0         1
+2 CDI, PIRA, CDW   1   2   0    1         1
 3                  0   0   0    0         0
 4           PIRA   0   1   0    1         0
 5           PIRA   0   1   0    1         0
 6                  0   0   0    0         0
-7           PIRA   0   1   0    1         0
+7            RAW   0   1   1    0         0
 > 
 > 
 > 
@@ -277,14 +281,14 @@ CDI events: 0
 Subject #1: 8 visits, 0 relapses
 Baseline at visit no.1
 Searching for events from visit no.2 on
-edss change at visit no.5 (2022-07-12); potential confirmation visits available: no.
+Found edss change at visit no.5 (2022-07-12); potential confirmation visits available: no.
 Change not confirmed: proceed with search
 Searching for events from visit no.6 on
-edss change at visit no.6 (2022-11-06); potential confirmation visits available: no.
+Found edss change at visit no.6 (2022-11-06); potential confirmation visits available: no.
 Change not confirmed: proceed with search
 Searching for events from visit no.7 on
-edss change at visit no.7 (2022-12-10); potential confirmation visits available: no.8
-edss PIRA (visit no.7, 2022-12-10) confirmed at 84 days, sustained up to visit no.8 (2023-03-11)
+Found edss change at visit no.7 (2022-12-10); potential confirmation visits available: no.8
+Found edss PIRA (visit no.7, 2022-12-10) confirmed at 84 days, sustained up to visit no.8 (2023-03-11)
 Baseline at visit no.8
 Searching for events from visit no.- on
 No edss change in any subsequent visit: end process
@@ -293,12 +297,12 @@ Event sequence: PIRA
 Subject #2: 10 visits, 2 relapses
 Baseline at visit no.1
 Searching for events from visit no.2 on
-edss change at visit no.4 (2021-06-12); potential confirmation visits available: no.5
-edss RAW (visit no.4, 2021-06-12) confirmed at 84 days, sustained up to visit no.5 (2021-09-04)
+Found edss change at visit no.4 (2021-06-12); potential confirmation visits available: no.5
+Found edss RAW (visit no.4, 2021-06-12) confirmed at 84 days, sustained up to visit no.5 (2021-09-04)
 Baseline at visit no.5
 Searching for events from visit no.6 on
-edss change at visit no.8 (2022-05-19); potential confirmation visits available: no.9
-edss PIRA (visit no.8, 2022-05-19) confirmed at 84 days, sustained up to visit no.10 (2022-11-26)
+Found edss change at visit no.8 (2022-05-19); potential confirmation visits available: no.9
+Found edss PIRA (visit no.8, 2022-05-19) confirmed at 84 days, sustained up to visit no.10 (2022-11-26)
 Baseline at visit no.9
 Searching for events from visit no.10 on
 No edss change in any subsequent visit: end process
@@ -307,7 +311,7 @@ Event sequence: RAW, PIRA
 Subject #3: 7 visits, 1 relapse
 Baseline at visit no.1
 Searching for events from visit no.2 on
-edss change at visit no.2 (2021-12-01); potential confirmation visits available: no.3
+Found edss change at visit no.2 (2021-12-01); potential confirmation visits available: no.3
 Change not confirmed: proceed with search
 Searching for events from visit no.3 on
 No edss change in any subsequent visit: end process
@@ -316,12 +320,12 @@ Event sequence:
 Subject #4: 7 visits, 0 relapses
 Baseline at visit no.1
 Searching for events from visit no.2 on
-edss change at visit no.2 (2021-12-04); potential confirmation visits available: no.3
-edss improvement (visit no.2, 2021-12-04) confirmed at 84 days, sustained up to visit no.3 (2022-03-12)
+Found edss change at visit no.2 (2021-12-04); potential confirmation visits available: no.3
+Found edss improvement (visit no.2, 2021-12-04) confirmed at 84 days, sustained up to visit no.3 (2022-03-12)
 Baseline at visit no.3
 Searching for events from visit no.4 on
-edss change at visit no.4 (2022-07-19); potential confirmation visits available: no.5
-edss PIRA (visit no.4, 2022-07-19) confirmed at 84 days, sustained up to visit no.7 (2023-04-27)
+Found edss change at visit no.4 (2022-07-19); potential confirmation visits available: no.5
+Found edss PIRA (visit no.4, 2022-07-19) confirmed at 84 days, sustained up to visit no.7 (2023-04-27)
 Baseline at visit no.5
 Searching for events from visit no.6 on
 No edss change in any subsequent visit: end process
@@ -330,14 +334,14 @@ Event sequence: CDI, PIRA
 Subject #5: 9 visits, 0 relapses
 Baseline at visit no.1
 Searching for events from visit no.2 on
-edss change at visit no.3 (2021-11-01); potential confirmation visits available: no.4
-edss PIRA (visit no.3, 2021-11-01) confirmed at 84 days, sustained up to visit no.9 (2023-03-13)
+Found edss change at visit no.3 (2021-11-01); potential confirmation visits available: no.4
+Found edss PIRA (visit no.3, 2021-11-01) confirmed at 84 days, sustained up to visit no.9 (2023-03-13)
 Baseline at visit no.4
 Searching for events from visit no.5 on
-edss change at visit no.5 (2022-04-30); potential confirmation visits available: no.6
+Found edss change at visit no.5 (2022-04-30); potential confirmation visits available: no.6
 Change not confirmed: proceed with search
 Searching for events from visit no.6 on
-edss change at visit no.8 (2022-12-15); potential confirmation visits available: no.9
+Found edss change at visit no.8 (2022-12-15); potential confirmation visits available: no.9
 Change not confirmed: proceed with search
 Searching for events from visit no.9 on
 No edss change in any subsequent visit: end process
@@ -346,17 +350,17 @@ Event sequence: PIRA
 Subject #6: 7 visits, 1 relapse
 Baseline at visit no.1
 Searching for events from visit no.2 on
-edss change at visit no.3 (2022-02-15); potential confirmation visits available: no.
+Found edss change at visit no.3 (2022-02-15); potential confirmation visits available: no.
 Change not confirmed: proceed with search
 Searching for events from visit no.4 on
-edss change at visit no.4 (2022-09-03); potential confirmation visits available: no.
+Found edss change at visit no.4 (2022-09-03); potential confirmation visits available: no.
 Change not confirmed: proceed with search
 Searching for events from visit no.5 on
-edss change at visit no.5 (2022-10-05); potential confirmation visits available: no.
+Found edss change at visit no.5 (2022-10-05); potential confirmation visits available: no.
 Change not confirmed: proceed with search
 Searching for events from visit no.6 on
-edss change at visit no.6 (2022-12-22); potential confirmation visits available: no.7
-edss RAW (visit no.6, 2022-12-22) confirmed at 84 days, sustained up to visit no.7 (2023-02-21)
+Found edss change at visit no.6 (2022-12-22); potential confirmation visits available: no.7
+Found edss RAW (visit no.6, 2022-12-22) confirmed at 84 days, sustained up to visit no.7 (2023-02-21)
 Baseline at visit no.7
 Searching for events from visit no.- on
 No edss change in any subsequent visit: end process
@@ -365,14 +369,14 @@ Event sequence: RAW
 Subject #7: 9 visits, 1 relapse
 Baseline at visit no.1
 Searching for events from visit no.2 on
-edss change at visit no.3 (2021-09-11); potential confirmation visits available: no.4
+Found edss change at visit no.3 (2021-09-11); potential confirmation visits available: no.4
 Change not confirmed: proceed with search
 Searching for events from visit no.4 on
-edss change at visit no.5 (2022-03-17); potential confirmation visits available: no.
+Found edss change at visit no.5 (2022-03-17); potential confirmation visits available: no.
 Change not confirmed: proceed with search
 Searching for events from visit no.6 on
-edss change at visit no.6 (2022-07-22); potential confirmation visits available: no.7
-edss PIRA (visit no.6, 2022-07-22) confirmed at 84 days, sustained up to visit no.9 (2023-04-28)
+Found edss change at visit no.6 (2022-07-22); potential confirmation visits available: no.7
+Found edss PIRA (visit no.6, 2022-07-22) confirmed at 84 days, sustained up to visit no.9 (2023-04-28)
 Baseline at visit no.7
 Searching for events from visit no.8 on
 No edss change in any subsequent visit: end process
@@ -480,7 +484,7 @@ Clinically meaningful threshold for EDSS change (delta function): default for ED
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  0.432 0.015 0.45 0 0 
+Time elapsed:  0.434 0.016 0.453 0 0 
 > grDevices::dev.off()
 null device 
           1 

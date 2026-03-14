@@ -1,6 +1,7 @@
 compute_delta	compute_delta
 is_event	is_event
 MSprog	MSprog
+MSprogOutput	MSprogOutput
 print.MSprogOutput	print.MSprogOutput
 relapse_indep_from_bounds	relapse_indep_from_bounds
 toydata_relapses	toydata_relapses

@@ -43,7 +43,7 @@ MSprog(
 )
 }
 \arguments{
-\item{data}{\code{data.frame} containing longitudinal data, including: subject ID, outcome value, date of visit.}
+\item{data}{data frame containing longitudinal data, including: subject ID, outcome value, date of visit.}
 
 \item{subj_col}{Name of data column with subject ID.}
 
@@ -64,7 +64,7 @@ and default definition of clinically meaningful change given the reference value
 (using the built-in function \code{\link[=compute_delta]{compute_delta()}}).
 This can be replaced by a custom function using the \code{delta_fun} argument.}
 
-\item{relapse}{Optional \code{data.frame} containing longitudinal data, including: subject ID and relapse date.}
+\item{relapse}{Optional data frame containing longitudinal data, including: subject ID and relapse date.}
 
 \item{rsubj_col}{Name of subject ID column for relapse data, if different from outcome data.}
 
@@ -250,13 +250,14 @@ with \code{time2event} = total follow up.}
 }}
 }
 \value{
-An object of class \code{'MSprogOutput'} with the following attributes:
+An object of class \code{MSprogOutput} with the following attributes:
 \itemize{
-\item{\code{event_count}: a \code{data.frame} containing the event sequence detected for each subject, and the counts for each event type}
-\item{\code{results}: a \code{data.frame} with extended info on each event for all subjects}
+\item{\code{event_count}: a data frame containing the event sequence detected for each subject, and the counts for each event type}
+\item{\code{results}: a data frame with extended info on each event for all subjects}
 \item{\code{settings}: a list containing all the arguments used to compute the output}
-\item{\code{unconfirmed}: a \code{data.frame} with info on unconfirmed events (initial change from baseline, but no confirmation)
+\item{\code{unconfirmed}: a data frame with info on unconfirmed events (initial change from baseline, but no confirmation)
 for all subjects.}
+For a detailed description of the \code{event_count} and \code{results} data frames, see \code{?MSprogOutput}.
 }
 }
 \description{

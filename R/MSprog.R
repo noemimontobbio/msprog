@@ -18,7 +18,7 @@
 #' relapse-free intervals (`relapse_indep` argument).
 #'
 #'
-#' @param data `data.frame` containing longitudinal data, including: subject ID, outcome value, date of visit.
+#' @param data data frame containing longitudinal data, including: subject ID, outcome value, date of visit.
 #' @param subj_col Name of data column with subject ID.
 #' @param value_col Name of data column with outcome value.
 #' @param date_col Name of data column with date of visit.
@@ -34,7 +34,7 @@
 #'  and default definition of clinically meaningful change given the reference value
 #'  (using the built-in function [compute_delta()]).
 #'  This can be replaced by a custom function using the `delta_fun` argument.
-#' @param relapse Optional `data.frame` containing longitudinal data, including: subject ID and relapse date.
+#' @param relapse Optional data frame containing longitudinal data, including: subject ID and relapse date.
 #' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data.
 #' @param rdate_col Name of onset date column for relapse data, if different from outcome data.
 #' @param renddate_col Name of end date column for relapse data (if present).
@@ -200,13 +200,14 @@
 #' JAMA Neurol. 2020;77:1132--40.
 #'
 #'
-#' @return An object of class `'MSprogOutput'` with the following attributes:
+#' @return An object of class `MSprogOutput` with the following attributes:
 #' \itemize{
-#' \item{`event_count`: a `data.frame` containing the event sequence detected for each subject, and the counts for each event type}
-#' \item{`results`: a `data.frame` with extended info on each event for all subjects}
+#' \item{`event_count`: a data frame containing the event sequence detected for each subject, and the counts for each event type}
+#' \item{`results`: a data frame with extended info on each event for all subjects}
 #' \item{`settings`: a list containing all the arguments used to compute the output}
-#' \item{`unconfirmed`: a `data.frame` with info on unconfirmed events (initial change from baseline, but no confirmation)
+#' \item{`unconfirmed`: a data frame with info on unconfirmed events (initial change from baseline, but no confirmation)
 #' for all subjects.}
+#' For a detailed description of the `event_count` and `results` data frames, see `?MSprogOutput`.
 #' }
 #'
 #' @importFrom stats na.omit setNames complete.cases rbinom
@@ -372,7 +373,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
 
   # Local function to display dates/days
-  display_date <- function(day, start, to_print=T) {
+  display_date <- function(day, start, to_print=F) {
     if (is.na(day) | is.null(day)) {
       return(ifelse(!is.null(date_format) && date_format == 'day',
              NaN, ""))
@@ -516,14 +517,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
   # Initialise results data.frame
   max_nevents <- round(max(table(data[[subj_col]]))/2)
-  allcol <- c(subj_col, 'nevent', 'event_type', 'bl_date', 'bl_value', 'date', 'value',
-              ###### NEW
-              'last_delta_date', 'last_delta_value',
+  allcol <- c(subj_col, 'nevent', 'event_type', 'date', 'value', 'bl_date', 'bl_value',
+              'last_delta_date', 'last_delta_value', 'total_fu', 'time2event', 'bl2event',
+              paste0('conf', conf_days), paste0('PIRA_conf', conf_days),
               paste0('conf', conf_days, '_date'), paste0('conf', conf_days, '_value'),
               paste0('PIRA_conf', conf_days, '_date'), paste0('PIRA_conf', conf_days, '_value'),
-              ######
-              'total_fu', 'time2event', 'bl2event', paste0('conf', conf_days),
-              paste0('PIRA_conf', conf_days), 'sust_days', 'sust_last')
+              'sust_days', 'sust_last')
   results_df <- data.frame(matrix(nrow=nsub*max_nevents, ncol=length(allcol)))
   colnames(results_df) <- allcol
   # Initialize columns with the correct types/values
@@ -531,16 +530,16 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   results_df$nevent <- rep(1:max_nevents, times=nsub)
   results_df$event_type <- ''  # character
   if (!is.null(date_format) && date_format == 'day') {
-  results_df$bl_date <- NaN # numeric
   results_df$date <- NaN # numeric
+  results_df$bl_date <- NaN # numeric
   results_df$last_delta_date <- NaN # numeric
   for (cd in conf_days) {
     results_df[[paste0('conf', cd, '_date')]] <- NaN # numeric
     results_df[[paste0('PIRA_conf', cd, '_date')]] <- NaN # numeric
   }
   } else {
-    results_df$bl_date <- as.Date(NA)  # Date
     results_df$date <- as.Date(NA)  # Date
+    results_df$bl_date <- as.Date(NA)  # Date
     results_df$last_delta_date <- as.Date(NA)  # Date
     for (cd in conf_days) {
       results_df[[paste0('conf', cd, '_date')]] <- as.Date(NA)  # Date

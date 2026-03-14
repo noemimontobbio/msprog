@@ -32,7 +32,7 @@ relapse_indep_from_bounds(
 \itemize{
 \item{\code{'baseline'}: the current baseline;}
 \item{\code{'last'}: the last visit before event onset;}
-\item{\code{'last_lower'}: the last visit before event onset with a clinically
+\item{\code{'last_delta'}: the last visit before event onset with a clinically
 meaningful score distance from the event score, i.e.,
 the last visit \code{i} where \code{outcome[event] - outcome[i] >= delta_fun(outcome[i])}.}
 }}

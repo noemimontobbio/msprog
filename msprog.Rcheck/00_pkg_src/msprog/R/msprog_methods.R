@@ -23,7 +23,7 @@ print.MSprogOutput <- function(x, web=F, ...) {
   cat('---\nmsprog version:', as.character(utils::packageVersion('msprog')), '\n---')
 
   s <- x$settings
-  outcome <- ifelse(s$outcome=='outcome', 'outcome', toupper(s$outcome))
+  outcome <- ifelse(s$outcome=='custom', 'outcome', toupper(s$outcome))
 
   keep <- setdiff(names(s), c('validconf_p', 'delta_fun'))
   cat('\nMSprog() arguments:\n', paste0(paste(keep, s[keep], sep='='), collapse=', '),

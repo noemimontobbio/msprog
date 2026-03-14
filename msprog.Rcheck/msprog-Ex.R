@@ -44,7 +44,7 @@ output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date
 print(output$results) # extended info on each event for all subjects
 print(output$event_count) # summary of event sequence for each subject
 # 3. SDMT course, with a custom delta function
-my_sdmt_delta <- function(reference_value) {min(c(reference_value/5, 4))}
+my_sdmt_delta <- function(reference_value) {min(c(reference_value/10, 3))}
 output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
     delta_fun=my_sdmt_delta,
     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,

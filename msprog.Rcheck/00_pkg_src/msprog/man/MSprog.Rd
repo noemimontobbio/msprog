@@ -17,13 +17,13 @@ MSprog(
   subjects = NULL,
   delta_fun = NULL,
   worsening = NULL,
-  event = "firstCDW",
-  baseline = "fixed",
-  proceed_from = "firstconf",
-  sub_threshold_rebl = "none",
+  event = c("firstCDW", "first", "firstPIRA", "firstRAW", "multiple", "firstCDI"),
+  baseline = c("fixed", "roving", "roving_impr", "roving_wors"),
+  proceed_from = c("firstconf", "event"),
+  sub_threshold_rebl = c("none", "event", "improvement", "worsening"),
   bl_geq = F,
   relapse_rebl = F,
-  skip_local_extrema = "none",
+  skip_local_extrema = c("none", "strict", "all"),
   validconf_col = NULL,
   conf_days = 12 * 7,
   conf_tol_days = c(7, 2 * 365.25),
@@ -37,13 +37,13 @@ MSprog(
   impute_last_visit = 0,
   date_format = NULL,
   include_dates = F,
-  include_value = F,
+  include_values = F,
   include_stable = T,
   verbose = 1
 )
 }
 \arguments{
-\item{data}{\code{data.frame} containing longitudinal data, including: subject ID, outcome value, date of visit.}
+\item{data}{data frame containing longitudinal data, including: subject ID, outcome value, date of visit.}
 
 \item{subj_col}{Name of data column with subject ID.}
 
@@ -53,18 +53,18 @@ MSprog(
 
 \item{outcome}{Specifies the outcome type. Must be one of the following:
 \itemize{
-\item \code{'edss'} (Expanded Disability Status Scale)
-\item \code{'nhpt'} (Nine-Hole Peg Test)
-\item \code{'t25fw'} (Timed 25-Foot Walk)
-\item \code{'sdmt'} (Symbol Digit Modalities Test)
-\item \code{NULL} (only accepted when specifying a custom \code{delta_fun}).
+\item \code{"edss"} (Expanded Disability Status Scale)
+\item \code{"nhpt"} (Nine-Hole Peg Test)
+\item \code{"t25fw"} (Timed 25-Foot Walk)
+\item \code{"sdmt"} (Symbol Digit Modalities Test)
+\item \code{"custom"} (only accepted when specifying custom \code{delta_fun} and \code{worsening}).
 }
 Outcome type determines a default direction of worsening (see \code{worsening}argument)
 and default definition of clinically meaningful change given the reference value
 (using the built-in function \code{\link[=compute_delta]{compute_delta()}}).
 This can be replaced by a custom function using the \code{delta_fun} argument.}
 
-\item{relapse}{Optional \code{data.frame} containing longitudinal data, including: subject ID and relapse date.}
+\item{relapse}{Optional data frame containing longitudinal data, including: subject ID and relapse date.}
 
 \item{rsubj_col}{Name of subject ID column for relapse data, if different from outcome data.}
 
@@ -78,59 +78,59 @@ This can be replaced by a custom function using the \code{delta_fun} argument.}
 change in the outcome measure from the provided reference value.
 The function provided must take a numeric value (reference score) as input,
 and return a numeric value corresponding to the minimum shift from baseline, see example below.
-If none is specified (default), the user must provide a non-\code{NULL} value for
-the \code{outcome} argument (see above) in order to use the built-in function \code{\link[=compute_delta]{compute_delta()}}.}
+A custom delta function must be specified if \code{outcome} is set to \code{"custom"}.
+Otherwise, if none is specified, the built-in function \code{\link[=compute_delta]{compute_delta()}} is used internally.}
 
-\item{worsening}{The direction of worsening (\code{'increase'} if higher values correspond to worse disease course, \code{'decrease'} otherwise).\if{html}{\out{<br>}}
-The given value is only used when \code{outcome} is set to \code{NULL}. Otherwise, \code{worsening} is automatically set to
-\code{'increase'} if \code{outcome} is set to \code{'edss'}, \code{'nhpt'}, \code{'t25fw'},
-and to \code{'decrease'} if \code{outcome} is set to \code{'sdmt'}.}
+\item{worsening}{The direction of worsening (\code{"increase"} if higher values correspond to worse disease course, \code{"decrease"} otherwise).\if{html}{\out{<br>}}
+The given value is only used when \code{outcome} is set to \code{"custom"}. Otherwise, \code{worsening} is automatically set to
+\code{"increase"} if \code{outcome} is set to \code{"edss"}, \code{"nhpt"}, \code{"t25fw"},
+and to \code{"decrease"} if \code{outcome} is set to \code{"sdmt"}.}
 
-\item{event}{Specifies which events to detect. Must be one of the following:
+\item{event}{Character string specifying which events to detect. Must be one of the following.
 \itemize{
-\item \code{'firstCDW'} (first CDW, default)
-\item \code{'firstCDI'} (first CDI)
-\item \code{'multiple'} (all confirmed events in chronological order)
-\item \code{'firstPIRA'} (first PIRA)
-\item \code{'firstRAW'} (first RAW)
-\item \code{'first'} (only the very first confirmed event -- CDI or CDW).
+\item \code{"firstCDW"} (first CDW, default).
+\item \code{"firstCDI"} (first CDI).
+\item \code{"multiple"} (all confirmed events in chronological order).
+\item \code{"firstPIRA"} (first PIRA).
+\item \code{"firstRAW"} (first RAW).
+\item \code{"first"} (only the very first confirmed event -- CDI or CDW).
 }}
 
 \item{baseline}{Specifies the baseline scheme. Must be one of the following.
 \itemize{
-\item \code{'fixed'}: first valid outcome value, default.
-\item \code{'roving'}: updated after each CDI or CDW event to the visit determined by \code{proceed_from};
-suitable for a multiple-event setting (i.e., when \code{event} is set to \code{'multiple'})
+\item \code{"fixed"}: first valid outcome value, default.
+\item \code{"roving"}: updated after each CDI or CDW event to the visit determined by \code{proceed_from};
+suitable for a multiple-event setting (i.e., when \code{event} is set to \code{"multiple"})
 or when searching for a specific type of CDW
-(i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}) -- not recommended for randomised data.
-\item \code{'roving_impr'}: updated after every CDI (to the visit determined by \code{proceed_from});
+(i.e., when \code{event} is set to \code{"firstPIRA"} or \code{"firstRAW"}) -- not recommended for randomised data.
+\item \code{"roving_impr"}: updated after every CDI (to the visit determined by \code{proceed_from});
 suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for multiple events, or for randomised data.
-\item \code{'roving_wors'}: updated after every CDW (to the visit determined by \code{proceed_from});
-suitable when searching for a specific type of CDW (i.e., when \code{event} is set to \code{'firstPIRA'} or \code{'firstRAW'}).
+\item \code{"roving_wors"}: updated after every CDW (to the visit determined by \code{proceed_from});
+suitable when searching for a specific type of CDW (i.e., when \code{event} is set to \code{"firstPIRA"} or \code{"firstRAW"}).
 }}
 
 \item{proceed_from}{After detecting a confirmed disability event, continue searching:
 \itemize{
-\item from the next visit after the first qualifying confirmation visit if \code{proceed_from='firstconf'}
-\item from the next visit after the event onset if \code{proceed_from='event'}.
+\item from the next visit after the first qualifying confirmation visit if \code{proceed_from="firstconf"}
+\item from the next visit after the event onset if \code{proceed_from="event"}.
 }
-If \code{baseline} is set to \code{'roving'}, \code{'roving_impr'}, or \code{'roving_wors'},
+If \code{baseline} is set to \code{"roving"}, \code{"roving_impr"}, or \code{"roving_wors"},
 when rebaselining after a confirmed disability event, the baseline is moved to:
 \itemize{
-\item the first qualifying confirmation visit if \code{proceed_from='firstconf'}
-\item the event visit if \code{proceed_from='event'}.
+\item the first qualifying confirmation visit if \code{proceed_from="firstconf"}
+\item the event visit if \code{proceed_from="event"}.
 }}
 
-\item{sub_threshold_rebl}{This argument is only used if \code{baseline} is not set to \code{'fixed'}.
+\item{sub_threshold_rebl}{This argument is only used if \code{baseline} is not set to \code{"fixed"}.
 Must be one of the following.
 \itemize{
-\item \code{'event'}: any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
+\item \code{"event"}: any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
 possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
-\item \code{'improvement'}: any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
+\item \code{"improvement"}: any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
 possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
-\item \code{'worsening'}: any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
+\item \code{"worsening"}: any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
 possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
-\item \code{'none'}: only use clinically meaningful confirmed changes for re-baseline.
+\item \code{"none"}: only use clinically meaningful confirmed changes for re-baseline.
 }
 See \code{delta_fun} argument and \code{\link[=compute_delta]{compute_delta()}} function for more details.}
 
@@ -234,10 +234,10 @@ Can be specified as:
 If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer it automatically.}
 
 \item{include_dates}{If \code{TRUE}, \code{output$results} will include the date of each event (\code{'date'} column)
-and the date of the corresponding baseline (\code{'bldate'} column).}
+and the date of the corresponding baseline (\code{'bl_date'} column).}
 
-\item{include_value}{If \code{TRUE},  \code{output$results} will include the outcome value at each event (\code{'value'} column)
-and at the corresponding baseline (\code{'blvalue'} column).}
+\item{include_values}{If \code{TRUE},  \code{output$results} will include the outcome value at each event (\code{'value'} column)
+and at the corresponding baseline (\code{'bl_value'} column).}
 
 \item{include_stable}{If \code{TRUE}, subjects with no confirmed events are included in \code{output$results},
 with \code{time2event} = total follow up.}
@@ -250,13 +250,14 @@ with \code{time2event} = total follow up.}
 }}
 }
 \value{
-An object of class \code{'MSprogOutput'} with the following attributes:
+An object of class \code{MSprogOutput} with the following attributes:
 \itemize{
-\item{\code{event_count}: a \code{data.frame} containing the event sequence detected for each subject, and the counts for each event type}
-\item{\code{results}: a \code{data.frame} with extended info on each event for all subjects}
+\item{\code{event_count}: a data frame containing the event sequence detected for each subject, and the counts for each event type}
+\item{\code{results}: a data frame with extended info on each event for all subjects}
 \item{\code{settings}: a list containing all the arguments used to compute the output}
-\item{\code{unconfirmed}: a \code{data.frame} with info on unconfirmed events (initial change from baseline, but no confirmation)
+\item{\code{unconfirmed}: a data frame with info on unconfirmed events (initial change from baseline, but no confirmation)
 for all subjects.}
+For a detailed description of the \code{event_count} and \code{results} data frames, see \code{?MSprogOutput}.
 }
 }
 \description{
@@ -291,7 +292,7 @@ output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date
 print(output$results) # extended info on each event for all subjects
 print(output$event_count) # summary of event sequence for each subject
 # 3. SDMT course, with a custom delta function
-my_sdmt_delta <- function(reference_value) {min(c(reference_value/5, 4))}
+my_sdmt_delta <- function(reference_value) {min(c(reference_value/10, 3))}
 output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
     delta_fun=my_sdmt_delta,
     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,

@@ -194,7 +194,7 @@ The user can provide their own function to customise the computation of clinical
     ```
     Specifying `outcome='sdmt'`, the outcomes values will be checked internally to verify that they are in the correct range for SDMT.
 
-2. **The outcome of interest is not among the ones listed above.** In this case, we set `outcome=NULL`, and `delta_fun` as our desired custom-defined function. For custom outcomes, the direction of worsening must be specified as well (i.e., whether increasing or decreasing values of the outcome are interpreted as a worsening). This can be done by setting the `worsening` argument to either `'increase'` or `'decrease'`. Note that the provided `worsening` argument is only used by `MSprog()` when `outcome` is set to `NULL`. Otherwise, `worsening` is automatically set to `'increase'` if `outcome` is set to `'edss'`, `'nhpt'`, `'t25fw'`, and to `'decrease'` if `outcome` is set to `'sdmt'`.
+2. **The outcome of interest is not among the ones listed above.** In this case, we set `outcome="custom"`, and `delta_fun` as our desired custom-defined function. For custom outcomes, the direction of worsening must be specified as well (i.e., whether increasing or decreasing values of the outcome are interpreted as a worsening). This can be done by setting the `worsening` argument to either `'increase'` or `'decrease'`. Note that the provided `worsening` argument is only used by `MSprog()` when `outcome` is set to `"custom"`. Otherwise, `worsening` is automatically set to `"increase"` if `outcome` is set to `"edss"`, `"nhpt"`, `"t25fw"`, and to `"decrease"` if `outcome` is set to `"sdmt"`.
 
 
 

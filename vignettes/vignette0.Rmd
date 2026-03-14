@@ -60,7 +60,7 @@ library(msprog)
 
 # Input data {#input}
 
-The data must be organised in a `data.frame` object containing (at least) the following columns:
+The data must be organised in a data frame object containing (at least) the following columns:
 
 * Subject IDs
 * Visit dates
@@ -75,7 +75,7 @@ head(toydata_visits)
 
 <br />
 
-For relapsing MS patients, an additional `data.frame` object with the onset dates of relapses is needed to correctly assess disease course, and to characterise worsening events as relapse-associated or relapse-independent. The dataset should contain (at least) the following columns:
+For relapsing MS patients, an additional data frame object with the onset dates of relapses is needed to correctly assess disease course, and to characterise worsening events as relapse-associated or relapse-independent. The dataset should contain (at least) the following columns:
 
 * Subject IDs
 * Relapse onset dates.
@@ -121,7 +121,7 @@ DT::datatable(output_edss$results, rownames=F,
 ```
     where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^timeto]; `bl2event` is the number of days from current baseline to event; `conf84` reports whether the event was confirmed over 84 days (12 weeks); `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
-2. `event_count`: a `data.frame` summarising event counts for each subject, and the event sequence (where relevant). Here's what it looks like for the EDSS-based computation above:
+2. `event_count`: a data frame summarising event counts for each subject, and the event sequence (where relevant). Here's what it looks like for the EDSS-based computation above:
 ```{r, indent="     "}
 # print(output_edss$event_count)
 DT::datatable(output_edss$event_count,
@@ -210,7 +210,7 @@ The assessment of the disability evolution strongly depends on the choices made 
 
 * **Roving baseline** (`baseline='roving'`): the baseline visit is initially set as the first available assessment, then updated after each event. **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below), **but not recommended for clinical trial data as it may break the randomisation**. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='event'`, for instance,  moves the reference value after *any* confirmed change, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold events are used to move the baseline, but not listed in the event sequence.
 
-**Note.** If the baseline data is stored in a separate file, the user should merge it with the main `data.frame` containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the beginning of the `data.frame` (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). 
+**Note.** If the baseline data is stored in a separate file, the user should merge it with the main data frame containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the beginning of the data frame (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). 
 <!-- <span style="color: red;">The possibility to directly input a separate file for baseline data may be added in the future.</span> -->
 
 <br />
@@ -379,7 +379,7 @@ A more detailed report of the event detection process in each of the cases exami
 
 # Classification of CDW events
 
-When relevant, relapse data is to be provided using the optional `relapse` argument in `MSprog()`. It should be given as a `data.frame` containing subject IDs and relapse onset dates (see ["Input data"](#input))[^rnames].
+When relevant, relapse data is to be provided using the optional `relapse` argument in `MSprog()`. It should be given as a data frame containing subject IDs and relapse onset dates (see ["Input data"](#input))[^rnames].
 
 [^rnames]: If the names of "subject ID" and "date" columns in the relapse database are different from the main database, they must be specified using arguments `rsubj_col` and `rdate_col`.
 
@@ -476,7 +476,7 @@ vm <- value_milestone(toydata_visits, milestone=6,
                  outcome='edss', relapse=toydata_relapses,
                  verbose=0)
 ```
-The function returns a `data.frame` with one row per subject:
+The function returns a data frame with one row per subject:
 ```{r}
 print(vm)
 ```

@@ -39,7 +39,7 @@ knitr::opts_chunk$set(
 `msprog` is an R package providing tools for exhaustive and reproducible analysis of disability course in multiple sclerosis (MS) from longitudinal data [@msprog2024]. 
 A [**Python version**](https://github.com/noemimontobbio/pymsprog) of the package is available as well. 
 
-Its core function, `MSprog()`, detects and characterises the evolution of an outcome measure (Expanded Disability Status Scale, EDSS; Nine-Hole Peg Test, NHPT; Timed 25-Foot Walk, T25FW; Symbol Digit Modalities Test, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes (if any).
+Its core function, `MSprog()`, detects and characterises the evolution of an outcome measure (Expanded Disability Status Scale, EDSS; Nine-Hole Peg Test, NHPT; Timed 25-Foot Walk, T25FW; Symbol Digit Modalities Test, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes (if any). 
 
 The package also provides two toy datasets for function testing:
 
@@ -113,22 +113,22 @@ output <- MSprog(toydata_visits,                                      # provide 
                  relapse=toydata_relapses)                            # provide data on relapses
 ```
 
-The function prints out a concise report of the results, and of the options used to obtain them. Complete results are stored in an object of class `MSprogOutput` with the following attributes.
-
-1. `event_count`: a `data.frame` containing the event sequence detected for each subject, and the counts for each event type.
-```{r, indent = "     "}
-print(output$event_count)
-```
-    where: `event_sequence` specifies the order of the events; the other columns count the events of each type.
+The function prints out a concise report of the results, and of the options used to obtain them. Full tabulation of the results can be accessed via the following attributes of the function output.
     
-2. `results`: extended info on each event for all subjects.
+1. `results`: detailed info on each event for all subjects.
 ```{r, indent="     "}
 print(output$results, row.names=FALSE)
 ```
     where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf84` reports whether the event was confirmed over 84 days (12 weeks); `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
+2. `event_count`: a data frame summarising event counts for each subject, and the event sequence (where relevant).
+```{r, indent = "     "}
+print(output$event_count)
+```
+    where: `event_sequence` specifies the order of the events; the other columns count the events of each type.
 
-Additionally, applying the `print` method to an object of class `MSprogOutput` prints out the full list of function arguments, as well as a short paragraph describing the complete set of criteria used to obtain the output, **to be reported to ensure complete reproducibility**:
+
+Additionally, applying the `print` method to the `MSprog()` output prints out the full list of function arguments, as well as a short paragraph describing the complete set of criteria used to obtain the output, **to be reported to ensure complete reproducibility**:
 ```{r}
 print(output)
 ```

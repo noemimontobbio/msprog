@@ -127,9 +127,9 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> *Please use `print(output)` to display full info on event detection criteria*
 #> 
 #> ---
-#> Total subjects: 6
+#> Total subjects: 7
 #> ---
-#> Subjects with CDW: 3 (PIRA: 2; RAW: 1)
+#> Subjects with CDW: 4 (PIRA: 3; RAW: 1)
 ```
 
 Several qualitative and quantitative options for event detection are
@@ -159,37 +159,20 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> *Please use `print(output)` to display full info on event detection criteria*
 #> 
 #> ---
-#> Total subjects: 6
+#> Total subjects: 7
 #> ---
-#> Subjects with CDW: 4 (PIRA: 4; RAW: 1)
+#> Subjects with CDW: 5 (PIRA: 5; RAW: 1)
 #> Subjects with CDI: 2
 #> ---
-#> CDW events: 5 (PIRA: 4; RAW: 1)
+#> CDW events: 6 (PIRA: 5; RAW: 1)
 #> CDI events: 2
 ```
 
 The function prints out a concise report of the results, and of the
-options used to obtain them. Complete results are stored in an object of
-class `MSprogOutput` with the following attributes.
+options used to obtain them. Full tabulation of the results can be
+accessed via the following attributes of the function output.
 
-1.  `event_count`: a `data.frame` containing the event sequence detected
-    for each subject, and the counts for each event type.
-
-    ``` r
-    print(output$event_count)
-    #>   event_sequence CDI CDW RAW PIRA undef_CDW
-    #> 1           PIRA   0   1   0    1         0
-    #> 2      RAW, PIRA   0   2   1    1         0
-    #> 3                  0   0   0    0         0
-    #> 4      CDI, PIRA   1   1   0    1         0
-    #> 5           PIRA   0   1   0    1         0
-    #> 6            CDI   1   0   0    0         0
-    ```
-
-    where: `event_sequence` specifies the order of the events; the other
-    columns count the events of each type.
-
-2.  `results`: extended info on each event for all subjects.
+1.  `results`: detailed info on each event for all subjects.
 
     ``` r
     print(output$results, row.names=FALSE)
@@ -202,6 +185,7 @@ class `MSprogOutput` with the following attributes.
     #>   4      2       PIRA      586        304      129      1           1       282
     #>   5      1       PIRA      637        140      140      1           1       497
     #>   6      1        CDI      491        120      120      1           0       232
+    #>   7      1       PIRA      779        372      372      1           1       407
     #>  sust_last
     #>          1
     #>          0
@@ -211,6 +195,7 @@ class `MSprogOutput` with the following attributes.
     #>          1
     #>          1
     #>          0
+    #>          1
     ```
 
     where: `nevent` is the cumulative event count for each subject;
@@ -221,11 +206,28 @@ class `MSprogOutput` with the following attributes.
     number of days for which the event was sustained; `sust_last`
     reports whether the event was sustained until the last visit.
 
-Additionally, applying the `print` method to an object of class
-`MSprogOutput` prints out the full list of function arguments, as well
-as a short paragraph describing the complete set of criteria used to
-obtain the output, **to be reported to ensure complete
-reproducibility**:
+2.  `event_count`: a data frame summarising event counts for each
+    subject, and the event sequence (where relevant).
+
+    ``` r
+    print(output$event_count)
+    #>   event_sequence CDI CDW RAW PIRA undef_CDW
+    #> 1           PIRA   0   1   0    1         0
+    #> 2      RAW, PIRA   0   2   1    1         0
+    #> 3                  0   0   0    0         0
+    #> 4      CDI, PIRA   1   1   0    1         0
+    #> 5           PIRA   0   1   0    1         0
+    #> 6            CDI   1   0   0    0         0
+    #> 7           PIRA   0   1   0    1         0
+    ```
+
+    where: `event_sequence` specifies the order of the events; the other
+    columns count the events of each type.
+
+Additionally, applying the `print` method to the `MSprog()` output
+prints out the full list of function arguments, as well as a short
+paragraph describing the complete set of criteria used to obtain the
+output, **to be reported to ensure complete reproducibility**:
 
 ``` r
 print(output)
