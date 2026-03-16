@@ -60,7 +60,7 @@ library(msprog)
 
 # Input data {#input}
 
-The data must be organised in a `data.frame` object containing (at least) the following columns:
+The data must be organised in a data frame object containing (at least) the following columns:
 
 * Subject IDs
 * Visit dates
@@ -75,7 +75,7 @@ head(toydata_visits)
 
 <br />
 
-For relapsing MS patients, an additional `data.frame` object with the onset dates of relapses is needed to correctly assess disease course, and to characterise worsening events as relapse-associated or relapse-independent. The dataset should contain (at least) the following columns:
+For relapsing MS patients, an additional data frame object with the onset dates of relapses is needed to correctly assess disease course, and to characterise worsening events as relapse-associated or relapse-independent. The dataset should contain (at least) the following columns:
 
 * Subject IDs
 * Relapse onset dates.
@@ -119,9 +119,9 @@ DT::datatable(output_edss$results, rownames=F,
               options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
               )
 ```
-    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^timeto]; `bl2event` is the number of days from current baseline to event; `conf84` reports whether the event was confirmed over 84 days (12 weeks); `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
+    where: `nevent` is the cumulative event count for each subject; `event_type` and `CDW_type` characterise the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^timeto]; `bl2event` is the number of days from current baseline to event; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
-2. `event_count`: a `data.frame` summarising event counts for each subject, and the event sequence (where relevant). Here's what it looks like for the EDSS-based computation above:
+2. `event_count`: a data frame summarising event counts for each subject, and the event sequence (where relevant). Here's what it looks like for the EDSS-based computation above:
 ```{r, indent="     "}
 # print(output_edss$event_count)
 DT::datatable(output_edss$event_count,
@@ -208,9 +208,9 @@ The assessment of the disability evolution strongly depends on the choices made 
 
 * **Worsening-based roving baseline** (`baseline='roving_wors'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed worsening. **This scheme is suitable when the endpoint of interest is a specific type of CDW**: for instance, when searching specifically for PIRA events, the reference should be moved after any previous RAW event; when searching specifically for RAW events, the reference should be moved after any previous PIRA event. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='worsening'`, for instance, moves the reference value after *any* confirmed worsening, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold worsening events are used to move the baseline, but not listed in the event sequence.
 
-* **Roving baseline** (`baseline='roving'`): the baseline visit is initially set as the first available assessment, then updated after each event. **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see example below), **but not recommended for clinical trial data as it may break the randomisation**. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='event'`, for instance,  moves the reference value after *any* confirmed change, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold events are used to move the baseline, but not listed in the event sequence.
+* **Roving baseline** (`baseline='roving'`): the baseline visit is initially set as the first available assessment, then updated after each event. **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see [example below](#multiple)), **but not recommended for clinical trial data as it may break the randomisation**. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='event'`, for instance,  moves the reference value after *any* confirmed change, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold events are used to move the baseline, but not listed in the event sequence.
 
-**Note.** If the baseline data is stored in a separate file, the user should merge it with the main `data.frame` containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the beginning of the `data.frame` (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). 
+**Note.** If the baseline data is stored in a separate file, the user should merge it with the main data frame containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the beginning of the data frame (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). 
 <!-- <span style="color: red;">The possibility to directly input a separate file for baseline data may be added in the future.</span> -->
 
 <br />
@@ -326,60 +326,12 @@ The `require_sust_days` argument may be of use in the following scenarios.
 
 * In observational data with coarsely- and unevenly-spaced visits, the `require_sust_days` argument may be used to detect sustained CDW (e.g., `require_sust_days=7*96`) while still requiring the presence of a confirmation visit within a specified interval from the event (e.g., `conf_days=7*12`, `conf_tol_days=c(0,7*12)`). 
 
-* Sustained disability worsening can be required to exclude transient RAW events (see example below).
-
-
-## Example {#confexample}
-
-Let's look at subject `2` from `toydata_visits`:
-```{r}
-print(toydata_visits[toydata_visits$id==2,c('date', 'EDSS')]) # EDSS visits
-print(toydata_relapses[toydata_relapses$id==2,]) # relapses
-```
-
-The following code detects 12- or 24-week (84- or 168-day) confirmed events for subject `2`. 
-```{r}
-output <- MSprog(data=toydata_visits, 
-                 subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
-                 relapse=toydata_relapses, subjects=2,
-                 event='multiple', baseline='roving', 
-                 relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=NULL, c0=NULL, c1=0),
-                 conf_days=c(7*12,7*24), verbose=0)
-# print(output$results, row.names=FALSE) # results
-DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
-              )
-```
-The `relapse_indep` argument specifies the relapse-free intervals for a CDW event to be classified as PIRA, see [the relevant section](#pira)[^pira]. In this case, a high-specificity definition of PIRA is used [@muller2023] that requires an absence of relapses between baseline and confirmation. The resulting events are 
-
-1. a 12-week-confirmed RAW;
-2. a 12-week-confirmed PIRA.
-
-Event #1 was confirmed over 12 weeks but not over 24 weeks, i.e., 168 days (`conf168` is `0`). Event #2 was also confirmed over 24 weeks (`conf168` is `1`) as a CDW. However, since a relapse occurred before the 24-week confirmation, it is not confirmed as PIRA over 24 weeks (`PIRA_conf168` is `0`).
-
-[^pira]: See also `relapse_indep_from_bounds()` function documentation, and the dedicated package vignette *Assessing progression independent of relapse activity (PIRA) in MS*.
-
-The RAW event found for subject `2` constitutes a *transient* accumulation of disability. Such events can be excluded from the `MSprog()` output by requiring that each event be sustained for at least a certain amount of time (specified by argument `require_sust_days`). For instance:
-```{r}
-output <- MSprog(data=toydata_visits, 
-                 subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
-                 relapse=toydata_relapses, subjects=2,
-                 event='multiple', baseline='roving', 
-                 relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=NULL, c0=NULL, c1=0),
-                 conf_days=c(7*12,7*24), require_sust_days=7*48, verbose=0)
-# print(output$results, row.names=FALSE) # results
-DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
-              )
-```
-
-A more detailed report of the event detection process in each of the cases examined above may be visualized by re-running the above code snippets with `verbose=2`, see ["Printing progress info"](#progressinfo).
-
+* Sustained disability worsening can be required to exclude transient accumulation of disability (e.g., as a consequence of relapses) followed by complete recovery.
 
 
 # Classification of CDW events
 
-When relevant, relapse data is to be provided using the optional `relapse` argument in `MSprog()`. It should be given as a `data.frame` containing subject IDs and relapse onset dates (see ["Input data"](#input))[^rnames].
+When relevant, relapse data is to be provided using the optional `relapse` argument in `MSprog()`. It should be given as a data frame containing subject IDs and relapse onset dates (see ["Input data"](#input))[^rnames].
 
 [^rnames]: If the names of "subject ID" and "date" columns in the relapse database are different from the main database, they must be specified using arguments `rsubj_col` and `rdate_col`.
 
@@ -476,7 +428,7 @@ vm <- value_milestone(toydata_visits, milestone=6,
                  outcome='edss', relapse=toydata_relapses,
                  verbose=0)
 ```
-The function returns a `data.frame` with one row per subject:
+The function returns a data frame with one row per subject:
 ```{r}
 print(vm)
 ```

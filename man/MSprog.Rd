@@ -233,11 +233,21 @@ Can be specified as:
 }
 If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer it automatically.}
 
-\item{include_dates}{If \code{TRUE}, \code{output$results} will include the date of each event (\code{'date'} column)
-and the date of the corresponding baseline (\code{'bl_date'} column).}
+\item{include_dates}{If \code{TRUE}, \code{output$results} will include the dates of:
+\itemize{
+\item event onset (\code{'date'} column)
+\item the current baseline (\code{'bl_date'} column)
+\item the last visit before event onset at a clinically meaningful score distance from it (\code{'last_delta_date'} column)
+\item the confirmation visit(s) (\code{'conf<c>_date'}/\code{'PIRA_conf<c>_date'} columns for each \code{c} in \code{conf_days})
+}}
 
-\item{include_values}{If \code{TRUE},  \code{output$results} will include the outcome value at each event (\code{'value'} column)
-and at the corresponding baseline (\code{'bl_value'} column).}
+\item{include_values}{If \code{TRUE},  \code{output$results} will include the outcome value at:
+\itemize{
+\item event onset (\code{'value'} column)
+\item the current baseline (\code{'bl_value'} column)
+\item the last visit before event onset at a clinically meaningful score distance from it (\code{'last_delta_value'} column)
+\item the confirmation visit(s) (\code{'conf<c>_value'}/\code{'PIRA_conf<c>_value'} columns for each \code{c} in \code{conf_days})
+}}
 
 \item{include_stable}{If \code{TRUE}, subjects with no confirmed events are included in \code{output$results},
 with \code{time2event} = total follow up.}

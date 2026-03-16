@@ -13,7 +13,7 @@
 >
 > ``` r
 > utils::packageVersion('msprog')
-> #> [1] '0.2.4'
+> #> [1] '0.2.5'
 > ```
 
 # msprog: reproducible assessment of disability course in MS
@@ -129,7 +129,7 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> ---
 #> Total subjects: 7
 #> ---
-#> Subjects with CDW: 4 (PIRA: 3; RAW: 1)
+#> Subjects with CDW: 0 (PIRA: 3; RAW: 1)
 ```
 
 Several qualitative and quantitative options for event detection are
@@ -161,10 +161,10 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> ---
 #> Total subjects: 7
 #> ---
-#> Subjects with CDW: 5 (PIRA: 5; RAW: 1)
+#> Subjects with CDW: 0 (PIRA: 5; RAW: 1)
 #> Subjects with CDI: 2
 #> ---
-#> CDW events: 6 (PIRA: 5; RAW: 1)
+#> CDW events: 0 (PIRA: 5; RAW: 1)
 #> CDI events: 2
 ```
 
@@ -176,34 +176,23 @@ accessed via the following attributes of the function output.
 
     ``` r
     print(output$results, row.names=FALSE)
-    #>  id nevent event_type total_fu time2event bl2event conf84 PIRA_conf84 sust_days
-    #>   1      1       PIRA      534        292      292      1           1       242
-    #>   2      1        RAW      730        198      198      1           0        84
-    #>   2      2       PIRA      730        539      257      1           1       191
-    #>   3      0                 491        491      NaN      0           0         0
-    #>   4      1        CDI      586         77       77      1           0        98
-    #>   4      2       PIRA      586        304      129      1           1       282
-    #>   5      1       PIRA      637        140      140      1           1       497
-    #>   6      1        CDI      491        120      120      1           0       232
-    #>   7      1       PIRA      779        372      372      1           1       407
-    #>  sust_last
-    #>          1
-    #>          0
-    #>          1
-    #>          0
-    #>          0
-    #>          1
-    #>          1
-    #>          0
-    #>          1
+    #>  id nevent event_type CDW_type total_fu time2event bl2event sust_days sust_last
+    #>   1      1        CDW     PIRA      534        292      292       242         1
+    #>   2      1        CDW      RAW      730        198      198        84         0
+    #>   2      2        CDW     PIRA      730        539      257       191         1
+    #>   3      0                          491        491      NaN         0         0
+    #>   4      1        CDI               586         77       77        98         0
+    #>   4      2        CDW     PIRA      586        304      129       282         1
+    #>   5      1        CDW     PIRA      637        140      140       497         1
+    #>   6      1        CDI               491        120      120       232         0
+    #>   7      1        CDW     PIRA      779        372      372       407         1
     ```
 
     where: `nevent` is the cumulative event count for each subject;
-    `event_type` characterises the event; `time2event` is the number of
-    days from start of follow-up to event; `bl2event` is the number of
-    days from current baseline to event; `conf84` reports whether the
-    event was confirmed over 84 days (12 weeks); `sust_days` is the
-    number of days for which the event was sustained; `sust_last`
+    `event_type` and `CDW_type` characterise the event; `time2event` is
+    the number of days from start of follow-up to event; `bl2event` is
+    the number of days from current baseline to event; `sust_days` is
+    the number of days for which the event was sustained; `sust_last`
     reports whether the event was sustained until the last visit.
 
 2.  `event_count`: a data frame summarising event counts for each
@@ -211,14 +200,14 @@ accessed via the following attributes of the function output.
 
     ``` r
     print(output$event_count)
-    #>   event_sequence CDI CDW RAW PIRA undef_CDW
-    #> 1           PIRA   0   1   0    1         0
-    #> 2      RAW, PIRA   0   2   1    1         0
-    #> 3                  0   0   0    0         0
-    #> 4      CDI, PIRA   1   1   0    1         0
-    #> 5           PIRA   0   1   0    1         0
-    #> 6            CDI   1   0   0    0         0
-    #> 7           PIRA   0   1   0    1         0
+    #>   event_sequence CDI CDW RAW PIRA
+    #> 1           PIRA   0   0   0    1
+    #> 2      RAW, PIRA   0   0   1    1
+    #> 3                  0   0   0    0
+    #> 4      CDI, PIRA   1   0   0    1
+    #> 5           PIRA   0   0   0    1
+    #> 6            CDI   1   0   0    0
+    #> 7           PIRA   0   0   0    1
     ```
 
     where: `event_sequence` specifies the order of the events; the other
@@ -232,7 +221,7 @@ output, **to be reported to ensure complete reproducibility**:
 ``` r
 print(output)
 #> ---
-#> msprog version: 0.2.4 
+#> msprog version: 0.2.5 
 #> ---
 #> MSprog() arguments:
 #> outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7, 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,

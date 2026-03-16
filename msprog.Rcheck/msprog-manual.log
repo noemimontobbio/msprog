@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.5)  15 MAR 2026 00:43
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.5)  16 MAR 2026 16:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -347,8 +347,8 @@ File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count294
 \l__pdf_internal_box=\box58
 )
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
-46332204/Rd2.aux)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpsgSr66/Rd2pdf1b71
+37eec3dd/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -386,10 +386,10 @@ LaTeX Font Info:    ... okay on input line 8.
 )
 Package hyperref Info: Link coloring ON on input line 8.
 
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
-46332204/Rd2.out)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
-46332204/Rd2.out)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpsgSr66/Rd2pdf1b71
+37eec3dd/Rd2.out)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpsgSr66/Rd2pdf1b71
+37eec3dd/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -419,8 +419,8 @@ LaTeX Font Info:    Trying to load font information for U+rsfs on input line 32
 (/usr/local/texlive/2024/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
-46332204/Rd2.toc)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpsgSr66/Rd2pdf1b71
+37eec3dd/Rd2.toc)
 \tf@toc=\write5
 \openout5 = `Rd2.toc'.
 
@@ -531,26 +531,33 @@ m/n/10 ; they are al-ways im-puted if []\T1/zi4/m/n/10 impute_last_visit=1[]\T1
  []
 
 
-Overfull \hbox (0.30913pt too wide) in paragraph at lines 441--443
-[]\T1/ptm/m/n/10 If []\T1/zi4/m/n/10 TRUE[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 ou
-tput$results []\T1/ptm/m/n/10 will in-clude the out-come value at each event ([
-]\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 value\TS1/zi4/m/n/10 '
+Overfull \hbox (4.45906pt too wide) in paragraph at lines 444--445
+[]\T1/ptm/m/n/10 the con-fir-ma-tion visit(s) ([]\TS1/zi4/m/n/10 '\T1/zi4/m/n/1
+0 conf<c>_date\TS1/zi4/m/n/10 '[]\T1/ptm/m/n/10 /[]\TS1/zi4/m/n/10 '\T1/zi4/m/n
+/10 PIRA_conf<c>_date\TS1/zi4/m/n/10 ' []\T1/ptm/m/n/10 columns
  []
 
 
-Overfull \hbox (44.94855pt too wide) in paragraph at lines 460--468
+Overfull \hbox (14.45906pt too wide) in paragraph at lines 455--456
+[]\T1/ptm/m/n/10 the con-fir-ma-tion visit(s) ([]\TS1/zi4/m/n/10 '\T1/zi4/m/n/1
+0 conf<c>_value\TS1/zi4/m/n/10 '[]\T1/ptm/m/n/10 /[]\TS1/zi4/m/n/10 '\T1/zi4/m/
+n/10 PIRA_conf<c>_value\TS1/zi4/m/n/10 ' []\T1/ptm/m/n/10 columns
+ []
+
+[8]
+Overfull \hbox (44.94855pt too wide) in paragraph at lines 476--484
 \T1/ptm/m/n/10 win-dows for con-fir-ma-tion vis-its are de-ter-mined by ar-gu-m
 ents []\T1/zi4/m/n/10 conf_days[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 conf_tol_day
 s[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 relapse_to_conf[]\T1/ptm/m/n/10 .
  []
 
-[8]
-Underfull \hbox (badness 10000) in paragraph at lines 486--493
+
+Underfull \hbox (badness 10000) in paragraph at lines 502--509
 
  []
 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 498--498
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 514--514
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
 zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
 /n/9 EDSS\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
@@ -559,7 +566,7 @@ zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
  []
 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 504--504
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 520--520
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
 zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
 /n/9 SDMT\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
@@ -568,7 +575,7 @@ zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
  []
 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 511--511
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 527--527
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
 zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
 /n/9 SDMT\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
@@ -577,38 +584,38 @@ zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
  []
 
 [9] [10] [11]
-Overfull \hbox (24.99966pt too wide) in paragraph at lines 634--638
+Overfull \hbox (24.99966pt too wide) in paragraph at lines 650--654
 \T1/ptm/m/n/10 from the event score (i.e., []\T1/zi4/m/n/10 i []\T1/ptm/m/n/10 
 such that []\T1/zi4/m/n/10 outcome[event] - outcome[i] >= delta_fun(outcome[i])
 []\T1/ptm/m/n/10 ,
  []
 
 
-Overfull \hbox (11.66826pt too wide) in paragraph at lines 679--682
+Overfull \hbox (11.66826pt too wide) in paragraph at lines 695--698
 \T1/ptm/m/n/10 score dis-tance from the event score, i.e., the last visit []\T1
 /zi4/m/n/10 i []\T1/ptm/m/n/10 where []\T1/zi4/m/n/10 outcome[event]
  []
 
 [12]
-Underfull \hbox (badness 10000) in paragraph at lines 714--721
+Underfull \hbox (badness 10000) in paragraph at lines 730--737
 
  []
 
 [13] [14] [15]
-Overfull \hbox (51.34917pt too wide) in paragraph at lines 894--900
+Overfull \hbox (51.34917pt too wide) in paragraph at lines 910--916
 \T1/ptm/m/n/10 never im-puted if []\T1/zi4/m/n/10 impute_last_visit=0[]\T1/ptm/
 m/n/10 ; they are al-ways im-puted if []\T1/zi4/m/n/10 impute_last_visit=1[]\T1
 /ptm/m/n/10 ;
  []
 
 [16]
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
-46332204/Rd2.ind [17] [18
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpsgSr66/Rd2pdf1b71
+37eec3dd/Rd2.ind [17] [18
 
 
 ])
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/Rtmpkgjrvc/Rd2pdf17c0
-46332204/Rd2.aux)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpsgSr66/Rd2pdf1b71
+37eec3dd/Rd2.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
@@ -638,7 +645,7 @@ y10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></
 usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/
 texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/20
 24/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (18 pages, 133561 bytes).
+Output written on Rd2.pdf (18 pages, 134182 bytes).
 PDF statistics:
  294 PDF objects out of 1000 (max. 8388607)
  258 compressed objects within 3 object streams

@@ -177,10 +177,20 @@
 #' -- e.g., days from randomisation in a clinical trial); negative values are accepted.
 #' }
 #' If not specified, function [as.Date()] will try to infer it automatically.
-#' @param include_dates If `TRUE`, `output$results` will include the date of each event (`'date'` column)
-#' and the date of the corresponding baseline (`'bl_date'` column).
-#' @param include_values If `TRUE`,  `output$results` will include the outcome value at each event (`'value'` column)
-#' and at the corresponding baseline (`'bl_value'` column).
+#' @param include_dates If `TRUE`, `output$results` will include the dates of:
+#' \itemize{
+#' \item event onset (`'date'` column)
+#' \item the current baseline (`'bl_date'` column)
+#' \item the last visit before event onset at a clinically meaningful score distance from it (`'last_delta_date'` column)
+#' \item the confirmation visit(s) (`'conf<c>_date'`/`'PIRA_conf<c>_date'` columns for each `c` in `conf_days`)
+#' }
+#' @param include_values If `TRUE`,  `output$results` will include the outcome value at:
+#' \itemize{
+#' \item event onset (`'value'` column)
+#' \item the current baseline (`'bl_value'` column)
+#' \item the last visit before event onset at a clinically meaningful score distance from it (`'last_delta_value'` column)
+#' \item the confirmation visit(s) (`'conf<c>_value'`/`'PIRA_conf<c>_value'` columns for each `c` in `conf_days`)
+#' }
 #' @param include_stable If `TRUE`, subjects with no confirmed events are included in `output$results`,
 #' with `time2event` = total follow up.
 #' @param verbose One of:
@@ -517,9 +527,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
   # Initialise results data.frame
   max_nevents <- round(max(table(data[[subj_col]]))/2)
-  allcol <- c(subj_col, 'nevent', 'event_type', 'date', 'value', 'bl_date', 'bl_value',
-              'last_delta_date', 'last_delta_value', 'total_fu', 'time2event', 'bl2event',
-              paste0('conf', conf_days), paste0('PIRA_conf', conf_days),
+  allcol <- c(subj_col, 'nevent', 'event_type', 'CDW_type', 'total_fu', 'time2event', 'bl2event',
+              'date', 'value', 'bl_date', 'bl_value', 'last_delta_date', 'last_delta_value',
+              # paste0('conf', conf_days), paste0('PIRA_conf', conf_days),
               paste0('conf', conf_days, '_date'), paste0('conf', conf_days, '_value'),
               paste0('PIRA_conf', conf_days, '_date'), paste0('PIRA_conf', conf_days, '_value'),
               'sust_days', 'sust_last')
@@ -529,6 +539,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   results_df[[subj_col]] <- rep(all_subj, each=max_nevents)
   results_df$nevent <- rep(1:max_nevents, times=nsub)
   results_df$event_type <- ''  # character
+  results_df$CDW_type <- ''  # character
   if (!is.null(date_format) && date_format == 'day') {
   results_df$date <- NaN # numeric
   results_df$bl_date <- NaN # numeric
@@ -553,23 +564,22 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   results_df$time2event <- NaN  # numeric
   results_df$bl2event <- NaN  # numeric
   for (cd in conf_days) {
-    results_df[[paste0('conf', cd)]] <- 0
-    results_df[[paste0('PIRA_conf', cd)]] <- 0
+    # results_df[[paste0('conf', cd)]] <- 0
+    # results_df[[paste0('PIRA_conf', cd)]] <- 0
     results_df[[paste0('conf', cd, '_value')]] <- NaN # numeric
     results_df[[paste0('PIRA_conf', cd, '_value')]] <- NaN # numeric
   }
   results_df$sust_days <- 0
   results_df$sust_last <- 0
 
-  summary <- data.frame(matrix(nrow=nsub, ncol=6))
-  colnames(summary) <- c('event_sequence', 'CDI', 'CDW', 'RAW', 'PIRA', 'undef_CDW')
+  summary <- data.frame(matrix(nrow=nsub, ncol=5))
+  colnames(summary) <- c('event_sequence', 'CDI', 'CDW', 'RAW', 'PIRA')
   rownames(summary) <- all_subj
   summary$event_sequence <- ''
   summary$CDI <- 0
   summary$CDW <- 0
   summary$RAW <- 0
   summary$PIRA <- 0
-  summary$undef_CDW <- 0
 
   unconf <- list()
   unconf_idx <- 1
@@ -643,12 +653,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     event_type <- ""
     event_index <- NULL
     bl_date <- edate <- last_delta_date <- bl_value <- evalue <- last_delta_value <- time2event <- bl2event <- sustd <- sustl <- vector()
-    conf <- conf_date <- conf_value <- pira_conf <- pira_conf_date <- pira_conf_value <- list()
+    # conf <- pira_conf <- list()
+    conf_date <- conf_value <- pira_conf_date <- pira_conf_value <- list()
     for (m in conf_days) {
-      conf[[as.character(m)]] <- vector()
+      # conf[[as.character(m)]] <- vector()
       conf_date[[as.character(m)]] <- vector()
       conf_value[[as.character(m)]] <- vector()
-      pira_conf[[as.character(m)]] <- vector()
+      # pira_conf[[as.character(m)]] <- vector()
       pira_conf_date[[as.character(m)]] <- vector()
       pira_conf_value[[as.character(m)]] <- vector()
       }
@@ -844,6 +855,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             conf_idx <- conf_idx[conf_idx < next_nonsust]
           }
 
+          if (length(conf_idx) == 0) {stop('uffa')}
+
           # The confirmed improvement can still be rejected if `require_sust_days>0`.
           # The `valid_ev` flag indicates whether the event can (1) or cannot (0) be retained:
           valid_ev <- 1
@@ -886,12 +899,15 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
               confirmed_at <- intersect(conf_t[[cm]], conf_idx)
               if (length(confirmed_at)==0) {
                 conf_t <- within(conf_t, rm(list=cm))
+                conf_date[[cm]] <- c(conf_date[[cm]], display_date(NA, NA))
+                conf_value[[cm]] <- c(conf_value[[cm]], NaN)
+              } else {
+                conf_date[[cm]] <- c(conf_date[[cm]], display_date(data_id[[date_col]][min(confirmed_at)], global_start))
+                conf_value[[cm]] <- c(conf_value[[cm]], data_id[[value_col]][min(confirmed_at)])
               }
-              conf[[cm]] <- c(conf[[cm]], as.integer(length(confirmed_at)>0))
-              pira_conf[[cm]] <- c(pira_conf[[cm]], 0)
-              conf_date[[cm]] <- c(conf_date[[cm]], display_date(data_id[[date_col]][min(confirmed_at)], global_start))
+              # conf[[cm]] <- c(conf[[cm]], as.integer(length(confirmed_at)>0))
+              # pira_conf[[cm]] <- c(pira_conf[[cm]], 0)
               pira_conf_date[[cm]] <- c(pira_conf_date[[cm]], display_date(NA, NA))
-              conf_value[[cm]] <- c(conf_value[[cm]], data_id[[value_col]][min(confirmed_at)])
               pira_conf_value[[cm]] <- c(pira_conf_value[[cm]], NaN)
               }
             sustd <- c(sustd, data_id[sust_idx,][[date_col]] - data_id[change_idx,][[date_col]])
@@ -924,7 +940,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
           # For each m in `conf_days`, only keep the earliest available confirmation visit:
           conf_idx <- unname(sapply(names(conf_t), function(cm) {
-            min(intersect(conf_t[[cm]], conf_idx))
+            x <- intersect(conf_t[[cm]], conf_idx)
+            if (length(x)) min(x)
           }))
 
           if (baseline %in% c('roving', 'roving_impr')) { #_r_#
@@ -1142,10 +1159,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                         confirmed_at <- intersect(pconf_t[[cm]], pconf_idx)
                         if (length(confirmed_at)==0) {
                           pconf_t <- within(pconf_t, rm(list=cm))
+                          pira_conf_date[[cm]] <- c(pira_conf_date[[cm]], display_date(NA, NA))
+                          pira_conf_value[[cm]] <- c(pira_conf_value[[cm]], NaN)
+                        } else {
+                          pira_conf_date[[cm]] <- c(pira_conf_date[[cm]], display_date(data_id[[date_col]][min(confirmed_at)], global_start))
+                          pira_conf_value[[cm]] <- c(pira_conf_value[[cm]], data_id[[value_col]][min(confirmed_at)])
                         }
-                        pira_conf[[cm]] <- c(pira_conf[[cm]], as.integer(length(confirmed_at)>0))
-                        pira_conf_date[[cm]] <- c(pira_conf_date[[cm]], display_date(data_id[[date_col]][min(confirmed_at)], global_start))
-                        pira_conf_value[[cm]] <- c(pira_conf_value[[cm]], data_id[[value_col]][min(confirmed_at)])
+                        # pira_conf[[cm]] <- c(pira_conf[[cm]], as.integer(length(confirmed_at)>0))
                       }
                       event_type <- c(event_type, 'PIRA')
                       event_index <- c(event_index, change_idx)
@@ -1158,7 +1178,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   # Store info:
                   if (event_type[length(event_type)] != 'PIRA') {
                     for (m in conf_days) {
-                        pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], 0)
+                        # pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], 0)
                         pira_conf_date[[as.character(m)]] <- c(pira_conf_date[[as.character(m)]], display_date(NA, NA))
                         pira_conf_value[[as.character(m)]] <- c(pira_conf_value[[as.character(m)]], NaN)
                         }
@@ -1175,10 +1195,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     confirmed_at <- intersect(conf_t[[cm]], conf_idx)
                     if (length(confirmed_at)==0) {
                       conf_t <- within(conf_t, rm(list=cm))
-                    }
-                    conf[[cm]] <- c(conf[[cm]], as.integer(length(confirmed_at)>0))
+                      conf_date[[cm]] <- c(conf_date[[cm]], display_date(NA, NA))
+                      conf_value[[cm]] <- c(conf_value[[cm]], NaN)
+                    } else {
                     conf_date[[cm]] <- c(conf_date[[cm]], display_date(data_id[[date_col]][min(confirmed_at)], global_start))
                     conf_value[[cm]] <- c(conf_value[[cm]], data_id[[value_col]][min(confirmed_at)])
+                    }
+                    # conf[[cm]] <- c(conf[[cm]], as.integer(length(confirmed_at)>0))
                   }
                   sustd <- c(sustd, data_id[sust_idx,][[date_col]] - data_id[change_idx,][[date_col]])
                   sustl <- c(sustl, as.integer(sust_idx == nvisits))
@@ -1186,7 +1209,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   # Print info
                   if (verbose == 2) {
                     message("Found ", ifelse(outcome != 'custom', paste0(outcome, " "), ""),
-                            event_type[length(event_type)], " (visit no.", change_idx, ", ",
+                            ifelse(event_type[length(event_type)] == "CDW", "", paste0(event_type[length(event_type)], "-")),
+                            "CDW (visit no.", change_idx, ", ",
                             display_date(data_id[change_idx,][[date_col]], global_start, to_print=T),
                             ifelse(length(conf_t)>0, paste0(") confirmed at ",
                             paste(ifelse(event_type[length(event_type)]=='PIRA', names(pconf_t), names(conf_t)), collapse=", "),
@@ -1225,7 +1249,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                 if (length(conf_t) > 0) {
                   # For each m in conf_days, only keep the earliest available confirmation visit:
                   conf_idx <- unname(sapply(names(conf_t), function(cm) {
-                    min(intersect(conf_t[[cm]], conf_idx))
+                    x <- intersect(conf_t[[cm]], conf_idx)
+                    if (length(x)) min(x)
                   }))
 
                   if (baseline %in% c('roving', 'roving_wors')) {
@@ -1415,7 +1440,6 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       prog_idx <- which(event_type %in% c("CDW", "RAW", "PIRA"))[1]
       raw_idx <- which(event_type == "RAW")[1]
       pira_idx <- which(event_type == "PIRA")[1]
-      undef_prog_idx <- which(event_type == "CDW")[1]
 
       if (event == "firstCDI") {
         first_events <- impr_idx
@@ -1458,10 +1482,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     results_df[results_df[[subj_col]] == subjid, "time2event"] <- time2event[event_order]
     results_df[results_df[[subj_col]] == subjid, "bl2event"] <- bl2event[event_order]
     for (m in conf_days) {
-      results_df[results_df[[subj_col]] == subjid, paste0("conf", m)] <- conf[[as.character(m)]][event_order]
+      # results_df[results_df[[subj_col]] == subjid, paste0("conf", m)] <- conf[[as.character(m)]][event_order]
       results_df[results_df[[subj_col]] == subjid, paste0("conf", m, "_date")] <- conf_date[[as.character(m)]][event_order]
       results_df[results_df[[subj_col]] == subjid, paste0("conf", m, "_value")] <- conf_value[[as.character(m)]][event_order]
-      results_df[results_df[[subj_col]] == subjid, paste0("PIRA_conf", m)] <- pira_conf[[as.character(m)]][event_order]
+      # results_df[results_df[[subj_col]] == subjid, paste0("PIRA_conf", m)] <- pira_conf[[as.character(m)]][event_order]
       results_df[results_df[[subj_col]] == subjid, paste0("PIRA_conf", m, "_date")] <- pira_conf_date[[as.character(m)]][event_order]
       results_df[results_df[[subj_col]] == subjid, paste0("PIRA_conf", m, "_value")] <- pira_conf_value[[as.character(m)]][event_order]
       }
@@ -1477,7 +1501,6 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     results_df[results_df[[subj_col]]==subjid, 'total_fu'] <- total_fu[subjid]
     results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
     results_df[results_df[[subj_col]] == subjid, 'date'] <- display_date(data_id[nvisits,][[date_col]], global_start)
-    results_df[results_df[[subj_col]]==subjid, 'event_type'] <- ''
 
     } else {
     # 3. subject has no events and is excluded
@@ -1487,13 +1510,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
 
   CDI <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "CDI")
-  CDW <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] %in% c("CDW", "RAW", "PIRA"))
-  undef_CDW <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "CDW")
+  CDW <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] =="CDW")
   RAW <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "RAW")
   PIRA <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "PIRA")
 
-  summary[subjid, c('CDI', 'CDW', 'RAW', 'PIRA', 'undef_CDW'
-          )] <- c(CDI, CDW, RAW, PIRA, undef_CDW)
+  summary[subjid, c('CDI', 'CDW', 'RAW', 'PIRA')] <- c(CDI, CDW, RAW, PIRA)
 
   summary[subjid, 'event_sequence'] <- paste(event_type, collapse=", ")
 
@@ -1508,6 +1529,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
 
   } # end for (subjid in all_subj)
+
+  results_df <- results_df %>% mutate(
+      CDW_type = ifelse(event_type %in% c("PIRA", "RAW"), event_type, ifelse(event_type == "CDW", "undefined", "")),
+      event_type = ifelse(event_type %in% c("CDW", "PIRA", "RAW"), "CDW", event_type)
+      )
 
   #################################################################
 

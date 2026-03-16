@@ -1,7 +1,7 @@
 Package: msprog
 Type: Package
 Title: Reproducible Assessment of Disability Course in MS
-Version: 0.2.4
+Version: 0.2.5
 Authors@R: c(
     person(given="Noemi", family="Montobbio", , email="noemi.montobbio@gmail.com", role=c("aut", "cre"),
            comment=c(ORCID = "0000-0003-0302-393X")),
@@ -18,7 +18,7 @@ VignetteBuilder: knitr
 Suggests: knitr, rmarkdown, xfun, DT
 License: MIT + file LICENSE
 NeedsCompilation: no
-Packaged: 2026-03-14 23:40:51 UTC; nmontobbio
+Packaged: 2026-03-16 15:48:45 UTC; nmontobbio
 Author: Noemi Montobbio [aut, cre] (<https://orcid.org/0000-0003-0302-393X>),
   Francesca Bovis [rev],
   Luca Carmisciano [rev]

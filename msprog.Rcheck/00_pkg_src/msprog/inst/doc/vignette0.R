@@ -107,34 +107,6 @@ knitr::include_graphics(paste0(getwd(), 'unscheduled.png'))
 #                   validconf_col='scheduled',
 #                   ...)
 
-## -----------------------------------------------------------------------------
-print(toydata_visits[toydata_visits$id==2,c('date', 'EDSS')]) # EDSS visits
-print(toydata_relapses[toydata_relapses$id==2,]) # relapses
-
-## -----------------------------------------------------------------------------
-output <- MSprog(data=toydata_visits, 
-                 subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
-                 relapse=toydata_relapses, subjects=2,
-                 event='multiple', baseline='roving', 
-                 relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=NULL, c0=NULL, c1=0),
-                 conf_days=c(7*12,7*24), verbose=0)
-# print(output$results, row.names=FALSE) # results
-DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
-              )
-
-## -----------------------------------------------------------------------------
-output <- MSprog(data=toydata_visits, 
-                 subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
-                 relapse=toydata_relapses, subjects=2,
-                 event='multiple', baseline='roving', 
-                 relapse_indep=relapse_indep_from_bounds(p0=0, p1=NULL, e0=NULL, e1=NULL, c0=NULL, c1=0),
-                 conf_days=c(7*12,7*24), require_sust_days=7*48, verbose=0)
-# print(output$results, row.names=FALSE) # results
-DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
-              )
-
 ## ----eval=FALSE---------------------------------------------------------------
 #  output <- MSprog(...
 #                   relapse_indep=relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1),

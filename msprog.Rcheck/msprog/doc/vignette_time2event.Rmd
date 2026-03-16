@@ -134,7 +134,7 @@ print(toydata_visits[toydata_visits$id==4, c('date', 'EDSS')], row.names=FALSE)
 ```
 
 
-The function returned the following `data.frame`:
+The function returned the following data frame:
 ```{r}
 # print(vm)
 DT::datatable(vm, 

@@ -25,14 +25,12 @@ Objects of class \code{"MSprogOutput"} are lists with the following elements:
 \describe{
 \item{event_sequence}{Sequence of detected events (if any), in chronological order.}
 \item{CDI}{Count of confirmed disability improvement (CDI) events.}
-\item{CDW}{Count of confirmed disability improvement (CDW) events.}
-\item{RAW}{Count of confirmed disability improvement (RAW) events.}
-\item{PIRA}{Count of confirmed disability improvement (PIRA) events.}
-\item{undef_CDW}{Count of confirmed disability improvement (undef_CDW) events.}
+\item{CDW}{Count of confirmed disability worsening (CDW) events.}
+\item{RAW}{Count of relapse-associated worsening (RAW) events.}
+\item{PIRA}{Count of progression independent of relapse activity (PIRA) events.}
 }
 Note: depending on computation settings, some of the above columns may not be
-included in the data frame
-(e.g., no CDI column if \code{event='firstCDW'} in \code{\link[=MSprog]{MSprog()}}).
+included in the data frame (e.g., no CDI column if \code{event='firstCDW'} in \code{\link[=MSprog]{MSprog()}}).
 }
 
 \section{\code{results} data frame}{
@@ -40,6 +38,11 @@ included in the data frame
 \describe{
 \item{\verb{<subj_col>}}{Subject ID.}
 \item{nevent}{Cumulative count of events for the subject.}
+\item{event_type}{Type of event (CDI or CDW).}
+\item{CDW_type}{Type of CDW (PIRA, RAW, undefined).}
+\item{total_fu}{Total length of follow-up period in days.}
+\item{time2event}{Number of days from start of follow-up to event onset.}
+\item{bl2event}{Number of days from baseline to event onset.}
 \item{date}{Date of event onset.}
 \item{value}{Outcome value at event onset.}
 \item{bl_date}{Date of baseline for the event.}
@@ -52,9 +55,6 @@ included in the data frame
 \item{PIRA_conf\verb{<conf_days>}}{Whether the event was confirmed \emph{as a PIRA event} at \verb{<conf_days>} days.}
 \item{PIRA_conf\verb{<conf_days>}_date}{Date of (potential) \verb{<conf_days>}-day confirmation visit for PIRA event.}
 \item{PIRA_conf\verb{<conf_days>}_value}{Outcome value at (potential) \verb{<conf_days>}-day confirmation visit for PIRA.}
-\item{total_fu}{Total length of follow-up period in days.}
-\item{time2event}{Number of days from start of follow-up to event onset.}
-\item{bl2event}{Number of days from baseline to event onset.}
 \item{sust_days}{Number of days for which the event was sustained.}
 \item{sust_last}{Whether the event was sustained up to the end of follow-up.}
 }

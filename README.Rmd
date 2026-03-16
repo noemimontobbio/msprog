@@ -36,7 +36,7 @@ knitr::opts_chunk$set(
   <img src="man/figures/logo_R.png" width="150"/>
 </p>
 
-`msprog` is an R package providing tools for exhaustive and reproducible analysis of disability course in multiple sclerosis (MS) from longitudinal data [@msprog2024]. 
+`msprog` is an R package providing tools for exhaustive and reproducible analysis of disability course in multiple sclerosis (MS) from longitudinal data [@msprog2024].
 A [**Python version**](https://github.com/noemimontobbio/pymsprog) of the package is available as well. 
 
 Its core function, `MSprog()`, detects and characterises the evolution of an outcome measure (Expanded Disability Status Scale, EDSS; Nine-Hole Peg Test, NHPT; Timed 25-Foot Walk, T25FW; Symbol Digit Modalities Test, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes (if any). 
@@ -119,7 +119,7 @@ The function prints out a concise report of the results, and of the options used
 ```{r, indent="     "}
 print(output$results, row.names=FALSE)
 ```
-    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `conf84` reports whether the event was confirmed over 84 days (12 weeks); `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
+    where: `nevent` is the cumulative event count for each subject; `event_type` and `CDW_type` characterise the event; `time2event` is the number of days from start of follow-up to event; `bl2event` is the number of days from current baseline to event; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
 2. `event_count`: a data frame summarising event counts for each subject, and the event sequence (where relevant).
 ```{r, indent = "     "}
