@@ -221,7 +221,7 @@
 #' }
 #'
 #' @importFrom stats na.omit setNames complete.cases rbinom
-#' @importFrom dplyr %>% group_by_at vars slice n mutate across ungroup
+#' @importFrom dplyr %>% group_by slice n mutate across ungroup
 #' @export
 #' @examples
 #' # 1. EDSS course

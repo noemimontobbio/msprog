@@ -78,7 +78,7 @@
 #' \item `"observed"`: whether the milestone was reached (1) or not (0).
 #' }
 #' @importFrom stats complete.cases
-#' @importFrom dplyr %>% group_by_at vars slice n mutate across ungroup
+#' @importFrom dplyr %>% group_by slice n mutate across ungroup
 #' @export
 
 value_milestone <- function(data, milestone, subj_col, value_col, date_col, outcome,
