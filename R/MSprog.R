@@ -596,7 +596,6 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     # If more than one visit occur on the same day, only keep last
     ucounts <- table(data_id[, date_col])
     if (any(ucounts > 1)) {
-      print('hello')
       data_id <- data_id %>%
         group_by(.data[[date_col]]) %>%
         slice(n()) %>%
@@ -919,9 +918,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             sustl <- c(sustl, as.integer(sust_idx == nvisits))
             # Print progress info
             if (verbose == 2) {
-              message("Found ", ifelse(outcome != 'custom', outcome, 'outcome'), " improvement (visit no.", change_idx, ", ",
+              message("Found ", ifelse(outcome != 'custom', paste0(outcome, "-"), ""), "CDI (visit no.", change_idx, ", ",
                       display_date(data_id[change_idx,][[date_col]], global_start),
-                           ") confirmed at ", paste(names(conf_t), collapse=", "), " days, sustained up to visit no.", sust_idx,
+                           ") confirmed at ", paste(names(conf_t), collapse=" and "), " days, sustained up to visit no.", sust_idx,
                            " (", display_date(data_id[sust_idx,][[date_col]], global_start, to_print=T), ")")
             }
           } else {
@@ -1213,12 +1212,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
                   # Print info
                   if (verbose == 2) {
-                    message("Found ", ifelse(outcome != 'custom', paste0(outcome, " "), ""),
-                            ifelse(event_type[length(event_type)] == "CDW", "", paste0(event_type[length(event_type)], "-")),
-                            "CDW (visit no.", change_idx, ", ",
+                    message("Found ", ifelse(outcome != 'custom', paste0(outcome, "-"), ""), "CDW",
+                            ifelse(event_type[length(event_type)] == "CDW", "", paste0(" (", event_type[length(event_type)], ")")),
+                            " (visit no.", change_idx, ", ",
                             display_date(data_id[change_idx,][[date_col]], global_start, to_print=T),
                             ifelse(length(conf_t)>0, paste0(") confirmed at ",
-                            paste(ifelse(event_type[length(event_type)]=='PIRA', names(pconf_t), names(conf_t)), collapse=", "),
+                            paste(ifelse(event_type[length(event_type)]=='PIRA', names(pconf_t), names(conf_t)), collapse=" and "),
                                 " days, sustained up to visit no.", sust_idx,
                                  " (", display_date(data_id[sust_idx,][[date_col]], global_start, to_print=T), ")"),
                             ") occurring at last assessment (no confirmation)")
