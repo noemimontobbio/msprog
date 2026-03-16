@@ -596,6 +596,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     # If more than one visit occur on the same day, only keep last
     ucounts <- table(data_id[, date_col])
     if (any(ucounts > 1)) {
+      print('hello')
       data_id <- data_id %>%
         group_by(.data[[date_col]]) %>%
         slice(n()) %>%
@@ -860,8 +861,6 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           if (!is.na(next_nonsust)) {
             conf_idx <- conf_idx[conf_idx < next_nonsust]
           }
-
-          if (length(conf_idx) == 0) {stop('uffa')}
 
           # The confirmed improvement can still be rejected if `require_sust_days>0`.
           # The `valid_ev` flag indicates whether the event can (1) or cannot (0) be retained:
