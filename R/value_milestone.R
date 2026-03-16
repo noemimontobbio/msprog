@@ -73,7 +73,7 @@
 #' @return A `data.frame` containing the following columns:
 #' \itemize{
 #' \item `date_col`: the date of first reaching or exceeding the milestone (or last date of follow-up if milestone is not reached)
-#' \item `value_col`: the first value  reaching orexceeding the milestone, if present, otherwise no value
+#' \item `value_col`: the first value  reaching or exceeding the milestone, if present, otherwise no value
 #' \item `"time2event"`: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached)
 #' \item `"observed"`: whether the milestone was reached (1) or not (0).
 #' }
@@ -133,6 +133,9 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
   } else {
     data[[validconf_col]] <- as.logical(data[[validconf_col]])
   }
+
+  # Convert outcome value column to numeric
+  data[[value_col]] <- as.numeric(data[[value_col]])
 
   # Remove missing values from columns of interest
   data <- data[complete.cases(data[ , c(subj_col, value_col, date_col, validconf_col)]), ]
@@ -244,7 +247,10 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
     # If more than one visit occur on the same day, only keep last
     ucounts <- table(data_id[, date_col])
     if (any(ucounts > 1)) {
-      data_id <- data_id %>% group_by_at(vars(date_col)) %>% slice(n())
+      data_id <- data_id %>%
+        group_by(.data[[date_col]]) %>%
+        slice(n()) %>%
+        ungroup()
     }
 
     # Sort visits in chronological order

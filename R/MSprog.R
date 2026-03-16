@@ -335,6 +335,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     relapse_rebl <- F
   }
 
+  # Convert outcome values to numeric
+  data[[value_col]] <- as.numeric(data[[value_col]])
+
   # Remove missing values from columns of interest
   data <- data[complete.cases(data[ , c(subj_col, value_col, date_col, validconf_col)]), ]
   if (is.null(renddate_col)) {
@@ -593,7 +596,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     # If more than one visit occur on the same day, only keep last
     ucounts <- table(data_id[, date_col])
     if (any(ucounts > 1)) {
-      data_id <- data_id %>% group_by_at(vars(date_col)) %>% slice(n())
+      data_id <- data_id %>%
+        group_by(.data[[date_col]]) %>%
+        slice(n()) %>%
+        ungroup()
     }
 
     # Sort visits in chronological order
