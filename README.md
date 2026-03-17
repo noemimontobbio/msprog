@@ -129,7 +129,7 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> ---
 #> Total subjects: 7
 #> ---
-#> Subjects with CDW: 0 (PIRA: 3; RAW: 1)
+#> Subjects with CDW: 4 (PIRA: 3; RAW: 1)
 ```
 
 Several qualitative and quantitative options for event detection are
@@ -161,10 +161,10 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> ---
 #> Total subjects: 7
 #> ---
-#> Subjects with CDW: 0 (PIRA: 5; RAW: 1)
+#> Subjects with CDW: 5 (PIRA: 5; RAW: 1)
 #> Subjects with CDI: 2
 #> ---
-#> CDW events: 0 (PIRA: 5; RAW: 1)
+#> CDW events: 6 (PIRA: 5; RAW: 1)
 #> CDI events: 2
 ```
 
@@ -201,13 +201,13 @@ accessed via the following attributes of the function output.
     ``` r
     print(output$event_count)
     #>   event_sequence CDI CDW RAW PIRA
-    #> 1           PIRA   0   0   0    1
-    #> 2      RAW, PIRA   0   0   1    1
+    #> 1           PIRA   0   1   0    1
+    #> 2      RAW, PIRA   0   2   1    1
     #> 3                  0   0   0    0
-    #> 4      CDI, PIRA   1   0   0    1
-    #> 5           PIRA   0   0   0    1
+    #> 4      CDI, PIRA   1   1   0    1
+    #> 5           PIRA   0   1   0    1
     #> 6            CDI   1   0   0    0
-    #> 7           PIRA   0   0   0    1
+    #> 7           PIRA   0   1   0    1
     ```
 
     where: `event_sequence` specifies the order of the events; the other

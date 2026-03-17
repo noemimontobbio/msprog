@@ -206,7 +206,7 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
   } else if (outcome=='sdmt') {
     worsening <- 'decrease'
   } else if (is.null(worsening)) {
-    stop('Either specify an outcome type, or specify the direction of worsening (\"increase\" or \"decrease\")')
+    stop('If using `outcome="custom"`, please specify the direction of worsening (\"increase\" or \"decrease\")')
   } else {
     worsening <- match.arg(worsening, c('increase', 'decrease'))
   }
@@ -442,7 +442,8 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
            ifelse(relapse_to_conf[1]==0 && relapse_to_conf[2]==0, '-', '')
            ))
     message("\n---\nTotal subjects: ", nsub, "\n",
-            sum(results[['observed']]), " reached the milestone ", ifelse(outcome != "custom", outcome, "outcome"), "=", milestone, ".")
+            sum(results[['observed']]), " reached the milestone ",
+            ifelse(outcome != "custom", toupper(outcome), "outcome"), "=", milestone, ".")
 
   }
 

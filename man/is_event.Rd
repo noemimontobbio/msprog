@@ -32,25 +32,25 @@ is_event(
 \item{\code{'nhpt'} (Nine-Hole Peg Test);}
 \item{\code{'t25fw'} (Timed 25-Foot Walk);}
 \item{\code{'sdmt'} (Symbol Digit Modalities Test);}
-\item{\code{NULL} (only accepted when specifying custom \code{worsening} -- and \code{delta_fun} as well, if \code{sub_threshold=F}).}
+\item{\code{'custom'} (only accepted when specifying custom \code{worsening} -- and \code{delta_fun} as well, if \code{sub_threshold=F}).}
 Outcome type determines a default direction of worsening (see \code{worsening}argument)
 and default definition of clinically meaningful change given the reference value
 (using the built-in function \code{\link[=compute_delta]{compute_delta()}}).
 This can be replaced by a custom function using the \code{delta_fun} argument.
 }}
 
-\item{worsening}{The direction of worsening (\code{'increase'} if higher values correspond to worse disease course, \code{'decrease'} otherwise).
-This argument is only used when \code{outcome} is set to \code{NULL}.
-If \code{outcome} is specified, \code{worsening} is automatically set to \code{'increase'} for EDSS, NHPT, T25FW,
-and to \code{'decrease'} for SDMT.}
+\item{worsening}{The direction of worsening (\code{"increase"} if higher values correspond to worse disease course, \code{'decrease'} otherwise).
+This argument is only used when \code{outcome} is set to \code{"custom"}.
+Otherwise, \code{worsening} is automatically set to \code{"increase"} for EDSS, NHPT, T25FW,
+and to \code{"decrease"} for SDMT.}
 
 \item{delta_fun}{Custom function specifying the minimum clinically meaningful
 change in the outcome measure from the provided reference value.
 The function provided must take a numeric value (reference score) as input,
 and return a numeric value corresponding to the minimum shift from baseline, see example below.
-If none is specified (default), the user must provide a non-\code{NULL} value for
-the \code{outcome} argument (see above) in order to use the built-in function \code{\link[=compute_delta]{compute_delta()}}.
-The argument is ignored if `sub_threshold=T.}
+A custom delta function must be specified if \code{outcome} is set to \code{"custom"}.
+Otherwise, if none is specified, the built-in function \code{\link[=compute_delta]{compute_delta()}} is used internally.
+The argument is ignored if \code{sub_threshold=T}.}
 
 \item{sub_threshold}{If \code{TRUE}, any confirmed worsening, or improvement, or change in the outcome measure is valid,
 regardless of \code{delta_fun}.}
@@ -63,6 +63,6 @@ A boolean value specifying if a valid event was found.
 or improvement, or change, from a given reference value.
 }
 \examples{
-is_event(x=4.5, baseline=4, type='wors', outcome='edss')
-is_event(x=50, baseline=57, type='wors', outcome='sdmt')
+is_event(x=4.5, baseline=4, type="wors", outcome="edss")
+is_event(x=50, baseline=57, type="wors", outcome="sdmt")
 }
