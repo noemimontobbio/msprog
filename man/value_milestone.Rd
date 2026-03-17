@@ -108,10 +108,10 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 \value{
 A \code{data.frame} containing the following columns:
 \itemize{
-\item \code{date_col}: the date of first reaching or exceeding the milestone (or last date of follow-up if milestone is not reached)
-\item \code{value_col}: the first value  reaching or exceeding the milestone, if present, otherwise no value
-\item \code{"time2event"}: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached)
-\item \code{"observed"}: whether the milestone was reached (1) or not (0).
+\item \code{date_col}: the date of first reaching or exceeding the milestone with confirmation (or last date of follow-up if milestone is not reached or not confirmed)
+\item \code{value_col}: the first value  reaching or exceeding the milestone with confirmation, if present, otherwise no value
+\item \code{"time2event"}: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached or not confirmed)
+\item \code{"observed"}: whether the milestone was reached with confirmation (1) or not (0).
 }
 }
 \description{

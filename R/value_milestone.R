@@ -72,10 +72,10 @@
 #'  }
 #' @return A `data.frame` containing the following columns:
 #' \itemize{
-#' \item `date_col`: the date of first reaching or exceeding the milestone (or last date of follow-up if milestone is not reached)
-#' \item `value_col`: the first value  reaching or exceeding the milestone, if present, otherwise no value
-#' \item `"time2event"`: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached)
-#' \item `"observed"`: whether the milestone was reached (1) or not (0).
+#' \item `date_col`: the date of first reaching or exceeding the milestone with confirmation (or last date of follow-up if milestone is not reached or not confirmed)
+#' \item `value_col`: the first value  reaching or exceeding the milestone with confirmation, if present, otherwise no value
+#' \item `"time2event"`: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached or not confirmed)
+#' \item `"observed"`: whether the milestone was reached with confirmation (1) or not (0).
 #' }
 #' @importFrom stats complete.cases
 #' @importFrom dplyr %>% group_by slice n mutate across ungroup
@@ -172,10 +172,16 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
   }
 
   # Local function to display dates/days
-  display_date <- function(day, start, to_print=T) {
-    ifelse(!is.null(date_format) && date_format == 'day',
-           ifelse(to_print, paste("day", day), day),
-           as.character(start + as.difftime(day, units="days")))
+  display_date <- function(day, start, to_print=F) {
+    if (is.na(day) | is.null(day)) {
+      return(ifelse(to_print, "",
+                    ifelse(!is.null(date_format) && date_format == 'day', NaN, as.Date(NA))))
+    }
+    if (!is.null(date_format) && date_format == 'day') {
+      ifelse(to_print, paste("day", day), day)
+    } else {
+      start + as.difftime(day, units="days")
+    }
   }
 
   # Convert dates to days from global minimum
