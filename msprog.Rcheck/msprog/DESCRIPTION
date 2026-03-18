@@ -12,15 +12,15 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-Imports: stats, dplyr
+Imports: stats, dplyr, rlang
 Depends: R (>= 3.5.0)
 VignetteBuilder: knitr
 Suggests: knitr, rmarkdown, xfun, DT
 License: MIT + file LICENSE
 NeedsCompilation: no
-Packaged: 2026-03-16 15:48:45 UTC; nmontobbio
+Packaged: 2026-03-18 15:21:24 UTC; nmontobbio
 Author: Noemi Montobbio [aut, cre] (<https://orcid.org/0000-0003-0302-393X>),
   Francesca Bovis [rev],
   Luca Carmisciano [rev]
 Maintainer: Noemi Montobbio <noemi.montobbio@gmail.com>
-Built: R 4.4.0; ; 2026-03-16 15:49:17 UTC; unix
+Built: R 4.4.0; ; 2026-03-18 15:21:51 UTC; unix

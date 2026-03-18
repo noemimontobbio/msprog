@@ -90,8 +90,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-is_event(x=4.5, baseline=4, type='wors', outcome='edss')
-is_event(x=50, baseline=57, type='wors', outcome='sdmt')
+is_event(x=4.5, baseline=4, type="wors", outcome="edss")
+is_event(x=50, baseline=57, type="wors", outcome="sdmt")
 
 
 

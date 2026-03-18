@@ -11,7 +11,7 @@
 * checking extension type ... Package
 * this is package ‘msprog’ version ‘0.2.5’
 * package encoding: UTF-8
-* checking CRAN incoming feasibility ... [3s/21s] NOTE
+* checking CRAN incoming feasibility ... [3s/23s] NOTE
 Maintainer: ‘Noemi Montobbio <noemi.montobbio@gmail.com>’
 
 New submission

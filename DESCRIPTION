@@ -12,7 +12,7 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-Imports: stats, dplyr
+Imports: stats, dplyr, rlang
 Depends: R (>= 3.5.0)
 VignetteBuilder: knitr
 Suggests: knitr, rmarkdown, xfun, DT

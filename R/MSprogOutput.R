@@ -7,10 +7,10 @@
 #' Objects of class `"MSprogOutput"` are lists with the following elements:
 #'
 #' \describe{
-#' \item{`event_count`}{a data frame containing the event sequence detected for each subject, and the counts for each event type}
-#' \item{`results`}{a data frame with extended info on each event for all subjects}
-#' \item{`settings`}{a list containing all the arguments used to compute the output}
-#' \item{`unconfirmed`}{a data frame with info on unconfirmed events (initial change from baseline, but no confirmation) for all subjects.}
+#' \item{`event_count`}{A data frame containing the event sequence detected for each subject, and the counts for each event type}
+#' \item{`results`}{A data frame with extended info on each event for all subjects}
+#' \item{`settings`}{A list containing all the arguments used to compute the output}
+#' \item{`unconfirmed`}{A data frame with info on unconfirmed events (initial change from baseline, but no confirmation) for all subjects.}
 #' }
 #'
 #' @section `event_count` data frame:
@@ -50,6 +50,20 @@
 #' }
 #' Note: some of the columns may not be included, depending on computation settings
 #' (e.g., no date columns if `include_dates=F` in [MSprog()]).
+#'
+#' @section `unconfirmed` data frame:
+#' \describe{
+#'   \item{`<subj_col>`}{Subject ID.}
+#'   \item{date}{Date of initial outcome change.}
+#'   \item{value}{Outcome value at initial outcome change.}
+#'   \item{bl_date}{Date of baseline.}
+#'   \item{bl_value}{Outcome value at baseline.}
+#'   \item{closest_rel_before}{Distance in days from the last relapse before the outcome change (if any).}
+#'   \item{closest_rel_after}{Distance in days from the next relapse after the outcome change (if any).}
+#'  }
+#'  Note: in first-event scenarios (e.g., `event='firstCDW'`), the event search stops as soon as
+#'  the first confirmed event is found -- in this case, the `unconfirmed` data frame only reports
+#'  unconfirmed outcome changes occurring *before* detecting a confirmed event.
 #'
 #' @name MSprogOutput
 #' @docType class

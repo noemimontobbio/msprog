@@ -108,21 +108,21 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 \value{
 A \code{data.frame} containing the following columns:
 \itemize{
-\item \code{date_col}: the date of first reaching or exceeding the milestone (or last date of follow-up if milestone is not reached)
-\item \code{value_col}: the first value  reaching orexceeding the milestone, if present, otherwise no value
-\item \code{"time2event"}: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached)
-\item \code{"observed"}: whether the milestone was reached (1) or not (0).
+\item \code{date_col}: the date of first reaching or exceeding the milestone with confirmation (or last date of follow-up if milestone is not reached or not confirmed)
+\item \code{value_col}: the first value  reaching or exceeding the milestone with confirmation, if present, otherwise no value
+\item \code{"time2event"}: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached or not confirmed)
+\item \code{"observed"}: whether the milestone was reached with confirmation (1) or not (0).
 }
 }
 \description{
 \code{value_milestone()} scans the visits in chronological order to detect the first
 outcome value exceeding a specified disability milestone (e.g., EDSS>=6), \emph{with confirmation}.
-Note: "exceeding" means either value>=milestone or value<=milestone, depending on the
-outcome measure (see arguments \code{outcome} and \code{worsening}).
 }
 \details{
-An event is only retained if \strong{confirmed}, i.e., if all values \emph{up to} the
-confirmation visit exceed the milestone.
-Valid time windows for confirmation visits are determined by arguments
-\code{conf_days}, \code{conf_tol_days}, \code{relapse_to_conf}.
+\itemize{
+\item "Reaching or exceeding" means either value>=milestone or value<=milestone, depending on the
+outcome measure (see arguments \code{outcome} and \code{worsening}).
+\item An event is only retained if \strong{confirmed}, i.e., if all values \emph{up to} the
+confirmation visit reach or exceed the milestone.
+}
 }

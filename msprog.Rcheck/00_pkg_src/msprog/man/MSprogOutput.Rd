@@ -13,10 +13,10 @@ the results of event detection and associated metadata.
 Objects of class \code{"MSprogOutput"} are lists with the following elements:
 
 \describe{
-\item{\code{event_count}}{a data frame containing the event sequence detected for each subject, and the counts for each event type}
-\item{\code{results}}{a data frame with extended info on each event for all subjects}
-\item{\code{settings}}{a list containing all the arguments used to compute the output}
-\item{\code{unconfirmed}}{a data frame with info on unconfirmed events (initial change from baseline, but no confirmation) for all subjects.}
+\item{\code{event_count}}{A data frame containing the event sequence detected for each subject, and the counts for each event type}
+\item{\code{results}}{A data frame with extended info on each event for all subjects}
+\item{\code{settings}}{A list containing all the arguments used to compute the output}
+\item{\code{unconfirmed}}{A data frame with info on unconfirmed events (initial change from baseline, but no confirmation) for all subjects.}
 }
 }
 
@@ -49,17 +49,33 @@ included in the data frame (e.g., no CDI column if \code{event='firstCDW'} in \c
 \item{bl_value}{Outcome value at baseline.}
 \item{last_delta_date}{Date of last visit before event onset at a clinically meaningful score distance from it.}
 \item{last_delta_value}{Last outcome value before event onset at a clinically meaningful score distance from it.}
-\item{conf\verb{<conf_days>}}{Whether the event was confirmed at \verb{<conf_days>} days.}
 \item{conf\verb{<conf_days>}_date}{Date of \verb{<conf_days>}-day confirmation visit for the event.}
 \item{conf\verb{<conf_days>}_value}{Outcome value at \verb{<conf_days>}-day confirmation visit.}
-\item{PIRA_conf\verb{<conf_days>}}{Whether the event was confirmed \emph{as a PIRA event} at \verb{<conf_days>} days.}
-\item{PIRA_conf\verb{<conf_days>}_date}{Date of (potential) \verb{<conf_days>}-day confirmation visit for PIRA event.}
-\item{PIRA_conf\verb{<conf_days>}_value}{Outcome value at (potential) \verb{<conf_days>}-day confirmation visit for PIRA.}
+\item{PIRA_conf\verb{<conf_days>}_date}{For PIRA events, date of \verb{<conf_days>}-day confirmation visit
+(could be different from CDW confirmation visit if the PIRA definition includes confirmation-related constraints on relapses).}
+\item{PIRA_conf\verb{<conf_days>}_value}{For PIRA events, outcome value at \verb{<conf_days>}-day confirmation visit
+(could be different from CDW confirmation visit if the PIRA definition includes confirmation-related constraints on relapses).}
 \item{sust_days}{Number of days for which the event was sustained.}
 \item{sust_last}{Whether the event was sustained up to the end of follow-up.}
 }
 Note: some of the columns may not be included, depending on computation settings
 (e.g., no date columns if \code{include_dates=F} in \code{\link[=MSprog]{MSprog()}}).
+}
+
+\section{\code{unconfirmed} data frame}{
+
+\describe{
+\item{\verb{<subj_col>}}{Subject ID.}
+\item{date}{Date of initial outcome change.}
+\item{value}{Outcome value at initial outcome change.}
+\item{bl_date}{Date of baseline.}
+\item{bl_value}{Outcome value at baseline.}
+\item{closest_rel_before}{Distance in days from the last relapse before the outcome change (if any).}
+\item{closest_rel_after}{Distance in days from the next relapse after the outcome change (if any).}
+}
+Note: in first-event scenarios (e.g., \code{event='firstCDW'}), the event search stops as soon as
+the first confirmed event is found -- in this case, the \code{unconfirmed} data frame only reports
+unconfirmed outcome changes occurring \emph{before} detecting a confirmed event.
 }
 
 \keyword{internal}

@@ -3,13 +3,13 @@
 #'
 #' `value_milestone()` scans the visits in chronological order to detect the first
 #' outcome value exceeding a specified disability milestone (e.g., EDSS>=6), *with confirmation*.
-#' Note: "exceeding" means either value>=milestone or value<=milestone, depending on the
-#' outcome measure (see arguments `outcome` and `worsening`).
 #'
-#' An event is only retained if **confirmed**, i.e., if all values *up to* the
-#' confirmation visit exceed the milestone.
-#' Valid time windows for confirmation visits are determined by arguments
-#' `conf_days`, `conf_tol_days`, `relapse_to_conf`.
+#' \itemize{
+#' \item "Reaching or exceeding" means either value>=milestone or value<=milestone, depending on the
+#' outcome measure (see arguments `outcome` and `worsening`).
+#' \item An event is only retained if **confirmed**, i.e., if all values *up to* the
+#' confirmation visit reach or exceed the milestone.
+#' }
 #'
 #' @param data a `data.frame` containing longitudinal data, including: subject ID, outcome value, date of visit.
 #' @param milestone Disability milestone (outcome value to check data against).
@@ -79,6 +79,7 @@
 #' }
 #' @importFrom stats complete.cases
 #' @importFrom dplyr %>% group_by slice n mutate across ungroup
+#' @importFrom rlang .data
 #' @export
 
 value_milestone <- function(data, milestone, subj_col, value_col, date_col, outcome,

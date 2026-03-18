@@ -117,12 +117,12 @@ A \code{data.frame} containing the following columns:
 \description{
 \code{value_milestone()} scans the visits in chronological order to detect the first
 outcome value exceeding a specified disability milestone (e.g., EDSS>=6), \emph{with confirmation}.
-Note: "exceeding" means either value>=milestone or value<=milestone, depending on the
-outcome measure (see arguments \code{outcome} and \code{worsening}).
 }
 \details{
-An event is only retained if \strong{confirmed}, i.e., if all values \emph{up to} the
-confirmation visit exceed the milestone.
-Valid time windows for confirmation visits are determined by arguments
-\code{conf_days}, \code{conf_tol_days}, \code{relapse_to_conf}.
+\itemize{
+\item "Reaching or exceeding" means either value>=milestone or value<=milestone, depending on the
+outcome measure (see arguments \code{outcome} and \code{worsening}).
+\item An event is only retained if \strong{confirmed}, i.e., if all values \emph{up to} the
+confirmation visit reach or exceed the milestone.
+}
 }

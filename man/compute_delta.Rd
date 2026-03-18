@@ -28,7 +28,9 @@ Minimum clinically meaningful change from the provided baseline value. Specifica
 \description{
 \code{compute_delta()} computes the default minimum clinically meaningful change
 from baseline in the outcome measure (EDSS, NHPT, T25FW, or SDMT).
-Note: default thresholds are meant to apply to all versions of each test (e.g.,
+}
+\details{
+Default thresholds are meant to apply to all versions of each test (e.g.,
 dominant or non-dominant hand for NHPT, best time or mean of two trials, etc.).
 }
 \examples{

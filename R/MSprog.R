@@ -5,18 +5,9 @@
 #' or improvement (CDI) events of an outcome measure (EDSS, NHPT, T25FW, or SDMT; or any custom outcome)
 #' for one or more subjects, based on repeated assessments
 #' through time (and on the dates of acute episodes, if any).
+#' The events are detected sequentially by scanning the outcome values in chronological order.
 #' Several qualitative and quantitative options are given as arguments that can be set
 #' by the user and reported as a complement to the results to ensure reproducibility.
-#'
-#' The events are detected sequentially by scanning the outcome values in chronological order.
-#' Time windows for confirmation visits are determined by arguments
-#' `conf_days`, `conf_tol_days`, `relapse_to_conf`.
-#' CDW events are classified as relapse-associated or relapse-independent based on their relative timing
-#' with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
-#' CDW events occurring within a specified interval (`relapse_assoc` argument) from a relapse;
-#' the definition of progression independent of relapse activity (PIRA) is established by specifying
-#' relapse-free intervals (`relapse_indep` argument).
-#'
 #'
 #' @param data data frame containing longitudinal data, including: subject ID, outcome value, date of visit.
 #' @param subj_col Name of data column with subject ID.
@@ -222,6 +213,7 @@
 #'
 #' @importFrom stats na.omit setNames complete.cases rbinom
 #' @importFrom dplyr %>% group_by slice n mutate across ungroup
+#' @importFrom rlang .data
 #' @export
 #' @examples
 #' # 1. EDSS course
@@ -355,7 +347,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       relapse[[renddate_col]] <- as.Date(relapse[[renddate_col]])
     }
     }, error=function(e) {
-      message("Failed to infer format for date columns; please provide correct format via `date_format` argument.")
+      stop("Failed to infer format for date columns; please provide correct format via `date_format` argument.")
       NULL
     }
     )
@@ -365,12 +357,19 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     relapse[[rdate_col]] <- as.numeric(relapse[[rdate_col]])
     if (!is.null(renddate_col)) {
       relapse[[renddate_col]] <- as.numeric(relapse[[renddate_col]])
+      if (nrow(relapse) > 0 & all(is.na(relapse[[rdate_col]]))) {
+        stop("Failed to intepret relapse end-date column as numeric (number of days, as per `date_format='day'`)")
+      }
     }
     }, error=function(e) {
-      message("Failed to intepret date columns as numeric (number of days, as per `date_format='day'`)")
+      stop("Failed to intepret date columns as numeric (number of days, as per `date_format='day'`)")
       NULL
     }
     )
+    # If conversion to numeric fails silently (all NAs):
+    if (all(is.na(data[[date_col]])) | (nrow(relapse) > 0 & all(is.na(relapse[[rdate_col]])))) {
+      stop("Failed to intepret date columns as numeric (number of days, as per `date_format='day'`)")
+    }
   } else {
   tryCatch({
   data[[date_col]] <- as.Date(data[[date_col]], format=date_format)
@@ -379,7 +378,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     relapse[[renddate_col]] <- as.Date(relapse[[renddate_col]], format=date_format)
   }
   }, error=function(e) {
-    message('Failed to intepret date columns as "', date_format, '" as specified in `date_format` argument.')
+    stop('Failed to intepret date columns as "', date_format, '" as specified in `date_format` argument.')
     NULL
   }
   )
@@ -614,7 +613,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     first_visit <- min(data_id[[date_col]])
     relapse_id <- relapse[relapse[[rsubj_col]] == subjid, ]
     relapse_id <- relapse_id[relapse_id[[rdate_col]] >= first_visit - relapse_to_bl[1], ]  # ignore relapses occurring before first visit
-    relapse_dates <- relapse_id[[rdate_col]] #onset_dates
+    relapse_dates <- relapse_id[[rdate_col]] # relapse onset_dates
     nrel <- length(relapse_dates)
 
     total_fu[subjid] <- data_id[nvisits,][[date_col]] - data_id[1,][[date_col]]
@@ -681,7 +680,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     if (nrel > 0) {
       for (r in 1:nrel) {
         if (relapse_dates[r] > data_id[bl_idx,][[date_col]]) {
-          change_idx <- r
+          irel <- r  #change_idx <- r
           break
         }
       }
@@ -697,7 +696,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
       n_iter <- n_iter + 1
 
-      if (n_iter > 1000) {stop('infinite loop')}
+      if (n_iter > 10000) {stop('infinite loop')}
 
       # Set baseline (skip if local extremum or within relapse influence)
       if (skip_local_extrema!='none') {

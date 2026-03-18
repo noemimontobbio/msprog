@@ -43,13 +43,13 @@ output_sdmt <- MSprog(data=toydata_visits, # data on visits
 ## ----indent="     "-----------------------------------------------------------
 # print(output_edss$results, row.names=FALSE)
 DT::datatable(output_edss$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 
 ## ----indent="     "-----------------------------------------------------------
 # print(output_edss$event_count)
 DT::datatable(output_edss$event_count,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 
 ## ----linewidth=90-------------------------------------------------------------
@@ -84,7 +84,7 @@ output <- MSprog(data=toydata_visits,
                  verbose=0)
 # print(output$results, row.names=FALSE) # results
 DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 
 ## -----------------------------------------------------------------------------
@@ -96,7 +96,7 @@ output <- MSprog(data=toydata_visits,
                  verbose=0)
 # print(output$results, row.names=FALSE) # results
 DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 
 ## ----echo=FALSE, out.width="40%", fig.cap = "*Figure 2. Example of data with unscheduled visits.*"----
@@ -123,7 +123,7 @@ output <- MSprog(data=toydata_visits,
 
 # print(output$results, row.names=FALSE)
 DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 
 ## -----------------------------------------------------------------------------
@@ -135,7 +135,7 @@ output <- MSprog(data=toydata_visits,
 ## -----------------------------------------------------------------------------
 # print(output$unconfirmed, row.names=FALSE)
 DT::datatable(output$unconfirmed, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 
 ## -----------------------------------------------------------------------------

@@ -116,7 +116,7 @@ Full tabulation of the results can be accessed via the following attributes of t
 ```{r, indent="     "}
 # print(output_edss$results, row.names=FALSE)
 DT::datatable(output_edss$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 ```
     where: `nevent` is the cumulative event count for each subject; `event_type` and `CDW_type` characterise the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^timeto]; `bl2event` is the number of days from current baseline to event; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
@@ -125,10 +125,10 @@ DT::datatable(output_edss$results, rownames=F,
 ```{r, indent="     "}
 # print(output_edss$event_count)
 DT::datatable(output_edss$event_count,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 ```
-    where: `event_sequence`[^seq] specifies the order of the events; the other columns count the events of each kind (CDW; relapse-associated worsening, [RAW](#raw); progression independent of relapse activity, [PIRA](#pira); and "undefined CDW" that could not be classified as either RAW of PIRA with the available information). See [@lublin2014; @kappos2018; @silent2019].
+    where: `event_sequence` specifies the order of the events; the other columns count the events of each kind (CDW; relapse-associated worsening, [RAW](#raw); progression independent of relapse activity, [PIRA](#pira), see [@lublin2014; @kappos2018; @silent2019]; CDI column is omitted).[^seq]
 
 
 Additionally, by applying the `print` method to the `MSprog()` output, the user can print out the full list of function arguments, as well as a short paragraph describing the complete set of applied criteria, to be reported to ensure complete reproducibility. In our example:
@@ -137,7 +137,7 @@ print(output_edss)
 ```
 
 
-[^seq]: In this example, `event_sequence` can contain a maximum of one event, as we are not specifying the argument `event` - which defaults to `firstCDW` (only detect the first CDW event). For the same reason, `nevent` in `output$results` can only be 0 or 1 in this example. In a multiple-event setting (`event=multiple`), more than one event per subject can be detected. See [the relevant section](#multiple).
+[^seq]: In this example, we did not specify the argument `event` - which defaults to `firstCDW` (only detect the first CDW event). For this reason, (1) `event_sequence` can contain a maximum of one event; (2) `nevent` in `output_edss$results` can only be 0 or 1; (3) CDI column is omitted. In a multiple-event setting (`event=multiple`), more than one event per subject can be detected. See [the relevant section](#multiple).
 [^timeto]: For subjects with no confirmed events, `time2event` is the total follow-up length. To omit these subjects, set `include_stable=FALSE` in `MSprog()`.
 
 
@@ -152,9 +152,10 @@ Several qualitative and quantitative options for analysing disability evolution 
 In `MSprog()`, outcome type is specified via the mandatory argument `outcome`. This triggers:
 
 * Value range checks (e.g., EDSS in the 0-10 range)
-* Outcome-specific **"minimum clinically relevant change"**.
+* Direction of worsening (e.g., for EDSS, "higher values = worse")
+* Outcome-specific **"minimum clinically relevant change"**
 
-Outcome values are scanned in chronological order, and tested for their difference from the current reference value. Such difference is typically required to be larger than a clinically meaningful threshold $\delta$, depending on the reference value $x$. Default settings are implemented for the most used disability scales (see [@lorscheider2016; @bosma2010; @kalinowski2022; @strober2019]):
+Outcome values are scanned in chronological order, and tested for their difference from the current reference value. Such difference is typically required to be larger than a clinically meaningful threshold $\delta$, depending on the reference value $x$. Default settings are implemented in `msprog` for the most used disability scales (see [@lorscheider2016; @bosma2010; @kalinowski2022; @strober2019]):
 
 * `outcome='edss'`: Expanded Disability Status Scale (EDSS). $\delta(x)=\begin{cases} 1.5 \quad \text{ if } x=0\\1 \quad\;\;\; \text{ if } 0 < x \leq 5\\0.5 \quad \text{ if } x>5\end{cases}$;
 
@@ -200,30 +201,34 @@ The user can provide their own function to customise the computation of clinical
 
 # Baseline scheme
 
-The assessment of the disability evolution strongly depends on the choices made in defining the starting point, i.e., the baseline. Different behaviours are appropriate in different contexts. This aspect is controlled by the `baseline` argument in `MSprog()`. The following three alternative baseline schemes can be adopted.
+The assessment of the disability evolution strongly depends on the choices made in defining the starting point, i.e., the baseline. Different behaviours are appropriate in different contexts. This aspect is controlled by the `baseline` argument in `MSprog()`. The following alternative baseline schemes can be adopted.
 
-* **Fixed baseline** (`baseline='fixed'`, default): the baseline visit is set to be the first available assessment.
+* *Fixed baseline* (`baseline='fixed'`, default): the baseline visit is set to be the first available assessment.
 
-* **Improvement-based roving baseline** (`baseline='roving_impr'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed improvement. **This scheme is suitable for a first-CDW setting to discard fluctuations around the baseline [@muller2023], but not recommended for clinical trial data as it may break the randomisation**. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='improvement'`, for instance, moves the reference value after *any* confirmed improvement, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold improvement events are used to move the baseline, but not listed in the event sequence.
+* *Roving baseline* (`baseline='roving'`): the baseline visit is initially set as the first available assessment, then updated after each event. This scheme is recommended in a **"multiple events" setting** [@kappos2018] (see [example below](#multiple)), but **not recommended for clinical trial data** as it may break the randomisation. 
 
-* **Worsening-based roving baseline** (`baseline='roving_wors'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed worsening. **This scheme is suitable when the endpoint of interest is a specific type of CDW**: for instance, when searching specifically for PIRA events, the reference should be moved after any previous RAW event; when searching specifically for RAW events, the reference should be moved after any previous PIRA event. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='worsening'`, for instance, moves the reference value after *any* confirmed worsening, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold worsening events are used to move the baseline, but not listed in the event sequence.
+* *Improvement-based roving baseline* (`baseline='roving_impr'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed improvement. This scheme is suitable for a **first-CDW setting** to discard fluctuations around the baseline [@muller2023], but **not recommended for clinical trial data** as it may break the randomisation. 
 
-* **Roving baseline** (`baseline='roving'`): the baseline visit is initially set as the first available assessment, then updated after each event. **This scheme is recommended in a "multiple events" setting** [@kappos2018] (see [example below](#multiple)), **but not recommended for clinical trial data as it may break the randomisation**. The re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='event'`, for instance,  moves the reference value after *any* confirmed change, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold events are used to move the baseline, but not listed in the event sequence.
+* *Worsening-based roving baseline* (`baseline='roving_wors'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed worsening. This scheme is suitable when the endpoint of interest is **a specific type of CDW**: for instance, when searching specifically for PIRA events, the reference should be moved after any previous RAW event; when searching specifically for RAW events, the reference should be moved after any previous PIRA event. 
 
 **Note.** If the baseline data is stored in a separate file, the user should merge it with the main data frame containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the beginning of the data frame (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). 
 <!-- <span style="color: red;">The possibility to directly input a separate file for baseline data may be added in the future.</span> -->
 
-<br />
+## Additional options
 
-When a roving baseline is used, the reference is moved after a previously detected event. The new reference may be set at the date of the previous event (`proceed_from='event'`), or at the first confirmation visit of such event (`proceed_from='firstconf'`, default).
+* For roving baseline schemes, the re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='event'`, for instance, rebaseline can be triggered by *any* confirmed change, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold improvement events are used to move the baseline, but not listed in the event sequence.
 
-If the baseline visit occurs in the vicinity of a clinical relapse, the reference value may be overestimated. The `relapse_to_bl` argument allows to specify the minimum accepted distance (in days) of the baseline visit from the onset of a previous relapse. For instance, if `baseline='fixed'` and `relapse_to_bl=30`, the baseline visit is chosen as the first available visit satisfying the requirement of "no relapses within the preceding 30 days". If two values are provided, they are interpreted as intervals before *and after* the event -- e.g., `relapse_to_bl=c(30, 2)` implements the constraint of "no relapses within the preceding 30 days or within the following 2 days". If relapse **end dates** are available (may be provided as an additional column in the relapse file whose name is specified by argument `renddate_col` in `MSprog()`), the first value of `relapse_to_bl` is overwritten by the relapse duration, unless it was set to 0 (in which case it stays 0 and the baseline is **not** moved based on the influence of previous relapses). If the `baseline` argument is set to a roving scheme, all the above applies to every baseline change as well. 
+* When a roving baseline is used, the reference is moved after a previously detected event. The new reference may be set at the date of the previous event (`proceed_from='event'`), or at the first confirmation visit of such event (`proceed_from='firstconf'`, default).
 
-On top of the chosen baseline scheme, *post-relapse re-baseline* @kappos2020 can be applied by setting `relapse_rebl=TRUE` in `MSprog()`. If this is enabled, the onset of each relapse prompts a re-baseline to the next available visit following the relapse and out of its influence (as per `relapse_to_bl`). 
+* If the baseline visit occurs in the vicinity of a clinical relapse, the reference value may be overestimated. The `relapse_to_bl` argument allows to specify the minimum accepted distance (in days) of the baseline visit from the onset of a previous relapse. For instance, if `baseline='fixed'` and `relapse_to_bl=30`, the baseline visit is chosen as the first available visit satisfying the requirement of "no relapses within the preceding 30 days". If two values are provided, they are interpreted as intervals before *and after* the event -- e.g., `relapse_to_bl=c(30, 2)` implements the constraint of "no relapses within the preceding 30 days or within the following 2 days". If relapse **end dates** are available (may be provided as an additional column in the relapse file whose name is specified by argument `renddate_col` in `MSprog()`), the first value of `relapse_to_bl` is overwritten by the relapse duration, unless it was set to 0 (in which case it stays 0 and the baseline is **not** moved based on the influence of previous relapses). If the `baseline` argument is set to a roving scheme, all the above applies to every baseline change as well. 
 
-Due to fluctuations in the data, the new reference value following a re-baseline may fall at a local minimum or maximum of the disability trajectory. These may be excluded for consideration as baseline visits using the `skip_local_extrema` argument in `MSprog()`.
+* On top of the chosen baseline scheme, *post-relapse re-baseline* @kappos2020 can be applied by setting `relapse_rebl=TRUE` in `MSprog()`. If this is enabled, the onset of each relapse prompts a re-baseline to the next available visit following the relapse and out of its influence (as per `relapse_to_bl`). 
 
-Finally, as an additional constraint, an updated baseline can be forced to have a score greater than or equal to the previous baseline by setting `bl_geq=TRUE` in `MSprog()`.
+* Due to fluctuations in the data, the new reference value following a re-baseline may fall at a local minimum or maximum of the disability trajectory. These may be excluded for consideration as baseline visits using the `skip_local_extrema` argument in `MSprog()`.
+
+* Finally, as an additional constraint, an updated baseline can be forced to have a score greater than or equal to the previous baseline by setting `bl_geq=TRUE` in `MSprog()`.
+
+<br>
 
 As already mentioned above, extra caution should be used when applying any re-baseline scheme to randomised data, as moving the reference value based on post-randomisation events can introduce bias (especially if the occurrence of these events is influenced by the treatment). **For clinical trial data, general recommendation is to use a fixed baseline (at the time of randomisation).**
 
@@ -243,7 +248,7 @@ output <- MSprog(data=toydata_visits,
                  verbose=0)
 # print(output$results, row.names=FALSE) # results
 DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 ```
 
@@ -257,10 +262,10 @@ output <- MSprog(data=toydata_visits,
                  verbose=0)
 # print(output$results, row.names=FALSE) # results
 DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 ```
-The baseline has now been moved to the confirmation visit of the first CDI event (visit 3, EDSS=3.5). With respect to this baseline, a PIRA event is detected at visit 4 (EDSS=5), confirmed at visit 5.
+The baseline has now been moved to the confirmation visit of the first CDI event (visit 3, EDSS=3.5). With respect to this baseline, a subsequent PIRA event is detected at visit 4 (EDSS=5), confirmed at visit 5.
 
 <br>
 
@@ -295,7 +300,7 @@ i.e., the confirmation visit must lie between 24 weeks after the event, and 36 w
 
 ## Additional options
 
-* If `conf_days` is specified as a sequence of values (e.g., `conf_days=c(7*12,7*24)`), events are retained if confirmed by *at least one visit* falling within any of the specified periods (here, 12 **or** 24 weeks with their relative tolerance interval)[^1224]. The results table will report whether an event was confirmed in each of the specified periods, see example [below](#confexample).
+* If `conf_days` is specified as a sequence of values (e.g., `conf_days=c(7*12,7*24)`), events are retained if confirmed by *at least one visit* falling within any of the specified periods (here, 12 **or** 24 weeks with their relative tolerance interval)[^1224]. Confirmation dates/values at *all* specified values will be included in the results table (if `include_dates=T` / `include_values=T` in `MSprog()`).
 
 [^1224]: An event is only confirmed if the value change from baseline is maintained **at all visits up to the confirmation visit**. So an event can only be "confirmed over 24 weeks" and *not* "confirmed over 12 weeks" if there are no valid confirmation visits falling within the 12-week window (unless `check_intermediate=FALSE`).
 
@@ -329,7 +334,7 @@ The `require_sust_days` argument may be of use in the following scenarios.
 * Sustained disability worsening can be required to exclude transient accumulation of disability (e.g., as a consequence of relapses) followed by complete recovery.
 
 
-# Classification of CDW events
+# Relapse-based classification of CDW events
 
 When relevant, relapse data is to be provided using the optional `relapse` argument in `MSprog()`. It should be given as a data frame containing subject IDs and relapse onset dates (see ["Input data"](#input))[^rnames].
 
@@ -378,8 +383,8 @@ For more details and examples on PIRA computation, please refer to the dedicated
 
 The `results` attribute provides extended info on each event for all subjects. The following arguments can be used to control the information included.
 
-* `include_dates`: if `TRUE`, the results will include the dates of baseline and event;
-* `include_value`: if `TRUE`, the results will include the outcome value at baseline and event;
+* `include_dates`: if `TRUE`, the results will include the dates of: event onset; baseline; last visit before event onset at clinically meaningful score distance from it; confirmation visit.
+* `include_value`: if `TRUE`, the results will include the outcome value at: event onset; baseline; last visit before event onset at clinically meaningful score distance from it; confirmation visit.
 * `include_stable`: if `TRUE`, subjects with no confirmed events are included in the results, with `time2event` = total follow up.
 
 
@@ -392,7 +397,7 @@ output <- MSprog(data=toydata_visits,
 
 # print(output$results, row.names=FALSE)
 DT::datatable(output$results, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 ```
 
@@ -412,7 +417,7 @@ For further insight into the event detection process, all score changes from bas
 ```{r}
 # print(output$unconfirmed, row.names=FALSE)
 DT::datatable(output$unconfirmed, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 ```
 
@@ -428,7 +433,7 @@ vm <- value_milestone(toydata_visits, milestone=6,
                  outcome='edss', relapse=toydata_relapses,
                  verbose=0)
 ```
-The function returns a data frame with one row per subject:
+The function returns a data frame indexed by subject IDs:
 ```{r}
 print(vm)
 ```

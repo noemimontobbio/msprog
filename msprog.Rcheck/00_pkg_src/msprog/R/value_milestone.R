@@ -3,13 +3,13 @@
 #'
 #' `value_milestone()` scans the visits in chronological order to detect the first
 #' outcome value exceeding a specified disability milestone (e.g., EDSS>=6), *with confirmation*.
-#' Note: "exceeding" means either value>=milestone or value<=milestone, depending on the
-#' outcome measure (see arguments `outcome` and `worsening`).
 #'
-#' An event is only retained if **confirmed**, i.e., if all values *up to* the
-#' confirmation visit exceed the milestone.
-#' Valid time windows for confirmation visits are determined by arguments
-#' `conf_days`, `conf_tol_days`, `relapse_to_conf`.
+#' \itemize{
+#' \item "Reaching or exceeding" means either value>=milestone or value<=milestone, depending on the
+#' outcome measure (see arguments `outcome` and `worsening`).
+#' \item An event is only retained if **confirmed**, i.e., if all values *up to* the
+#' confirmation visit reach or exceed the milestone.
+#' }
 #'
 #' @param data a `data.frame` containing longitudinal data, including: subject ID, outcome value, date of visit.
 #' @param milestone Disability milestone (outcome value to check data against).
@@ -72,13 +72,14 @@
 #'  }
 #' @return A `data.frame` containing the following columns:
 #' \itemize{
-#' \item `date_col`: the date of first reaching or exceeding the milestone (or last date of follow-up if milestone is not reached)
-#' \item `value_col`: the first value  reaching orexceeding the milestone, if present, otherwise no value
-#' \item `"time2event"`: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached)
-#' \item `"observed"`: whether the milestone was reached (1) or not (0).
+#' \item `date_col`: the date of first reaching or exceeding the milestone with confirmation (or last date of follow-up if milestone is not reached or not confirmed)
+#' \item `value_col`: the first value  reaching or exceeding the milestone with confirmation, if present, otherwise no value
+#' \item `"time2event"`: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached or not confirmed)
+#' \item `"observed"`: whether the milestone was reached with confirmation (1) or not (0).
 #' }
 #' @importFrom stats complete.cases
-#' @importFrom dplyr %>% group_by_at vars slice n mutate across
+#' @importFrom dplyr %>% group_by slice n mutate across ungroup
+#' @importFrom rlang .data
 #' @export
 
 value_milestone <- function(data, milestone, subj_col, value_col, date_col, outcome,
@@ -134,6 +135,9 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
     data[[validconf_col]] <- as.logical(data[[validconf_col]])
   }
 
+  # Convert outcome value column to numeric
+  data[[value_col]] <- as.numeric(data[[value_col]])
+
   # Remove missing values from columns of interest
   data <- data[complete.cases(data[ , c(subj_col, value_col, date_col, validconf_col)]), ]
   relapse <- relapse[complete.cases(relapse[, c(rsubj_col, rdate_col)]), ]
@@ -169,10 +173,16 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
   }
 
   # Local function to display dates/days
-  display_date <- function(day, start, to_print=T) {
-    ifelse(!is.null(date_format) && date_format == 'day',
-           ifelse(to_print, paste("day", day), day),
-           as.character(start + as.difftime(day, units="days")))
+  display_date <- function(day, start, to_print=F) {
+    if (is.na(day) | is.null(day)) {
+      return(ifelse(to_print, "",
+                    ifelse(!is.null(date_format) && date_format == 'day', NaN, as.Date(NA))))
+    }
+    if (!is.null(date_format) && date_format == 'day') {
+      ifelse(to_print, paste("day", day), day)
+    } else {
+      start + as.difftime(day, units="days")
+    }
   }
 
   # Convert dates to days from global minimum
@@ -203,7 +213,7 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
   } else if (outcome=='sdmt') {
     worsening <- 'decrease'
   } else if (is.null(worsening)) {
-    stop('Either specify an outcome type, or specify the direction of worsening (\"increase\" or \"decrease\")')
+    stop('If using `outcome="custom"`, please specify the direction of worsening (\"increase\" or \"decrease\")')
   } else {
     worsening <- match.arg(worsening, c('increase', 'decrease'))
   }
@@ -244,7 +254,10 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
     # If more than one visit occur on the same day, only keep last
     ucounts <- table(data_id[, date_col])
     if (any(ucounts > 1)) {
-      data_id <- data_id %>% group_by_at(vars(date_col)) %>% slice(n())
+      data_id <- data_id %>%
+        group_by(.data[[date_col]]) %>%
+        slice(n()) %>%
+        ungroup()
     }
 
     # Sort visits in chronological order
@@ -436,7 +449,8 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
            ifelse(relapse_to_conf[1]==0 && relapse_to_conf[2]==0, '-', '')
            ))
     message("\n---\nTotal subjects: ", nsub, "\n",
-            sum(results[['observed']]), " reached the milestone ", ifelse(outcome != "custom", outcome, "outcome"), "=", milestone, ".")
+            sum(results[['observed']]), " reached the milestone ",
+            ifelse(outcome != "custom", toupper(outcome), "outcome"), "=", milestone, ".")
 
   }
 

@@ -275,18 +275,9 @@ For a detailed description of the \code{event_count} and \code{results} data fra
 or improvement (CDI) events of an outcome measure (EDSS, NHPT, T25FW, or SDMT; or any custom outcome)
 for one or more subjects, based on repeated assessments
 through time (and on the dates of acute episodes, if any).
+The events are detected sequentially by scanning the outcome values in chronological order.
 Several qualitative and quantitative options are given as arguments that can be set
 by the user and reported as a complement to the results to ensure reproducibility.
-}
-\details{
-The events are detected sequentially by scanning the outcome values in chronological order.
-Time windows for confirmation visits are determined by arguments
-\code{conf_days}, \code{conf_tol_days}, \code{relapse_to_conf}.
-CDW events are classified as relapse-associated or relapse-independent based on their relative timing
-with respect to the relapses. Specifically, relapse-associated worsening (RAW) events are defined as
-CDW events occurring within a specified interval (\code{relapse_assoc} argument) from a relapse;
-the definition of progression independent of relapse activity (PIRA) is established by specifying
-relapse-free intervals (\code{relapse_indep} argument).
 }
 \examples{
 # 1. EDSS course

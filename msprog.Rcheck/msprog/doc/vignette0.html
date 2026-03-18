@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noemi Montobbio" />
 
-<meta name="date" content="2026-03-16" />
+<meta name="date" content="2026-03-18" />
 
 <title>Analysing disability course in MS</title>
 
@@ -2866,7 +2866,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Analysing disability course in MS</h1>
 <h4 class="author">Noemi Montobbio</h4>
-<h4 class="date">2026-03-16</h4>
+<h4 class="date">2026-03-18</h4>
 
 
 <div id="TOC">
@@ -2880,14 +2880,16 @@ change”</a></li>
 </ul></li>
 <li><a href="#baseline-scheme" id="toc-baseline-scheme"><span class="toc-section-number">4</span> Baseline scheme</a>
 <ul>
-<li><a href="#multiple" id="toc-multiple"><span class="toc-section-number">4.1</span> Multiple events</a></li>
+<li><a href="#additional-options" id="toc-additional-options"><span class="toc-section-number">4.1</span> Additional options</a></li>
+<li><a href="#multiple" id="toc-multiple"><span class="toc-section-number">4.2</span> Multiple events</a></li>
 </ul></li>
 <li><a href="#event-confirmation" id="toc-event-confirmation"><span class="toc-section-number">5</span> Event confirmation</a>
 <ul>
-<li><a href="#additional-options" id="toc-additional-options"><span class="toc-section-number">5.1</span> Additional options</a></li>
+<li><a href="#additional-options-1" id="toc-additional-options-1"><span class="toc-section-number">5.1</span> Additional options</a></li>
 <li><a href="#sustained" id="toc-sustained"><span class="toc-section-number">5.2</span> Sustained CDW or CDI</a></li>
 </ul></li>
-<li><a href="#classification-of-cdw-events" id="toc-classification-of-cdw-events"><span class="toc-section-number">6</span> Classification of CDW events</a>
+<li><a href="#relapse-based-classification-of-cdw-events" id="toc-relapse-based-classification-of-cdw-events"><span class="toc-section-number">6</span> Relapse-based classification of CDW
+events</a>
 <ul>
 <li><a href="#raw" id="toc-raw"><span class="toc-section-number">6.1</span> Relapse-associated worsening
 (RAW)</a></li>
@@ -3006,7 +3008,7 @@ can test it on the EDSS toy data…</p>
 <span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
 <span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; Total subjects: 7</span></span>
 <span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt; Subjects with CDW: 0 (PIRA: 3; RAW: 1)</span></span></code></pre></div>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt; Subjects with CDW: 4 (PIRA: 3; RAW: 1)</span></span></code></pre></div>
 <p>…or on the SDMT toy data:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>output_sdmt <span class="ot">&lt;-</span> <span class="fu">MSprog</span>(<span class="at">data=</span>toydata_visits, <span class="co"># data on visits</span></span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&#39;id&#39;</span>, <span class="at">value_col=</span><span class="st">&#39;SDMT&#39;</span>, <span class="at">date_col=</span><span class="st">&#39;visit_day&#39;</span>, <span class="co"># specify column names</span></span>
@@ -3028,7 +3030,7 @@ can test it on the EDSS toy data…</p>
 <span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
 <span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; Total subjects: 7</span></span>
 <span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; Subjects with CDW: 1 (PIRA: 4; RAW: 0)</span></span></code></pre></div>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; Subjects with CDW: 5 (PIRA: 4; RAW: 0)</span></span></code></pre></div>
 <p>Note that, in the SDMT example, <code>&#39;visit_day&#39;</code> is used as
 date column. For the <code>MSprog()</code> function to interpret it
 correctly, we need to specify <code>date_format=&#39;day&#39;</code> (note that
@@ -3042,10 +3044,10 @@ attributes of the function output.</p>
 subjects. In our example:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># print(output_edss$results, row.names=FALSE)</span></span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(output_edss<span class="sc">$</span>results, <span class="at">rownames=</span>F,</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span><span class="st">&quot;200px&quot;</span>, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-b7fb0cd35ba0d7b77e51" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-b7fb0cd35ba0d7b77e51">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],[1,1,0,0,1,0,1],["CDW","CDW","","","CDW","","CDW"],["PIRA","RAW","","","PIRA","","PIRA"],[534,730,491,586,637,491,779],[292,198,491,586,140,491,372],[292,198,null,null,140,null,372],[242,84,0,0,497,0,407],[1,0,0,0,1,0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>CDW_type<\/th>\n      <th>total_fu<\/th>\n      <th>time2event<\/th>\n      <th>bl2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,4,5,6,7,8]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"CDW_type","targets":3},{"name":"total_fu","targets":4},{"name":"time2event","targets":5},{"name":"bl2event","targets":6},{"name":"sust_days","targets":7},{"name":"sust_last","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-aab1343ec87b6cbf9c61" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-aab1343ec87b6cbf9c61">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],[1,1,0,0,1,0,1],["CDW","CDW","","","CDW","","CDW"],["PIRA","RAW","","","PIRA","","PIRA"],[534,730,491,586,637,491,779],[292,198,491,586,140,491,372],[292,198,null,null,140,null,372],[242,84,0,0,497,0,407],[1,0,0,0,1,0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>CDW_type<\/th>\n      <th>total_fu<\/th>\n      <th>time2event<\/th>\n      <th>bl2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,4,5,6,7,8]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"CDW_type","targets":3},{"name":"total_fu","targets":4},{"name":"time2event","targets":5},{"name":"bl2event","targets":6},{"name":"sust_days","targets":7},{"name":"sust_last","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>where: <code>nevent</code> is the cumulative event count for each
 subject; <code>event_type</code> and <code>CDW_type</code> characterise
 the event; <code>total_fu</code> is the number of days from start to end
@@ -3059,16 +3061,15 @@ for each subject, and the event sequence (where relevant). Here’s what
 it looks like for the EDSS-based computation above:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># print(output_edss$event_count)</span></span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(output_edss<span class="sc">$</span>event_count,</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span><span class="st">&quot;200px&quot;</span>, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-3b757573e92682e2cc82" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-3b757573e92682e2cc82">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],["PIRA","RAW","","","PIRA","","PIRA"],[0,0,0,0,0,0,0],[0,1,0,0,0,0,0],[1,0,0,0,1,0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>event_sequence<\/th>\n      <th>CDW<\/th>\n      <th>RAW<\/th>\n      <th>PIRA<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"event_sequence","targets":1},{"name":"CDW","targets":2},{"name":"RAW","targets":3},{"name":"PIRA","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-<p>where: <code>event_sequence</code><a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> specifies the order of the events; the
-other columns count the events of each kind (CDW; relapse-associated
+<div class="datatables html-widget html-fill-item" id="htmlwidget-a828c9b115e6ac4fca2f" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-a828c9b115e6ac4fca2f">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],["PIRA","RAW","","","PIRA","","PIRA"],[1,1,0,0,1,0,1],[0,1,0,0,0,0,0],[1,0,0,0,1,0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>event_sequence<\/th>\n      <th>CDW<\/th>\n      <th>RAW<\/th>\n      <th>PIRA<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"event_sequence","targets":1},{"name":"CDW","targets":2},{"name":"RAW","targets":3},{"name":"PIRA","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p>where: <code>event_sequence</code> specifies the order of the events;
+the other columns count the events of each kind (CDW; relapse-associated
 worsening, <a href="#raw">RAW</a>; progression independent of relapse
-activity, <a href="#pira">PIRA</a>; and “undefined CDW” that could not
-be classified as either RAW of PIRA with the available information). See
-<span class="citation">[<a href="#ref-lublin2014">1</a>–<a href="#ref-silent2019">3</a>]</span>.</p></li>
+activity, <a href="#pira">PIRA</a>, see <span class="citation">[<a href="#ref-lublin2014">1</a>–<a href="#ref-silent2019">3</a>]</span>;
+CDI column is omitted).<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p></li>
 </ol>
 <p>Additionally, by applying the <code>print</code> method to the
 <code>MSprog()</code> output, the user can print out the full list of
@@ -3121,15 +3122,18 @@ the function arguments and their default values.</p>
 argument <code>outcome</code>. This triggers:</p>
 <ul>
 <li>Value range checks (e.g., EDSS in the 0-10 range)</li>
+<li>Direction of worsening (e.g., for EDSS, “higher values =
+worse”)</li>
 <li>Outcome-specific <strong>“minimum clinically relevant
-change”</strong>.</li>
+change”</strong></li>
 </ul>
 <p>Outcome values are scanned in chronological order, and tested for
 their difference from the current reference value. Such difference is
 typically required to be larger than a clinically meaningful threshold
 <span class="math inline">\(\delta\)</span>, depending on the reference
 value <span class="math inline">\(x\)</span>. Default settings are
-implemented for the most used disability scales (see <span class="citation">[<a href="#ref-lorscheider2016">4</a>–<a href="#ref-strober2019">7</a>]</span>):</p>
+implemented in <code>msprog</code> for the most used disability scales
+(see <span class="citation">[<a href="#ref-lorscheider2016">4</a>–<a href="#ref-strober2019">7</a>]</span>):</p>
 <ul>
 <li><p><code>outcome=&#39;edss&#39;</code>: Expanded Disability Status Scale
 (EDSS). <span class="math inline">\(\delta(x)=\begin{cases} 1.5 \quad
@@ -3204,52 +3208,32 @@ and to <code>&quot;decrease&quot;</code> if <code>outcome</code> is set to
 choices made in defining the starting point, i.e., the baseline.
 Different behaviours are appropriate in different contexts. This aspect
 is controlled by the <code>baseline</code> argument in
-<code>MSprog()</code>. The following three alternative baseline schemes
-can be adopted.</p>
+<code>MSprog()</code>. The following alternative baseline schemes can be
+adopted.</p>
 <ul>
-<li><p><strong>Fixed baseline</strong> (<code>baseline=&#39;fixed&#39;</code>,
-default): the baseline visit is set to be the first available
-assessment.</p></li>
-<li><p><strong>Improvement-based roving baseline</strong>
+<li><p><em>Fixed baseline</em> (<code>baseline=&#39;fixed&#39;</code>, default):
+the baseline visit is set to be the first available assessment.</p></li>
+<li><p><em>Roving baseline</em> (<code>baseline=&#39;roving&#39;</code>): the
+baseline visit is initially set as the first available assessment, then
+updated after each event. This scheme is recommended in a
+<strong>“multiple events” setting</strong> <span class="citation">[<a href="#ref-kappos2018">2</a>]</span> (see <a href="#multiple">example
+below</a>), but <strong>not recommended for clinical trial data</strong>
+as it may break the randomisation.</p></li>
+<li><p><em>Improvement-based roving baseline</em>
 (<code>baseline=&#39;roving_impr&#39;</code>): the baseline visit is initially
 set as the first available assessment, then updated after each confirmed
-improvement. <strong>This scheme is suitable for a first-CDW setting to
-discard fluctuations around the baseline <span class="citation">[<a href="#ref-muller2023">8</a>]</span>, but not recommended for clinical
-trial data as it may break the randomisation</strong>. The re-baseline
-procedure can be made finer through the <code>sub_threshold_rebl</code>
-argument in <code>MSprog()</code>: setting
-<code>sub_threshold_rebl=&#39;improvement&#39;</code>, for instance, moves the
-reference value after <em>any</em> confirmed improvement, even if below
-<a href="#outcome">the clinically meaningful threshold</a>. In this
-case, the sub-threshold improvement events are used to move the
-baseline, but not listed in the event sequence.</p></li>
-<li><p><strong>Worsening-based roving baseline</strong>
+improvement. This scheme is suitable for a <strong>first-CDW
+setting</strong> to discard fluctuations around the baseline <span class="citation">[<a href="#ref-muller2023">8</a>]</span>, but
+<strong>not recommended for clinical trial data</strong> as it may break
+the randomisation.</p></li>
+<li><p><em>Worsening-based roving baseline</em>
 (<code>baseline=&#39;roving_wors&#39;</code>): the baseline visit is initially
 set as the first available assessment, then updated after each confirmed
-worsening. <strong>This scheme is suitable when the endpoint of interest
-is a specific type of CDW</strong>: for instance, when searching
+worsening. This scheme is suitable when the endpoint of interest is
+<strong>a specific type of CDW</strong>: for instance, when searching
 specifically for PIRA events, the reference should be moved after any
 previous RAW event; when searching specifically for RAW events, the
-reference should be moved after any previous PIRA event. The re-baseline
-procedure can be made finer through the <code>sub_threshold_rebl</code>
-argument in <code>MSprog()</code>: setting
-<code>sub_threshold_rebl=&#39;worsening&#39;</code>, for instance, moves the
-reference value after <em>any</em> confirmed worsening, even if below <a href="#outcome">the clinically meaningful threshold</a>. In this case,
-the sub-threshold worsening events are used to move the baseline, but
-not listed in the event sequence.</p></li>
-<li><p><strong>Roving baseline</strong>
-(<code>baseline=&#39;roving&#39;</code>): the baseline visit is initially set as
-the first available assessment, then updated after each event.
-<strong>This scheme is recommended in a “multiple events”
-setting</strong> <span class="citation">[<a href="#ref-kappos2018">2</a>]</span> (see <a href="#multiple">example
-below</a>), <strong>but not recommended for clinical trial data as it
-may break the randomisation</strong>. The re-baseline procedure can be
-made finer through the <code>sub_threshold_rebl</code> argument in
-<code>MSprog()</code>: setting <code>sub_threshold_rebl=&#39;event&#39;</code>,
-for instance, moves the reference value after <em>any</em> confirmed
-change, even if below <a href="#outcome">the clinically meaningful
-threshold</a>. In this case, the sub-threshold events are used to move
-the baseline, but not listed in the event sequence.</p></li>
+reference should be moved after any previous PIRA event.</p></li>
 </ul>
 <p><strong>Note.</strong> If the baseline data is stored in a separate
 file, the user should merge it with the main data frame containing
@@ -3258,53 +3242,68 @@ and outcome value for each subject at the beginning of the data frame
 (not necessarily next to the other visits from the same subject – they
 will be grouped by subject ID).
 <!-- <span style="color: red;">The possibility to directly input a separate file for baseline data may be added in the future.</span> --></p>
-<p><br /></p>
-<p>When a roving baseline is used, the reference is moved after a
+<div id="additional-options" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Additional
+options</h2>
+<ul>
+<li><p>For roving baseline schemes, the re-baseline procedure can be
+made finer through the <code>sub_threshold_rebl</code> argument in
+<code>MSprog()</code>: setting <code>sub_threshold_rebl=&#39;event&#39;</code>,
+for instance, rebaseline can be triggered by <em>any</em> confirmed
+change, even if below <a href="#outcome">the clinically meaningful
+threshold</a>. In this case, the sub-threshold improvement events are
+used to move the baseline, but not listed in the event
+sequence.</p></li>
+<li><p>When a roving baseline is used, the reference is moved after a
 previously detected event. The new reference may be set at the date of
 the previous event (<code>proceed_from=&#39;event&#39;</code>), or at the first
 confirmation visit of such event (<code>proceed_from=&#39;firstconf&#39;</code>,
-default).</p>
-<p>If the baseline visit occurs in the vicinity of a clinical relapse,
-the reference value may be overestimated. The <code>relapse_to_bl</code>
-argument allows to specify the minimum accepted distance (in days) of
-the baseline visit from the onset of a previous relapse. For instance,
-if <code>baseline=&#39;fixed&#39;</code> and <code>relapse_to_bl=30</code>, the
-baseline visit is chosen as the first available visit satisfying the
-requirement of “no relapses within the preceding 30 days”. If two values
-are provided, they are interpreted as intervals before <em>and
-after</em> the event – e.g., <code>relapse_to_bl=c(30, 2)</code>
-implements the constraint of “no relapses within the preceding 30 days
-or within the following 2 days”. If relapse <strong>end dates</strong>
-are available (may be provided as an additional column in the relapse
-file whose name is specified by argument <code>renddate_col</code> in
-<code>MSprog()</code>), the first value of <code>relapse_to_bl</code> is
-overwritten by the relapse duration, unless it was set to 0 (in which
-case it stays 0 and the baseline is <strong>not</strong> moved based on
-the influence of previous relapses). If the <code>baseline</code>
-argument is set to a roving scheme, all the above applies to every
-baseline change as well.</p>
-<p>On top of the chosen baseline scheme, <em>post-relapse
+default).</p></li>
+<li><p>If the baseline visit occurs in the vicinity of a clinical
+relapse, the reference value may be overestimated. The
+<code>relapse_to_bl</code> argument allows to specify the minimum
+accepted distance (in days) of the baseline visit from the onset of a
+previous relapse. For instance, if <code>baseline=&#39;fixed&#39;</code> and
+<code>relapse_to_bl=30</code>, the baseline visit is chosen as the first
+available visit satisfying the requirement of “no relapses within the
+preceding 30 days”. If two values are provided, they are interpreted as
+intervals before <em>and after</em> the event – e.g.,
+<code>relapse_to_bl=c(30, 2)</code> implements the constraint of “no
+relapses within the preceding 30 days or within the following 2 days”.
+If relapse <strong>end dates</strong> are available (may be provided as
+an additional column in the relapse file whose name is specified by
+argument <code>renddate_col</code> in <code>MSprog()</code>), the first
+value of <code>relapse_to_bl</code> is overwritten by the relapse
+duration, unless it was set to 0 (in which case it stays 0 and the
+baseline is <strong>not</strong> moved based on the influence of
+previous relapses). If the <code>baseline</code> argument is set to a
+roving scheme, all the above applies to every baseline change as
+well.</p></li>
+<li><p>On top of the chosen baseline scheme, <em>post-relapse
 re-baseline</em> <span class="citation">[<a href="#ref-kappos2020">9</a>]</span> can be applied by setting
 <code>relapse_rebl=TRUE</code> in <code>MSprog()</code>. If this is
 enabled, the onset of each relapse prompts a re-baseline to the next
 available visit following the relapse and out of its influence (as per
-<code>relapse_to_bl</code>).</p>
-<p>Due to fluctuations in the data, the new reference value following a
-re-baseline may fall at a local minimum or maximum of the disability
-trajectory. These may be excluded for consideration as baseline visits
-using the <code>skip_local_extrema</code> argument in
-<code>MSprog()</code>.</p>
-<p>Finally, as an additional constraint, an updated baseline can be
+<code>relapse_to_bl</code>).</p></li>
+<li><p>Due to fluctuations in the data, the new reference value
+following a re-baseline may fall at a local minimum or maximum of the
+disability trajectory. These may be excluded for consideration as
+baseline visits using the <code>skip_local_extrema</code> argument in
+<code>MSprog()</code>.</p></li>
+<li><p>Finally, as an additional constraint, an updated baseline can be
 forced to have a score greater than or equal to the previous baseline by
-setting <code>bl_geq=TRUE</code> in <code>MSprog()</code>.</p>
+setting <code>bl_geq=TRUE</code> in <code>MSprog()</code>.</p></li>
+</ul>
+<p><br></p>
 <p>As already mentioned above, extra caution should be used when
 applying any re-baseline scheme to randomised data, as moving the
 reference value based on post-randomisation events can introduce bias
 (especially if the occurrence of these events is influenced by the
 treatment). <strong>For clinical trial data, general recommendation is
 to use a fixed baseline (at the time of randomisation).</strong></p>
-<div id="multiple" class="section level2" number="4.1">
-<h2><span class="header-section-number">4.1</span> Multiple events</h2>
+</div>
+<div id="multiple" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Multiple events</h2>
 <p>The <code>event</code> argument allows to specify which events to
 detect. By default, it is set to <code>&#39;firstCDW&#39;</code> (only detect
 the first CDW event). It can be set to <code>&#39;multiple&#39;</code> to
@@ -3332,10 +3331,10 @@ sequentially detect all CDW or CDI events.</p>
 <span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>                 <span class="at">verbose=</span><span class="dv">0</span>)</span>
 <span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="co"># print(output$results, row.names=FALSE) # results</span></span>
 <span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(output<span class="sc">$</span>results, <span class="at">rownames=</span>F,</span>
-<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span><span class="st">&quot;200px&quot;</span>, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-754ebfb5391888240257" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-754ebfb5391888240257">{"x":{"filter":"none","vertical":false,"data":[["4"],[1],["CDI"],[""],[586],[77],[77],[98],[0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>CDW_type<\/th>\n      <th>total_fu<\/th>\n      <th>time2event<\/th>\n      <th>bl2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,4,5,6,7,8]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"CDW_type","targets":3},{"name":"total_fu","targets":4},{"name":"time2event","targets":5},{"name":"bl2event","targets":6},{"name":"sust_days","targets":7},{"name":"sust_last","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-b8f698e8f8745e8f65b3" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-b8f698e8f8745e8f65b3">{"x":{"filter":"none","vertical":false,"data":[["4"],[1],["CDI"],[""],[586],[77],[77],[98],[0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>CDW_type<\/th>\n      <th>total_fu<\/th>\n      <th>time2event<\/th>\n      <th>bl2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,4,5,6,7,8]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"CDW_type","targets":3},{"name":"total_fu","targets":4},{"name":"time2event","targets":5},{"name":"bl2event","targets":6},{"name":"sust_days","targets":7},{"name":"sust_last","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>With these settings, the EDSS improvement at visit 2 (EDSS=3.5,
 confirmed at visit 3) does not trigger a re-baseline. The algorithm
 keeps searching for events from after the confirmation visit, evaluating
@@ -3351,13 +3350,14 @@ get:</p>
 <span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>                 <span class="at">verbose=</span><span class="dv">0</span>)</span>
 <span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a><span class="co"># print(output$results, row.names=FALSE) # results</span></span>
 <span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(output<span class="sc">$</span>results, <span class="at">rownames=</span>F,</span>
-<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span><span class="st">&quot;200px&quot;</span>, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-e6b9de8645e3a9a4fbd0" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-e6b9de8645e3a9a4fbd0">{"x":{"filter":"none","vertical":false,"data":[["4","4"],[1,2],["CDI","CDW"],["","PIRA"],[586,586],[77,304],[77,129],[98,282],[0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>CDW_type<\/th>\n      <th>total_fu<\/th>\n      <th>time2event<\/th>\n      <th>bl2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,4,5,6,7,8]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"CDW_type","targets":3},{"name":"total_fu","targets":4},{"name":"time2event","targets":5},{"name":"bl2event","targets":6},{"name":"sust_days","targets":7},{"name":"sust_last","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-98c98826e3059a24fd6b" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-98c98826e3059a24fd6b">{"x":{"filter":"none","vertical":false,"data":[["4","4"],[1,2],["CDI","CDW"],["","PIRA"],[586,586],[77,304],[77,129],[98,282],[0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>CDW_type<\/th>\n      <th>total_fu<\/th>\n      <th>time2event<\/th>\n      <th>bl2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,4,5,6,7,8]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"CDW_type","targets":3},{"name":"total_fu","targets":4},{"name":"time2event","targets":5},{"name":"bl2event","targets":6},{"name":"sust_days","targets":7},{"name":"sust_last","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>The baseline has now been moved to the confirmation visit of the
 first CDI event (visit 3, EDSS=3.5). With respect to this baseline, a
-PIRA event is detected at visit 4 (EDSS=5), confirmed at visit 5.</p>
+subsequent PIRA event is detected at visit 4 (EDSS=5), confirmed at
+visit 5.</p>
 <p><br></p>
 <p>Other valid values for the <code>event</code> argument are:</p>
 <ul>
@@ -3413,7 +3413,7 @@ least</em> 12 weeks after the initial change is selected as confirmation
 visit</strong>. The confirmation window is then defined as the interval
 between the initial worsening and that confirmation visit, and scores
 are checked therein.</p>
-<div id="additional-options" class="section level2" number="5.1">
+<div id="additional-options-1" class="section level2" number="5.1">
 <h2><span class="header-section-number">5.1</span> Additional
 options</h2>
 <ul>
@@ -3421,8 +3421,10 @@ options</h2>
 (e.g., <code>conf_days=c(7*12,7*24)</code>), events are retained if
 confirmed by <em>at least one visit</em> falling within any of the
 specified periods (here, 12 <strong>or</strong> 24 weeks with their
-relative tolerance interval)<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>. The results table will report whether an
-event was confirmed in each of the specified periods, see example <a href="#confexample">below</a>.</li>
+relative tolerance interval)<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>. Confirmation dates/values at <em>all</em>
+specified values will be included in the results table (if
+<code>include_dates=T</code> / <code>include_values=T</code> in
+<code>MSprog()</code>).</li>
 </ul>
 <ul>
 <li><p>If the confirmation visit occurs in the vicinity of a clinical
@@ -3515,9 +3517,9 @@ relapses) followed by complete recovery.</p></li>
 </ul>
 </div>
 </div>
-<div id="classification-of-cdw-events" class="section level1" number="6">
-<h1><span class="header-section-number">6</span> Classification of CDW
-events</h1>
+<div id="relapse-based-classification-of-cdw-events" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Relapse-based
+classification of CDW events</h1>
 <p>When relevant, relapse data is to be provided using the optional
 <code>relapse</code> argument in <code>MSprog()</code>. It should be
 given as a data frame containing subject IDs and relapse onset dates
@@ -3610,9 +3612,13 @@ event for all subjects. The following arguments can be used to control
 the information included.</p>
 <ul>
 <li><code>include_dates</code>: if <code>TRUE</code>, the results will
-include the dates of baseline and event;</li>
+include the dates of: event onset; baseline; last visit before event
+onset at clinically meaningful score distance from it; confirmation
+visit.</li>
 <li><code>include_value</code>: if <code>TRUE</code>, the results will
-include the outcome value at baseline and event;</li>
+include the outcome value at: event onset; baseline; last visit before
+event onset at clinically meaningful score distance from it;
+confirmation visit.</li>
 <li><code>include_stable</code>: if <code>TRUE</code>, subjects with no
 confirmed events are included in the results, with
 <code>time2event</code> = total follow up.</li>
@@ -3625,10 +3631,10 @@ confirmed events are included in the results, with
 <span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a></span>
 <span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a><span class="co"># print(output$results, row.names=FALSE)</span></span>
 <span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(output<span class="sc">$</span>results, <span class="at">rownames=</span>F,</span>
-<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span><span class="st">&quot;200px&quot;</span>, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-46653691640ba4b49819" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-46653691640ba4b49819">{"x":{"filter":"none","vertical":false,"data":[["1","2","5","7"],[1,1,1,1],["CDW","CDW","CDW","CDW"],["PIRA","RAW","PIRA","PIRA"],[534,730,637,779],[292,198,140,372],[292,198,140,372],["2022-07-12","2021-06-12","2021-11-01","2022-03-17"],[6,5.5,5,4.5],["2021-09-23","2020-11-26","2021-06-14","2021-03-10"],[5.5,4,4,3.5],["2022-04-27","2020-12-30","2021-09-12","2021-12-02"],[5.5,4,4,3.5],["2022-11-06","2021-09-04","2022-01-17","2022-07-22"],[6,5,5.5,4.5],["2022-11-06",null,"2022-01-17","2022-07-22"],[6,null,5.5,4.5],[242,84,497,407],[1,0,1,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>CDW_type<\/th>\n      <th>total_fu<\/th>\n      <th>time2event<\/th>\n      <th>bl2event<\/th>\n      <th>date<\/th>\n      <th>value<\/th>\n      <th>bl_date<\/th>\n      <th>bl_value<\/th>\n      <th>last_delta_date<\/th>\n      <th>last_delta_value<\/th>\n      <th>conf84_date<\/th>\n      <th>conf84_value<\/th>\n      <th>PIRA_conf84_date<\/th>\n      <th>PIRA_conf84_value<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,4,5,6,8,10,12,14,16,17,18]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"CDW_type","targets":3},{"name":"total_fu","targets":4},{"name":"time2event","targets":5},{"name":"bl2event","targets":6},{"name":"date","targets":7},{"name":"value","targets":8},{"name":"bl_date","targets":9},{"name":"bl_value","targets":10},{"name":"last_delta_date","targets":11},{"name":"last_delta_value","targets":12},{"name":"conf84_date","targets":13},{"name":"conf84_value","targets":14},{"name":"PIRA_conf84_date","targets":15},{"name":"PIRA_conf84_value","targets":16},{"name":"sust_days","targets":17},{"name":"sust_last","targets":18}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-42172f7af65266e778e3" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-42172f7af65266e778e3">{"x":{"filter":"none","vertical":false,"data":[["1","2","5","7"],[1,1,1,1],["CDW","CDW","CDW","CDW"],["PIRA","RAW","PIRA","PIRA"],[534,730,637,779],[292,198,140,372],[292,198,140,372],["2022-07-12","2021-06-12","2021-11-01","2022-03-17"],[6,5.5,5,4.5],["2021-09-23","2020-11-26","2021-06-14","2021-03-10"],[5.5,4,4,3.5],["2022-04-27","2020-12-30","2021-09-12","2021-12-02"],[5.5,4,4,3.5],["2022-11-06","2021-09-04","2022-01-17","2022-07-22"],[6,5,5.5,4.5],["2022-11-06",null,"2022-01-17","2022-07-22"],[6,null,5.5,4.5],[242,84,497,407],[1,0,1,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>CDW_type<\/th>\n      <th>total_fu<\/th>\n      <th>time2event<\/th>\n      <th>bl2event<\/th>\n      <th>date<\/th>\n      <th>value<\/th>\n      <th>bl_date<\/th>\n      <th>bl_value<\/th>\n      <th>last_delta_date<\/th>\n      <th>last_delta_value<\/th>\n      <th>conf84_date<\/th>\n      <th>conf84_value<\/th>\n      <th>PIRA_conf84_date<\/th>\n      <th>PIRA_conf84_value<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,4,5,6,8,10,12,14,16,17,18]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"CDW_type","targets":3},{"name":"total_fu","targets":4},{"name":"time2event","targets":5},{"name":"bl2event","targets":6},{"name":"date","targets":7},{"name":"value","targets":8},{"name":"bl_date","targets":9},{"name":"bl_value","targets":10},{"name":"last_delta_date","targets":11},{"name":"last_delta_value","targets":12},{"name":"conf84_date","targets":13},{"name":"conf84_value","targets":14},{"name":"PIRA_conf84_date","targets":15},{"name":"PIRA_conf84_value","targets":16},{"name":"sust_days","targets":17},{"name":"sust_last","targets":18}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="progressinfo" class="section level2" number="7.2">
 <h2><span class="header-section-number">7.2</span> Printing progress
@@ -3647,8 +3653,8 @@ extended log of the ongoing computations. See the example below.</p>
 <span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a><span class="co">#&gt; Subject #1: 8 visits, 0 relapses</span></span>
 <span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.1</span></span>
 <span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.2 on</span></span>
-<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="co">#&gt; Found edss change at visit no.5 (2022-07-12); potential confirmation visits available: no.6, 7, 8</span></span>
-<span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a><span class="co">#&gt; Found edss PIRA-CDW (visit no.5, 2022-07-12) confirmed at 84 days, sustained up to visit no.8 (2023-03-11)</span></span>
+<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="co">#&gt; Found EDSS change at visit no.5 (2022-07-12); potential confirmation visits available: no.6, 7, 8</span></span>
+<span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a><span class="co">#&gt; Found EDSS-CDW (PIRA) (visit no.5, 2022-07-12) confirmed at 84 days, sustained up to visit no.8 (2023-03-11)</span></span>
 <span id="cb21-11"><a href="#cb21-11" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.6</span></span>
 <span id="cb21-12"><a href="#cb21-12" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.7 on</span></span>
 <span id="cb21-13"><a href="#cb21-13" tabindex="-1"></a><span class="co">#&gt; No edss change in any subsequent visit: end process</span></span>
@@ -3657,12 +3663,12 @@ extended log of the ongoing computations. See the example below.</p>
 <span id="cb21-16"><a href="#cb21-16" tabindex="-1"></a><span class="co">#&gt; Subject #2: 10 visits, 2 relapses</span></span>
 <span id="cb21-17"><a href="#cb21-17" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.1</span></span>
 <span id="cb21-18"><a href="#cb21-18" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.2 on</span></span>
-<span id="cb21-19"><a href="#cb21-19" tabindex="-1"></a><span class="co">#&gt; Found edss change at visit no.4 (2021-06-12); potential confirmation visits available: no.5, 6, 7, 8, 9, 10</span></span>
-<span id="cb21-20"><a href="#cb21-20" tabindex="-1"></a><span class="co">#&gt; Found edss RAW-CDW (visit no.4, 2021-06-12) confirmed at 84 days, sustained up to visit no.5 (2021-09-04)</span></span>
+<span id="cb21-19"><a href="#cb21-19" tabindex="-1"></a><span class="co">#&gt; Found EDSS change at visit no.4 (2021-06-12); potential confirmation visits available: no.5, 6, 7, 8, 9, 10</span></span>
+<span id="cb21-20"><a href="#cb21-20" tabindex="-1"></a><span class="co">#&gt; Found EDSS-CDW (RAW) (visit no.4, 2021-06-12) confirmed at 84 days, sustained up to visit no.5 (2021-09-04)</span></span>
 <span id="cb21-21"><a href="#cb21-21" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.5</span></span>
 <span id="cb21-22"><a href="#cb21-22" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.6 on</span></span>
-<span id="cb21-23"><a href="#cb21-23" tabindex="-1"></a><span class="co">#&gt; Found edss change at visit no.8 (2022-05-19); potential confirmation visits available: no.9, 10</span></span>
-<span id="cb21-24"><a href="#cb21-24" tabindex="-1"></a><span class="co">#&gt; Found edss PIRA-CDW (visit no.8, 2022-05-19) confirmed at 84 days, sustained up to visit no.10 (2022-11-26)</span></span>
+<span id="cb21-23"><a href="#cb21-23" tabindex="-1"></a><span class="co">#&gt; Found EDSS change at visit no.8 (2022-05-19); potential confirmation visits available: no.9, 10</span></span>
+<span id="cb21-24"><a href="#cb21-24" tabindex="-1"></a><span class="co">#&gt; Found EDSS-CDW (PIRA) (visit no.8, 2022-05-19) confirmed at 84 days, sustained up to visit no.10 (2022-11-26)</span></span>
 <span id="cb21-25"><a href="#cb21-25" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.9</span></span>
 <span id="cb21-26"><a href="#cb21-26" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.10 on</span></span>
 <span id="cb21-27"><a href="#cb21-27" tabindex="-1"></a><span class="co">#&gt; No edss change in any subsequent visit: end process</span></span>
@@ -3671,7 +3677,7 @@ extended log of the ongoing computations. See the example below.</p>
 <span id="cb21-30"><a href="#cb21-30" tabindex="-1"></a><span class="co">#&gt; Subject #3: 7 visits, 1 relapse</span></span>
 <span id="cb21-31"><a href="#cb21-31" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.1</span></span>
 <span id="cb21-32"><a href="#cb21-32" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.2 on</span></span>
-<span id="cb21-33"><a href="#cb21-33" tabindex="-1"></a><span class="co">#&gt; Found edss change at visit no.2 (2021-12-01); potential confirmation visits available: no.4, 5, 7</span></span>
+<span id="cb21-33"><a href="#cb21-33" tabindex="-1"></a><span class="co">#&gt; Found EDSS change at visit no.2 (2021-12-01); potential confirmation visits available: no.4, 5, 7</span></span>
 <span id="cb21-34"><a href="#cb21-34" tabindex="-1"></a><span class="co">#&gt; Change not confirmed: proceed with search</span></span>
 <span id="cb21-35"><a href="#cb21-35" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.3 on</span></span>
 <span id="cb21-36"><a href="#cb21-36" tabindex="-1"></a><span class="co">#&gt; No edss change in any subsequent visit: end process</span></span>
@@ -3680,12 +3686,12 @@ extended log of the ongoing computations. See the example below.</p>
 <span id="cb21-39"><a href="#cb21-39" tabindex="-1"></a><span class="co">#&gt; Subject #4: 7 visits, 0 relapses</span></span>
 <span id="cb21-40"><a href="#cb21-40" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.1</span></span>
 <span id="cb21-41"><a href="#cb21-41" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.2 on</span></span>
-<span id="cb21-42"><a href="#cb21-42" tabindex="-1"></a><span class="co">#&gt; Found edss change at visit no.2 (2021-12-04); potential confirmation visits available: no.3, 4, 5, 6, 7</span></span>
-<span id="cb21-43"><a href="#cb21-43" tabindex="-1"></a><span class="co">#&gt; Found edss improvement (visit no.2, 2021-12-04) confirmed at 84 days, sustained up to visit no.3 (2022-03-12)</span></span>
+<span id="cb21-42"><a href="#cb21-42" tabindex="-1"></a><span class="co">#&gt; Found EDSS change at visit no.2 (2021-12-04); potential confirmation visits available: no.3, 4, 5, 6, 7</span></span>
+<span id="cb21-43"><a href="#cb21-43" tabindex="-1"></a><span class="co">#&gt; Found EDSS-CDI (visit no.2, 2021-12-04) confirmed at 84 days, sustained up to visit no.3 (2022-03-12)</span></span>
 <span id="cb21-44"><a href="#cb21-44" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.3</span></span>
 <span id="cb21-45"><a href="#cb21-45" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.4 on</span></span>
-<span id="cb21-46"><a href="#cb21-46" tabindex="-1"></a><span class="co">#&gt; Found edss change at visit no.4 (2022-07-19); potential confirmation visits available: no.5, 6, 7</span></span>
-<span id="cb21-47"><a href="#cb21-47" tabindex="-1"></a><span class="co">#&gt; Found edss PIRA-CDW (visit no.4, 2022-07-19) confirmed at 84 days, sustained up to visit no.7 (2023-04-27)</span></span>
+<span id="cb21-46"><a href="#cb21-46" tabindex="-1"></a><span class="co">#&gt; Found EDSS change at visit no.4 (2022-07-19); potential confirmation visits available: no.5, 6, 7</span></span>
+<span id="cb21-47"><a href="#cb21-47" tabindex="-1"></a><span class="co">#&gt; Found EDSS-CDW (PIRA) (visit no.4, 2022-07-19) confirmed at 84 days, sustained up to visit no.7 (2023-04-27)</span></span>
 <span id="cb21-48"><a href="#cb21-48" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.5</span></span>
 <span id="cb21-49"><a href="#cb21-49" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.6 on</span></span>
 <span id="cb21-50"><a href="#cb21-50" tabindex="-1"></a><span class="co">#&gt; No edss change in any subsequent visit: end process</span></span>
@@ -3694,14 +3700,14 @@ extended log of the ongoing computations. See the example below.</p>
 <span id="cb21-53"><a href="#cb21-53" tabindex="-1"></a><span class="co">#&gt; Subject #5: 9 visits, 0 relapses</span></span>
 <span id="cb21-54"><a href="#cb21-54" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.1</span></span>
 <span id="cb21-55"><a href="#cb21-55" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.2 on</span></span>
-<span id="cb21-56"><a href="#cb21-56" tabindex="-1"></a><span class="co">#&gt; Found edss change at visit no.3 (2021-11-01); potential confirmation visits available: no.4, 5, 6, 7, 8, 9</span></span>
-<span id="cb21-57"><a href="#cb21-57" tabindex="-1"></a><span class="co">#&gt; Found edss PIRA-CDW (visit no.3, 2021-11-01) confirmed at 84 days, sustained up to visit no.9 (2023-03-13)</span></span>
+<span id="cb21-56"><a href="#cb21-56" tabindex="-1"></a><span class="co">#&gt; Found EDSS change at visit no.3 (2021-11-01); potential confirmation visits available: no.4, 5, 6, 7, 8, 9</span></span>
+<span id="cb21-57"><a href="#cb21-57" tabindex="-1"></a><span class="co">#&gt; Found EDSS-CDW (PIRA) (visit no.3, 2021-11-01) confirmed at 84 days, sustained up to visit no.9 (2023-03-13)</span></span>
 <span id="cb21-58"><a href="#cb21-58" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.4</span></span>
 <span id="cb21-59"><a href="#cb21-59" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.5 on</span></span>
-<span id="cb21-60"><a href="#cb21-60" tabindex="-1"></a><span class="co">#&gt; Found edss change at visit no.5 (2022-04-30); potential confirmation visits available: no.7, 8, 9</span></span>
+<span id="cb21-60"><a href="#cb21-60" tabindex="-1"></a><span class="co">#&gt; Found EDSS change at visit no.5 (2022-04-30); potential confirmation visits available: no.7, 8, 9</span></span>
 <span id="cb21-61"><a href="#cb21-61" tabindex="-1"></a><span class="co">#&gt; Change not confirmed: proceed with search</span></span>
 <span id="cb21-62"><a href="#cb21-62" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.6 on</span></span>
-<span id="cb21-63"><a href="#cb21-63" tabindex="-1"></a><span class="co">#&gt; Found edss change at visit no.8 (2022-12-15); potential confirmation visits available: no.9</span></span>
+<span id="cb21-63"><a href="#cb21-63" tabindex="-1"></a><span class="co">#&gt; Found EDSS change at visit no.8 (2022-12-15); potential confirmation visits available: no.9</span></span>
 <span id="cb21-64"><a href="#cb21-64" tabindex="-1"></a><span class="co">#&gt; Change not confirmed: proceed with search</span></span>
 <span id="cb21-65"><a href="#cb21-65" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.9 on</span></span>
 <span id="cb21-66"><a href="#cb21-66" tabindex="-1"></a><span class="co">#&gt; No edss change in any subsequent visit: end process</span></span>
@@ -3710,14 +3716,14 @@ extended log of the ongoing computations. See the example below.</p>
 <span id="cb21-69"><a href="#cb21-69" tabindex="-1"></a><span class="co">#&gt; Subject #6: 7 visits, 1 relapse</span></span>
 <span id="cb21-70"><a href="#cb21-70" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.1</span></span>
 <span id="cb21-71"><a href="#cb21-71" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.2 on</span></span>
-<span id="cb21-72"><a href="#cb21-72" tabindex="-1"></a><span class="co">#&gt; Found edss change at visit no.3 (2022-02-15); potential confirmation visits available: no.4, 5, 7</span></span>
-<span id="cb21-73"><a href="#cb21-73" tabindex="-1"></a><span class="co">#&gt; Found edss improvement (visit no.3, 2022-02-15) confirmed at 84 days, sustained up to visit no.5 (2022-10-05)</span></span>
+<span id="cb21-72"><a href="#cb21-72" tabindex="-1"></a><span class="co">#&gt; Found EDSS change at visit no.3 (2022-02-15); potential confirmation visits available: no.4, 5, 7</span></span>
+<span id="cb21-73"><a href="#cb21-73" tabindex="-1"></a><span class="co">#&gt; Found EDSS-CDI (visit no.3, 2022-02-15) confirmed at 84 days, sustained up to visit no.5 (2022-10-05)</span></span>
 <span id="cb21-74"><a href="#cb21-74" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.4</span></span>
 <span id="cb21-75"><a href="#cb21-75" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.5 on</span></span>
-<span id="cb21-76"><a href="#cb21-76" tabindex="-1"></a><span class="co">#&gt; Found edss change at visit no.6 (2022-12-22); potential confirmation visits available: no.</span></span>
+<span id="cb21-76"><a href="#cb21-76" tabindex="-1"></a><span class="co">#&gt; Found EDSS change at visit no.6 (2022-12-22); potential confirmation visits available: no.</span></span>
 <span id="cb21-77"><a href="#cb21-77" tabindex="-1"></a><span class="co">#&gt; Change not confirmed: proceed with search</span></span>
 <span id="cb21-78"><a href="#cb21-78" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.7 on</span></span>
-<span id="cb21-79"><a href="#cb21-79" tabindex="-1"></a><span class="co">#&gt; Found edss change at visit no.7 (2023-02-21); potential confirmation visits available: no.</span></span>
+<span id="cb21-79"><a href="#cb21-79" tabindex="-1"></a><span class="co">#&gt; Found EDSS change at visit no.7 (2023-02-21); potential confirmation visits available: no.</span></span>
 <span id="cb21-80"><a href="#cb21-80" tabindex="-1"></a><span class="co">#&gt; Change not confirmed: proceed with search</span></span>
 <span id="cb21-81"><a href="#cb21-81" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.- on</span></span>
 <span id="cb21-82"><a href="#cb21-82" tabindex="-1"></a><span class="co">#&gt; No edss change in any subsequent visit: end process</span></span>
@@ -3726,11 +3732,11 @@ extended log of the ongoing computations. See the example below.</p>
 <span id="cb21-85"><a href="#cb21-85" tabindex="-1"></a><span class="co">#&gt; Subject #7: 9 visits, 1 relapse</span></span>
 <span id="cb21-86"><a href="#cb21-86" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.1</span></span>
 <span id="cb21-87"><a href="#cb21-87" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.2 on</span></span>
-<span id="cb21-88"><a href="#cb21-88" tabindex="-1"></a><span class="co">#&gt; Found edss change at visit no.3 (2021-09-11); potential confirmation visits available: no.4, 5, 6, 7, 8, 9</span></span>
+<span id="cb21-88"><a href="#cb21-88" tabindex="-1"></a><span class="co">#&gt; Found EDSS change at visit no.3 (2021-09-11); potential confirmation visits available: no.4, 5, 6, 7, 8, 9</span></span>
 <span id="cb21-89"><a href="#cb21-89" tabindex="-1"></a><span class="co">#&gt; Change not confirmed: proceed with search</span></span>
 <span id="cb21-90"><a href="#cb21-90" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.4 on</span></span>
-<span id="cb21-91"><a href="#cb21-91" tabindex="-1"></a><span class="co">#&gt; Found edss change at visit no.5 (2022-03-17); potential confirmation visits available: no.6, 7, 8, 9</span></span>
-<span id="cb21-92"><a href="#cb21-92" tabindex="-1"></a><span class="co">#&gt; Found edss PIRA-CDW (visit no.5, 2022-03-17) confirmed at 84 days, sustained up to visit no.9 (2023-04-28)</span></span>
+<span id="cb21-91"><a href="#cb21-91" tabindex="-1"></a><span class="co">#&gt; Found EDSS change at visit no.5 (2022-03-17); potential confirmation visits available: no.6, 7, 8, 9</span></span>
+<span id="cb21-92"><a href="#cb21-92" tabindex="-1"></a><span class="co">#&gt; Found EDSS-CDW (PIRA) (visit no.5, 2022-03-17) confirmed at 84 days, sustained up to visit no.9 (2023-04-28)</span></span>
 <span id="cb21-93"><a href="#cb21-93" tabindex="-1"></a><span class="co">#&gt; Baseline at visit no.6</span></span>
 <span id="cb21-94"><a href="#cb21-94" tabindex="-1"></a><span class="co">#&gt; Searching for events from visit no.7 on</span></span>
 <span id="cb21-95"><a href="#cb21-95" tabindex="-1"></a><span class="co">#&gt; No edss change in any subsequent visit: end process</span></span>
@@ -3750,10 +3756,10 @@ extended log of the ongoing computations. See the example below.</p>
 <span id="cb21-109"><a href="#cb21-109" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
 <span id="cb21-110"><a href="#cb21-110" tabindex="-1"></a><span class="co">#&gt; Total subjects: 7</span></span>
 <span id="cb21-111"><a href="#cb21-111" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb21-112"><a href="#cb21-112" tabindex="-1"></a><span class="co">#&gt; Subjects with CDW: 0 (PIRA: 5; RAW: 1)</span></span>
+<span id="cb21-112"><a href="#cb21-112" tabindex="-1"></a><span class="co">#&gt; Subjects with CDW: 5 (PIRA: 5; RAW: 1)</span></span>
 <span id="cb21-113"><a href="#cb21-113" tabindex="-1"></a><span class="co">#&gt; Subjects with CDI: 2</span></span>
 <span id="cb21-114"><a href="#cb21-114" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb21-115"><a href="#cb21-115" tabindex="-1"></a><span class="co">#&gt; CDW events: 0 (PIRA: 5; RAW: 1)</span></span>
+<span id="cb21-115"><a href="#cb21-115" tabindex="-1"></a><span class="co">#&gt; CDW events: 6 (PIRA: 5; RAW: 1)</span></span>
 <span id="cb21-116"><a href="#cb21-116" tabindex="-1"></a><span class="co">#&gt; CDI events: 2</span></span></code></pre></div>
 <p>For further insight into the event detection process, all score
 changes from baseline that were not identified as valid events (e.g.,
@@ -3761,10 +3767,10 @@ not confirmed) are stored in <code>output$unconfirmed</code>. In this
 example, this looks like:</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co"># print(output$unconfirmed, row.names=FALSE)</span></span>
 <span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(output<span class="sc">$</span>unconfirmed, <span class="at">rownames=</span>F,</span>
-<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span><span class="st">&quot;200px&quot;</span>, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-3ed351ae1732b826690d" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-3ed351ae1732b826690d">{"x":{"filter":"none","vertical":false,"data":[["3","5","5","6","6","7"],["2021-12-01","2022-04-30","2022-12-15","2022-12-22","2023-02-21","2021-09-11"],[4.5,5,5,6,6,5],["2021-10-18","2022-01-17","2022-01-17","2022-09-03","2022-09-03","2021-03-10"],[3.5,5.5,5.5,4.5,4.5,3.5],[null,null,null,4,65,-0],[365,null,null,null,null,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>date<\/th>\n      <th>value<\/th>\n      <th>bl_date<\/th>\n      <th>bl_value<\/th>\n      <th>closest_rel_before<\/th>\n      <th>closest_rel_after<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[2,4,5,6]},{"name":"id","targets":0},{"name":"date","targets":1},{"name":"value","targets":2},{"name":"bl_date","targets":3},{"name":"bl_value","targets":4},{"name":"closest_rel_before","targets":5},{"name":"closest_rel_after","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-6075cb3708f3da9a6099" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-6075cb3708f3da9a6099">{"x":{"filter":"none","vertical":false,"data":[["3","5","5","6","6","7"],[18962,19112,19341,19348,19409,18881],[4.5,5,5,6,6,5],[18918,19009,19009,19238,19238,18696],[3.5,5.5,5.5,4.5,4.5,3.5],[null,null,null,4,65,-0],[365,null,null,null,null,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>date<\/th>\n      <th>value<\/th>\n      <th>bl_date<\/th>\n      <th>bl_value<\/th>\n      <th>closest_rel_before<\/th>\n      <th>closest_rel_after<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4,5,6]},{"name":"id","targets":0},{"name":"date","targets":1},{"name":"value","targets":2},{"name":"bl_date","targets":3},{"name":"bl_value","targets":4},{"name":"closest_rel_before","targets":5},{"name":"closest_rel_after","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <div id="time-to-disability-milestone" class="section level1" number="8">
@@ -3781,7 +3787,7 @@ data.</p>
 <span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&#39;id&#39;</span>, <span class="at">value_col=</span><span class="st">&#39;EDSS&#39;</span>, <span class="at">date_col=</span><span class="st">&#39;date&#39;</span>,</span>
 <span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>                 <span class="at">outcome=</span><span class="st">&#39;edss&#39;</span>, <span class="at">relapse=</span>toydata_relapses,</span>
 <span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>                 <span class="at">verbose=</span><span class="dv">0</span>)</span></code></pre></div>
-<p>The function returns a data frame with one row per subject:</p>
+<p>The function returns a data frame indexed by subject IDs:</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="fu">print</span>(vm)</span>
 <span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="co">#&gt;         date EDSS time2event observed</span></span>
 <span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a><span class="co">#&gt; 1 2022-07-12    6        292        1</span></span>
@@ -3918,14 +3924,14 @@ With Relapsing Multiple Sclerosis</span>. JAMA Neurology [Internet].
 <code>time2event</code> is the total follow-up length. To omit these
 subjects, set <code>include_stable=FALSE</code> in
 <code>MSprog()</code>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>In this example, <code>event_sequence</code> can contain
-a maximum of one event, as we are not specifying the argument
+<li id="fn2"><p>In this example, we did not specify the argument
 <code>event</code> - which defaults to <code>firstCDW</code> (only
-detect the first CDW event). For the same reason, <code>nevent</code> in
-<code>output$results</code> can only be 0 or 1 in this example. In a
-multiple-event setting (<code>event=multiple</code>), more than one
-event per subject can be detected. See <a href="#multiple">the relevant
-section</a>.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+detect the first CDW event). For this reason, (1)
+<code>event_sequence</code> can contain a maximum of one event; (2)
+<code>nevent</code> in <code>output_edss$results</code> can only be 0 or
+1; (3) CDI column is omitted. In a multiple-event setting
+(<code>event=multiple</code>), more than one event per subject can be
+detected. See <a href="#multiple">the relevant section</a>.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 <li id="fn3"><p>The value change from baseline must also be maintained
 at all intermediate visits between the event and the confirmation visit.
 This behaviour may be changed by setting the
