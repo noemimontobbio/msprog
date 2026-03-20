@@ -1,7 +1,7 @@
 MSprog                  Assess multiple sclerosis disability course
                         from longitudinal data.
-compute_delta           Definition of minimum clinically meaningful
-                        shift for different scales.
+compute_delta           Default minimum clinically meaningful shift for
+                        different scales.
 is_event                Compare value to reference.
 print.MSprogOutput      Textual description of criteria used to assess
                         disability course.

@@ -10,12 +10,12 @@
 #'
 #' @usage data(toydata_visits)
 #'
-#' @format An object of class `data.frame`
+#' @format An object of class `data.frame`.
 #' \describe{
-#'  \item{id}{Subject ID}
-#'  \item{date}{The visit date}
-#'  \item{EDSS}{A value between 0 and 10}
-#'  \item{SDMT}{A value between 0 and 110}
+#'  \item{id}{Subject ID.}
+#'  \item{date}{The visit date.}
+#'  \item{EDSS}{A value between 0 and 10.}
+#'  \item{SDMT}{A value between 0 and 110.}
 #' }
 #' @references This data set was artificially created for the `msprog` package.
 #' @keywords datasets
@@ -38,10 +38,10 @@ NULL
 #'
 #' @usage data(toydata_relapses)
 #'
-#' @format An object of class `data.frame`
+#' @format An object of class `data.frame`.
 #' \describe{
-#'  \item{id}{Subject ID}
-#'  \item{date}{The relapse date}
+#'  \item{id}{Subject ID.}
+#'  \item{date}{The relapse date.}
 #' }
 #' @references This data set was artificially created for the `msprog` package.
 #' @keywords datasets

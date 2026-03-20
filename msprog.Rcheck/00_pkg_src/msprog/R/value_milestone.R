@@ -1,17 +1,18 @@
 
 #' Time to disability milestone.
 #'
-#' `value_milestone()` scans the visits in chronological order to detect the first
-#' outcome value exceeding a specified disability milestone (e.g., EDSS>=6), *with confirmation*.
+#' Scan the visits in chronological order to detect the first outcome value
+#' reaching or exceeding a specified disability milestone (e.g., EDSS>=6),
+#' *with confirmation*.
 #'
 #' \itemize{
 #' \item "Reaching or exceeding" means either value>=milestone or value<=milestone, depending on the
-#' outcome measure (see arguments `outcome` and `worsening`).
-#' \item An event is only retained if **confirmed**, i.e., if all values *up to* the
+#' direction of worsening (see arguments `outcome` and `worsening`).
+#' \item An event is only considered "observed" if **confirmed**, i.e., if all values *up to* the
 #' confirmation visit reach or exceed the milestone.
 #' }
 #'
-#' @param data a `data.frame` containing longitudinal data, including: subject ID, outcome value, date of visit.
+#' @param data Data frame containing longitudinal data, including: subject ID, outcome value, date of visit.
 #' @param milestone Disability milestone (outcome value to check data against).
 #' @param subj_col Name of data column with subject ID.
 #' @param value_col Name of data column with outcome value.
@@ -24,35 +25,46 @@
 #'  \item `"sdmt"` (Symbol Digit Modalities Test)
 #'  \item `"custom"` (only accepted when specifying argument `worsening`).
 #'  }
+#'  Outcome type triggers internal checks on value range and
+#'  determines the direction of worsening (see `worsening` argument).
 #' @param worsening The direction of worsening (`"increase"` if higher values correspond to worse disease course, `"decrease"` otherwise).<br />
 #' The given value is only used when `outcome` is set to `"custom"`. Otherwise, `worsening` is automatically set to
 #' `"increase"` if `outcome` is set to `"edss"`, `"nhpt"`, `"t25fw"`,
 #'  and to `"decrease"` if `outcome` is set to `"sdmt"`.
-#' @param relapse `data.frame` containing longitudinal data, including: subject ID and relapse date.
+#' @param relapse Optional data frame containing longitudinal data, including: subject ID and relapse date.
 #' @param rsubj_col Name of subject column for relapse data, if different from outcome data.
 #' @param rdate_col Name of date column for relapse data, if different from outcome data.
-#' @param validconf_col Name of data column specifying which visits can (`T`) or cannot (`F`) be used as confirmation visits.
+#' @param validconf_col Name of data column specifying which visits can (`TRUE`) or cannot (`FALSE`) be used as confirmation visits.
 #' The input data does not necessarily have to include such a column.
 #' If `validconf_col=NULL`, all visits are potentially used as confirmation visits.
-#' @param conf_days Period before confirmation (days).
-#' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
-#' or list-like of length 2 (different tolerance on left and right).
+#' @param conf_days Period before confirmation (days). Can be a single value, or
+#' list-like of any length if considering multiple windows.
+#' If `length(conf_days) > 1` (e.g., `conf_days=c(12*7, 24*7)`),
+#' the function retains milestones confirmed at \emph{either} time point (e.g.,
+#' "confirmed at 12 \emph{or} 24 weeks") with the relative tolerance (as per `conf_tol_days`).
+#' @param conf_tol_days Tolerance window for confirmation visit (days); can be
+#' an integer (same lower and upper tolerance)
+#' or list-like of length 2 (different lower and upper tolerance).
 #' The right end of the interval can be set to `Inf` (confirmation window unbounded on the right
 #' -- e.g., "confirmed over 12 \emph{or more} weeks").
 #' @param require_sust_days Minimum number of days over which the milestone must be sustained
 #' (i.e., confirmed at \emph{all} visits occurring in the specified period).
 #' If the milestone is sustained for the remainder of the follow-up period, it is considered reached regardless of follow-up duration.
 #' If `require_sust_days=Inf`, values are retained only when sustained for the remainder of the follow-up period.
-#' @param relapse_to_event Minimum distance from a relapse (days) for the milestone to be considered reached.
-#' Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
-#' (minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+#' @param relapse_to_event Minimum distance (days) from the onset of a relapse
+#' for the milestone to be considered reached.
+#' Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+#' (minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 #' Note that setting the distance to zero means retaining the event regardless of surrounding relapses.
-#' @param relapse_to_conf Minimum distance from a relapse (days) for a visit to be a valid confirmation visit.
-#' Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
-#' (minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+#' @param relapse_to_conf Minimum distance (days) from the onset of a relapse
+#' for a visit to be a valid confirmation visit.
+#' Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+#' (minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 #' Note that setting the distance to zero means using any visit for confirmation regardless of surrounding relapses.
-#' @param impute_last_visit Imputation probability when the milestone is reached at the last visit (i.e. with no confirmation).
-#' Unconfirmed values exceeding the milestone at the last visit are never imputed if `impute_last_visit=0`;
+#' @param impute_last_visit Imputation probability when the milestone is reached
+#' at the last available visit (i.e., with no confirmation).
+#' Unconfirmed values exceeding the milestone at the last visit are never imputed
+#' if `impute_last_visit=0`;
 #' they are always imputed if `impute_last_visit=1`;
 #' they are imputed with probability `p`, `0<p<1`, if `impute_last_visit=p`.
 #' If a value `N>1` is passed, unconfirmed values exceeding the milestone are imputed only if occurring within `N` days of follow-up
@@ -70,10 +82,10 @@
 #'  \item 1 (print concise info, default)
 #'  \item 2 (print extended info).
 #'  }
-#' @return A `data.frame` containing the following columns:
+#' @return A data frame containing the following columns:
 #' \itemize{
-#' \item `date_col`: the date of first reaching or exceeding the milestone with confirmation (or last date of follow-up if milestone is not reached or not confirmed)
-#' \item `value_col`: the first value  reaching or exceeding the milestone with confirmation, if present, otherwise no value
+#' \item `<date_col>`: the date of first reaching or exceeding the milestone with confirmation (or last date of follow-up if milestone is not reached or not confirmed)
+#' \item `<value_col`: the first value  reaching or exceeding the milestone with confirmation, if present, otherwise no value
 #' \item `"time2event"`: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached or not confirmed)
 #' \item `"observed"`: whether the milestone was reached with confirmation (1) or not (0).
 #' }
@@ -84,7 +96,7 @@
 
 value_milestone <- function(data, milestone, subj_col, value_col, date_col, outcome,
                             worsening=NULL, relapse=NULL, rsubj_col=NULL, rdate_col=NULL,
-                            validconf_col=NULL, conf_days=24*7, conf_tol_days=c(7, 2*365.25), require_sust_days=0,
+                            validconf_col=NULL, conf_days=12*7, conf_tol_days=c(7, 2*365.25), require_sust_days=0,
                             relapse_to_event=0, relapse_to_conf=30, impute_last_visit=0, date_format=NULL,
                             verbose=0) {
 
@@ -92,7 +104,7 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
   # CHECKS ON ARGUMENT VALUES
 
   # If conf_tol_days is a single value, duplicate it (equal left and right tolerance)
-  if (length(conf_tol_days)==1) {
+  if (length(conf_tol_days) == 1) {
     conf_tol_days <- c(conf_tol_days, conf_tol_days)
   }
 
@@ -130,7 +142,7 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
   # If no `validconf_col` is specified, create a dummy one
   if (is.null(validconf_col)) {
     validconf_col <- 'validconf'
-    data$validconf <- T
+    data$validconf <- TRUE
   } else {
     data[[validconf_col]] <- as.logical(data[[validconf_col]])
   }
@@ -173,16 +185,26 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
   }
 
   # Local function to display dates/days
-  display_date <- function(day, start, to_print=F) {
+  display_date <- function(day, start) {
     if (is.na(day) | is.null(day)) {
-      return(ifelse(to_print, "",
-                    ifelse(!is.null(date_format) && date_format == 'day', NaN, as.Date(NA))))
+      return("")
     }
     if (!is.null(date_format) && date_format == 'day') {
-      ifelse(to_print, paste("day", day), day)
+      paste("day", day)
     } else {
-      start + as.difftime(day, units="days")
+      as.character(start + day)
     }
+  }
+
+  # Local function to re-convert numeric to date (vectorised)
+  num_to_date <- function(day, start) {
+    if (!is.null(date_format) && date_format == "day") {
+      return(day)
+    }
+    out <- as.Date(rep(NA_real_, length(day)))
+    ok <- !is.na(day)
+    out[ok] <- start + day[ok]
+    out
   }
 
   # Convert dates to days from global minimum
@@ -235,17 +257,18 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
   nsub <- length(all_subj)
 
   # Initialise results data.frame
-  results <- data.frame(matrix(ncol = 4, nrow = nsub))
+  results <- data.frame(matrix(ncol=4, nrow=nsub))
   colnames(results) <- c(date_col, value_col, 'time2event', 'observed')
   rownames(results) <- all_subj
-  if (!is.null(date_format) && date_format == 'day') {
-    results[[date_col]] <- NaN  # numeric
-  } else {
-    results[[date_col]] <- as.Date(NA)  # Date
-  }
-  results[[value_col]] <- NaN
-  results$time2event <- NaN
-  results$observed <- 0
+  # if (!is.null(date_format) && date_format == 'day') {
+  #   results[[date_col]] <- NaN  # numeric
+  # } else {
+  #   results[[date_col]] <- as.Date(NA)  # Date
+  # }
+  results[[date_col]] <- NaN  # numeric
+  results[[value_col]] <- NaN  # numeric
+  results$time2event <- NaN  # numeric
+  results$observed <- FALSE  # logical
 
   for (subjid in all_subj) {
 
@@ -275,8 +298,8 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
 
     # Print info
     if (verbose == 2) {
-      message("\nSubject #", subjid, ": ", nvisits, " visit", ifelse(nvisits == 1, "", "s"),
-              ", ", nrel, " relapse", ifelse(nrel == 1, "", "s"))
+      message("\nSubject #", subjid, ": ", nvisits, " visit", if (nvisits == 1) "" else "s",
+              ", ", nrel, " relapse", if (nrel == 1) "" else "s")
       if (any(ucounts > 1)) {
         message("Found multiple visits on the same day: only keeping last.")
       }
@@ -289,7 +312,7 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
     if (length(relapse_dates) > 0) {
       relapse_df <- data.frame(split(rep(relapse_dates, each=nrow(data_id)),
                                      rep(1:length(relapse_dates), each=nrow(data_id))))
-      relapse_df$visit <- data_id[,][[date_col]]
+      relapse_df$visit <- data_id[[date_col]]
       dist <- (relapse_df %>% mutate(across(1:length(relapse_dates),
                                 ~ as.numeric(.x - visit))))[1:length(relapse_dates)]
       distm <- - dist
@@ -310,9 +333,8 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
       milestone_idx <- NA
       if (search_idx <= nvisits) {
           for (x in (search_idx:nvisits)) {
-            if (ifelse(worsening=='increase',
-                       data_id[x, value_col] >= milestone,
-                       data_id[x, value_col] <= milestone) # first value reaching milestone
+            if (if (worsening=='increase') {data_id[x, value_col] >= milestone}
+                else {data_id[x, value_col] <= milestone} # first value reaching milestone
                 && data_id[x, 'closest_rel_before'] >= relapse_to_event[1]
                 && data_id[x, 'closest_rel_after'] >= relapse_to_event[2])
               {
@@ -323,11 +345,11 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
         }
 
       if (is.na(milestone_idx)) {
-        results[subjid, date_col] <- display_date(data_id[nvisits,][[date_col]], global_start) # end of FU
+        results[subjid, date_col] <- data_id[[date_col]][nvisits] # end of FU
         results[subjid, 'time2event'] <- data_id[nvisits, date_col] - data_id[1, date_col] # FU length
         proceed <- FALSE
         if (verbose == 2) {
-          message("No value",  ifelse(worsening=='increase', '>=', '<='), milestone, " in any visit: end process\n")
+          message("No value",  if (worsening=='increase') '>=' else '<=', milestone, " in any visit: end process\n")
         }
 
       } else {
@@ -337,11 +359,11 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
           conf_idx <- lapply(conf_window, function(t) {
             match_idx <- numeric(0)
             for (x in (milestone_idx + 1):nvisits) {
-              if (data_id[x,][[date_col]] - data_id[milestone_idx,][[date_col]] >= t[1]
-                  && data_id[x,][[date_col]] - data_id[milestone_idx,][[date_col]] <= t[2]  # date in confirmation range
-                  && data_id[x,][['closest_rel_before']] >= relapse_to_conf[1]  # occurring out of influence of last relapse
-                  && data_id[x,][['closest_rel_after']] >= relapse_to_conf[2]  # occurring out of influence of next relapse
-                  && data_id[x,][[validconf_col]]  # can be used as confirmation
+              if (data_id[[date_col]][x] - data_id[[date_col]][milestone_idx] >= t[1]
+                  && data_id[[date_col]][x] - data_id[[date_col]][milestone_idx] <= t[2]  # date in confirmation range
+                  && data_id[['closest_rel_before']][x] >= relapse_to_conf[1]  # occurring out of influence of last relapse
+                  && data_id[['closest_rel_after']][x] >= relapse_to_conf[2]  # occurring out of influence of next relapse
+                  && data_id[[validconf_col]][x]  # can be used as confirmation
               ) {
                 match_idx <- append(match_idx, x)
               }
@@ -351,20 +373,20 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
           conf_idx <- unique(unlist(conf_idx))
         }
         if (verbose == 2) {
-          message("Found value", ifelse(worsening=='increase', '>=', '<='), milestone,
+          message("Found value", if (worsening=='increase') '>=' else '<=', milestone,
                   " at visit no.", milestone_idx, " (",
-                  display_date(data_id[milestone_idx,][[date_col]], global_start, to_print=T),
-                  "); potential confirmation visits available: ", ifelse(length(conf_idx)>0,
-                                        paste0("no. ", paste(conf_idx, collapse=", ")), "none"))
+                  display_date(data_id[[date_col]][milestone_idx], global_start),
+                  "); potential confirmation visits available: ", if (length(conf_idx)>0)
+                                        paste0("no. ", paste(conf_idx, collapse=", ")) else "none")
         }
 
         if (
           (length(conf_idx) > 0  # confirmation visits available
-            && ifelse(worsening=='increase',
-                      all(data_id[(milestone_idx + 1):conf_idx[[1]], value_col] >= milestone),
-                      all(data_id[(milestone_idx + 1):conf_idx[[1]], value_col] <= milestone))   # milestone is confirmed at (all visits up to) first valid date
+            && if (worsening=='increase')
+                      all(data_id[(milestone_idx + 1):conf_idx[[1]], value_col] >= milestone) else
+                      all(data_id[(milestone_idx + 1):conf_idx[[1]], value_col] <= milestone)   # milestone is confirmed at (all visits up to) first valid date
             ) || (milestone_idx == nvisits  # milestone reached at last visit
-                  && data_id[milestone_idx,][[date_col]] - data_id[1,][[date_col]] <= impute_max_fu  # visit below follow-up threshold
+                  && data_id[[date_col]][milestone_idx] - data_id[[date_col]][1] <= impute_max_fu  # visit below follow-up threshold
                   && rbinom(1, 1, impute_last_visit)  # impute with probability `impute_last_visit`
                   )
             ) {
@@ -377,9 +399,9 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
           if (conf_idx[[1]]==nvisits) {
             next_nonsust <- NA
           } else {
-            next_nonsust <- which(ifelse(worsening=='increase',
-                                         data_id[(conf_idx[[1]] + 1):nvisits, value_col] < milestone,
-                                         data_id[(conf_idx[[1]] + 1):nvisits, value_col] > milestone)
+            next_nonsust <- which(if (worsening=='increase')
+                                         data_id[(conf_idx[[1]] + 1):nvisits, value_col] < milestone
+                                         else data_id[(conf_idx[[1]] + 1):nvisits, value_col] > milestone
             )[1] + conf_idx[[1]]
           }
 
@@ -387,29 +409,29 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
           # The `valid` flag indicates whether the event can (1) or cannot (0) be retained:
           valid <- 1
           if (require_sust_days > 0) {
-            valid <- is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
-                                data_id[milestone_idx,][[date_col]]) >= require_sust_days # sustained up to end of follow-up, or for `require_sust_days`
+            valid <- is.na(next_nonsust) || (data_id[[date_col]][next_nonsust] -
+                                data_id[[date_col]][milestone_idx]) >= require_sust_days # sustained up to end of follow-up, or for `require_sust_days`
           }
 
           if (valid) {
-          results[subjid, date_col] <- display_date(data_id[milestone_idx,][[date_col]], global_start) # date of reaching the milestone
+          results[subjid, date_col] <- data_id[[date_col]][milestone_idx] # date of reaching the milestone
           results[subjid, value_col] <- data_id[milestone_idx, value_col] # first value >= milestone
-          results[subjid, 'time2event'] <- data_id[milestone_idx, date_col] - data_id[1, date_col] # time to reach the milestone
-          results[subjid, 'observed'] <- 1 # whether milestone was reached
+          results[subjid, "time2event"] <- data_id[milestone_idx, date_col] - data_id[1, date_col] # time to reach the milestone
+          results[subjid, "observed"] <- TRUE # whether milestone was reached
           proceed <- FALSE
-          if (verbose == 2) message(ifelse(milestone_idx == nvisits, "Imputed", "Confirmed"), " value",
-                                    ifelse(worsening=='increase', '>=', '<='), milestone,
-                                    ifelse(milestone_idx == nvisits, " (last visit", paste0(" (visit no.", milestone_idx, ", ",
-                                    display_date(data_id[milestone_idx,][[date_col]], global_start, to_print=T))),
+          if (verbose == 2) message(if (milestone_idx == nvisits) "Imputed" else "Confirmed", " value",
+                                    if (worsening=='increase') '>=' else '<=', milestone,
+                                    if (milestone_idx == nvisits) " (last visit" else paste0(" (visit no.", milestone_idx, ", ",
+                                    display_date(data_id[[date_col]][milestone_idx], global_start)),
                                     "): end process\n")
           } else {
             # (not sustained)
             search_idx <- next_nonsust + 1
             if (verbose == 2) {
-              message("Value", ifelse(worsening=='increase', '>=', '<='),
+              message("Value", if (worsening=='increase') '>=' else '<=',
                       milestone, " confirmed but not sustained over ",
-                      ifelse(require_sust_days<Inf, paste(">=", require_sust_days, "days"),
-                             "remainder of follow-up"), ": proceed with search")
+                      if (require_sust_days<Inf) paste(">=", require_sust_days, "days")
+                             else "remainder of follow-up", ": proceed with search")
             }
           }
 
@@ -418,14 +440,14 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
           if (milestone_idx == nvisits) {
             next_change <- nvisits
           } else {
-            next_change <- which(ifelse(worsening=='increase',
-                                         data_id[(milestone_idx + 1):nvisits, value_col] < milestone,
-                                         data_id[(milestone_idx + 1):nvisits, value_col] > milestone)
+            next_change <- which(if (worsening=='increase')
+                                         data_id[(milestone_idx + 1):nvisits, value_col] < milestone
+                                         else data_id[(milestone_idx + 1):nvisits, value_col] > milestone
             )[1] + milestone_idx
           }
-          search_idx <- ifelse(is.na(next_change), nvisits, next_change + 1)
+          search_idx <- if (is.na(next_change)) nvisits else next_change + 1
           if (verbose == 2) {
-            message("Value", ifelse(worsening=='increase', '>=', '<='),
+            message("Value", if (worsening=='increase') '>=' else '<=',
                               milestone, " not confirmed: proceed with search")
             }
         }
@@ -434,23 +456,37 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
 
   }  # END for (subjid in all_subj)
 
+  # Convert date columns to Date format (relative to global_start)
+  date_cols <- date_col
+  results[date_cols] <- lapply(
+    results[date_cols],
+    num_to_date,
+    start = global_start
+  )
+
   if (verbose >= 1) {
     message(paste0("\n---\nOutcome: ", outcome, "\nConfirmation over: ",
            paste(conf_days, collapse=", "), " days (-", conf_tol_days[1], " days, +",
            conf_tol_days[2], " days)",
-           "\nEvent skipped if: ", ifelse(relapse_to_event[1]>0,
-                                  paste0("<", relapse_to_event[1], " days from last relapse"), ""),
-           ifelse(relapse_to_event[2]>0, paste0(ifelse(relapse_to_event[1]>0, ", <", '<'),
-                                                relapse_to_event[2], " days to next relapse"), ""),
-           ifelse(relapse_to_event[1]==0 && relapse_to_event[2]==0, '-', ''),
-           "\nConfirmation visit skipped if: ", ifelse(relapse_to_conf[1]>0, paste0("<", relapse_to_conf[1], " days from last relapse"), ""),
-           ifelse(relapse_to_conf[2]>0, paste0(ifelse(relapse_to_conf[1]>0, ", <", '<'),
-                                               relapse_to_conf[2], " days to next relapse"), ""),
-           ifelse(relapse_to_conf[1]==0 && relapse_to_conf[2]==0, '-', '')
+           "\nEvent skipped if: ",
+           if (relapse_to_event[1] > 0)
+             paste0("<", relapse_to_event[1], " days from last relapse")
+           else "",
+           if (relapse_to_event[2] > 0)
+             paste0(if (relapse_to_event[1] > 0) ", <" else '<', relapse_to_event[2], " days to next relapse")
+           else "",
+           if (relapse_to_event[1] == 0 && relapse_to_event[2] == 0) "-" else "",
+           "\nConfirmation visit skipped if: ",
+           if (relapse_to_conf[1] > 0) paste0("<", relapse_to_conf[1], " days from last relapse")
+           else "",
+           if (relapse_to_conf[2] > 0)
+             paste0(if (relapse_to_conf[1] > 0) ", <" else '<', relapse_to_conf[2], " days to next relapse")
+           else "",
+           if (relapse_to_conf[1] == 0 && relapse_to_conf[2] == 0) "-" else ""
            ))
     message("\n---\nTotal subjects: ", nsub, "\n",
-            sum(results[['observed']]), " reached the milestone ",
-            ifelse(outcome != "custom", toupper(outcome), "outcome"), "=", milestone, ".")
+            sum(results[["observed"]]), " reached the milestone ",
+            if (outcome != "custom") toupper(outcome) else "outcome", "=", milestone, ".")
 
   }
 

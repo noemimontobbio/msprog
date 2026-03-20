@@ -30,44 +30,49 @@ relapse_indep_from_bounds(
 
 \item{prec_type}{Which visit to use as "preceding visit". Must be one of:
 \itemize{
-\item{\code{'baseline'}: the current baseline;}
-\item{\code{'last'}: the last visit before event onset;}
-\item{\code{'last_delta'}: the last visit before event onset with a clinically
-meaningful score distance from the event score, i.e.,
-the last visit \code{i} where \code{outcome[event] - outcome[i] >= delta_fun(outcome[i])}.}
+\item{\code{"baseline"}: the current baseline.}
+\item{\code{"last"}: the last visit before event onset.}
+\item{\verb{"last_delta2}: the last visit before event onset with a clinically
+meaningful score distance from the event score, i.e., for an outcome \code{x} with
+"higher score" = "worse", the last visit \code{i} where
+\cr\code{x[event] - x[i] >= delta_fun(x[i])}\cr
+and
+\cr\code{x[confirmation] - x[i] >= delta_fun(x[i])}.\cr}
 }}
 
-\item{use_end_dates}{If \code{TRUE}, only the right bounds (\code{e1}, \code{c1}) are used,
-as the right bounds will be defined by the onset-to-end interval of each relapse.
-This option is only relevant when relapse \emph{end} dates are available.}
+\item{use_end_dates}{If \code{TRUE}, only the right bounds \code{e1} and \code{c1} are used,
+as the left bounds will be defined by the onset-to-end interval of each relapse.
+This option is only relevant when relapse \emph{end} dates are provided.}
 }
 \value{
-A named list to be given as argument \code{relapse_indep} to function \code{\link[=MSprog]{MSprog()}}
+A named list to be given as argument \code{relapse_indep} to function \code{\link[=MSprog]{MSprog()}}.
 }
 \description{
-\code{relapse_indep_from_bounds()} organises the given interval bounds
-into a named list to be given as argument \code{relapse_indep} to function \code{\link[=MSprog]{MSprog()}}.
-The relapse-free intervals may be anchored to (any subset of) the following three data-driven checkpoints.
-\itemize{
-\item{\code{'prec'}: a visit preceding the event: can be (i) the current baseline, (ii) the last visit before event onset,
+Organise the given interval bounds into a named list to be given as argument
+\code{relapse_indep} to function \code{\link[=MSprog]{MSprog()}}.
+The relapse-free intervals may be anchored to (any subset of) the following
+three data-driven checkpoints.
+\enumerate{
+\item{\code{"prec"}: a visit preceding the event: can be (i) the current baseline, (ii) the last visit before event onset,
 or (iii) the last visit before event onset with a clinically meaningful score distance from the event score
-(i.e., \code{i} such that \code{outcome[event] - outcome[i] >= delta_fun(outcome[i])},
-and same for the confirmation visit);}
-\item{\code{'event'}: the disability worsening event onset;}
-\item{\code{'conf'}: the (first) confirmation visit.}
+(i.e., for an outcome \code{x} with "higher score" = "worse", the last visit \code{i} such that \code{x[event] - x[i] >= delta_fun(x[i])},
+and same for the confirmation visit).}
+\item{\code{"event"}: the disability worsening event onset.}
+\item{\code{"conf"}: the (first available) confirmation visit.}
 }
 }
 \details{
-If both ends of an interval are 0 (e.g., if both \code{p0=0} and \code{p1=0}), the checkpoint is ignored. If the right end is \code{NULL}, the interval is assumed to extend up to the left end of the next interval.
+If both ends of an interval are 0 (e.g., if both \code{p0=0} and \code{p1=0}), the checkpoint is ignored.
+If the right end is \code{NULL}, the interval is assumed to extend up to the left end of the next interval.
 If the left end is \code{NULL}, the interval is assumed to extend up to the right end of the previous interval.
 Here are some examples:
 \itemize{
-\item{No relapses from 90dd before to 30dd after the event, and from 90dd before to 30dd after the confirmation [1]:
-\cr\code{relapse_indep_from_bounds(e0=90,e1=30,c0=90,c1=30)};}
-\item{No relapses between baseline and confirmation (high-specificity definition from [1]):
-\cr\code{relapse_indep_from_bounds(p0=0,p1=NULL,e0=NULL,e1=NULL,c0=NULL,c1=0)};}
-\item{No relapses from baseline to 30dd after the event, and within confirmation+-30dd [2]:
-\cr\code{relapse_indep_from_bounds(p0=0,p1=NULL,e0=NULL,e1=30,c0=30,c1=30)}.}
+\item No relapses from 90dd before to 30dd after the event, and from 90dd before to 30dd after the confirmation [1]:
+\cr\code{relapse_indep_from_bounds(e0=90,e1=30,c0=90,c1=30)}.
+\item No relapses between baseline and confirmation (high-specificity definition from [1]):
+\cr\code{relapse_indep_from_bounds(p0=0,p1=NULL,e0=NULL,e1=NULL,c0=NULL,c1=0)}.
+\item No relapses from baseline to 30dd after the event, and within confirmation+-30dd [2]:
+\cr\code{relapse_indep_from_bounds(p0=0,p1=NULL,e0=NULL,e1=30,c0=30,c1=30)}.
 }
 }
 \references{

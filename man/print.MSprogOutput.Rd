@@ -4,17 +4,17 @@
 \alias{print.MSprogOutput}
 \title{Textual description of criteria used to assess disability course.}
 \usage{
-\method{print}{MSprogOutput}(x, web = F, ...)
+\method{print}{MSprogOutput}(x, web = FALSE, ...)
 }
 \arguments{
-\item{x}{An object of class \code{'MSprogOutput'} (result of a call to \code{\link[=MSprog]{MSprog()}}).}
+\item{x}{An object of class \code{"MSprogOutput"} (result of a call to \code{\link[=MSprog]{MSprog()}}).}
 
 \item{web}{Adapt for printing in web app.}
 
 \item{...}{Optional arguments for \code{print} methods. They are ignored in this function.}
 }
 \description{
-\code{print} method for class \code{'MSprogOutput'}.
+\code{print} method for class \code{"MSprogOutput"}.
 }
 \details{
 The method prints out (1) the package version, (2) a full list of function arguments,
@@ -22,8 +22,8 @@ and (3) a short paragraph describing the full set of criteria used to
 obtain the output.
 }
 \examples{
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
+output <- MSprog(toydata_visits, "id", "EDSS", "date", "edss",
     relapse=toydata_relapses, conf_days=7*12, conf_tol_days=30,
-    event='multiple', baseline='roving', verbose=2)
+    event="multiple", baseline="roving", verbose=2)
 print(output) # textual description of parameters used to obtain output
 }

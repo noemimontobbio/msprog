@@ -2,7 +2,7 @@
 % Please edit documentation in R/event_testing.R
 \name{compute_delta}
 \alias{compute_delta}
-\title{Definition of minimum clinically meaningful shift for different scales.}
+\title{Default minimum clinically meaningful shift for different scales.}
 \usage{
 compute_delta(baseline, outcome = "edss")
 }
@@ -11,10 +11,10 @@ compute_delta(baseline, outcome = "edss")
 
 \item{outcome}{One of: \cr
 \itemize{
-\item{\code{'edss'} (Extended Disability Status Scale, default);}
-\item{\code{'nhpt'} (Nine-Hole Peg Test);}
-\item{\code{'t25fw'} (Timed 25-Foot Walk);}
-\item{\code{'sdmt'} (Symbol Digit Modalities Test).}
+\item{\code{"edss"} (Extended Disability Status Scale, default);}
+\item{\code{"nhpt"} (Nine-Hole Peg Test);}
+\item{\code{"t25fw"} (Timed 25-Foot Walk);}
+\item{\code{"sdmt"} (Symbol Digit Modalities Test).}
 }}
 }
 \value{
@@ -26,14 +26,15 @@ Minimum clinically meaningful change from the provided baseline value. Specifica
 }
 }
 \description{
-\code{compute_delta()} computes the default minimum clinically meaningful change
-from baseline in the outcome measure (EDSS, NHPT, T25FW, or SDMT).
+Compute the minimum clinically meaningful score change as a function of
+the reference value for some widely used scales (EDSS, NHPT, T25FW, or SDMT),
+according to the most established rule for each of these outcomes.
 }
 \details{
 Default thresholds are meant to apply to all versions of each test (e.g.,
 dominant or non-dominant hand for NHPT, best time or mean of two trials, etc.).
 }
 \examples{
-compute_delta(4.5) # default outcome is 'edss'
-compute_delta(55, outcome='sdmt')
+compute_delta(4.5) # default outcome is "edss"
+compute_delta(55, outcome="sdmt")
 }

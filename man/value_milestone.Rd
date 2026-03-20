@@ -16,7 +16,7 @@ value_milestone(
   rsubj_col = NULL,
   rdate_col = NULL,
   validconf_col = NULL,
-  conf_days = 24 * 7,
+  conf_days = 12 * 7,
   conf_tol_days = c(7, 2 * 365.25),
   require_sust_days = 0,
   relapse_to_event = 0,
@@ -27,7 +27,7 @@ value_milestone(
 )
 }
 \arguments{
-\item{data}{a \code{data.frame} containing longitudinal data, including: subject ID, outcome value, date of visit.}
+\item{data}{Data frame containing longitudinal data, including: subject ID, outcome value, date of visit.}
 
 \item{milestone}{Disability milestone (outcome value to check data against).}
 
@@ -44,27 +44,34 @@ value_milestone(
 \item \code{"t25fw"} (Timed 25-Foot Walk)
 \item \code{"sdmt"} (Symbol Digit Modalities Test)
 \item \code{"custom"} (only accepted when specifying argument \code{worsening}).
-}}
+}
+Outcome type triggers internal checks on value range and
+determines the direction of worsening (see \code{worsening} argument).}
 
 \item{worsening}{The direction of worsening (\code{"increase"} if higher values correspond to worse disease course, \code{"decrease"} otherwise).\if{html}{\out{<br />}}
 The given value is only used when \code{outcome} is set to \code{"custom"}. Otherwise, \code{worsening} is automatically set to
 \code{"increase"} if \code{outcome} is set to \code{"edss"}, \code{"nhpt"}, \code{"t25fw"},
 and to \code{"decrease"} if \code{outcome} is set to \code{"sdmt"}.}
 
-\item{relapse}{\code{data.frame} containing longitudinal data, including: subject ID and relapse date.}
+\item{relapse}{Optional data frame containing longitudinal data, including: subject ID and relapse date.}
 
 \item{rsubj_col}{Name of subject column for relapse data, if different from outcome data.}
 
 \item{rdate_col}{Name of date column for relapse data, if different from outcome data.}
 
-\item{validconf_col}{Name of data column specifying which visits can (\code{T}) or cannot (\code{F}) be used as confirmation visits.
+\item{validconf_col}{Name of data column specifying which visits can (\code{TRUE}) or cannot (\code{FALSE}) be used as confirmation visits.
 The input data does not necessarily have to include such a column.
 If \code{validconf_col=NULL}, all visits are potentially used as confirmation visits.}
 
-\item{conf_days}{Period before confirmation (days).}
+\item{conf_days}{Period before confirmation (days). Can be a single value, or
+list-like of any length if considering multiple windows.
+If \code{length(conf_days) > 1} (e.g., \code{conf_days=c(12*7, 24*7)}),
+the function retains milestones confirmed at \emph{either} time point (e.g.,
+"confirmed at 12 \emph{or} 24 weeks") with the relative tolerance (as per \code{conf_tol_days}).}
 
-\item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
-or list-like of length 2 (different tolerance on left and right).
+\item{conf_tol_days}{Tolerance window for confirmation visit (days); can be
+an integer (same lower and upper tolerance)
+or list-like of length 2 (different lower and upper tolerance).
 The right end of the interval can be set to \code{Inf} (confirmation window unbounded on the right
 -- e.g., "confirmed over 12 \emph{or more} weeks").}
 
@@ -73,18 +80,22 @@ The right end of the interval can be set to \code{Inf} (confirmation window unbo
 If the milestone is sustained for the remainder of the follow-up period, it is considered reached regardless of follow-up duration.
 If \code{require_sust_days=Inf}, values are retained only when sustained for the remainder of the follow-up period.}
 
-\item{relapse_to_event}{Minimum distance from a relapse (days) for the milestone to be considered reached.
-Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
-(minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+\item{relapse_to_event}{Minimum distance (days) from the onset of a relapse
+for the milestone to be considered reached.
+Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+(minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 Note that setting the distance to zero means retaining the event regardless of surrounding relapses.}
 
-\item{relapse_to_conf}{Minimum distance from a relapse (days) for a visit to be a valid confirmation visit.
-Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
-(minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+\item{relapse_to_conf}{Minimum distance (days) from the onset of a relapse
+for a visit to be a valid confirmation visit.
+Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+(minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 Note that setting the distance to zero means using any visit for confirmation regardless of surrounding relapses.}
 
-\item{impute_last_visit}{Imputation probability when the milestone is reached at the last visit (i.e. with no confirmation).
-Unconfirmed values exceeding the milestone at the last visit are never imputed if \code{impute_last_visit=0};
+\item{impute_last_visit}{Imputation probability when the milestone is reached
+at the last available visit (i.e., with no confirmation).
+Unconfirmed values exceeding the milestone at the last visit are never imputed
+if \code{impute_last_visit=0};
 they are always imputed if \code{impute_last_visit=1};
 they are imputed with probability \code{p}, \verb{0<p<1}, if \code{impute_last_visit=p}.
 If a value \code{N>1} is passed, unconfirmed values exceeding the milestone are imputed only if occurring within \code{N} days of follow-up
@@ -106,23 +117,24 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 }}
 }
 \value{
-A \code{data.frame} containing the following columns:
+A data frame containing the following columns:
 \itemize{
-\item \code{date_col}: the date of first reaching or exceeding the milestone with confirmation (or last date of follow-up if milestone is not reached or not confirmed)
-\item \code{value_col}: the first value  reaching or exceeding the milestone with confirmation, if present, otherwise no value
+\item \verb{<date_col>}: the date of first reaching or exceeding the milestone with confirmation (or last date of follow-up if milestone is not reached or not confirmed)
+\item \verb{<value_col}: the first value  reaching or exceeding the milestone with confirmation, if present, otherwise no value
 \item \code{"time2event"}: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached or not confirmed)
 \item \code{"observed"}: whether the milestone was reached with confirmation (1) or not (0).
 }
 }
 \description{
-\code{value_milestone()} scans the visits in chronological order to detect the first
-outcome value exceeding a specified disability milestone (e.g., EDSS>=6), \emph{with confirmation}.
+Scan the visits in chronological order to detect the first outcome value
+reaching or exceeding a specified disability milestone (e.g., EDSS>=6),
+\emph{with confirmation}.
 }
 \details{
 \itemize{
 \item "Reaching or exceeding" means either value>=milestone or value<=milestone, depending on the
-outcome measure (see arguments \code{outcome} and \code{worsening}).
-\item An event is only retained if \strong{confirmed}, i.e., if all values \emph{up to} the
+direction of worsening (see arguments \code{outcome} and \code{worsening}).
+\item An event is only considered "observed" if \strong{confirmed}, i.e., if all values \emph{up to} the
 confirmation visit reach or exceed the milestone.
 }
 }

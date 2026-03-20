@@ -1,15 +1,14 @@
 
 #' Assess multiple sclerosis disability course from longitudinal data.
 #'
-#' `MSprog()` detects and characterises the confirmed disability worsening (CDW)
-#' or improvement (CDI) events of an outcome measure (EDSS, NHPT, T25FW, or SDMT; or any custom outcome)
-#' for one or more subjects, based on repeated assessments
-#' through time (and on the dates of acute episodes, if any).
+#' Detect and characterise confirmed disability worsening (CDW) or improvement
+#' (CDI) events of an outcome measure (EDSS, NHPT, T25FW, or SDMT; or any custom outcome)
+#' based on repeated assessments through time (and on the dates of acute episodes, if any).
 #' The events are detected sequentially by scanning the outcome values in chronological order.
 #' Several qualitative and quantitative options are given as arguments that can be set
 #' by the user and reported as a complement to the results to ensure reproducibility.
 #'
-#' @param data data frame containing longitudinal data, including: subject ID, outcome value, date of visit.
+#' @param data Data frame containing longitudinal data, including: subject ID, outcome value, date of visit.
 #' @param subj_col Name of data column with subject ID.
 #' @param value_col Name of data column with outcome value.
 #' @param date_col Name of data column with date of visit.
@@ -21,10 +20,11 @@
 #'  \item `"sdmt"` (Symbol Digit Modalities Test)
 #'  \item `"custom"` (only accepted when specifying custom `delta_fun` and `worsening`).
 #'  }
-#'  Outcome type determines a default direction of worsening (see `worsening`argument)
-#'  and default definition of clinically meaningful change given the reference value
-#'  (using the built-in function [compute_delta()]).
-#'  This can be replaced by a custom function using the `delta_fun` argument.
+#'  Outcome type triggers internal checks on value range,
+#'  determines the direction of worsening (see `worsening` argument),
+#'  and selects the default definition of clinically meaningful change given
+#'  the reference value (using the built-in function [compute_delta()]).
+#'  The latter can be replaced by a custom function using the `delta_fun` argument.
 #' @param relapse Optional data frame containing longitudinal data, including: subject ID and relapse date.
 #' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data.
 #' @param rdate_col Name of onset date column for relapse data, if different from outcome data.
@@ -34,9 +34,10 @@
 #' change in the outcome measure from the provided reference value.
 #' The function provided must take a numeric value (reference score) as input,
 #' and return a numeric value corresponding to the minimum shift from baseline, see example below.
-#' A custom delta function must be specified if `outcome` is set to `"custom"`.
-#' Otherwise, if none is specified, the built-in function [compute_delta()] is used internally.
-#' @param worsening The direction of worsening (`"increase"` if higher values correspond to worse disease course, `"decrease"` otherwise).<br>
+#' If `outcome` is set to `"custom"`, a custom delta function must be specified by the user.
+#' For other values of `outcome`, if no `delta_fun` is specified,  the built-in function [compute_delta()] is used internally.
+#' @param worsening The direction of worsening (`"increase"` if higher values correspond to worse disease course, `"decrease"` otherwise).
+#'
 #' The given value is only used when `outcome` is set to `"custom"`. Otherwise, `worsening` is automatically set to
 #' `"increase"` if `outcome` is set to `"edss"`, `"nhpt"`, `"t25fw"`,
 #'  and to `"decrease"` if `outcome` is set to `"sdmt"`.
@@ -73,88 +74,121 @@
 #' \item the event visit if `proceed_from="event"`.
 #' }
 #' @param sub_threshold_rebl This argument is only used if `baseline` is not set to `"fixed"`.
+#' It controls whether and which "sub-threshold" events (i.e., \emph{confirmed}
+#' changes in the outcome measure below the clinically meaningful threshold) can
+#' trigger a re-baseline.
 #' Must be one of the following.
 #' \itemize{
-#' \item `"event"`: any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
-#' possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
-#' \item `"improvement"`: any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
-#' possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
-#' \item `"worsening"`: any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
-#' possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
-#' \item `"none"`: only use clinically meaningful confirmed changes for re-baseline.
+#' \item `"none"` (default): only use *clinically meaningful* confirmed changes for re-baseline.
+#' \item `"event"`: any confirmed sub-threshold event can potentially trigger a re-baseline.
+#' \item `"improvement"`: any confirmed sub-threshold improvement can potentially trigger a re-baseline.
+#' \item `"worsening"`: any confirmed sub-threshold worsening can potentially trigger a re-baseline.
 #' }
 #' See `delta_fun` argument and [compute_delta()] function for more details.
 #' @param bl_geq This argument is only used if the baseline is moved.
 #' If `TRUE`, the new reference value must always be greater or equal than the previous one;
 #' when it is not, the old reference value is assigned to it \[2\].
-#' @param relapse_rebl If `TRUE`, re-baseline after every relapse.
+#' @param relapse_rebl If `TRUE`, re-baseline after every relapse \[2\].
 #' @param skip_local_extrema This argument is only used if the baseline is moved.
-#' It controls function behaviour in the presence of local minima or maxima. <br>
-#' A visit `i` is a local minimum point for `outcome` if `outcome[i+1]>outcome[i]`
-#' and `outcome[i-1]>outcome[i]`; local maxima are defined similarly.<br>
-#' A visit `i` is a \emph{strict} local minimum point for `outcome` if <br> `outcome[i+1]-outcome[i]>=delta_fun(outcome[i])`;
-#' <br> `outcome[i-1]-outcome[i]>=delta_fun(outcome[i])`. <br>
-#' Strict local maxima are defined similarly. <br>
-#' When `outcome[i]=outcome[i-2]`, visit `i` is \emph{not} considered a local extremum point even if the above conditions hold.
-#' This controls for cases where the outcome has an undulating course.<br>
+#' It controls function behaviour in the presence of local minima or maxima.
+#'
+#' A visit `i` is a local minimum point for outcome `x` if
+#'
+#' `x[i+1]>x[i]` and `x[i-1]>x[i]`.
+#'
+#' Local maxima are defined similarly.
+#'
+#' A visit `i` is a \emph{strict} local minimum point for outcome `x` if
+#'
+#' `x[i+1]-x[i]>=delta_fun(x[i])`;
+#'
+#' `x[i-1]-x[i]>=delta_fun(x[i])`.
+#'
+#' Strict local maxima are defined similarly.
+#'
+#' When `x[i]=x[i-2]`, visit `i` is \emph{not} considered a local
+#' extremum point even if the above conditions hold.
+#' This controls for cases where the outcome has an undulating course.
 #' The following argument values are accepted.
 #' \itemize{
-#' \item `'none'`: local extrema are always accepted as valid baseline values.
-#' \item `'strict'`: the baseline cannot be placed at a \emph{strict} local minimum or maximum.
-#' \item `'all'`: the baseline cannot be placed at a local minimum or maximum.
+#' \item `"none"` (default): local extrema are always accepted as valid baseline values.
+#' \item `"strict"`: the baseline cannot be placed at a \emph{strict} local minimum or maximum.
+#' \item `"all"`: the baseline cannot be placed at a local minimum or maximum.
 #' }
-#' @param validconf_col Name of data column specifying which visits can (`T`) or cannot (`F`) be used as confirmation visits.
+#' @param validconf_col Name of data column specifying which visits can (`TRUE`) or cannot (`FALSE`) be used as confirmation visits.
 #' The input data does not necessarily have to include such a column.
 #' If `validconf_col=NULL`, all visits are potentially used as confirmation visits.
-#' @param conf_days Period before confirmation (days). Can be a single value or list-like of any length if multiple windows are to be considered.
-#' @param conf_tol_days Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
-#' or list-like of length 2 (different tolerance on left and right).
-#' The right end of the interval can be set to `Inf` (confirmation window unbounded on the right
-#' -- e.g., "confirmed over 12 \emph{or more} weeks").
+#' @param conf_days Period before confirmation (days). Can be a single value, or
+#' list-like of any length if considering multiple windows.
+#' If `length(conf_days) > 1` (e.g., `conf_days=c(12*7, 24*7)`),
+#' the function detects events confirmed at \emph{either} time point (e.g.,
+#' "confirmed at 12 \emph{or} 24 weeks") with the relative tolerance (as per `conf_tol_days`).
+#' @param conf_tol_days Tolerance window for confirmation visit (days).
+#' Can be an integer (same lower and upper tolerance)
+#' or list-like of length 2 (different lower and upper tolerance).
+#' The right end of the interval (upper tolerance) can be set to `Inf`
+#' (confirmation window unbounded on the right
+#' -- e.g., "confirmed over 12 *or more* weeks").
 #' @param require_sust_days Minimum number of days over which a confirmed change must be sustained
 #' (i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
 #' Events sustained for the remainder of the follow-up period are always retained regardless of follow-up duration.
-#' If `require_sust_days=Inf`, events are retained only when sustained for the remainder of the follow-up period.<br>
+#' If `require_sust_days=Inf`, events are retained only when sustained for the remainder of the follow-up period.
+#'
 #' (Warning: if `check_intermediate` is set to `FALSE`, sustained change will be established based \emph{only on the end} of the specified period.)
 #' @param check_intermediate If `TRUE` (default), events are confirmed \emph{over all intermediate visits}
-#' up to the confirmation visit. <br>
+#' up to the confirmation visit.
+#'
 #' If set to `FALSE` (not recommended in most cases, as it may discard meaningful fluctuations),
 #' events will be confirmed \emph{only at} the specified confirmation visit
 #' (and \emph{only at the end} of the period defined by `require_sust_days`, if any).
-#' @param relapse_to_bl Minimum distance from a relapse (days) for a visit to be used as baseline.
-#' Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
-#' (minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+#' @param relapse_to_bl Minimum distance (days) from the onset of a relapse for a visit to be used as baseline.
+#' Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+#' (minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 #' Note that setting the distance to zero means keeping the baseline where it is regardless of surrounding relapses.
-#' If relapse end dates are available (`renddate_col`), the minimum distance from last relapse
-#' is overwritten by the relapse duration, unless it was set to zero (in which case it stays 0).
+#'
+#' If relapse end dates are available (`renddate_col`), the minimum distance from last relapse onset
+#' is automatically set to the specific relapse duration, unless `relapse_to_bl` (or `relapse_to_bl[1]`) is zero
+#' (in which case relapse timing does not affect baseline placement).
+#'
 #' If the designated baseline does not respect this constraint, the baseline is moved to the next available visit.
-#' @param relapse_to_event Minimum distance from a relapse (days) for an event to be considered as such.
-#' Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
-#' (minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+#' @param relapse_to_event Minimum distance (days) from the onset of a relapse for an event to be considered as such.
+#' Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+#' (minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 #' Note that setting the distance to zero means retaining the event regardless of surrounding relapses.
-#' If relapse end dates are available (`renddate_col`), the minimum distance from last relapse
-#' is overwritten by the relapse duration, unless it was set to zero (in which case it stays 0).
-#' @param relapse_to_conf Minimum distance from a relapse (days) for a visit to be a valid confirmation visit.
-#' Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
-#' (minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+#'
+#' If relapse end dates are available (`renddate_col`), the minimum distance from last relapse onset
+#' is automatically set to the specific relapse duration, unless `relapse_to_event` (or `relapse_to_event[1]`) is zero
+#' (in which case relapse timing does not affect event validation).
+#' @param relapse_to_conf Minimum distance (days) from the onset of a relapse for a visit to be a valid confirmation visit.
+#' Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+#' (minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 #' Note that setting the distance to zero means using any visit for confirmation regardless of surrounding relapses.
-#' If relapse end dates are available (`renddate_col`), the minimum distance from last relapse
-#' is overwritten by the relapse duration, unless it was set to zero (in which case it stays 0).
-#' @param relapse_assoc Maximum distance from a relapse (days) for a CDW event to be classified as RAW.
-#' Can be an integer (maximum distance from \emph{last} relapse) or list-like of length 2
-#' (maximum distance from \emph{last} relapse, maximum distance from \emph{next} relapse).
+#'
+#' If relapse end dates are available (`renddate_col`), the minimum distance from last relapse onset
+#' is automatically set to the specific relapse duration, unless `relapse_to_conf` (or `relapse_to_conf[1]`) is zero
+#' (in which case relapse timing does not affect selection of confirmation visits).
+#' @param relapse_assoc Maximum distance (days) from the onset of a relapse for a CDW event to be classified as RAW.
+#' Can be an integer (maximum distance from \emph{last} relapse onset) or list-like of length 2
+#' (maximum distance from \emph{last} relapse onset, maximum distance from \emph{next} relapse onset).
 #' If relapse end dates are available (`renddate_col`), the maximum distance from last relapse
-#' is overwritten by the relapse duration.
+#' is automatically set to the specific relapse duration.
 #' @param relapse_indep Specifies relapse-free intervals for PIRA definition.
-#' Must be given in the form produced by function [relapse_indep_from_bounds()] by calling
+#' Must be a named list
+#' \cr`list(prec=list(p0, p1), event=list(e0, e1), conf=list(c0, c1))`\cr
+#' specifying the intervals around (any subset of) three checkpoints:
+#' \enumerate{
+#' \item a preceding visit, e.g., baseline or last visit before the worsening (`p0` and `p1`)
+#' \item the event onset (`e0` and `e1`)
+#' \item the first available confirmation visit (`c0` and `c1`).
+#' }
+#' The auxiliary function `relapse_indep_from_bounds()` can be used to organise
+#' interval bounds into a named list correctly, by calling:
 #' \cr`relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1)`\cr
-#' to specify the intervals around (any subset of) three checkpoints:
-#' (i) a preceding visit, e.g., baseline or last visit before the worsening (`p0` and `p1`),
-#' (ii) the event onset (`e0` and `e1`), and (iii) the first available confirmation visit (`c0` and `c1`).
 #' See [relapse_indep_from_bounds()] function docs for more details on how to define the intervals.
 #' If relapse end dates are available (`renddate_col`), it is possible to also define PIRA based on those
-#' by setting `use_end_dates=T` in [relapse_indep_from_bounds()].
-#' @param impute_last_visit Imputation probability for worsening events occurring at last visit (i.e. with no confirmation).
+#' by setting `use_end_dates=TRUE` in [relapse_indep_from_bounds()].
+#' @param impute_last_visit Imputation probability for worsening events occurring
+#' at the last available visit (i.e., with no confirmation).
 #' Unconfirmed worsening events occurring at the last visit are never imputed if `impute_last_visit=0`;
 #' they are always imputed if `impute_last_visit=1`;
 #' they are imputed with probability `p`, `0<p<1`, if `impute_last_visit=p`.
@@ -173,14 +207,14 @@
 #' \item event onset (`'date'` column)
 #' \item the current baseline (`'bl_date'` column)
 #' \item the last visit before event onset at a clinically meaningful score distance from it (`'last_delta_date'` column)
-#' \item the confirmation visit(s) (`'conf<c>_date'`/`'PIRA_conf<c>_date'` columns for each `c` in `conf_days`)
+#' \item the confirmation visit(s) (`'conf<c>_date'` and `'PIRA_conf<c>_date'` columns for each `c` in `conf_days`)
 #' }
 #' @param include_values If `TRUE`,  `output$results` will include the outcome value at:
 #' \itemize{
 #' \item event onset (`'value'` column)
 #' \item the current baseline (`'bl_value'` column)
 #' \item the last visit before event onset at a clinically meaningful score distance from it (`'last_delta_value'` column)
-#' \item the confirmation visit(s) (`'conf<c>_value'`/`'PIRA_conf<c>_value'` columns for each `c` in `conf_days`)
+#' \item the confirmation visit(s) (`'conf<c>_value'` and `'PIRA_conf<c>_value'` columns for each `c` in `conf_days`)
 #' }
 #' @param include_stable If `TRUE`, subjects with no confirmed events are included in `output$results`,
 #' with `time2event` = total follow up.
@@ -203,13 +237,13 @@
 #'
 #' @return An object of class `MSprogOutput` with the following attributes:
 #' \itemize{
-#' \item{`event_count`: a data frame containing the event sequence detected for each subject, and the counts for each event type}
-#' \item{`results`: a data frame with extended info on each event for all subjects}
-#' \item{`settings`: a list containing all the arguments used to compute the output}
+#' \item{`event_count`: a data frame containing the event sequence detected for each subject, and the counts for each event type.}
+#' \item{`results`: a data frame with extended info on each event for all subjects.}
+#' \item{`settings`: a list containing all the arguments used to compute the output.}
 #' \item{`unconfirmed`: a data frame with info on unconfirmed events (initial change from baseline, but no confirmation)
 #' for all subjects.}
-#' For a detailed description of the `event_count` and `results` data frames, see `?MSprogOutput`.
 #' }
+#' For a detailed description of output data frames, see `?MSprogOutput`.
 #'
 #' @importFrom stats na.omit setNames complete.cases rbinom
 #' @importFrom dplyr %>% group_by slice n mutate across ungroup
@@ -239,17 +273,17 @@
 MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, renddate_col=NULL,
                    subjects=NULL, delta_fun=NULL, worsening=NULL,
-                   event=c('firstCDW', 'first','firstPIRA', 'firstRAW', 'multiple', 'firstCDI'),
+                   event=c('firstCDW', 'firstCDI', 'multiple', 'firstPIRA', 'firstRAW', 'first'),
                    baseline=c('fixed', 'roving', 'roving_impr', 'roving_wors'),
                    proceed_from=c('firstconf', 'event'),
                    sub_threshold_rebl=c('none', 'event', 'improvement', 'worsening'),
-                   bl_geq=F, relapse_rebl=F, skip_local_extrema=c('none', 'strict', 'all'),
+                   bl_geq=FALSE, relapse_rebl=FALSE, skip_local_extrema=c('none', 'strict', 'all'),
                    validconf_col=NULL, conf_days=12*7, conf_tol_days=c(7,2*365.25),
                    require_sust_days=0, check_intermediate=T,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30,
                    relapse_assoc=90, relapse_indep=NULL,
                    impute_last_visit=0, date_format=NULL,
-                   include_dates=F, include_values=F, include_stable=T,
+                   include_dates=FALSE, include_values=FALSE, include_stable=TRUE,
                    verbose=1
                    ) {
 
@@ -297,9 +331,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   ###########################
 
   if (!is.null(renddate_col)) {
-    relapse_to_bl[1] <- ifelse(relapse_to_bl[1]==0, 0, Inf)
-    relapse_to_event[1] <- ifelse(relapse_to_event[1]==0, 0, Inf)
-    relapse_to_conf[1] <- ifelse(relapse_to_conf[1]==0, 0, Inf)
+    relapse_to_bl[1] <- if (relapse_to_bl[1] == 0) 0 else Inf
+    relapse_to_event[1] <- if (relapse_to_event[1] == 0) 0 else Inf
+    relapse_to_conf[1] <- if (relapse_to_conf[1] == 0) 0 else Inf
     relapse_assoc[1] <- Inf
   }
 
@@ -314,7 +348,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   # If no `validconf_col` is specified, create a dummy one
   if (is.null(validconf_col) || !validconf_col %in% names(data)) {
     validconf_col <- 'validconf'
-    data$validconf <- T
+    data$validconf <- TRUE
   } else {
     data[[validconf_col]] <- as.logical(data[[validconf_col]])
   }
@@ -324,7 +358,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     relapse <- data.frame(matrix(nrow=0, ncol=2))
     names(relapse) <- c(rsubj_col, rdate_col)
     renddate_col <- NULL
-    relapse_rebl <- F
+    relapse_rebl <- FALSE
   }
 
   # Convert outcome values to numeric
@@ -385,16 +419,26 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
 
   # Local function to display dates/days
-  display_date <- function(day, start, to_print=F) {
+  display_date <- function(day, start) {
     if (is.na(day) | is.null(day)) {
-      return(ifelse(to_print, "",
-                    ifelse(!is.null(date_format) && date_format == 'day', NaN, as.Date(NA))))
+      return("")
     }
     if (!is.null(date_format) && date_format == 'day') {
-      ifelse(to_print, paste("day", day), day)
+      paste("day", day)
     } else {
-      start + as.difftime(day, units="days")
+      as.character(start + day)
     }
+  }
+
+  # Local function to re-convert numeric to date (vectorised)
+  num_to_date <- function(day, start) {
+    if (!is.null(date_format) && date_format == "day") {
+      return(day)
+    }
+    out <- as.Date(rep(NA_real_, length(day)))
+    ok <- !is.na(day)
+    out[ok] <- start + day[ok]
+    out
   }
 
   # Restrict to subset of subjects
@@ -465,45 +509,68 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
 
   # Define local is_event() function
-  isevent_loc <- function(x, bl, type='wors', st=F) {
+  isevent_loc <- function(x, bl, type='wors', st=FALSE) {
     is_event(x, bl, type=type, outcome=outcome, worsening=worsening,
              sub_threshold=st, delta_fun=delta_fun)
   }
 
   # Define function detecting last_delta
   find_last_delta_idx <- function(data_id, change_idx, conf_idx) {
-    valid_ref <- F
+    valid_ref <- FALSE
     iref <- change_idx
     while (iref > 1 && !valid_ref) {
       iref <- iref - 1
       #
       if (skip_local_extrema != 'none') {
-        prec <- ifelse(iref==1, data_id[iref,][[value_col]], data_id[iref-1,][[value_col]])
-        prec2 <- ifelse(iref<=2, -1, data_id[iref-2,][[value_col]])
-        subs <- ifelse(iref==nvisits, data_id[iref,][[value_col]], data_id[iref+1,][[value_col]])
-        vis <- data_id[iref,][[value_col]]
+        prec <- if (iref == 1) data_id[[value_col]][iref] else data_id[[value_col]][iref - 1]
+        prec2 <- if (iref <= 2) -1 else data_id[[value_col]][iref - 2]
+        subs <- if (iref == nvisits) data_id[[value_col]][iref] else data_id[[value_col]][iref + 1]
+        vis <- data_id[[value_col]][iref]
         local_extr <- ((isevent_loc(prec, bl=vis, type='wors', st=skip_local_extrema=='all')
                         && isevent_loc(subs, bl=vis, type='wors', st=skip_local_extrema=='all')) || (
                           isevent_loc(prec, bl=vis, type='impr', st=skip_local_extrema=='all')
                           && isevent_loc(subs, bl=vis, type='impr', st=skip_local_extrema=='all'))
         ) && (vis!=prec2)
       } else {
-        local_extr <- F
+        local_extr <- FALSE
       }
       event_ok <- isevent_loc(data_id[[value_col]][change_idx],
                               bl=data_id[[value_col]][iref], type='wors')
-      if (is.na(conf_idx)) {
-        conf_ok <- T
+      if (is.null(conf_idx)) {
+        conf_ok <- TRUE
       } else {
-        conf_ok <- ifelse(check_intermediate,
-                      all(sapply((change_idx + 1):conf_idx[[1]],
-                                 function(x) isevent_loc(data_id[x,][[value_col]], bl=data_id[iref,][[value_col]], type='wors'))),  # worsening is confirmed at (all visits up to) first valid date
-                      isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl=data_id[iref,][[value_col]], type='wors') # worsening is confirmed at first valid date
-        )
+        conf_ok <- if (check_intermediate) all(sapply((change_idx + 1):conf_idx[[1]],
+                          function(x) isevent_loc(data_id[[value_col]][x], bl=data_id[[value_col]][iref], type='wors'))  # worsening is confirmed at (all visits up to) first valid date
+                      ) else isevent_loc(data_id[[value_col]][conf_idx[[1]]], bl=data_id[[value_col]][iref], type='wors') # worsening is confirmed at first valid date
       }
       valid_ref <- event_ok && conf_ok && !local_extr
     }
-    ifelse(valid_ref, iref, 1)
+    if (valid_ref) iref else 1
+  }
+
+  # Define function creating empty event template #_ev_
+  make_empty_event <- function() {
+    ev <- list(
+      event_type = "",
+      event_index = NA_integer_,
+      date = if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA),
+      value = NaN,
+      bl_date = if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA),
+      bl_value = NaN,
+      last_delta_date = if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA),
+      last_delta_value = NaN,
+      bl2event = NaN,
+      time2event = NaN,
+      sust_days = 0,
+      sust_last = FALSE #0L
+    )
+    for (cd in conf_days) {
+      ev[[paste0("conf", cd, "_date")]] <- if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA)
+      ev[[paste0("conf", cd, "_value")]] <- NaN
+      ev[[paste0("PIRA_conf", cd, "_date")]] <- if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA)
+      ev[[paste0("PIRA_conf", cd, "_value")]] <- NaN
+    }
+    ev
   }
 
   # Define a confirmation window for each value of conf_days
@@ -518,7 +585,6 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     relapse_indep <- relapse_indep_from_bounds(p0=0, p1=0, e0=90, e1=30, c0=90, c1=30)
   }
 
-
   #################################################################
   # Assess disability course
 
@@ -530,60 +596,65 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   nsub <- length(all_subj)
 
   # Initialise results data.frame
-  max_nevents <- round(max(table(data[[subj_col]]))/2)
-  allcol <- c(subj_col, 'nevent', 'event_type', 'CDW_type', 'total_fu', 'time2event', 'bl2event',
-              'date', 'value', 'bl_date', 'bl_value', 'last_delta_date', 'last_delta_value',
-              # paste0('conf', conf_days), paste0('PIRA_conf', conf_days),
-              paste0('conf', conf_days, '_date'), paste0('conf', conf_days, '_value'),
-              paste0('PIRA_conf', conf_days, '_date'), paste0('PIRA_conf', conf_days, '_value'),
-              'sust_days', 'sust_last')
-  results_df <- data.frame(matrix(nrow=nsub*max_nevents, ncol=length(allcol)))
-  colnames(results_df) <- allcol
-  # Initialize columns with the correct types/values
-  results_df[[subj_col]] <- rep(all_subj, each=max_nevents)
-  results_df$nevent <- rep(1:max_nevents, times=nsub)
-  results_df$event_type <- ''  # character
-  results_df$CDW_type <- ''  # character
-  if (!is.null(date_format) && date_format == 'day') {
-  results_df$date <- NaN # numeric
-  results_df$bl_date <- NaN # numeric
-  results_df$last_delta_date <- NaN # numeric
-  for (cd in conf_days) {
-    results_df[[paste0('conf', cd, '_date')]] <- NaN # numeric
-    results_df[[paste0('PIRA_conf', cd, '_date')]] <- NaN # numeric
-  }
-  } else {
-    results_df$date <- as.Date(NA)  # Date
-    results_df$bl_date <- as.Date(NA)  # Date
-    results_df$last_delta_date <- as.Date(NA)  # Date
-    for (cd in conf_days) {
-      results_df[[paste0('conf', cd, '_date')]] <- as.Date(NA)  # Date
-      results_df[[paste0('PIRA_conf', cd, '_date')]] <- as.Date(NA)  # Date
-    }
-  }
-  results_df$bl_value <- NaN # numeric
-  results_df$value <- NaN  # numeric
-  results_df$last_delta_value <- NaN  # numeric
-  results_df$total_fu <- 0  # numeric
-  results_df$time2event <- NaN  # numeric
-  results_df$bl2event <- NaN  # numeric
-  for (cd in conf_days) {
-    # results_df[[paste0('conf', cd)]] <- 0
-    # results_df[[paste0('PIRA_conf', cd)]] <- 0
-    results_df[[paste0('conf', cd, '_value')]] <- NaN # numeric
-    results_df[[paste0('PIRA_conf', cd, '_value')]] <- NaN # numeric
-  }
-  results_df$sust_days <- 0
-  results_df$sust_last <- 0
+  #####_ev_
+  subject_results <- vector("list", nsub)
+  names(subject_results) <- all_subj
+  #####_ev_
+  # max_nevents <- round(max(table(data[[subj_col]]))/2)
+  # allcol <- c(subj_col, 'nevent', 'event_type', 'CDW_type', 'total_fu', 'time2event', 'bl2event',
+  #             'date', 'value', 'bl_date', 'bl_value', 'last_delta_date', 'last_delta_value',
+  #             # paste0('conf', conf_days), paste0('PIRA_conf', conf_days),
+  #             paste0('conf', conf_days, '_date'), paste0('conf', conf_days, '_value'),
+  #             paste0('PIRA_conf', conf_days, '_date'), paste0('PIRA_conf', conf_days, '_value'),
+  #             'sust_days', 'sust_last')
+  # results_df <- data.frame(matrix(nrow=nsub*max_nevents, ncol=length(allcol)))
+  # colnames(results_df) <- allcol
+  # # Initialize columns with the correct types/values
+  # results_df[[subj_col]] <- rep(all_subj, each=max_nevents)
+  # results_df$nevent <- rep(1:max_nevents, times=nsub)
+  # results_df$event_type <- ''  # character
+  # results_df$CDW_type <- ''  # character
+  # if (!is.null(date_format) && date_format == 'day') {
+  # results_df$date <- NaN # numeric
+  # results_df$bl_date <- NaN # numeric
+  # results_df$last_delta_date <- NaN # numeric
+  # for (cd in conf_days) {
+  #   results_df[[paste0('conf', cd, '_date')]] <- NaN # numeric
+  #   results_df[[paste0('PIRA_conf', cd, '_date')]] <- NaN # numeric
+  # }
+  # } else {
+  #   results_df$date <- as.Date(NA)  # Date
+  #   results_df$bl_date <- as.Date(NA)  # Date
+  #   results_df$last_delta_date <- as.Date(NA)  # Date
+  #   for (cd in conf_days) {
+  #     results_df[[paste0('conf', cd, '_date')]] <- as.Date(NA)  # Date
+  #     results_df[[paste0('PIRA_conf', cd, '_date')]] <- as.Date(NA)  # Date
+  #   }
+  # }
+  # results_df$bl_value <- NaN # numeric
+  # results_df$value <- NaN  # numeric
+  # results_df$last_delta_value <- NaN  # numeric
+  # results_df$total_fu <- 0  # numeric
+  # results_df$time2event <- NaN  # numeric
+  # results_df$bl2event <- NaN  # numeric
+  # for (cd in conf_days) {
+  #   # results_df[[paste0('conf', cd)]] <- 0
+  #   # results_df[[paste0('PIRA_conf', cd)]] <- 0
+  #   results_df[[paste0('conf', cd, '_value')]] <- NaN # numeric
+  #   results_df[[paste0('PIRA_conf', cd, '_value')]] <- NaN # numeric
+  # }
+  # results_df$sust_days <- 0
+  # results_df$sust_last <- 0
+  #####_ev_
 
   summary <- data.frame(matrix(nrow=nsub, ncol=5))
   colnames(summary) <- c('event_sequence', 'CDI', 'CDW', 'RAW', 'PIRA')
   rownames(summary) <- all_subj
-  summary$event_sequence <- ''
-  summary$CDI <- 0
-  summary$CDW <- 0
-  summary$RAW <- 0
-  summary$PIRA <- 0
+  summary$event_sequence <- ""
+  summary$CDI <- 0L
+  summary$CDW <- 0L
+  summary$RAW <- 0L
+  summary$PIRA <- 0L
 
   unconf <- list()
   unconf_idx <- 1
@@ -616,13 +687,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     relapse_dates <- relapse_id[[rdate_col]] # relapse onset_dates
     nrel <- length(relapse_dates)
 
-    total_fu[subjid] <- data_id[nvisits,][[date_col]] - data_id[1,][[date_col]]
+    total_fu[subjid] <- data_id[[date_col]][nvisits] - data_id[[date_col]][1]
 
 
     # Print info
     if (verbose == 2) {
-      message("\nSubject #", subjid, ": ", nvisits, " visit", ifelse(nvisits == 1, "", "s"),
-              ", ", nrel, " relapse", ifelse(nrel == 1, "", "s"))
+      message("\nSubject #", subjid, ": ", nvisits, " visit", (if (nvisits == 1) "" else "s"),
+              ", ", nrel, " relapse", (if (nrel == 1) "" else "s"))
       if (any(ucounts > 1)) {
         message("Found multiple visits in the same day: only keeping last.")
       }
@@ -633,43 +704,50 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
     # Compute distance from relapses
     if (length(relapse_dates) > 0) {
-      relapse_df <- data.frame(split(rep(relapse_dates, each=nrow(data_id)),
-                                     rep(1:length(relapse_dates), each=nrow(data_id))))
-      relapse_df$visit <- data_id[,][[date_col]]
-      dist <- (relapse_df %>% mutate(across(1:length(relapse_dates),
-                                ~ as.numeric(.x - visit))))[1:length(relapse_dates)]
+      # relapse_df <- data.frame(split(rep(relapse_dates, each=nrow(data_id)),
+      #                                rep(1:length(relapse_dates), each=nrow(data_id))))
+      # relapse_df$visit <- data_id[[date_col]]
+      # dist <- (relapse_df %>% mutate(across(1:length(relapse_dates),
+      #                           ~ as.numeric(.x - visit))))[1:length(relapse_dates)]
+      dist <- outer(- data_id[[date_col]], relapse_dates, "+")
       distm <- - dist
       distp <- dist
-      distm[distm<0] <- Inf
-      distp[distp<0] <- Inf
-      data_id$closest_rel_before <- if (all(is.na(distm))) Inf else apply(distm, 1, min, na.rm=TRUE)
+      distm[distm < 0] <- Inf
+      distp[distp < 0] <- Inf
+      data_id$closest_rel_before <- apply(distm, 1, min)  #if (all(is.na(distm))) Inf else apply(distm, 1, min, na.rm=TRUE)
       if (!is.null(renddate_col)) {
         relapse_duration <- relapse_id[[renddate_col]] - relapse_id[[rdate_col]]
-        which_rel <- if (all(is.na(distm))) Inf else apply(distm, 1, which.min)
+        which_rel <- apply(distm, 1, which.min)  #if (all(is.na(distm))) Inf else apply(distm, 1, which.min)
         data_id$closest_rel_duration <- relapse_duration[which_rel]
         data_id$outside_influence <- data_id$closest_rel_duration < data_id$closest_rel_before
         data_id[data_id$outside_influence, 'closest_rel_before'] <- Inf
           }
-      data_id$closest_rel_after <- if (all(is.na(distp))) Inf else apply(distp, 1, min, na.rm=TRUE)
+      data_id$closest_rel_after <- apply(distp, 1, min)  #if (all(is.na(distp))) Inf else apply(distp, 1, min, na.rm=TRUE)
     } else {
       data_id$closest_rel_before <- Inf
       data_id$closest_rel_after <- Inf
     }
 
     # Initialise results columns
-    event_type <- ""
-    event_index <- NULL
-    bl_date <- edate <- last_delta_date <- bl_value <- evalue <- last_delta_value <- time2event <- bl2event <- sustd <- sustl <- vector()
-    # conf <- pira_conf <- list()
-    conf_date <- conf_value <- pira_conf_date <- pira_conf_value <- list()
-    for (m in conf_days) {
-      # conf[[as.character(m)]] <- vector()
-      conf_date[[as.character(m)]] <- vector()
-      conf_value[[as.character(m)]] <- vector()
-      # pira_conf[[as.character(m)]] <- vector()
-      pira_conf_date[[as.character(m)]] <- vector()
-      pira_conf_value[[as.character(m)]] <- vector()
-      }
+    #####_ev_
+    events <- list()
+    event_type <- character(0)
+    event_index <- integer(0)
+    #####_ev_
+    # event_type <- ""
+    # event_index <- NULL
+    # bl_date <- edate <- last_delta_date <- bl_value <- evalue <- last_delta_value <- time2event <- bl2event <- sustd <- sustl <- vector()
+    # # conf <- pira_conf <- list()
+    # conf_date <- conf_value <- pira_conf_date <- pira_conf_value <- list()
+    # for (m in conf_days) {
+    #   # conf[[as.character(m)]] <- vector()
+    #   conf_date[[as.character(m)]] <- vector()
+    #   conf_value[[as.character(m)]] <- vector()
+    #   # pira_conf[[as.character(m)]] <- vector()
+    #   pira_conf_date[[as.character(m)]] <- vector()
+    #   pira_conf_value[[as.character(m)]] <- vector()
+    # }
+    #####_ev
 
     # Initialise variables
     bl_idx <- 1 # Baseline index
@@ -679,7 +757,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     irel <- 1 # Current relapse index
     if (nrel > 0) {
       for (r in 1:nrel) {
-        if (relapse_dates[r] > data_id[bl_idx,][[date_col]]) {
+        if (relapse_dates[r] > data_id[[date_col]][bl_idx]) {
           irel <- r  #change_idx <- r
           break
         }
@@ -696,45 +774,45 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
       n_iter <- n_iter + 1
 
-      if (n_iter > 10000) {stop('infinite loop')}
+      if (n_iter > 10000) {stop('Something got stuck: infinite loop')}
 
       # Set baseline (skip if local extremum or within relapse influence)
       if (skip_local_extrema!='none') {
-        prec <- ifelse(bl_idx==1, data_id[bl_idx,][[value_col]], data_id[bl_idx-1,][[value_col]])
-        prec2 <- ifelse(bl_idx<=2, -1, data_id[bl_idx-2,][[value_col]])
-        subs <- ifelse(bl_idx==nvisits, data_id[bl_idx,][[value_col]], data_id[bl_idx+1,][[value_col]])
-        vis <- data_id[bl_idx,][[value_col]]
-        local_extr <- ((isevent_loc(prec, bl=vis, type='wors', st=skip_local_extrema=='all')
-                       && isevent_loc(subs, bl=vis, type='wors', st=skip_local_extrema=='all')) || (
-                        isevent_loc(prec, bl=vis, type='impr', st=skip_local_extrema=='all')
-                        && isevent_loc(subs, bl=vis, type='impr', st=skip_local_extrema=='all'))
+        prec <- if (bl_idx == 1) data_id[[value_col]][bl_idx] else data_id[[value_col]][bl_idx - 1]
+        prec2 <- if (bl_idx <= 2) -1 else data_id[[value_col]][bl_idx - 2]
+        subs <- if (bl_idx == nvisits) data_id[[value_col]][bl_idx] else data_id[[value_col]][bl_idx + 1]
+        vis <- data_id[[value_col]][bl_idx]
+        local_extr <- ((isevent_loc(prec, bl=vis, type='wors', st=skip_local_extrema == 'all')
+                       && isevent_loc(subs, bl=vis, type='wors', st=skip_local_extrema == 'all')) || (
+                        isevent_loc(prec, bl=vis, type='impr', st=skip_local_extrema == 'all')
+                        && isevent_loc(subs, bl=vis, type='impr', st=skip_local_extrema == 'all'))
                       ) && (vis!=prec2)
       } else {
-        local_extr <- F
+        local_extr <- FALSE
       }
       while (proceed
-             && (data_id[bl_idx,][['closest_rel_before']] < relapse_to_bl[1]
-             || data_id[bl_idx,][['closest_rel_after']] < relapse_to_bl[2]
+             && (data_id[['closest_rel_before']][bl_idx] < relapse_to_bl[1]
+             || data_id[['closest_rel_after']][bl_idx] < relapse_to_bl[2]
              || local_extr)) {
         if (verbose == 2) {
           message("Baseline (visit no.", bl_idx, ") is ",
-                  ifelse(local_extr, "a local extremum: ", "within relapse influence: "),
+                  if (local_extr) "a local extremum: " else "within relapse influence: ",
                   "moved to visit no.", bl_idx + 1)
         }
         bl_idx <- bl_idx + 1
         #
         if (skip_local_extrema != 'none') {
-          prec <- ifelse(bl_idx==1, data_id[bl_idx,][[value_col]], data_id[bl_idx-1,][[value_col]])
-          prec2 <- ifelse(bl_idx<=2, -1, data_id[bl_idx-2,][[value_col]])
-          subs <- ifelse(bl_idx==nvisits, data_id[bl_idx,][[value_col]], data_id[bl_idx+1,][[value_col]])
-          vis <- data_id[bl_idx,][[value_col]]
+          prec <- if (bl_idx == 1) data_id[[value_col]][bl_idx] else data_id[[value_col]][bl_idx - 1]
+          prec2 <- if (bl_idx <= 2) -1 else data_id[[value_col]][bl_idx - 2]
+          subs <- if (bl_idx==nvisits) data_id[[value_col]][bl_idx] else data_id[[value_col]][bl_idx + 1]
+          vis <- data_id[[value_col]][bl_idx]
           local_extr <- ((isevent_loc(prec, bl=vis, type='wors', st=skip_local_extrema=='all')
                          && isevent_loc(subs, bl=vis, type='wors', st=skip_local_extrema=='all')) || (
                         isevent_loc(prec, bl=vis, type='impr', st=skip_local_extrema=='all')
                         && isevent_loc(subs, bl=vis, type='impr', st=skip_local_extrema=='all'))
                         ) && (vis!=prec2)
         } else {
-          local_extr <- F
+          local_extr <- FALSE
         }
         #
         if (bl_idx > nvisits - 1) {
@@ -746,10 +824,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       }
 
       # If `relapse_rebl` is enabled, update relapse index to next relapse after baseline
-      if (relapse_rebl && !is.na(irel) && irel <= nrel) {
+      if (relapse_rebl && !is.na(irel) && irel <= nrel && bl_idx <= nvisits) {
         idx_tmp <- NA
         for (x in irel:nrel) {
-          if (relapse_dates[x] > data_id[bl_idx,][[date_col]]) {
+          if (relapse_dates[x] > data_id[[date_col]][bl_idx]) {
             idx_tmp <- x
             break
           }
@@ -758,10 +836,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       }
 
       # If baseline was moved after current search index, move search index:
-      search_idx <- ifelse(search_idx <= bl_idx, bl_idx + 1, search_idx)
+      if (search_idx <= bl_idx) {search_idx <- bl_idx + 1}
       if (verbose == 2) {
         message("Searching for events from visit no.",
-                ifelse(search_idx > nvisits, "-", search_idx), " on")
+                if (search_idx > nvisits) "-" else search_idx, " on")
       }
 
       if (bl_idx > nvisits) {
@@ -770,7 +848,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         if (verbose == 2) {
           message("Not enough visits left: end process")
         }
-      } else if (bl_geq && !is.null(bl_last) && bl_last > data_id[bl_idx,][[value_col]]) {
+      } else if (bl_geq && !is.null(bl_last) && bl_last > data_id[[value_col]][bl_idx]) {
         # Kappos2020 (by Sean Yiu)
         data_id[bl_idx, value_col] <- bl_last
       }
@@ -782,10 +860,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       change_idx <- NA
       if (search_idx <= nvisits) {
       for (x in search_idx:nvisits) {
-          if (isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='change',
+          if (isevent_loc(data_id[[value_col]][x], bl=bl[[value_col]], type='change',
                           st=sub_threshold_rebl!='none') &
-              data_id[x,][['closest_rel_before']] >= relapse_to_event[1]
-               && data_id[x,][['closest_rel_after']] >= relapse_to_event[2]) {
+              data_id[['closest_rel_before']][x] >= relapse_to_event[1]
+               && data_id[['closest_rel_after']][x] >= relapse_to_event[2]) {
             change_idx <- x
             break
           }
@@ -795,11 +873,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       if (is.na(change_idx) || change_idx > nvisits) {
         proceed <- 0
         if (verbose == 2) {
-          message("No ", ifelse(outcome != "custom", outcome, "outcome"), " change in any subsequent visit: end process")
+          message("No ", if (outcome != "custom") outcome else "outcome", " change in any subsequent visit: end process")
         }
       } else if (relapse_rebl && !is.na(irel) && irel <= nrel
-                 && data_id[change_idx,][[date_col]]
-                    > relapse_dates[irel] + ifelse(event=='firstPIRA', 0, relapse_assoc[1])) {
+                 && data_id[[date_col]][change_idx]
+                    > relapse_dates[irel] + (if (event=='firstPIRA') 0 else relapse_assoc[1])) {
         # If `relapse_rebl`is enabled and the detected change from baseline has crossed the next relapse,
         # the baseline needs to be moved after that relapse (post-relapse re-baseline below).
         # (unless search_idx is after the relapse but within its influence as per `relapse_assoc[0]`: could be a RAW)
@@ -812,11 +890,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         conf_idx <- lapply(conf_window, function(t) {
           match_idx <- numeric(0)
           for (x in (change_idx + 1):nvisits) {
-            if (data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] >= t[1]
-                && data_id[x,][[date_col]] - data_id[change_idx,][[date_col]] <= t[2]  # date in confirmation range
-                && data_id[x,][['closest_rel_before']] >= relapse_to_conf[1]  # occurring out of influence of last relapse
-                && data_id[x,][['closest_rel_after']] >= relapse_to_conf[2]  # occurring out of influence of next relapse
-                && data_id[x,][[validconf_col]]  # can be used as confirmation
+            if (data_id[[date_col]][x] - data_id[[date_col]][change_idx] >= t[1]
+                && data_id[[date_col]][x] - data_id[[date_col]][change_idx] <= t[2]  # date in confirmation range
+                && data_id[['closest_rel_before']][x] >= relapse_to_conf[1]  # occurring out of influence of last relapse
+                && data_id[['closest_rel_after']][x] >= relapse_to_conf[2]  # occurring out of influence of next relapse
+                && data_id[[validconf_col]][x]  # can be used as confirmation
                 ) {
               match_idx <- append(match_idx, x)
             }
@@ -830,8 +908,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         conf_idx <- unique(unlist(conf_idx))
         }
         if (verbose == 2) {
-          message("Found ", ifelse(outcome != 'custom', toupper(outcome), 'outcome'), " change at visit no.", change_idx, " (",
-                  display_date(data_id[change_idx,][[date_col]], global_start, to_print=T),
+          message("Found ", if (outcome != 'custom') toupper(outcome) else 'outcome',
+                  " change at visit no.", change_idx, " (",
+                  display_date(data_id[[date_col]][change_idx], global_start),
                        "); potential confirmation visits available: no.", paste(conf_idx, collapse=", "))
         }
 
@@ -841,12 +920,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
         # CONFIRMED IMPROVEMENT:
         # --------------------
-        if (isevent_loc(data_id[change_idx,][[value_col]], bl=bl[[value_col]], type='impr') # value improved (>delta) from baseline
+        if (isevent_loc(data_id[[value_col]][change_idx], bl=bl[[value_col]], type='impr') # value improved (>delta) from baseline
             && length(conf_idx) > 0  # confirmation visits available
             && ifelse(check_intermediate,
-            all(sapply((change_idx + 1):conf_idx[[1]], function(x) isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]],
+            all(sapply((change_idx + 1):conf_idx[[1]], function(x) isevent_loc(data_id[[value_col]][x], bl=bl[[value_col]],
                        type='impr'))),  # improvement is confirmed at (all visits up to) first valid date
-            isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl=bl[[value_col]], type='impr'))  # improvement is confirmed at first valid date
+            isevent_loc(data_id[[value_col]][conf_idx[[1]]], bl=bl[[value_col]], type='impr'))  # improvement is confirmed at first valid date
             && !((event %in% c('firstCDW', 'firstPIRA', 'firstRAW')) && baseline %in% c('fixed', 'roving_wors'))
             ) {
 
@@ -870,15 +949,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   && data_id[[date_col]][nvisits] - data_id[[date_col]][change_idx] >= require_sust_days # if follow-up lasts at least require_sust_days
                   ) {
                 sust_vis <- which(data_id[(change_idx + 1):nvisits, date_col]
-                      - data_id[change_idx,][[date_col]] >= require_sust_days)[1] + change_idx  # first visit occurring at least `require_sust_days` from event
+                      - data_id[[date_col]][change_idx] >= require_sust_days)[1] + change_idx  # first visit occurring at least `require_sust_days` from event
               } else {
                 sust_vis <- nvisits  # if follow-up lasts before `require_sust_days`, check at last visit
                 }
-            valid_ev <- ifelse(check_intermediate,
-                is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]]
-                          - data_id[[date_col]][change_idx]) >= require_sust_days,  # improvement sustained up to end of follow-up, or for `require_sust_days`
-                isevent_loc(data_id[sust_vis,][[value_col]], bl=bl[[value_col]], type='impr')  # improvement confirmed at `sust_vis` (last visit, or first visit after `require_sust_days`)
-            )
+            valid_ev <- if (check_intermediate) {is.na(next_nonsust) || (data_id[[date_col]][next_nonsust]
+                          - data_id[[date_col]][change_idx]) >= require_sust_days  # improvement sustained up to end of follow-up, or for `require_sust_days`
+                } else isevent_loc(data_id[[value_col]][sust_vis], bl=bl[[value_col]], type='impr')  # improvement confirmed at `sust_vis` (last visit, or first visit after `require_sust_days`)
           }
 
           # If the event is retained (as per `require_sust_days`), we store the info:
@@ -886,58 +963,89 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
             # Find last visit at clinically meaningful score distance from event
             lastdelta_idx <- find_last_delta_idx(data_id, change_idx,
-                                  ifelse(change_idx == nvisits, NA, conf_idx))
+                                  if (change_idx == nvisits) NULL else conf_idx)
             lastdelta <- data_id[lastdelta_idx,]
 
-            sust_idx <- ifelse(is.na(next_nonsust), nvisits, next_nonsust - 1)
-            event_type <- c(event_type, "CDI")
-            event_index <- c(event_index, change_idx)
-            bl_date <- c(bl_date, display_date(bl[[date_col]], global_start))
-            bl_value <- c(bl_value, bl[[value_col]])
-            edate <- c(edate, display_date(data_id[change_idx,][[date_col]], global_start))
-            evalue <- c(evalue, data_id[change_idx,][[value_col]])
-            last_delta_date <- c(last_delta_date, display_date(lastdelta[[date_col]], global_start))
-            last_delta_value <- c(last_delta_value, lastdelta[[value_col]])
-            bl2event <- c(bl2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
-            time2event <- c(time2event, data_id[change_idx,][[date_col]] - data_id[1,][[date_col]])
+            sust_idx <- if (is.na(next_nonsust)) nvisits else next_nonsust - 1
+            #####_ev_
+            ev <- make_empty_event()
+            ev$event_type <- "CDI"
+            ev$event_index <- change_idx
+            ev$date <- data_id[[date_col]][change_idx]
+            ev$value <- data_id[[value_col]][change_idx]
+            ev$bl_date <- bl[[date_col]]
+            ev$bl_value <- bl[[value_col]]
+            ev$last_delta_date <- lastdelta[[date_col]]
+            ev$last_delta_value <- lastdelta[[value_col]]
+            ev$bl2event <- data_id[[date_col]][change_idx] - bl[[date_col]]
+            ev$time2event <- data_id[[date_col]][change_idx] - data_id[[date_col]][1]
             for (cm in names(conf_t)) {
               confirmed_at <- intersect(conf_t[[cm]], conf_idx)
               if (length(confirmed_at)==0) {
-                conf_t <- within(conf_t, rm(list=cm))
-                conf_date[[cm]] <- c(conf_date[[cm]], display_date(NA, global_start))
-                conf_value[[cm]] <- c(conf_value[[cm]], NaN)
+                conf_t[[cm]] <- NULL #conf_t <- within(conf_t, rm(list=cm))
               } else {
-                conf_date[[cm]] <- c(conf_date[[cm]], display_date(data_id[[date_col]][min(confirmed_at)], global_start))
-                conf_value[[cm]] <- c(conf_value[[cm]], data_id[[value_col]][min(confirmed_at)])
+                ev[[paste0("conf", cm, "_date")]] <- data_id[[date_col]][min(confirmed_at)]
+                ev[[paste0("conf", cm, "_value")]] <- data_id[[value_col]][min(confirmed_at)]
               }
-              # conf[[cm]] <- c(conf[[cm]], as.integer(length(confirmed_at)>0))
-              # pira_conf[[cm]] <- c(pira_conf[[cm]], 0)
-              pira_conf_date[[cm]] <- c(pira_conf_date[[cm]], display_date(NA, global_start))
-              pira_conf_value[[cm]] <- c(pira_conf_value[[cm]], NaN)
-              }
-            sustd <- c(sustd, data_id[sust_idx,][[date_col]] - data_id[change_idx,][[date_col]])
-            sustl <- c(sustl, as.integer(sust_idx == nvisits))
+            }
+            ev$sust_days <- data_id[[date_col]][sust_idx] - data_id[[date_col]][change_idx]
+            ev$sust_last <- sust_idx == nvisits
+            #####_ev_
+            # event_type <- c(event_type, "CDI")
+            # event_index <- c(event_index, change_idx)
+            # bl_date <- c(bl_date, display_date(bl[[date_col]], global_start))
+            # bl_value <- c(bl_value, bl[[value_col]])
+            # edate <- c(edate, display_date(data_id[[date_col]][change_idx], global_start))
+            # evalue <- c(evalue, data_id[[value_col]][change_idx])
+            # last_delta_date <- c(last_delta_date, display_date(lastdelta[[date_col]], global_start))
+            # last_delta_value <- c(last_delta_value, lastdelta[[value_col]])
+            # bl2event <- c(bl2event, data_id[[date_col]][change_idx] - bl[[date_col]])
+            # time2event <- c(time2event, data_id[[date_col]][change_idx] - data_id[[date_col]][1])
+            # for (cm in names(conf_t)) {
+            #   confirmed_at <- intersect(conf_t[[cm]], conf_idx)
+            #   if (length(confirmed_at)==0) {
+            #     conf_t <- within(conf_t, rm(list=cm))
+            #     conf_date[[cm]] <- c(conf_date[[cm]], display_date(NA, global_start))
+            #     conf_value[[cm]] <- c(conf_value[[cm]], NaN)
+            #   } else {
+            #     conf_date[[cm]] <- c(conf_date[[cm]], display_date(data_id[[date_col]][min(confirmed_at)], global_start))
+            #     conf_value[[cm]] <- c(conf_value[[cm]], data_id[[value_col]][min(confirmed_at)])
+            #   }
+            #   # conf[[cm]] <- c(conf[[cm]], as.integer(length(confirmed_at)>0))
+            #   # pira_conf[[cm]] <- c(pira_conf[[cm]], 0)
+            #   pira_conf_date[[cm]] <- c(pira_conf_date[[cm]], display_date(NA, global_start))
+            #   pira_conf_value[[cm]] <- c(pira_conf_value[[cm]], NaN)
+            #   }
+            # sustd <- c(sustd, data_id[[date_col]][sust_idx] - data_id[[date_col]][change_idx])
+            # sustl <- c(sustl, as.integer(sust_idx == nvisits))
+            #####_ev_
             # Print progress info
             if (verbose == 2) {
-              message("Found ", ifelse(outcome != 'custom', paste0(toupper(outcome), "-"), ""), "CDI (visit no.", change_idx, ", ",
-                      display_date(data_id[change_idx,][[date_col]], global_start),
+              message("Found ", if (outcome != 'custom') paste0(toupper(outcome), "-") else "",
+                      "CDI (visit no.", change_idx, ", ",
+                      display_date(data_id[[date_col]][change_idx], global_start),
                            ") confirmed at ", paste(names(conf_t), collapse=" and "), " days, sustained up to visit no.", sust_idx,
-                           " (", display_date(data_id[sust_idx,][[date_col]], global_start, to_print=T), ")")
+                           " (", display_date(data_id[[date_col]][sust_idx], global_start), ")")
             }
+
+            events[[length(events) + 1]] <- ev
+            event_type <- c(event_type, ev$event_type)
+            event_index <- c(event_index, ev$event_index)
+
           } else {
             # If the event is NOT retained (as per `require_sust_days`), we proceed.
             if (verbose == 2) {
               message("Change confirmed but not sustained over ",
-                      ifelse(require_sust_days<Inf, paste(">=", require_sust_days, "days"),
-                             "entire follow-up"), ": proceed with search")
+                      if (require_sust_days < Inf) paste(">=", require_sust_days, "days") else "entire follow-up",
+                      ": proceed with search")
             }
             unconf[[unconf_idx]] <- setNames(list(subjid,
-                                                  display_date(data_id[change_idx,][[date_col]], global_start),
-                                                  data_id[change_idx,][[value_col]],
-                                                  display_date(bl[[date_col]], global_start),
+                                                  data_id[[date_col]][change_idx],
+                                                  data_id[[value_col]][change_idx],
+                                                  bl[[date_col]],
                                                   bl[[value_col]],
-                                                  data_id[change_idx,][['closest_rel_before']],
-                                                  data_id[change_idx,][['closest_rel_after']]),
+                                                  data_id[['closest_rel_before']][change_idx],
+                                                  data_id[['closest_rel_after']][change_idx]),
                                              c(subj_col, 'date', 'value', 'bl_date', 'bl_value',
                                                'closest_rel_before', 'closest_rel_after'))
             unconf_idx <- unconf_idx + 1
@@ -951,10 +1059,10 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
           if (baseline %in% c('roving', 'roving_impr')) { #_r_#
             # In a roving baseline setting, the baseline is moved after the confirmed event (even if it is not sustained):
-            newref <- ifelse(proceed_from=='firstconf', conf_idx[[1]], change_idx)
+            newref <- if (proceed_from=='firstconf') conf_idx[[1]] else change_idx
             bl_idx <- newref}
           else if (valid_ev) {
-              newref <- ifelse(proceed_from=='firstconf', conf_idx[[1]], change_idx)
+              newref <- if (proceed_from=='firstconf') conf_idx[[1]] else change_idx
             } else {
               # If the event is not retained (as per `require_sust_days`),
               # proceed with search starting from event, regardless of `proceed_from`:
@@ -967,54 +1075,28 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
           # Move the search index.
           search_idx <- newref + 1
-
-          # # Next change (in any direction!)
-          # next_change <- NA
-          # if (newref<nvisits) {
-          #   for (x in (newref + 1):nvisits) {
-          #     if (isevent_loc(data_id[x,][[value_col]], bl=data_id[bl_idx,][[value_col]],
-          #                                                   type='change') # further change in any direction (from updated baseline)
-          #         # || !isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='impr') # or improvement not sustained (from original baseline)
-          #         ) {
-          #       next_change <- x
-          #       break
-          #     }
-          #   }
-          # }
-          # # Move the search index.
-          # search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
-
         }
 
       # Confirmed sub-threshold improvement: RE-BASELINE
       # ------------------------------------------------
       else if (length(conf_idx) > 0 # confirmation visits available
-          && isevent_loc(data_id[change_idx,][[value_col]], bl=bl[[value_col]], type='impr', st=T) # (sub-threshold) improvement from baseline
+          && isevent_loc(data_id[[value_col]][change_idx], bl=bl[[value_col]], type='impr', st=TRUE) # (sub-threshold) improvement from baseline
           && ifelse(check_intermediate,
           all(sapply((change_idx + 1):conf_idx[[1]], function(x)
-            isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='impr', st=T))), # (sub-threshold) improvement is confirmed over (all visits up to) first valid date
-            isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl=bl[[value_col]], type='impr', st=T)) # (sub-threshold) improvement is confirmed at first valid date
+            isevent_loc(data_id[[value_col]][x], bl=bl[[value_col]], type='impr', st=TRUE))), # (sub-threshold) improvement is confirmed over (all visits up to) first valid date
+            isevent_loc(data_id[[value_col]][conf_idx[[1]]], bl=bl[[value_col]], type='impr', st=TRUE)) # (sub-threshold) improvement is confirmed at first valid date
           && baseline %in% c('roving', 'roving_impr') #_r_#
           && sub_threshold_rebl %in% c('event', 'improvement')
               ) {
-              newref <- ifelse(proceed_from=='firstconf', conf_idx[[1]], change_idx)
+              newref <- if (proceed_from=='firstconf') conf_idx[[1]] else change_idx
 
               # Set new baseline after event:
               bl_idx <- newref
               # Move search index
               search_idx <- newref + 1
 
-              # # Move search index at next change from baseline:
-              # if (newref==nvisits) {
-              #   next_change <- NA
-              # } else {
-              #   next_change <- which(!isevent_loc(data_id[(newref + 1):nvisits, value_col],
-              #                         bl=data_id[bl_idx,][[value_col]], type='impr', st=T))[1] + newref
-              # }
-              # search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
-
               if (verbose == 2) {
-                message("Found confirmed sub-threshold ", ifelse(outcome != 'custom', toupper(outcome), 'outcome'),
+                message("Found confirmed sub-threshold ", if (outcome != 'custom') toupper(outcome), 'outcome',
                         " improvement (visit no.", change_idx, ")")
                 message("Baseline at visit no.", bl_idx)
               }
@@ -1022,14 +1104,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
       # CONFIRMED WORSENING:
       # -------------------
-      else if (isevent_loc(data_id[change_idx,][[value_col]], bl=bl[[value_col]], type='wors')  # value worsened (>delta) from baseline
+      else if (isevent_loc(data_id[[value_col]][change_idx], bl=bl[[value_col]], type='wors')  # value worsened (>delta) from baseline
 
          && ((length(conf_idx) > 0 # confirmation visits available
            && ifelse(check_intermediate,
               all(sapply((change_idx + 1):conf_idx[[1]],
-               function(x) isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='wors'))),  # worsening is confirmed at (all visits up to) first valid date
-              isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl=bl[[value_col]], type='wors')) # worsening is confirmed at first valid date
-          ) || (data_id[change_idx,][[date_col]] - data_id[1,][[date_col]] <= impute_max_fu
+               function(x) isevent_loc(data_id[[value_col]][x], bl=bl[[value_col]], type='wors'))),  # worsening is confirmed at (all visits up to) first valid date
+              isevent_loc(data_id[[value_col]][conf_idx[[1]]], bl=bl[[value_col]], type='wors')) # worsening is confirmed at first valid date
+          ) || (data_id[[date_col]][change_idx] - data_id[[date_col]][1] <= impute_max_fu
                 && rbinom(1,1,impute_last_visit)
                 && change_idx == nvisits))
          ) {
@@ -1054,13 +1136,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   if ((!check_intermediate)
                       && data_id[[date_col]][nvisits] - data_id[[date_col]][change_idx] >= require_sust_days) { # follow-up lasts at least `require_sust_days`
                     sust_vis <- which(data_id[(change_idx + 1):nvisits, date_col]
-                                      - data_id[change_idx,][[date_col]] >= require_sust_days)[1] + change_idx
+                                      - data_id[[date_col]][change_idx] >= require_sust_days)[1] + change_idx
                     } else {sust_vis <- nvisits}
-                  valid_ev <- ifelse(check_intermediate,
-                    is.na(next_nonsust) || (data_id[next_nonsust,][[date_col]] -
-                                data_id[change_idx,][[date_col]]) >= require_sust_days, # worsening sustained up to end of follow-up, or for `require_sust_days`
-                    isevent_loc(data_id[sust_vis,][[value_col]], bl=bl[[value_col]], type='wors') # worsening confirmed at last visit, or first visit after `require_sust_days`
-                  )
+                  valid_ev <- if (check_intermediate) {is.na(next_nonsust) || (data_id[[date_col]][next_nonsust] -
+                                data_id[[date_col]][change_idx]) >= require_sust_days # worsening sustained up to end of follow-up, or for `require_sust_days`
+                    } else isevent_loc(data_id[[value_col]][sust_vis], bl=bl[[value_col]], type='wors') # worsening confirmed at last visit, or first visit after `require_sust_days`
                 }
 
                 # If the event is retained (as per `require_sust_days`),
@@ -1068,27 +1148,34 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                 # 2. we store the info.
                 if (valid_ev) {
 
+
+                  #####_ev_
+                  ev <- make_empty_event()
+                  #####_ev_
+
                   # Find last visit at clinically meaningful score distance from event
                   lastdelta_idx <- find_last_delta_idx(data_id, change_idx,
-                                                       ifelse(change_idx == nvisits, NA, conf_idx))
+                                                       if (change_idx == nvisits) NULL else conf_idx)
                   lastdelta <- data_id[lastdelta_idx,]
 
-                  nev <- length(event_type)
+                  sust_idx <- if (is.na(next_nonsust)) nvisits else next_nonsust - 1
 
-                  sust_idx <- ifelse(is.na(next_nonsust), nvisits, next_nonsust - 1)
-
-                  if (data_id[change_idx,][['closest_rel_before']] <= relapse_assoc[1]
-                      || data_id[change_idx,][['closest_rel_after']] <= relapse_assoc[2]) { # event is relapse-associated
+                  if (data_id[['closest_rel_before']][change_idx] <= relapse_assoc[1]
+                      || data_id[['closest_rel_after']][change_idx] <= relapse_assoc[2]) {
+                    # A) Event is relapse-associated.
                     if (event=='firstPIRA' && baseline %in% c('fixed', 'roving_impr')) {
                       search_idx <- change_idx + 1 # skip this event if only searching for PIRA with no CDW-driven re-baseline
                       next
                     }
-                    event_type <- c(event_type, 'RAW')
-                    event_index <- c(event_index, change_idx)
-                  } else #if (data_id[change_idx,][['closest_rel_before']] > relapse_assoc[1]
-                             #&& data_id[change_idx,][['closest_rel_after']] > relapse_assoc[2])
-                    # event is not relapse-associated
-                    {
+                    #####_ev_
+                    ev$event_type <- "RAW"
+                    ev$event_index <- change_idx
+                    #####_ev_
+                    # event_type <- c(event_type, 'RAW')
+                    # event_index <- c(event_index, change_idx)
+                    #####_ev_
+                  } else {
+                    # B) event is not relapse-associated.
                     if (event=='firstRAW' && baseline %in% c('fixed', 'roving_impr')) {
                       search_idx <- change_idx + 1 # skip this event if only searching for RAW with no CDW-driven re-baseline
                       next
@@ -1097,7 +1184,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     # The detected CDW is not RAW. Let's check if it's PIRA.
 
                     if (is.null(renddate_col) # either relapse end dates are not provided
-                        || length(relapse_indep[['event']]==2)) { # or they are provided but not used for PIRA (`use_end_dates=F` in `relapse_indep_from_bounds`)
+                        || length(relapse_indep[['event']]==2)) { # or they are provided but not used for PIRA (`use_end_dates=FALSE` in `relapse_indep_from_bounds`)
 
                       # Compute intervals that must be relapse-free for PIRA definition
                       if (relapse_indep[['prec_type']]=='baseline') {
@@ -1115,9 +1202,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                         right[[iic]] <- list() # right borders of relapse-free intervals for current confirmation visit
                         ic <- conf_idx[[iic]]
                         for (point in c('prec', 'event', 'conf')) {
-                          t <- ifelse(point == 'prec', prec[[date_col]],
-                                      ifelse(point == 'event', data_id[change_idx,][[date_col]],
-                                             data_id[ic,][[date_col]]))
+                          t <- if (point == 'prec') prec[[date_col]] else if (point == 'event') {
+                            data_id[[date_col]][change_idx]} else data_id[[date_col]][ic]
 
                           if (!is.null(relapse_indep[[point]][[1]])) {
                             t0 <- t - relapse_indep[[point]][[1]]
@@ -1144,14 +1230,14 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                       })
                     } else {  # if using relapse end dates!
 
-                      if (data_id[change_idx,][['closest_rel_before']] < Inf
-                          || data_id[change_idx,][['closest_rel_after']] <= relapse_indep[['event']][[2]]) {
+                      if (data_id[['closest_rel_before']][change_idx] < Inf
+                          || data_id[['closest_rel_after']][change_idx] <= relapse_indep[['event']][[2]]) {
                         # (relapse-free interval around event not satisfied)
-                        rel_inbetween <- rep(T, length(conf_idx))
+                        rel_inbetween <- rep(TRUE, length(conf_idx))
                       } else {
                         # Check relapse-free interval around each confirmation visit:
                       rel_inbetween <- sapply(1:length(conf_idx), function(iic) {
-                        data_id[iic,][['closest_rel_before']] < Inf || data_id[iic,][['closest_rel_after']] <= relapse_indep[['conf']][[2]]
+                        data_id[['closest_rel_before']][iic] < Inf || data_id[['closest_rel_after']][iic] <= relapse_indep[['conf']][[2]]
                       })
                       }
                     }
@@ -1163,88 +1249,131 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                       for (cm in names(conf_t)) {
                         confirmed_at <- intersect(pconf_t[[cm]], pconf_idx)
                         if (length(confirmed_at)==0) {
-                          pconf_t <- within(pconf_t, rm(list=cm))
-                          pira_conf_date[[cm]] <- c(pira_conf_date[[cm]], display_date(NA, global_start))
-                          pira_conf_value[[cm]] <- c(pira_conf_value[[cm]], NaN)
+                          pconf_t[[cm]] <- NULL #pconf_t <- within(pconf_t, rm(list=cm))
+                          #####_ev_
+                          # pira_conf_date[[cm]] <- c(pira_conf_date[[cm]], display_date(NA, global_start))
+                          # pira_conf_value[[cm]] <- c(pira_conf_value[[cm]], NaN)
+                          #####_ev_
                         } else {
-                          pira_conf_date[[cm]] <- c(pira_conf_date[[cm]], display_date(data_id[[date_col]][min(confirmed_at)], global_start))
-                          pira_conf_value[[cm]] <- c(pira_conf_value[[cm]], data_id[[value_col]][min(confirmed_at)])
+                          #####_ev_
+                          ev[[paste0("PIRA_conf", cm, "_date")]] <- data_id[[date_col]][min(confirmed_at)]
+                          ev[[paste0("PIRA_conf", cm, "_value")]] <- data_id[[value_col]][min(confirmed_at)]
+                          #####_ev_
+                          # pira_conf_date[[cm]] <- c(pira_conf_date[[cm]], display_date(data_id[[date_col]][min(confirmed_at)], global_start))
+                          # pira_conf_value[[cm]] <- c(pira_conf_value[[cm]], data_id[[value_col]][min(confirmed_at)])
+                          #####_ev_
                         }
                         # pira_conf[[cm]] <- c(pira_conf[[cm]], as.integer(length(confirmed_at)>0))
                       }
-                      event_type <- c(event_type, 'PIRA')
-                      event_index <- c(event_index, change_idx)
+                      #####_ev_
+                      ev$event_type <- "PIRA"
+                      ev$event_index <- change_idx
+                      #####_ev_
+                      # event_type <- c(event_type, 'PIRA')
+                      # event_index <- c(event_index, change_idx)
+                      #####_ev_
                     } else {
-                      event_type <- c(event_type, 'CDW')
-                      event_index <- c(event_index, change_idx)
+                      #####_ev_
+                      ev$event_type <- "CDW"
+                      ev$event_index <- change_idx
+                      #####_ev_
+                      # event_type <- c(event_type, 'CDW')
+                      # event_index <- c(event_index, change_idx)
+                      #####_ev_
                     }
                   }
 
                   # Store info:
-                  if (event_type[length(event_type)] != 'PIRA') {
-                    for (m in conf_days) {
-                        # pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], 0)
-                        pira_conf_date[[as.character(m)]] <- c(pira_conf_date[[as.character(m)]], display_date(NA, global_start))
-                        pira_conf_value[[as.character(m)]] <- c(pira_conf_value[[as.character(m)]], NaN)
-                        }
-                  }
-                  bl_date <- c(bl_date, display_date(bl[[date_col]], global_start))
-                  bl_value <- c(bl_value, bl[[value_col]])
-                  edate <- c(edate, display_date(data_id[change_idx,][[date_col]], global_start))
-                  evalue <- c(evalue, data_id[change_idx,][[value_col]])
-                  last_delta_date <- c(last_delta_date, display_date(lastdelta[[date_col]], global_start))
-                  last_delta_value <- c(last_delta_value, lastdelta[[value_col]])
-                  bl2event <- c(bl2event, data_id[change_idx,][[date_col]] - bl[[date_col]])
-                  time2event <- c(time2event, data_id[change_idx,][[date_col]] - data_id[1,][[date_col]])
+                  #####_ev_
+                  ev$date <- data_id[[date_col]][change_idx]
+                  ev$value <- data_id[[value_col]][change_idx]
+                  ev$bl_date <- bl[[date_col]]
+                  ev$bl_value <- bl[[value_col]]
+                  ev$last_delta_date <- lastdelta[[date_col]]
+                  ev$last_delta_value <- lastdelta[[value_col]]
+                  ev$bl2event <- data_id[[date_col]][change_idx] - bl[[date_col]]
+                  ev$time2event <- data_id[[date_col]][change_idx] - data_id[[date_col]][1]
                   for (cm in names(conf_t)) {
                     confirmed_at <- intersect(conf_t[[cm]], conf_idx)
                     if (length(confirmed_at)==0) {
-                      conf_t <- within(conf_t, rm(list=cm))
-                      conf_date[[cm]] <- c(conf_date[[cm]], display_date(NA, global_start))
-                      conf_value[[cm]] <- c(conf_value[[cm]], NaN)
+                      conf_t[[cm]] <- NULL #conf_t <- within(conf_t, rm(list=cm))
                     } else {
-                    conf_date[[cm]] <- c(conf_date[[cm]], display_date(data_id[[date_col]][min(confirmed_at)], global_start))
-                    conf_value[[cm]] <- c(conf_value[[cm]], data_id[[value_col]][min(confirmed_at)])
+                      ev[[paste0("conf", cm, "_date")]] <- data_id[[date_col]][min(confirmed_at)]
+                      ev[[paste0("conf", cm, "_value")]] <- data_id[[value_col]][min(confirmed_at)]
                     }
-                    # conf[[cm]] <- c(conf[[cm]], as.integer(length(confirmed_at)>0))
                   }
-                  sustd <- c(sustd, data_id[sust_idx,][[date_col]] - data_id[change_idx,][[date_col]])
-                  sustl <- c(sustl, as.integer(sust_idx == nvisits))
+                  ev$sust_days <- data_id[[date_col]][sust_idx] - data_id[[date_col]][change_idx]
+                  ev$sust_last <- sust_idx == nvisits
+                  #####_ev_
+                  # if (event_type[length(event_type)] != 'PIRA') {
+                  #   for (m in conf_days) {
+                  #       # pira_conf[[as.character(m)]] <- c(pira_conf[[as.character(m)]], 0)
+                  #       pira_conf_date[[as.character(m)]] <- c(pira_conf_date[[as.character(m)]], display_date(NA, global_start))
+                  #       pira_conf_value[[as.character(m)]] <- c(pira_conf_value[[as.character(m)]], NaN)
+                  #       }
+                  # }
+                  # bl_date <- c(bl_date, display_date(bl[[date_col]], global_start))
+                  # bl_value <- c(bl_value, bl[[value_col]])
+                  # edate <- c(edate, display_date(data_id[[date_col]][change_idx], global_start))
+                  # evalue <- c(evalue, data_id[[value_col]][change_idx])
+                  # last_delta_date <- c(last_delta_date, display_date(lastdelta[[date_col]], global_start))
+                  # last_delta_value <- c(last_delta_value, lastdelta[[value_col]])
+                  # bl2event <- c(bl2event, data_id[[date_col]][change_idx] - bl[[date_col]])
+                  # time2event <- c(time2event, data_id[[date_col]][change_idx] - data_id[[date_col]][1])
+                  # for (cm in names(conf_t)) {
+                  #   confirmed_at <- intersect(conf_t[[cm]], conf_idx)
+                  #   if (length(confirmed_at)==0) {
+                  #     conf_t <- within(conf_t, rm(list=cm))
+                  #     conf_date[[cm]] <- c(conf_date[[cm]], display_date(NA, global_start))
+                  #     conf_value[[cm]] <- c(conf_value[[cm]], NaN)
+                  #   } else {
+                  #   conf_date[[cm]] <- c(conf_date[[cm]], display_date(data_id[[date_col]][min(confirmed_at)], global_start))
+                  #   conf_value[[cm]] <- c(conf_value[[cm]], data_id[[value_col]][min(confirmed_at)])
+                  #   }
+                  #   # conf[[cm]] <- c(conf[[cm]], as.integer(length(confirmed_at)>0))
+                  # }
+                  # sustd <- c(sustd, data_id[[date_col]][sust_idx] - data_id[[date_col]][change_idx])
+                  # sustl <- c(sustl, as.integer(sust_idx == nvisits))
+                  #####_ev_
 
                   # Print info
                   if (verbose == 2) {
-                    message("Found ", ifelse(outcome != 'custom', paste0(toupper(outcome), "-"), ""), "CDW",
-                            ifelse(event_type[length(event_type)] == "CDW", "", paste0(" (", event_type[length(event_type)], ")")),
+                    message("Found ", if (outcome != 'custom') paste0(toupper(outcome), "-") else "", "CDW",
+                            if (ev$event_type == "CDW") "" else paste0(" (", ev$event_type, ")"),
                             " (visit no.", change_idx, ", ",
-                            display_date(data_id[change_idx,][[date_col]], global_start, to_print=T),
-                            ifelse(length(conf_t)>0, paste0(") confirmed at ",
-                            paste(ifelse(event_type[length(event_type)]=='PIRA', names(pconf_t), names(conf_t)), collapse=" and "),
+                            display_date(data_id[[date_col]][change_idx], global_start),
+                            if (length(conf_t) > 0) paste0(") confirmed at ",
+                            paste(ifelse(ev$event_type == 'PIRA', names(pconf_t), names(conf_t)), collapse=" and "),
                                 " days, sustained up to visit no.", sust_idx,
-                                 " (", display_date(data_id[sust_idx,][[date_col]], global_start, to_print=T), ")"),
-                            ") occurring at last assessment (no confirmation)")
+                                 " (", display_date(data_id[[date_col]][sust_idx], global_start), ")") else {
+                            ") occurring at last assessment (no confirmation)"}
                             )
                   }
+
+                  events[[length(events) + 1]] <- ev
+                  event_type <- c(event_type, ev$event_type)
+                  event_index <- c(event_index, ev$event_index)
 
                   } else {
                     # If the event is NOT retained (as per `require_sust_days`), we proceed.
                     for (cm in names(conf_t)) {
                       confirmed_at <- intersect(conf_t[[cm]], conf_idx)
                       if (length(confirmed_at)==0) {
-                        conf_t <- within(conf_t, rm(list=cm))
+                        conf_t[[cm]] <- NULL #conf_t <- within(conf_t, rm(list=cm))
                       }
                     }
                     if (verbose == 2) {
                       message("Change confirmed but not sustained over ",
-                              ifelse(require_sust_days<Inf, paste(">=", require_sust_days, "days"),
-                                     "entire follow-up"), ": proceed with search")
+                          if (require_sust_days < Inf) paste(">=", require_sust_days, "days") else "entire follow-up",
+                      ": proceed with search")
                     }
                     unconf[[unconf_idx]] <- setNames(list(subjid,
-                                                          display_date(data_id[change_idx,][[date_col]], global_start),
-                                                          data_id[change_idx,][[value_col]],
-                                                          display_date(bl[[date_col]], global_start),
+                                                          data_id[[date_col]][change_idx],
+                                                          data_id[[value_col]][change_idx],
+                                                          bl[[date_col]],
                                                           bl[[value_col]],
-                                                          data_id[change_idx,][['closest_rel_before']],
-                                                          data_id[change_idx,][['closest_rel_after']]),
+                                                          data_id[['closest_rel_before']][change_idx],
+                                                          data_id[['closest_rel_after']][change_idx]),
                                                      c(subj_col, 'date', 'value', 'bl_date', 'bl_value',
                                                        'closest_rel_before', 'closest_rel_after'))
                     unconf_idx <- unconf_idx + 1
@@ -1260,43 +1389,27 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
                   if (baseline %in% c('roving', 'roving_wors')) {
                     # In a roving baseline setting, the baseline is moved after the confirmed event (even if it is not sustained):
-                    newref <- ifelse(proceed_from=='firstconf', conf_idx[[1]], change_idx)
+                    newref <- if (proceed_from=='firstconf') conf_idx[[1]] else change_idx
                     bl_idx <- newref
-                    } else if ((event_type[length(event_type)]!='PIRA' && event=='firstPIRA')
-                          || (event_type[length(event_type)]!='RAW' && event=='firstRAW')
-                          || !valid_ev
+                    } else if (!valid_ev
+                               || (ev$event_type != 'PIRA' && event == 'firstPIRA')
+                               || (ev$event_type != 'RAW' && event == 'firstRAW')
                     ) {
-                    # If the event is NOT retained (as per `require_sust_days`, or != required event type),
+                    # If the event is NOT retained as per `require_sust_days`,
+                    # or != required event type,
                     # proceed with search starting from event, regardless of `proceed_from`:
                     newref <- change_idx
                   } else {
                     # If baseline is static, only update `newref` (to be used for search index):
-                    newref <- ifelse(proceed_from=='firstconf', conf_idx[[1]], change_idx)
+                    newref <- if (proceed_from=='firstconf') conf_idx[[1]] else change_idx
                   }
 
                   # Move the search index.
                   search_idx <- newref + 1
 
-                  # # Next valid change (in any direction!)
-                  # next_change <- NA
-                  # if (newref < nvisits) {
-                  #   for (x in (newref + 1):nvisits) {
-                  #     if (isevent_loc(data_id[x,][[value_col]],  bl=data_id[bl_idx,][[value_col]],
-                  #                        type='change') # further change in any direction (from updated baseline)
-                  #         # || !isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='wors') # or worsening not sustained (from original baseline)
-                  #         ) {
-                  #       next_change <- x
-                  #       break
-                  #     }
-                  #   }
-                  # }
-                  # # Move the search index.
-                  # search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
-
                 } else { # worsening occurring at last visit (length(conf_t)==0)
                   search_idx <- change_idx + 1
                 }
-
 
               if (verbose == 2 & baseline!='fixed') {
                 message("Baseline at visit no.", bl_idx)
@@ -1308,32 +1421,24 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
        # Confirmed sub-threshold worsening: RE-BASELINE
        # ------------------------------------------------
       else if (length(conf_idx) > 0
-               && isevent_loc(data_id[change_idx,][[value_col]], bl=bl[[value_col]], type='wors', st=T)
+               && isevent_loc(data_id[[value_col]][change_idx], bl=bl[[value_col]], type='wors', st=TRUE)
                && ifelse(check_intermediate,
                     all(sapply((change_idx + 1):conf_idx[[1]], function(x)
-                      isevent_loc(data_id[x,][[value_col]], bl=bl[[value_col]], type='wors', st=T))), # (sub-threshold) worsening confirmed over (all visits up to) first valid date
-                    isevent_loc(data_id[conf_idx[[1]],][[value_col]], bl=bl[[value_col]], type='wors', st=T))  # (sub-threshold) worsening confirmed at first valid date
+                      isevent_loc(data_id[[value_col]][x], bl=bl[[value_col]], type='wors', st=TRUE))), # (sub-threshold) worsening confirmed over (all visits up to) first valid date
+                    isevent_loc(data_id[[value_col]][conf_idx[[1]]], bl=bl[[value_col]], type='wors', st=TRUE))  # (sub-threshold) worsening confirmed at first valid date
                && baseline %in% c('roving', 'roving_wors')
                && sub_threshold_rebl %in% c('event', 'worsening')
                ) {
-                  newref <- ifelse(proceed_from=='firstconf', conf_idx[[1]], change_idx)
+                  newref <- if (proceed_from=='firstconf') conf_idx[[1]] else change_idx
 
                   # Set new baseline after the event:
                   bl_idx <- newref
                   # Move search index
                   search_idx <- newref + 1
 
-                  # # Move search index to next change:
-                  # if (newref==nvisits) {
-                  #   next_change <- NA
-                  #   } else {
-                  #   next_change <- which(!isevent_loc(data_id[(newref + 1):nvisits, value_col],
-                  #                         bl=data_id[bl_idx,][[value_col]], type='wors', st=T))[1] + newref
-                  #   }
-                  # search_idx <- ifelse(is.na(next_change), nvisits + 1, next_change)
-
                   if (verbose == 2) {
-                    message("Found confirmed sub-threshold ", ifelse(outcome != 'custom', toupper(outcome), 'outcome'), " worsening (visit no.", change_idx, ")")
+                    message("Found confirmed sub-threshold ", if (outcome != 'custom') toupper(outcome) else 'outcome',
+                            " worsening (visit no.", change_idx, ")")
                     message("Baseline at visit no.", bl_idx)
                   }
                 }
@@ -1347,12 +1452,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         }
         if (!is.na(change_idx)) {
           unconf[[unconf_idx]] <- setNames(list(subjid,
-                                                display_date(data_id[change_idx,][[date_col]], global_start),
-                                                data_id[change_idx,][[value_col]],
-                                                display_date(bl[[date_col]], global_start),
+                                                data_id[[date_col]][change_idx],
+                                                data_id[[value_col]][change_idx],
+                                                bl[[date_col]],
                                                 bl[[value_col]],
-                                                data_id[change_idx,][['closest_rel_before']],
-                                                data_id[change_idx,][['closest_rel_after']]),
+                                                data_id[['closest_rel_before']][change_idx],
+                                                data_id[['closest_rel_after']][change_idx]),
                                            c(subj_col, 'date', 'value', 'bl_date', 'bl_value',
                                              'closest_rel_before', 'closest_rel_after'))
           unconf_idx <- unconf_idx + 1
@@ -1364,16 +1469,16 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       # Relapse-based rebaseline: if search_idx crossed a relapse, move baseline after it.
       # (unless search_idx is after the relapse but within its influence as per `relapse_assoc[0]`: could be a RAW)
         if (relapse_rebl && proceed && search_idx <= nvisits
-            && any(data_id[bl_idx,][[date_col]] < relapse_dates  # presence of a relapse between baseline...
-                   & (relapse_dates + ifelse(event=='firstPIRA', 0, relapse_assoc[1])
-                      < data_id[search_idx,][[date_col]]))  # ...and search index
+            && any(data_id[[date_col]][bl_idx] < relapse_dates  # presence of a relapse between baseline...
+                   & (relapse_dates + (if (event=='firstPIRA') 0 else relapse_assoc[1])
+                      < data_id[[date_col]][search_idx]))  # ...and search index
             ) {
 
           # Move baseline just after `irel`-th relapse
           if (bl_idx <= nvisits && !is.na(irel)) {
             idx_tmp <- NA
             for (x in bl_idx:nvisits) {
-              if (relapse_dates[irel] <= data_id[x,][[date_col]]) {
+              if (relapse_dates[irel] <= data_id[[date_col]][x]) {
                 idx_tmp <- x
                 break
               }
@@ -1401,143 +1506,187 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
 
         # In a first-event setting, stop search if specified event was already found:
-        if (proceed && ((event == "first" && length(event_type) > 1) ||
+        if (proceed && ((event == "first" && length(events) > 1) ||
                         (event == "firstCDI" && ("CDI" %in% event_type)) ||
                         (event == "firstCDW" && (("RAW" %in% event_type) || ("PIRA" %in% event_type) || ("CDW" %in% event_type))) ||
                         (event == "firstPIRA" && ("PIRA" %in% event_type)) ||
                         (event == "firstRAW" && ("RAW" %in% event_type)))
             ) {
-                          proceed <- 0
-                          if (verbose == 2) {
-                            message("\'", event, "\'", " already found: end process")
-                          }
-                        }
+          proceed <- 0
+          if (verbose == 2) {
+            message("\'", event, "\'", " already found: end process")
+          }
+        }
 
     } # end while (proceed)
 
-  #################################################################
+    #################################################################
 
-  subj_index <- as.numeric(row.names(results_df[results_df[subj_col] == subjid, ]))
+    # Possibly reduce to a subset of events (based on `event` argument)
+    #####_ev_
+    # subj_index <- as.numeric(row.names(results_df[results_df[subj_col] == subjid, ]))
+    # if (length(event_type) > 1) {
+    if (length(events) > 0) {
+    #####_ev_
 
-  # Possibly reduce event_type to a subset (based on `event` argument)
-  if (length(event_type) > 1) {
+      #####_ev_
+      # event_type <- event_type[2:length(event_type)]  # remove first empty event
+      #####_ev_
 
-    event_type <- event_type[2:length(event_type)]  # remove first empty event
+      # Spot duplicate events
+      # (can only occur if relapse_rebl is enabled - in that case, only keep last detected)
+      uevents <- unique(event_index)
+      ucounts <- table(event_index)
+      duplicates <- uevents[ucounts > 1]
+      diff <- length(event_index) - length(uevents) # keep track of no. duplicates
+      for (ev in duplicates) {
+        all_ind <- which(event_index == ev)
+        event_index[all_ind[-length(all_ind)]] <- 0 # mark duplicate events with 0
+      }
 
-    # Spot duplicate events
-    # (can only occur if relapse_rebl is enabled - in that case, only keep last detected)
-    uevents <- unique(event_index)
-    ucounts <- table(event_index)
-    duplicates <- uevents[ucounts > 1]
-    diff <- length(event_index) - length(uevents) # keep track of no. duplicates
-    for (ev in duplicates) {
-      all_ind <- which(event_index == ev)
-      event_index[all_ind[-length(all_ind)]] <- 0 # mark duplicate events with 0
-    }
+      event_order <- order(event_index)
+      event_order <- event_order[(diff + 1):length(event_order)] # eliminate duplicates (those marked with 0)
 
-    event_order <- order(event_index)
-    event_order <- event_order[(diff + 1):length(event_order)] # eliminate duplicates (those marked with 0)
+      event_type <- event_type[event_order]
 
+      if (startsWith(event, "first")) {
+        impr_idx <- which(event_type == "CDI")[1]
+        prog_idx <- which(event_type %in% c("CDW", "RAW", "PIRA"))[1]
+        raw_idx <- which(event_type == "RAW")[1]
+        pira_idx <- which(event_type == "PIRA")[1]
+
+        if (event == "firstCDI") {
+          first_events <- impr_idx
+        } else if (event == "firstCDW") {
+          first_events <- prog_idx
+        } else if (event == "firstPIRA") {
+          first_events <- pira_idx
+        } else if (event == "firstRAW") {
+          first_events <- raw_idx
+        }
+
+        if (event=='first') {
+          first_events <- 1
+        } else {
+          first_events <- unique(na.omit(first_events))
+        }
+
+        event_order <- event_order[first_events]
+      }
+    } else {
+      #####_ev_
+      event_order <- character(0)
+      #####_ev_
+      # event_type <- c() # remove first empty event
+      #####_ev_
+      }
+    #####_ev_
+    events <- events[event_order]
     event_type <- event_type[event_order]
 
-    if (startsWith(event, "first")) {
-      impr_idx <- which(event_type == "CDI")[1]
-      prog_idx <- which(event_type %in% c("CDW", "RAW", "PIRA"))[1]
-      raw_idx <- which(event_type == "RAW")[1]
-      pira_idx <- which(event_type == "PIRA")[1]
+    # Build subject-level df
+    if (length(event_type) > 0) {
+      # 1. subject has events
 
-      if (event == "firstCDI") {
-        first_events <- impr_idx
-      } else if (event == "firstCDW") {
-        first_events <- prog_idx
-      } else if (event == "firstPIRA") {
-        first_events <- pira_idx
-      } else if (event == "firstRAW") {
-        first_events <- raw_idx
-      }
+      events_clean <- lapply(events, function(ev) {
+        ev[setdiff(names(ev), "event_index")]
+      })
+      subject_df <- do.call(rbind.data.frame, c(events_clean, stringsAsFactors = FALSE))
+      subject_df[[subj_col]] <- subjid
+      subject_df$nevent <- seq_len(nrow(subject_df))
+      subject_df$total_fu <- total_fu[subjid]
 
-      if (event=='first') {
-        first_events <- 1
-      } else {
-        first_events <- unique(na.omit(first_events))
-      }
+    } else if (include_stable) {
+      # 2. subject has no events but is included
 
-      event_type <- event_type[first_events]
-      event_order <- event_order[first_events]
-    }
-  } else {
-    event_type <- c() # remove first empty event
-    }
-
-  # Build results with updated event_type
-  if (length(event_type) > 0) {
-    # 1. subject has events
-
-    results_df <- results_df[-subj_index[(length(event_type) + 1):length(subj_index)], ]
-    rownames(results_df) <- NULL # reset column names
-    results_df[results_df[[subj_col]] == subjid, "event_type"] <- event_type
-    results_df[results_df[[subj_col]] == subjid, "bl_date"] <- bl_date[event_order]
-    results_df[results_df[[subj_col]] == subjid, "bl_value"] <- bl_value[event_order]
-    results_df[results_df[[subj_col]] == subjid, "date"] <- edate[event_order]
-    results_df[results_df[[subj_col]] == subjid, "value"] <- evalue[event_order]
-    results_df[results_df[[subj_col]] == subjid, "last_delta_date"] <- last_delta_date[event_order]
-    results_df[results_df[[subj_col]] == subjid, "last_delta_value"] <- last_delta_value[event_order]
-    results_df[results_df[[subj_col]] == subjid, 'total_fu'] <- total_fu[subjid]
-    results_df[results_df[[subj_col]] == subjid, "time2event"] <- time2event[event_order]
-    results_df[results_df[[subj_col]] == subjid, "bl2event"] <- bl2event[event_order]
-    for (m in conf_days) {
-      # results_df[results_df[[subj_col]] == subjid, paste0("conf", m)] <- conf[[as.character(m)]][event_order]
-      results_df[results_df[[subj_col]] == subjid, paste0("conf", m, "_date")] <- conf_date[[as.character(m)]][event_order]
-      results_df[results_df[[subj_col]] == subjid, paste0("conf", m, "_value")] <- conf_value[[as.character(m)]][event_order]
-      # results_df[results_df[[subj_col]] == subjid, paste0("PIRA_conf", m)] <- pira_conf[[as.character(m)]][event_order]
-      results_df[results_df[[subj_col]] == subjid, paste0("PIRA_conf", m, "_date")] <- pira_conf_date[[as.character(m)]][event_order]
-      results_df[results_df[[subj_col]] == subjid, paste0("PIRA_conf", m, "_value")] <- pira_conf_value[[as.character(m)]][event_order]
-      }
-    results_df[results_df[[subj_col]] == subjid, "sust_days"] <- sustd[event_order]
-    results_df[results_df[[subj_col]] == subjid, "sust_last"] <- sustl[event_order]
-
-  } else if (include_stable) {
-    # 2. subject has no events but is included
-
-    results_df <- results_df[-subj_index[2:length(subj_index)], ]
-    rownames(results_df) <- NULL # reset column names
-    results_df[results_df[[subj_col]]==subjid, 'nevent'] <- 0
-    results_df[results_df[[subj_col]]==subjid, 'total_fu'] <- total_fu[subjid]
-    results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
-    # results_df[results_df[[subj_col]] == subjid, 'date'] <- display_date(data_id[nvisits,][[date_col]], global_start)
+      ev <- make_empty_event()
+      ev$time2event <- total_fu[subjid]
+      subject_df <- as.data.frame(ev[setdiff(names(ev), "event_index")], stringsAsFactors = FALSE)
+      subject_df[[subj_col]] <- subjid
+      subject_df$nevent <- 0
+      subject_df$total_fu <- total_fu[subjid]
 
     } else {
-    # 3. subject has no events and is excluded
+      # 3. subject has no events and is excluded
 
-    results_df <- results_df[-subj_index, ]
-    rownames(results_df) <- NULL # reset column names
-  }
+      subject_df <- NULL
+    }
 
-  CDI <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "CDI")
-  CDW <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] %in% c("CDW", "RAW", "PIRA"))
-  RAW <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "RAW")
-  PIRA <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "PIRA")
+    # Add to global `subject_results` list
+    subject_results[[subjid]] <- subject_df
 
-  summary[subjid, c('CDI', 'CDW', 'RAW', 'PIRA')] <- c(CDI, CDW, RAW, PIRA)
+    # Extract event counts
+    CDI <- sum(subject_df$event_type == "CDI")
+    CDW <- sum(subject_df$event_type %in% c("CDW", "RAW", "PIRA"))
+    RAW <- sum(subject_df$event_type == "RAW")
+    PIRA <- sum(subject_df$event_type == "PIRA")
 
-  summary[subjid, 'event_sequence'] <- paste(event_type, collapse=", ")
+    #####_ev_
+    # # Build results for subjid with updated event_type
+    # if (length(event_type) > 0) {
+    #   # 1. subject has events
+    #
+    #   results_df <- results_df[-subj_index[(length(event_type) + 1):length(subj_index)], ]
+    #   rownames(results_df) <- NULL # reset column names
+    #   results_df[results_df[[subj_col]] == subjid, "event_type"] <- event_type
+    #   results_df[results_df[[subj_col]] == subjid, "bl_date"] <- bl_date[event_order]
+    #   results_df[results_df[[subj_col]] == subjid, "bl_value"] <- bl_value[event_order]
+    #   results_df[results_df[[subj_col]] == subjid, "date"] <- edate[event_order]
+    #   results_df[results_df[[subj_col]] == subjid, "value"] <- evalue[event_order]
+    #   results_df[results_df[[subj_col]] == subjid, "last_delta_date"] <- last_delta_date[event_order]
+    #   results_df[results_df[[subj_col]] == subjid, "last_delta_value"] <- last_delta_value[event_order]
+    #   results_df[results_df[[subj_col]] == subjid, 'total_fu'] <- total_fu[subjid]
+    #   results_df[results_df[[subj_col]] == subjid, "time2event"] <- time2event[event_order]
+    #   results_df[results_df[[subj_col]] == subjid, "bl2event"] <- bl2event[event_order]
+    #   for (m in conf_days) {
+    #     # results_df[results_df[[subj_col]] == subjid, paste0("conf", m)] <- conf[[as.character(m)]][event_order]
+    #     results_df[results_df[[subj_col]] == subjid, paste0("conf", m, "_date")] <- conf_date[[as.character(m)]][event_order]
+    #     results_df[results_df[[subj_col]] == subjid, paste0("conf", m, "_value")] <- conf_value[[as.character(m)]][event_order]
+    #     # results_df[results_df[[subj_col]] == subjid, paste0("PIRA_conf", m)] <- pira_conf[[as.character(m)]][event_order]
+    #     results_df[results_df[[subj_col]] == subjid, paste0("PIRA_conf", m, "_date")] <- pira_conf_date[[as.character(m)]][event_order]
+    #     results_df[results_df[[subj_col]] == subjid, paste0("PIRA_conf", m, "_value")] <- pira_conf_value[[as.character(m)]][event_order]
+    #     }
+    #   results_df[results_df[[subj_col]] == subjid, "sust_days"] <- sustd[event_order]
+    #   results_df[results_df[[subj_col]] == subjid, "sust_last"] <- sustl[event_order]
+    #
+    # } else if (include_stable) {
+    #   # 2. subject has no events but is included
+    #
+    #   results_df <- results_df[-subj_index[2:length(subj_index)], ]
+    #   rownames(results_df) <- NULL # reset column names
+    #   results_df[results_df[[subj_col]]==subjid, 'nevent'] <- 0
+    #   results_df[results_df[[subj_col]]==subjid, 'total_fu'] <- total_fu[subjid]
+    #   results_df[results_df[[subj_col]]==subjid, 'time2event'] <- total_fu[subjid]
+    #   # results_df[results_df[[subj_col]] == subjid, 'date'] <- display_date(data_id[[date_col]][nvisits], global_start)
+    #
+    #   } else {
+    #   # 3. subject has no events and is excluded
+    #
+    #   results_df <- results_df[-subj_index, ]
+    #   rownames(results_df) <- NULL # reset column names
+    # }
+    #
+    # # Extract event counts
+    # CDI <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "CDI")
+    # CDW <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] %in% c("CDW", "RAW", "PIRA"))
+    # RAW <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "RAW")
+    # PIRA <- sum(results_df[results_df[[subj_col]] == subjid, "event_type"] == "PIRA")
+    #####_ev_
 
-  # if (startsWith(event, "firstCDW")) {
-  #   summary <- summary[, colnames(summary) != "CDI"]
-  # }
+    # Update `summary` df with event counts + sequence
+    summary[subjid, c('CDI', 'CDW', 'RAW', 'PIRA')] <- c(CDI, CDW, RAW, PIRA)
+    summary[subjid, 'event_sequence'] <- paste(event_type, collapse=", ")
 
-  if (verbose == 2) {
-    message("Event sequence: ", ifelse(event_type[1]!="",
-                              paste(event_type, collapse=", "), "-"))
-  }
-
+    if (verbose == 2) {
+      message("Event sequence: ", ifelse(length(events) > 0,
+                                paste(event_type, collapse=", "), "-"))
+    }
 
   } # end for (subjid in all_subj)
 
-  results_df <- results_df %>% mutate(
-      CDW_type = ifelse(event_type %in% c("PIRA", "RAW"), event_type, ifelse(event_type == "CDW", "undefined", "")),
-      event_type = ifelse(event_type %in% c("CDW", "PIRA", "RAW"), "CDW", event_type)
-      )
+  # Merge final data frame
+  results_df <- do.call(rbind.data.frame, subject_results)
+  rownames(results_df) <- NULL
 
   #################################################################
 
@@ -1553,29 +1702,29 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                 "within duration of a relapse"), ""),
               ifelse(relapse_to_bl[2]>0, paste0(ifelse(relapse_to_bl[1]>0, ", <", '<'),
                       relapse_to_bl[2], " days to next relapse"), ""),
-          ifelse(skip_local_extrema!='none', paste0(ifelse(relapse_to_bl[1]==0 && relapse_to_bl[2]==0, "",
-                              ", or "), "local extremum"), ""),
-          ifelse(relapse_to_bl[1]==0 && relapse_to_bl[2]==0 && skip_local_extrema=='none', '-', ''),
+          if (skip_local_extrema!='none') paste0(if (relapse_to_bl[1] == 0 && relapse_to_bl[2] == 0) "" else
+                              ", or ", "local extremum") else "",
+          if (relapse_to_bl[1]==0 && relapse_to_bl[2]==0 && skip_local_extrema=='none') "-" else "",
           "\nEvent skipped if: ", ifelse(relapse_to_event[1]>0, ifelse(is.null(renddate_col),
                 paste0("<", relapse_to_event[1], " days from last relapse"),
                 "within last relapse duration"), ""),
               ifelse(relapse_to_event[2]>0, paste0(ifelse(relapse_to_event[1]>0, ", <", '<'),
                     relapse_to_event[2], " days to next relapse"), ""),
-          ifelse(relapse_to_event[1]==0 && relapse_to_event[2]==0, '-', ''),
+          if (relapse_to_event[1]==0 && relapse_to_event[2]==0) "-" else "",
           "\nConfirmation visit skipped if: ", ifelse(relapse_to_conf[1]>0, ifelse(is.null(renddate_col),
                 paste0("<", relapse_to_conf[1], " days from last relapse"),
                 "within last relapse duration"), ""),
               ifelse(relapse_to_conf[2]>0, paste0(ifelse(relapse_to_conf[1]>0, ", <", '<'),
                     relapse_to_conf[2], " days to next relapse"), ""),
-          ifelse(relapse_to_conf[1]==0 && relapse_to_conf[2]==0, '-', ''),
+          if (relapse_to_conf[1] == 0 && relapse_to_conf[2] == 0) "-" else "",
           "\nEvents detected: ", event))
     message('\n*Please use `print(output)` to display full info on event detection criteria*')
     if (is.null(subjects) || length(subjects)>1) {
         message("\n---\nTotal subjects: ", nsub,
             "\n---\nSubjects with ",
-            ifelse(event=='firstPIRA', "PIRA: ", ifelse(event=='firstRAW', "RAW: ", "CDW: ")),
-              sum(summary$CDW > 0), ifelse(event %in% c('firstPIRA','firstRAW'), "", paste0(" (PIRA: ", sum(summary$PIRA > 0),
-            "; RAW: ", sum(summary$RAW > 0), ")")))
+            if (event=='firstPIRA') "PIRA: " else if (event=='firstRAW') "RAW: " else "CDW: ",
+              sum(summary$CDW > 0), if (event %in% c('firstPIRA','firstRAW')) "" else paste0(" (PIRA: ", sum(summary$PIRA > 0),
+            "; RAW: ", sum(summary$RAW > 0), ")"))
         if (!(event %in% c('firstCDW', 'firstPIRA', 'firstRAW'))) {
         message("Subjects with CDI: ", sum(summary$CDI > 0))
         }
@@ -1588,7 +1737,29 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
   }
 
+  # Convert date columns to Date format (relative to global_start)
+  date_cols <- names(results_df)[endsWith(names(results_df), "date")]
+  results_df[date_cols] <- lapply(
+    results_df[date_cols],
+    num_to_date,
+    start = global_start
+  )
+
+  # Split `event_type` into `event_type` and `CDW_type`
+  results_df <- results_df %>% mutate(
+    CDW_type = ifelse(event_type %in% c("PIRA", "RAW"), event_type, ifelse(event_type == "CDW", "undefined", "")),
+    event_type = ifelse(event_type %in% c("CDW", "PIRA", "RAW"), "CDW", event_type)
+  )
+
   columns <- names(results_df)
+  # Reorder columns
+  to_move <- c(subj_col, "nevent", "total_fu", "CDW_type")
+  columns <- columns[!columns %in% to_move]
+  columns <- c(subj_col, setdiff(columns, subj_col)) # move in front
+  columns <- append(columns, "nevent", after = 1) # position 2
+  columns <- append(columns, "CDW_type", after = 3) # position 4
+  columns <- append(columns, "total_fu", after = 4) # position 5
+
   if (!include_dates) {
     columns <- columns[!endsWith(columns, "date")]
   }
@@ -1616,14 +1787,22 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   summary <- summary[scolumns]
   results_df <- results_df[columns]
 
+  # Merge `unconfirmed` df
   unconfirmed <- do.call(rbind.data.frame, unconf)
+  # Convert date columns to Date format (relative to global_start)
+  date_cols <- names(unconfirmed)[endsWith(names(unconfirmed), "date")]
+  unconfirmed[date_cols] <- lapply(
+    unconfirmed[date_cols],
+    num_to_date,
+    start = global_start
+  )
 
   for (w in warnings) {
       warning(w)
   }
 
   settings <- list(outcome=outcome, event=event, baseline=baseline, proceed_from=proceed_from,
-                validconf_p=ifelse(is.null(validconf_col), 1, mean(data[[validconf_col]])),
+                validconf_p=if (is.null(validconf_col)) 1 else mean(data[[validconf_col]]),
                 validconf_col=validconf_col, skip_local_extrema=skip_local_extrema,
                 conf_days=conf_days, conf_tol_days=conf_tol_days,
                 require_sust_days=require_sust_days, check_intermediate=check_intermediate,

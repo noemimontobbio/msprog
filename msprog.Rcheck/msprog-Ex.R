@@ -64,14 +64,14 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: compute_delta
-### Title: Definition of minimum clinically meaningful shift for different
+### Title: Default minimum clinically meaningful shift for different
 ###   scales.
 ### Aliases: compute_delta
 
 ### ** Examples
 
-compute_delta(4.5) # default outcome is 'edss'
-compute_delta(55, outcome='sdmt')
+compute_delta(4.5) # default outcome is "edss"
+compute_delta(55, outcome="sdmt")
 
 
 
@@ -92,6 +92,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 is_event(x=4.5, baseline=4, type="wors", outcome="edss")
 is_event(x=50, baseline=57, type="wors", outcome="sdmt")
+is_event(x=3, baseline=3.5, type="impr", outcome="edss", sub_threshold=TRUE)
 
 
 
@@ -111,9 +112,9 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
+output <- MSprog(toydata_visits, "id", "EDSS", "date", "edss",
     relapse=toydata_relapses, conf_days=7*12, conf_tol_days=30,
-    event='multiple', baseline='roving', verbose=2)
+    event="multiple", baseline="roving", verbose=2)
 print(output) # textual description of parameters used to obtain output
 
 

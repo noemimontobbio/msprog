@@ -5,10 +5,10 @@
 \alias{toydata_relapses}
 \title{Synthetic Relapse Data}
 \format{
-An object of class \code{data.frame}
+An object of class \code{data.frame}.
 \describe{
-\item{id}{Subject ID}
-\item{date}{The relapse date}
+\item{id}{Subject ID.}
+\item{date}{The relapse date.}
 }
 }
 \usage{

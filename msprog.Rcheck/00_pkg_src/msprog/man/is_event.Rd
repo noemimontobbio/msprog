@@ -21,25 +21,27 @@ is_event(
 
 \item{type}{One of: \cr
 \itemize{
-\item{\code{'wors'} (worsening);}
-\item{\code{'impr'} (improvement);}
-\item{\code{'change'} (any valid change).}
+\item{\code{"wors"} (worsening);}
+\item{\code{"impr"} (improvement);}
+\item{\code{"change"} (any valid change).}
 }}
 
 \item{outcome}{One of: \cr
 \itemize{
-\item{\code{'edss'} (Extended Disability Status Scale, default);}
-\item{\code{'nhpt'} (Nine-Hole Peg Test);}
-\item{\code{'t25fw'} (Timed 25-Foot Walk);}
-\item{\code{'sdmt'} (Symbol Digit Modalities Test);}
-\item{\code{'custom'} (only accepted when specifying custom \code{worsening} -- and \code{delta_fun} as well, if \code{sub_threshold=F}).}
-Outcome type determines a default direction of worsening (see \code{worsening}argument)
-and default definition of clinically meaningful change given the reference value
+\item{\code{"edss"} (Extended Disability Status Scale, default);}
+\item{\code{"nhpt"} (Nine-Hole Peg Test);}
+\item{\code{"t25fw"} (Timed 25-Foot Walk);}
+\item{\code{"sdmt"} (Symbol Digit Modalities Test);}
+\item{\code{"custom"} (only accepted when specifying non-\code{NULL} \code{worsening}
+-- and \code{delta_fun} as well, if \code{sub_threshold=FALSE}).}
+}
+Outcome type determines the direction of worsening (see \code{worsening} argument)
+and selects the default definition of clinically meaningful change given the reference value
 (using the built-in function \code{\link[=compute_delta]{compute_delta()}}).
-This can be replaced by a custom function using the \code{delta_fun} argument.
-}}
+The latter can be replaced by a custom function using the \code{delta_fun} argument.}
 
-\item{worsening}{The direction of worsening (\code{"increase"} if higher values correspond to worse disease course, \code{'decrease'} otherwise).
+\item{worsening}{The direction of worsening (\code{"increase"} if higher values
+correspond to worse disease course, \code{"decrease"} otherwise).
 This argument is only used when \code{outcome} is set to \code{"custom"}.
 Otherwise, \code{worsening} is automatically set to \code{"increase"} for EDSS, NHPT, T25FW,
 and to \code{"decrease"} for SDMT.}
@@ -47,10 +49,10 @@ and to \code{"decrease"} for SDMT.}
 \item{delta_fun}{Custom function specifying the minimum clinically meaningful
 change in the outcome measure from the provided reference value.
 The function provided must take a numeric value (reference score) as input,
-and return a numeric value corresponding to the minimum shift from baseline, see example below.
-A custom delta function must be specified if \code{outcome} is set to \code{"custom"}.
-Otherwise, if none is specified, the built-in function \code{\link[=compute_delta]{compute_delta()}} is used internally.
-The argument is ignored if \code{sub_threshold=T}.}
+and return a numeric value corresponding to the minimum relevant shift from baseline, see example below.
+If \code{outcome} is set to \code{"custom"}, a custom delta function must be specified by the user.
+For other values of \code{outcome}, if no \code{delta_fun} is specified, the built-in function \code{\link[=compute_delta]{compute_delta()}} is used internally.
+The argument is ignored if \code{sub_threshold=TRUE}.}
 
 \item{sub_threshold}{If \code{TRUE}, any confirmed worsening, or improvement, or change in the outcome measure is valid,
 regardless of \code{delta_fun}.}
@@ -59,10 +61,11 @@ regardless of \code{delta_fun}.}
 A boolean value specifying if a valid event was found.
 }
 \description{
-\code{is_event()} checks if an outcome value determines a valid worsening,
-or improvement, or change, from a given reference value.
+Check if an outcome value determines a valid worsening, or improvement,
+or change, from a given reference value.
 }
 \examples{
 is_event(x=4.5, baseline=4, type="wors", outcome="edss")
 is_event(x=50, baseline=57, type="wors", outcome="sdmt")
+is_event(x=3, baseline=3.5, type="impr", outcome="edss", sub_threshold=TRUE)
 }

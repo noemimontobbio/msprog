@@ -75,26 +75,26 @@ Subjects with CDI: 1
 CDW events: 7 (PIRA: 5; RAW: 2)
 CDI events: 1
 > print(output$results) # extended info on each event for all subjects
-  id nevent event_type CDW_type total_fu time2event bl2event sust_days
-1  1      1        CDW     PIRA      534        443      443        91
-2  2      1        CDW      RAW      730        198      198        84
-3  2      2        CDW     PIRA      730        539      257       191
-4  3      0                          491        491      NaN         0
-5  4      1        CDI               586         77       77        98
-6  4      2        CDW     PIRA      586        304      129       282
-7  5      1        CDW     PIRA      637        140      140       497
-8  6      1        CDW      RAW      491        430      430        61
-9  7      1        CDW     PIRA      779        499      499       280
+  id nevent event_type CDW_type total_fu bl2event time2event sust_days
+1  1      1        CDW     PIRA      534      443        443        91
+2  2      1        CDW      RAW      730      198        198        84
+3  2      2        CDW     PIRA      730      257        539       191
+4  3      0                          491      NaN        491         0
+5  4      1        CDI               586       77         77        98
+6  4      2        CDW     PIRA      586      129        304       282
+7  5      1        CDW     PIRA      637      140        140       497
+8  6      1        CDW      RAW      491      430        430        61
+9  7      1        CDW     PIRA      779      499        499       280
   sust_last
-1         1
-2         0
-3         1
-4         0
-5         0
-6         1
-7         1
-8         1
-9         1
+1      TRUE
+2     FALSE
+3      TRUE
+4     FALSE
+5     FALSE
+6      TRUE
+7      TRUE
+8      TRUE
+9      TRUE
 > print(output$event_count) # summary of event sequence for each subject
   event_sequence CDI CDW RAW PIRA
 1           PIRA   0   1   0    1
@@ -129,22 +129,22 @@ Subjects with CDI: 0
 CDW events: 5 (PIRA: 4; RAW: 0)
 CDI events: 0
 > print(output$results) # extended info on each event for all subjects
-  id nevent event_type  CDW_type total_fu time2event bl2event sust_days
-1  1      1        CDW      PIRA      534        443      443        91
-2  2      1        CDW undefined      730        640      640        90
-3  3      0                           491        491      NaN         0
-4  4      1        CDW      PIRA      586         77       77       509
-5  5      1        CDW      PIRA      637        549      549        88
-6  6      0                           491        491      NaN         0
-7  7      1        CDW      PIRA      779        674      674       105
+  id nevent event_type  CDW_type total_fu bl2event time2event sust_days
+1  1      1        CDW      PIRA      534      443        443        91
+2  2      1        CDW undefined      730      640        640        90
+3  3      0                           491      NaN        491         0
+4  4      1        CDW      PIRA      586       77         77       509
+5  5      1        CDW      PIRA      637      549        549        88
+6  6      0                           491      NaN        491         0
+7  7      1        CDW      PIRA      779      674        674       105
   sust_last
-1         1
-2         1
-3         0
-4         1
-5         1
-6         0
-7         1
+1      TRUE
+2      TRUE
+3     FALSE
+4      TRUE
+5      TRUE
+6     FALSE
+7      TRUE
 > print(output$event_count) # summary of event sequence for each subject
   event_sequence CDI CDW RAW PIRA
 1           PIRA   0   1   0    1
@@ -181,26 +181,26 @@ Subjects with CDI: 1
 CDW events: 6 (PIRA: 4; RAW: 1)
 CDI events: 1
 > print(output$results) # extended info on each event for all subjects
-  id nevent event_type  CDW_type total_fu time2event bl2event sust_days
-1  1      1        CDW      PIRA      534        443      443        91
-2  2      1        CDI                730        198      198        84
-3  2      2        CDW      PIRA      730        371       89       359
-4  2      3        CDW undefined      730        640      186        90
-5  3      0                           491        491      NaN         0
-6  4      1        CDW      PIRA      586         77       77       509
-7  5      1        CDW      PIRA      637        549      549        88
-8  6      0                           491        491      NaN         0
-9  7      1        CDW       RAW      779        185      185       187
+  id nevent event_type  CDW_type total_fu bl2event time2event sust_days
+1  1      1        CDW      PIRA      534      443        443        91
+2  2      1        CDI                730      198        198        84
+3  2      2        CDW      PIRA      730       89        371       359
+4  2      3        CDW undefined      730      186        640        90
+5  3      0                           491      NaN        491         0
+6  4      1        CDW      PIRA      586       77         77       509
+7  5      1        CDW      PIRA      637      549        549        88
+8  6      0                           491      NaN        491         0
+9  7      1        CDW       RAW      779      185        185       187
   sust_last
-1         1
-2         0
-3         1
-4         1
-5         0
-6         1
-7         1
-8         0
-9         0
+1      TRUE
+2     FALSE
+3      TRUE
+4      TRUE
+5     FALSE
+6      TRUE
+7      TRUE
+8     FALSE
+9     FALSE
 > print(output$event_count) # summary of event sequence for each subject
   event_sequence CDI CDW RAW PIRA
 1           PIRA   0   1   0    1
@@ -223,15 +223,15 @@ CDI events: 1
 > 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: compute_delta
-> ### Title: Definition of minimum clinically meaningful shift for different
+> ### Title: Default minimum clinically meaningful shift for different
 > ###   scales.
 > ### Aliases: compute_delta
 > 
 > ### ** Examples
 > 
-> compute_delta(4.5) # default outcome is 'edss'
+> compute_delta(4.5) # default outcome is "edss"
 [1] 1
-> compute_delta(55, outcome='sdmt')
+> compute_delta(55, outcome="sdmt")
 [1] 4
 > 
 > 
@@ -255,6 +255,8 @@ CDI events: 1
 [1] FALSE
 > is_event(x=50, baseline=57, type="wors", outcome="sdmt")
 [1] TRUE
+> is_event(x=3, baseline=3.5, type="impr", outcome="edss", sub_threshold=TRUE)
+[1] TRUE
 > 
 > 
 > 
@@ -274,9 +276,9 @@ CDI events: 1
 > 
 > ### ** Examples
 > 
-> output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
+> output <- MSprog(toydata_visits, "id", "EDSS", "date", "edss",
 +     relapse=toydata_relapses, conf_days=7*12, conf_tol_days=30,
-+     event='multiple', baseline='roving', verbose=2)
++     event="multiple", baseline="roving", verbose=2)
 
 Subject #1: 8 visits, 0 relapses
 Baseline at visit no.1
@@ -315,7 +317,7 @@ Found EDSS change at visit no.2 (2021-12-01); potential confirmation visits avai
 Change not confirmed: proceed with search
 Searching for events from visit no.3 on
 No edss change in any subsequent visit: end process
-Event sequence: 
+Event sequence: -
 
 Subject #4: 7 visits, 0 relapses
 Baseline at visit no.1
@@ -403,7 +405,7 @@ CDW events: 7 (PIRA: 5; RAW: 2)
 CDI events: 1
 > print(output) # textual description of parameters used to obtain output
 ---
-msprog version: 0.2.5 
+msprog version: 0.2.6 
 ---
 MSprog() arguments:
 outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(30, 30), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
@@ -484,7 +486,7 @@ Clinically meaningful threshold for EDSS change (delta function): default for ED
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  0.44 0.017 0.459 0 0 
+Time elapsed:  0.378 0.017 0.4 0 0 
 > grDevices::dev.off()
 null device 
           1 

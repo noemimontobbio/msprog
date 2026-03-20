@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noemi Montobbio" />
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-20" />
 
 <title>Time to event</title>
 
@@ -2844,7 +2844,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Time to event</h1>
 <h4 class="author">Noemi Montobbio</h4>
-<h4 class="date">2026-03-18</h4>
+<h4 class="date">2026-03-20</h4>
 
 
 <div id="TOC">
@@ -2920,7 +2920,7 @@ used for the above computation, to make sure all the settings are as
 expected.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">print</span>(output_edss)</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; #&gt; msprog version: 0.2.5</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; #&gt; msprog version: 0.2.6</span></span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; #&gt; ---</span></span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; #&gt; MSprog() arguments:</span></span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; #&gt; outcome=edss, event=firstCDW, baseline=fixed, proceed_from=firstconf,</span></span>
@@ -2954,8 +2954,8 @@ expected.</p>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(res, <span class="at">rownames=</span>F,</span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span><span class="st">&quot;200px&quot;</span>, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-c83319ffb179ae206793" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-c83319ffb179ae206793">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],[1,1,0,0,1,0,1],["CDW","CDW","","","CDW","","CDW"],["PIRA","RAW","","","PIRA","","PIRA"],[534,730,491,586,637,491,779],[292,198,491,586,140,491,372],[292,198,null,null,140,null,372],[242,84,0,0,497,0,407],[1,0,0,0,1,0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>CDW_type<\/th>\n      <th>total_fu<\/th>\n      <th>time2event<\/th>\n      <th>bl2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,4,5,6,7,8]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"CDW_type","targets":3},{"name":"total_fu","targets":4},{"name":"time2event","targets":5},{"name":"bl2event","targets":6},{"name":"sust_days","targets":7},{"name":"sust_last","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-b6fe18aeff3ee8a66a13" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-b6fe18aeff3ee8a66a13">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],[1,1,0,0,1,0,1],["CDW","CDW","","","CDW","","CDW"],["PIRA","RAW","","","PIRA","","PIRA"],[534,730,491,586,637,491,779],[292,198,null,null,140,null,372],[292,198,491,586,140,491,372],[242,84,0,0,497,0,407],[true,false,false,false,true,false,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>CDW_type<\/th>\n      <th>total_fu<\/th>\n      <th>bl2event<\/th>\n      <th>time2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,4,5,6,7]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"CDW_type","targets":3},{"name":"total_fu","targets":4},{"name":"bl2event","targets":5},{"name":"time2event","targets":6},{"name":"sust_days","targets":7},{"name":"sust_last","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>If we were to conduct a survival analysis with censoring, we would be
 interested in the <code>&#39;time2event&#39;</code> column (time to CDW, in
 days) and in the <code>&#39;nevent&#39;</code> column (1 if the event occurred,
@@ -2965,8 +2965,8 @@ days) and in the <code>&#39;nevent&#39;</code> column (1 if the event occurred,
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(survival_data, <span class="at">rownames=</span>F,</span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span><span class="st">&quot;200px&quot;</span>, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-036262dbadae3d6a8fd1" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-036262dbadae3d6a8fd1">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],[292,198,491,586,140,491,372],[1,1,0,0,1,0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>time2event<\/th>\n      <th>nevent<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"name":"id","targets":0},{"name":"time2event","targets":1},{"name":"nevent","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-e3310c18042cf602d0a2" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-e3310c18042cf602d0a2">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],[292,198,491,586,140,491,372],[1,1,0,0,1,0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>time2event<\/th>\n      <th>nevent<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"name":"id","targets":0},{"name":"time2event","targets":1},{"name":"nevent","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>Note that, in a more general multiple-event setting, the
 <code>&#39;nevent&#39;</code> column would contain the count of events for each
 subject. Here, since we’re stopping at the first event, this number can
@@ -3002,7 +3002,7 @@ data. Similar to <code>MSprog()</code>, we can set
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>                 <span class="at">verbose=</span><span class="dv">2</span>)</span>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; Subject #1: 8 visits, 0 relapses</span></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; Found value&gt;=4.5 at visit no.1 (2021-09-23); potential confirmation visits available: no. 4, 5, 6, 7, 8</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; Found value&gt;=4.5 at visit no.1 (2021-09-23); potential confirmation visits available: no. 3, 4, 5, 6, 7, 8</span></span>
 <span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; Confirmed value&gt;=4.5 (visit no.1, 2021-09-23): end process</span></span>
 <span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt; Subject #2: 10 visits, 2 relapses</span></span>
@@ -3015,28 +3015,28 @@ data. Similar to <code>MSprog()</code>, we can set
 <span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt; No value&gt;=4.5 in any visit: end process</span></span>
 <span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt; Subject #4: 7 visits, 0 relapses</span></span>
-<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="co">#&gt; Found value&gt;=4.5 at visit no.1 (2021-09-18); potential confirmation visits available: no. 3, 4, 5, 6, 7</span></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="co">#&gt; Found value&gt;=4.5 at visit no.1 (2021-09-18); potential confirmation visits available: no. 2, 3, 4, 5, 6, 7</span></span>
 <span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="co">#&gt; Value&gt;=4.5 not confirmed: proceed with search</span></span>
-<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="co">#&gt; Found value&gt;=4.5 at visit no.4 (2022-07-19); potential confirmation visits available: no. 6, 7</span></span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="co">#&gt; Found value&gt;=4.5 at visit no.4 (2022-07-19); potential confirmation visits available: no. 5, 6, 7</span></span>
 <span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="co">#&gt; Confirmed value&gt;=4.5 (visit no.4, 2022-07-19): end process</span></span>
 <span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a><span class="co">#&gt; Subject #5: 9 visits, 0 relapses</span></span>
-<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a><span class="co">#&gt; Found value&gt;=4.5 at visit no.3 (2021-11-01); potential confirmation visits available: no. 5, 6, 7, 8, 9</span></span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a><span class="co">#&gt; Found value&gt;=4.5 at visit no.3 (2021-11-01); potential confirmation visits available: no. 4, 5, 6, 7, 8, 9</span></span>
 <span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a><span class="co">#&gt; Confirmed value&gt;=4.5 (visit no.3, 2021-11-01): end process</span></span>
 <span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a><span class="co">#&gt; Subject #6: 7 visits, 1 relapse</span></span>
-<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a><span class="co">#&gt; Found value&gt;=4.5 at visit no.1 (2021-10-18); potential confirmation visits available: no. 4, 5, 7</span></span>
+<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a><span class="co">#&gt; Found value&gt;=4.5 at visit no.1 (2021-10-18); potential confirmation visits available: no. 3, 4, 5, 7</span></span>
 <span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a><span class="co">#&gt; Confirmed value&gt;=4.5 (visit no.1, 2021-10-18): end process</span></span>
 <span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a><span class="co">#&gt; Subject #7: 9 visits, 1 relapse</span></span>
-<span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a><span class="co">#&gt; Found value&gt;=4.5 at visit no.3 (2021-09-11); potential confirmation visits available: no. 5, 6, 7, 8, 9</span></span>
+<span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a><span class="co">#&gt; Found value&gt;=4.5 at visit no.3 (2021-09-11); potential confirmation visits available: no. 4, 5, 6, 7, 8, 9</span></span>
 <span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a><span class="co">#&gt; Value&gt;=4.5 not confirmed: proceed with search</span></span>
-<span id="cb8-36"><a href="#cb8-36" tabindex="-1"></a><span class="co">#&gt; Found value&gt;=4.5 at visit no.5 (2022-03-17); potential confirmation visits available: no. 7, 8, 9</span></span>
+<span id="cb8-36"><a href="#cb8-36" tabindex="-1"></a><span class="co">#&gt; Found value&gt;=4.5 at visit no.5 (2022-03-17); potential confirmation visits available: no. 6, 7, 8, 9</span></span>
 <span id="cb8-37"><a href="#cb8-37" tabindex="-1"></a><span class="co">#&gt; Confirmed value&gt;=4.5 (visit no.5, 2022-03-17): end process</span></span>
 <span id="cb8-38"><a href="#cb8-38" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb8-39"><a href="#cb8-39" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
 <span id="cb8-40"><a href="#cb8-40" tabindex="-1"></a><span class="co">#&gt; Outcome: edss</span></span>
-<span id="cb8-41"><a href="#cb8-41" tabindex="-1"></a><span class="co">#&gt; Confirmation over: 168 days (-7 days, +730.5 days)</span></span>
+<span id="cb8-41"><a href="#cb8-41" tabindex="-1"></a><span class="co">#&gt; Confirmation over: 84 days (-7 days, +730.5 days)</span></span>
 <span id="cb8-42"><a href="#cb8-42" tabindex="-1"></a><span class="co">#&gt; Event skipped if: -</span></span>
 <span id="cb8-43"><a href="#cb8-43" tabindex="-1"></a><span class="co">#&gt; Confirmation visit skipped if: &lt;30 days from last relapse</span></span>
 <span id="cb8-44"><a href="#cb8-44" tabindex="-1"></a><span class="co">#&gt; </span></span>
@@ -3078,8 +3078,8 @@ on date 2022-07-19:</p>
 <span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(vm, </span>
 <span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span><span class="st">&quot;200px&quot;</span>, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-7cc29ad2d0c5c6f59036" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-7cc29ad2d0c5c6f59036">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],["2021-09-23","2021-03-24","2023-02-21","2022-07-19","2021-11-01","2021-10-18","2022-03-17"],[5.5,4.5,null,5,5,5.5,4.5],[0,118,491,304,140,0,372],[1,1,0,1,1,1,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>date<\/th>\n      <th>EDSS<\/th>\n      <th>time2event<\/th>\n      <th>observed<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"date","targets":1},{"name":"EDSS","targets":2},{"name":"time2event","targets":3},{"name":"observed","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-1ce2f0550f251e11e379" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-1ce2f0550f251e11e379">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],["2021-09-23","2021-03-24","2023-02-21","2022-07-19","2021-11-01","2021-10-18","2022-03-17"],[5.5,4.5,null,5,5,5.5,4.5],[0,118,491,304,140,0,372],[true,true,false,true,true,true,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>date<\/th>\n      <th>EDSS<\/th>\n      <th>time2event<\/th>\n      <th>observed<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"date","targets":1},{"name":"EDSS","targets":2},{"name":"time2event","targets":3},{"name":"observed","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>where: <code>&#39;date&#39;</code> contains the date of the first confirmed
 EDSS <span class="math inline">\(\geq\)</span> 4.5 (or last date of
 follow-up if milestone was not reached or not confirmed);
@@ -3111,8 +3111,8 @@ updated after each event to the first available confirmation visit).</p>
 <span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(survival_data, <span class="at">rownames=</span>F,</span>
 <span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span><span class="st">&quot;200px&quot;</span>, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-b0c1430e513630d015ab" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-b0c1430e513630d015ab">{"x":{"filter":"none","vertical":false,"data":[["1","2","2","3","4","4","5","6","7"],[1,1,2,0,1,2,1,1,1],[292,198,539,491,77,304,140,120,372]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>time2event<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"time2event","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-1ce6333d276174c974a3" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-1ce6333d276174c974a3">{"x":{"filter":"none","vertical":false,"data":[["1","2","2","3","4","4","5","6","7"],[1,1,2,0,1,2,1,1,1],[292,198,539,491,77,304,140,120,372]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>time2event<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"time2event","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>Note that the <code>event</code> argument is set to
 <code>multiple</code>, and that the results can contain more than one
 row for the same subject, with the <code>&#39;nevent&#39;</code> column keeping

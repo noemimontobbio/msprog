@@ -17,12 +17,12 @@ MSprog(
   subjects = NULL,
   delta_fun = NULL,
   worsening = NULL,
-  event = c("firstCDW", "first", "firstPIRA", "firstRAW", "multiple", "firstCDI"),
+  event = c("firstCDW", "firstCDI", "multiple", "firstPIRA", "firstRAW", "first"),
   baseline = c("fixed", "roving", "roving_impr", "roving_wors"),
   proceed_from = c("firstconf", "event"),
   sub_threshold_rebl = c("none", "event", "improvement", "worsening"),
-  bl_geq = F,
-  relapse_rebl = F,
+  bl_geq = FALSE,
+  relapse_rebl = FALSE,
   skip_local_extrema = c("none", "strict", "all"),
   validconf_col = NULL,
   conf_days = 12 * 7,
@@ -36,14 +36,14 @@ MSprog(
   relapse_indep = NULL,
   impute_last_visit = 0,
   date_format = NULL,
-  include_dates = F,
-  include_values = F,
-  include_stable = T,
+  include_dates = FALSE,
+  include_values = FALSE,
+  include_stable = TRUE,
   verbose = 1
 )
 }
 \arguments{
-\item{data}{data frame containing longitudinal data, including: subject ID, outcome value, date of visit.}
+\item{data}{Data frame containing longitudinal data, including: subject ID, outcome value, date of visit.}
 
 \item{subj_col}{Name of data column with subject ID.}
 
@@ -59,10 +59,11 @@ MSprog(
 \item \code{"sdmt"} (Symbol Digit Modalities Test)
 \item \code{"custom"} (only accepted when specifying custom \code{delta_fun} and \code{worsening}).
 }
-Outcome type determines a default direction of worsening (see \code{worsening}argument)
-and default definition of clinically meaningful change given the reference value
-(using the built-in function \code{\link[=compute_delta]{compute_delta()}}).
-This can be replaced by a custom function using the \code{delta_fun} argument.}
+Outcome type triggers internal checks on value range,
+determines the direction of worsening (see \code{worsening} argument),
+and selects the default definition of clinically meaningful change given
+the reference value (using the built-in function \code{\link[=compute_delta]{compute_delta()}}).
+The latter can be replaced by a custom function using the \code{delta_fun} argument.}
 
 \item{relapse}{Optional data frame containing longitudinal data, including: subject ID and relapse date.}
 
@@ -78,10 +79,11 @@ This can be replaced by a custom function using the \code{delta_fun} argument.}
 change in the outcome measure from the provided reference value.
 The function provided must take a numeric value (reference score) as input,
 and return a numeric value corresponding to the minimum shift from baseline, see example below.
-A custom delta function must be specified if \code{outcome} is set to \code{"custom"}.
-Otherwise, if none is specified, the built-in function \code{\link[=compute_delta]{compute_delta()}} is used internally.}
+If \code{outcome} is set to \code{"custom"}, a custom delta function must be specified by the user.
+For other values of \code{outcome}, if no \code{delta_fun} is specified,  the built-in function \code{\link[=compute_delta]{compute_delta()}} is used internally.}
 
-\item{worsening}{The direction of worsening (\code{"increase"} if higher values correspond to worse disease course, \code{"decrease"} otherwise).\if{html}{\out{<br>}}
+\item{worsening}{The direction of worsening (\code{"increase"} if higher values correspond to worse disease course, \code{"decrease"} otherwise).
+
 The given value is only used when \code{outcome} is set to \code{"custom"}. Otherwise, \code{worsening} is automatically set to
 \code{"increase"} if \code{outcome} is set to \code{"edss"}, \code{"nhpt"}, \code{"t25fw"},
 and to \code{"decrease"} if \code{outcome} is set to \code{"sdmt"}.}
@@ -122,15 +124,15 @@ when rebaselining after a confirmed disability event, the baseline is moved to:
 }}
 
 \item{sub_threshold_rebl}{This argument is only used if \code{baseline} is not set to \code{"fixed"}.
+It controls whether and which "sub-threshold" events (i.e., \emph{confirmed}
+changes in the outcome measure below the clinically meaningful threshold) can
+trigger a re-baseline.
 Must be one of the following.
 \itemize{
-\item \code{"event"}: any confirmed sub-threshold event (i.e. any \emph{confirmed} change in the outcome measure,
-possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
-\item \code{"improvement"}: any confirmed sub-threshold improvement (i.e. any \emph{confirmed} improvement in the outcome measure,
-possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
-\item \code{"worsening"}: any confirmed sub-threshold worsening (i.e. any \emph{confirmed} worsening in the outcome measure,
-possibly below clinically meaningful threshold) can potentially trigger a re-baseline.
-\item \code{"none"}: only use clinically meaningful confirmed changes for re-baseline.
+\item \code{"none"} (default): only use \emph{clinically meaningful} confirmed changes for re-baseline.
+\item \code{"event"}: any confirmed sub-threshold event can potentially trigger a re-baseline.
+\item \code{"improvement"}: any confirmed sub-threshold improvement can potentially trigger a re-baseline.
+\item \code{"worsening"}: any confirmed sub-threshold worsening can potentially trigger a re-baseline.
 }
 See \code{delta_fun} argument and \code{\link[=compute_delta]{compute_delta()}} function for more details.}
 
@@ -138,86 +140,119 @@ See \code{delta_fun} argument and \code{\link[=compute_delta]{compute_delta()}} 
 If \code{TRUE}, the new reference value must always be greater or equal than the previous one;
 when it is not, the old reference value is assigned to it [2].}
 
-\item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse.}
+\item{relapse_rebl}{If \code{TRUE}, re-baseline after every relapse [2].}
 
 \item{skip_local_extrema}{This argument is only used if the baseline is moved.
-It controls function behaviour in the presence of local minima or maxima. \if{html}{\out{<br>}}
-A visit \code{i} is a local minimum point for \code{outcome} if \code{outcome[i+1]>outcome[i]}
-and \code{outcome[i-1]>outcome[i]}; local maxima are defined similarly.\if{html}{\out{<br>}}
-A visit \code{i} is a \emph{strict} local minimum point for \code{outcome} if \if{html}{\out{<br>}} \code{outcome[i+1]-outcome[i]>=delta_fun(outcome[i])};
-\if{html}{\out{<br>}} \code{outcome[i-1]-outcome[i]>=delta_fun(outcome[i])}. \if{html}{\out{<br>}}
-Strict local maxima are defined similarly. \if{html}{\out{<br>}}
-When \code{outcome[i]=outcome[i-2]}, visit \code{i} is \emph{not} considered a local extremum point even if the above conditions hold.
-This controls for cases where the outcome has an undulating course.\if{html}{\out{<br>}}
+It controls function behaviour in the presence of local minima or maxima.
+
+A visit \code{i} is a local minimum point for outcome \code{x} if
+
+\code{x[i+1]>x[i]} and \code{x[i-1]>x[i]}.
+
+Local maxima are defined similarly.
+
+A visit \code{i} is a \emph{strict} local minimum point for outcome \code{x} if
+
+\code{x[i+1]-x[i]>=delta_fun(x[i])};
+
+\code{x[i-1]-x[i]>=delta_fun(x[i])}.
+
+Strict local maxima are defined similarly.
+
+When \code{x[i]=x[i-2]}, visit \code{i} is \emph{not} considered a local
+extremum point even if the above conditions hold.
+This controls for cases where the outcome has an undulating course.
 The following argument values are accepted.
 \itemize{
-\item \code{'none'}: local extrema are always accepted as valid baseline values.
-\item \code{'strict'}: the baseline cannot be placed at a \emph{strict} local minimum or maximum.
-\item \code{'all'}: the baseline cannot be placed at a local minimum or maximum.
+\item \code{"none"} (default): local extrema are always accepted as valid baseline values.
+\item \code{"strict"}: the baseline cannot be placed at a \emph{strict} local minimum or maximum.
+\item \code{"all"}: the baseline cannot be placed at a local minimum or maximum.
 }}
 
-\item{validconf_col}{Name of data column specifying which visits can (\code{T}) or cannot (\code{F}) be used as confirmation visits.
+\item{validconf_col}{Name of data column specifying which visits can (\code{TRUE}) or cannot (\code{FALSE}) be used as confirmation visits.
 The input data does not necessarily have to include such a column.
 If \code{validconf_col=NULL}, all visits are potentially used as confirmation visits.}
 
-\item{conf_days}{Period before confirmation (days). Can be a single value or list-like of any length if multiple windows are to be considered.}
+\item{conf_days}{Period before confirmation (days). Can be a single value, or
+list-like of any length if considering multiple windows.
+If \code{length(conf_days) > 1} (e.g., \code{conf_days=c(12*7, 24*7)}),
+the function detects events confirmed at \emph{either} time point (e.g.,
+"confirmed at 12 \emph{or} 24 weeks") with the relative tolerance (as per \code{conf_tol_days}).}
 
-\item{conf_tol_days}{Tolerance window for confirmation visit (days); can be an integer (same tolerance on left and right)
-or list-like of length 2 (different tolerance on left and right).
-The right end of the interval can be set to \code{Inf} (confirmation window unbounded on the right
+\item{conf_tol_days}{Tolerance window for confirmation visit (days).
+Can be an integer (same lower and upper tolerance)
+or list-like of length 2 (different lower and upper tolerance).
+The right end of the interval (upper tolerance) can be set to \code{Inf}
+(confirmation window unbounded on the right
 -- e.g., "confirmed over 12 \emph{or more} weeks").}
 
 \item{require_sust_days}{Minimum number of days over which a confirmed change must be sustained
 (i.e., confirmed at \emph{all} visits occurring in the specified period) to be retained as an event.
 Events sustained for the remainder of the follow-up period are always retained regardless of follow-up duration.
-If \code{require_sust_days=Inf}, events are retained only when sustained for the remainder of the follow-up period.\if{html}{\out{<br>}}
+If \code{require_sust_days=Inf}, events are retained only when sustained for the remainder of the follow-up period.
+
 (Warning: if \code{check_intermediate} is set to \code{FALSE}, sustained change will be established based \emph{only on the end} of the specified period.)}
 
 \item{check_intermediate}{If \code{TRUE} (default), events are confirmed \emph{over all intermediate visits}
-up to the confirmation visit. \if{html}{\out{<br>}}
+up to the confirmation visit.
+
 If set to \code{FALSE} (not recommended in most cases, as it may discard meaningful fluctuations),
 events will be confirmed \emph{only at} the specified confirmation visit
 (and \emph{only at the end} of the period defined by \code{require_sust_days}, if any).}
 
-\item{relapse_to_bl}{Minimum distance from a relapse (days) for a visit to be used as baseline.
-Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
-(minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+\item{relapse_to_bl}{Minimum distance (days) from the onset of a relapse for a visit to be used as baseline.
+Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+(minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 Note that setting the distance to zero means keeping the baseline where it is regardless of surrounding relapses.
-If relapse end dates are available (\code{renddate_col}), the minimum distance from last relapse
-is overwritten by the relapse duration, unless it was set to zero (in which case it stays 0).
+
+If relapse end dates are available (\code{renddate_col}), the minimum distance from last relapse onset
+is automatically set to the specific relapse duration, unless \code{relapse_to_bl} (or \code{relapse_to_bl[1]}) is zero
+(in which case relapse timing does not affect baseline placement).
+
 If the designated baseline does not respect this constraint, the baseline is moved to the next available visit.}
 
-\item{relapse_to_event}{Minimum distance from a relapse (days) for an event to be considered as such.
-Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
-(minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+\item{relapse_to_event}{Minimum distance (days) from the onset of a relapse for an event to be considered as such.
+Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+(minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 Note that setting the distance to zero means retaining the event regardless of surrounding relapses.
-If relapse end dates are available (\code{renddate_col}), the minimum distance from last relapse
-is overwritten by the relapse duration, unless it was set to zero (in which case it stays 0).}
 
-\item{relapse_to_conf}{Minimum distance from a relapse (days) for a visit to be a valid confirmation visit.
-Can be an integer (minimum distance from \emph{last} relapse) or list-like of length 2
-(minimum distance from \emph{last} relapse, minimum distance from \emph{next} relapse).
+If relapse end dates are available (\code{renddate_col}), the minimum distance from last relapse onset
+is automatically set to the specific relapse duration, unless \code{relapse_to_event} (or \code{relapse_to_event[1]}) is zero
+(in which case relapse timing does not affect event validation).}
+
+\item{relapse_to_conf}{Minimum distance (days) from the onset of a relapse for a visit to be a valid confirmation visit.
+Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+(minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 Note that setting the distance to zero means using any visit for confirmation regardless of surrounding relapses.
-If relapse end dates are available (\code{renddate_col}), the minimum distance from last relapse
-is overwritten by the relapse duration, unless it was set to zero (in which case it stays 0).}
 
-\item{relapse_assoc}{Maximum distance from a relapse (days) for a CDW event to be classified as RAW.
-Can be an integer (maximum distance from \emph{last} relapse) or list-like of length 2
-(maximum distance from \emph{last} relapse, maximum distance from \emph{next} relapse).
+If relapse end dates are available (\code{renddate_col}), the minimum distance from last relapse onset
+is automatically set to the specific relapse duration, unless \code{relapse_to_conf} (or \code{relapse_to_conf[1]}) is zero
+(in which case relapse timing does not affect selection of confirmation visits).}
+
+\item{relapse_assoc}{Maximum distance (days) from the onset of a relapse for a CDW event to be classified as RAW.
+Can be an integer (maximum distance from \emph{last} relapse onset) or list-like of length 2
+(maximum distance from \emph{last} relapse onset, maximum distance from \emph{next} relapse onset).
 If relapse end dates are available (\code{renddate_col}), the maximum distance from last relapse
-is overwritten by the relapse duration.}
+is automatically set to the specific relapse duration.}
 
 \item{relapse_indep}{Specifies relapse-free intervals for PIRA definition.
-Must be given in the form produced by function \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}} by calling
+Must be a named list
+\cr\code{list(prec=list(p0, p1), event=list(e0, e1), conf=list(c0, c1))}\cr
+specifying the intervals around (any subset of) three checkpoints:
+\enumerate{
+\item a preceding visit, e.g., baseline or last visit before the worsening (\code{p0} and \code{p1})
+\item the event onset (\code{e0} and \code{e1})
+\item the first available confirmation visit (\code{c0} and \code{c1}).
+}
+The auxiliary function \code{relapse_indep_from_bounds()} can be used to organise
+interval bounds into a named list correctly, by calling:
 \cr\code{relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1)}\cr
-to specify the intervals around (any subset of) three checkpoints:
-(i) a preceding visit, e.g., baseline or last visit before the worsening (\code{p0} and \code{p1}),
-(ii) the event onset (\code{e0} and \code{e1}), and (iii) the first available confirmation visit (\code{c0} and \code{c1}).
 See \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}} function docs for more details on how to define the intervals.
 If relapse end dates are available (\code{renddate_col}), it is possible to also define PIRA based on those
-by setting \code{use_end_dates=T} in \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}}.}
+by setting \code{use_end_dates=TRUE} in \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}}.}
 
-\item{impute_last_visit}{Imputation probability for worsening events occurring at last visit (i.e. with no confirmation).
+\item{impute_last_visit}{Imputation probability for worsening events occurring
+at the last available visit (i.e., with no confirmation).
 Unconfirmed worsening events occurring at the last visit are never imputed if \code{impute_last_visit=0};
 they are always imputed if \code{impute_last_visit=1};
 they are imputed with probability \code{p}, \verb{0<p<1}, if \code{impute_last_visit=p}.
@@ -238,7 +273,7 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 \item event onset (\code{'date'} column)
 \item the current baseline (\code{'bl_date'} column)
 \item the last visit before event onset at a clinically meaningful score distance from it (\code{'last_delta_date'} column)
-\item the confirmation visit(s) (\code{'conf<c>_date'}/\code{'PIRA_conf<c>_date'} columns for each \code{c} in \code{conf_days})
+\item the confirmation visit(s) (\code{'conf<c>_date'} and \code{'PIRA_conf<c>_date'} columns for each \code{c} in \code{conf_days})
 }}
 
 \item{include_values}{If \code{TRUE},  \code{output$results} will include the outcome value at:
@@ -246,7 +281,7 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 \item event onset (\code{'value'} column)
 \item the current baseline (\code{'bl_value'} column)
 \item the last visit before event onset at a clinically meaningful score distance from it (\code{'last_delta_value'} column)
-\item the confirmation visit(s) (\code{'conf<c>_value'}/\code{'PIRA_conf<c>_value'} columns for each \code{c} in \code{conf_days})
+\item the confirmation visit(s) (\code{'conf<c>_value'} and \code{'PIRA_conf<c>_value'} columns for each \code{c} in \code{conf_days})
 }}
 
 \item{include_stable}{If \code{TRUE}, subjects with no confirmed events are included in \code{output$results},
@@ -262,19 +297,18 @@ with \code{time2event} = total follow up.}
 \value{
 An object of class \code{MSprogOutput} with the following attributes:
 \itemize{
-\item{\code{event_count}: a data frame containing the event sequence detected for each subject, and the counts for each event type}
-\item{\code{results}: a data frame with extended info on each event for all subjects}
-\item{\code{settings}: a list containing all the arguments used to compute the output}
+\item{\code{event_count}: a data frame containing the event sequence detected for each subject, and the counts for each event type.}
+\item{\code{results}: a data frame with extended info on each event for all subjects.}
+\item{\code{settings}: a list containing all the arguments used to compute the output.}
 \item{\code{unconfirmed}: a data frame with info on unconfirmed events (initial change from baseline, but no confirmation)
 for all subjects.}
-For a detailed description of the \code{event_count} and \code{results} data frames, see \code{?MSprogOutput}.
 }
+For a detailed description of output data frames, see \code{?MSprogOutput}.
 }
 \description{
-\code{MSprog()} detects and characterises the confirmed disability worsening (CDW)
-or improvement (CDI) events of an outcome measure (EDSS, NHPT, T25FW, or SDMT; or any custom outcome)
-for one or more subjects, based on repeated assessments
-through time (and on the dates of acute episodes, if any).
+Detect and characterise confirmed disability worsening (CDW) or improvement
+(CDI) events of an outcome measure (EDSS, NHPT, T25FW, or SDMT; or any custom outcome)
+based on repeated assessments through time (and on the dates of acute episodes, if any).
 The events are detected sequentially by scanning the outcome values in chronological order.
 Several qualitative and quantitative options are given as arguments that can be set
 by the user and reported as a complement to the results to ensure reproducibility.
