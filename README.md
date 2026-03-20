@@ -3,11 +3,8 @@
 
 <br>
 
-> \[!WARNING\] 🚧 **This repository is under active development. Please
-> make sure you are using the latest version of the package (check by
-> running `utils::packageVersion('msprog')`) – or at least v0.2.0, which
-> is functionally stable, though some minor aspects may still change
-> ahead of a full stable release on CRAN.** 🚧
+> [!WARNING]
+> 🚧 **This repository is under active development. Please make sure you are using the latest version of the package (check by running `utils::packageVersion('msprog')`) -- or at least v0.2.0, which is functionally stable, though some minor aspects may still change ahead of a full stable release on CRAN.** 🚧
 
 <br>
 
