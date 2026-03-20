@@ -21,11 +21,11 @@ knitr::opts_chunk$set(
 
 ```{=markdown}
 > [!WARNING]
-> 🚧 **This repository is under active development. Please make sure you are using the latest version of the package (check by running `utils::packageVersion('msprog')`) -- or at least v0.2.0, which is functionally stable, though some minor aspects may still change ahead of a full stable release on CRAN.** 🚧
+> 🚧 **This repository is under active development. 🚧 Please make sure you are using the latest version of the package (check by running `utils::packageVersion('msprog')`) -- or at least v0.2.0, which is functionally stable, though some minor aspects may still change ahead of a full stable release on CRAN.** 
 >
 > **Latest version:**
 > ```{r}
-> utils::packageVersion('msprog')
+> utils::packageVersion("msprog")
 > ```
 ```
 
@@ -102,8 +102,8 @@ data(toydata_relapses)
 
 # Compute disability course
 output <- MSprog(toydata_visits,                                      # provide data on visits
-                 subj_col='id', value_col='EDSS', date_col='date',    # specify column names
-                 outcome='edss',                                      # specify outcome type
+                 subj_col="id", value_col="EDSS", date_col="date",    # specify column names
+                 outcome="edss",                                      # specify outcome type
                  relapse=toydata_relapses)                            # provide data on relapses
 ```
 
@@ -115,9 +115,9 @@ each event (`event='multiple', baseline='roving'`)`:
 
 ```{r}
 output <- MSprog(toydata_visits,                                      # provide data on visits
-                 subj_col='id', value_col='EDSS', date_col='date',    # specify column names
-                 outcome='edss',                                      # specify outcome type
-                 event='multiple', baseline='roving',                 # modify default options
+                 subj_col="id", value_col="EDSS", date_col="date",    # specify column names
+                 outcome="edss",                                      # specify outcome type
+                 event="multiple", baseline="roving",                 # modify default options
                  relapse=toydata_relapses)                            # provide data on relapses
 ```
 
@@ -148,7 +148,7 @@ print(output)
 ### Vignettes
 For detailed indications on usage and best practices, please refer to the package vignettes (make sure to enable `build_vignettes` during [installation](#install)). 
 ```{r, message=FALSE}
-browseVignettes('msprog')
+browseVignettes("msprog")
 ```
 
 <a id="citation"></a>
@@ -157,7 +157,7 @@ browseVignettes('msprog')
 
 If you use the `msprog` package, please use the `citation()` function to obtain the correct reference:
 ```{r}
-citation('msprog')
+citation("msprog")
 ```
     
 ## References

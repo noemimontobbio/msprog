@@ -3,23 +3,20 @@
 
 <br>
 
-> \[!WARNING\] 🚧 **This repository is under active development. Please
-> make sure you are using the latest version of the package (check by
-> running `utils::packageVersion('msprog')`) – or at least v0.2.0, which
-> is functionally stable, though some minor aspects may still change
-> ahead of a full stable release on CRAN.** 🚧
+> [!WARNING]
+> 🚧 **This repository is under active development. 🚧 Please make sure you are using the latest version of the package (check by running `utils::packageVersion('msprog')`) -- or at least v0.2.0, which is functionally stable, though some minor aspects may still change ahead of a full stable release on CRAN.** 
+>
+> **Latest version:**
+> 
+> ``` r
+> utils::packageVersion("msprog")
+> #> [1] '0.2.6'
+> ```
 
 <br>
 
-> **Latest version:**
->
-> ``` r
-> utils::packageVersion('msprog')
-> #> [1] '0.2.6'
-> ```
->
 > 📣 **What’s new**  
-> Calculation speed-up + confirmation dates in output
+> Calculation speed-up + confirmation dates/values in output
 
 # msprog: reproducible assessment of disability course in MS
 
@@ -116,8 +113,8 @@ data(toydata_relapses)
 
 # Compute disability course
 output <- MSprog(toydata_visits,                                      # provide data on visits
-                 subj_col='id', value_col='EDSS', date_col='date',    # specify column names
-                 outcome='edss',                                      # specify outcome type
+                 subj_col="id", value_col="EDSS", date_col="date",    # specify column names
+                 outcome="edss",                                      # specify outcome type
                  relapse=toydata_relapses)                            # provide data on relapses
 #> 
 #> ---
@@ -147,9 +144,9 @@ sequentially by moving the baseline after each event
 
 ``` r
 output <- MSprog(toydata_visits,                                      # provide data on visits
-                 subj_col='id', value_col='EDSS', date_col='date',    # specify column names
-                 outcome='edss',                                      # specify outcome type
-                 event='multiple', baseline='roving',                 # modify default options
+                 subj_col="id", value_col="EDSS", date_col="date",    # specify column names
+                 outcome="edss",                                      # specify outcome type
+                 event="multiple", baseline="roving",                 # modify default options
                  relapse=toydata_relapses)                            # provide data on relapses
 #> 
 #> ---
@@ -181,26 +178,16 @@ accessed via the following attributes of the function output.
 
     ``` r
     print(output$results, row.names=FALSE)
-    #>  event_type event_index bl2event time2event sust_days sust_last id nevent
-    #>         CDW           5      292        292       242      TRUE  1      1
-    #>         CDW           4      198        198        84     FALSE  2      1
-    #>         CDW           8      257        539       191      TRUE  2      2
-    #>                      NA      NaN        491         0     FALSE  3      0
-    #>         CDI           2       77         77        98     FALSE  4      1
-    #>         CDW           4      129        304       282      TRUE  4      2
-    #>         CDW           3      140        140       497      TRUE  5      1
-    #>         CDI           3      120        120       232     FALSE  6      1
-    #>         CDW           5      372        372       407      TRUE  7      1
-    #>  total_fu CDW_type
-    #>       534     PIRA
-    #>       730      RAW
-    #>       730     PIRA
-    #>       491         
-    #>       586         
-    #>       586     PIRA
-    #>       637     PIRA
-    #>       491         
-    #>       779     PIRA
+    #>  id nevent event_type CDW_type total_fu bl2event time2event sust_days sust_last
+    #>   1      1        CDW     PIRA      534      292        292       242      TRUE
+    #>   2      1        CDW      RAW      730      198        198        84     FALSE
+    #>   2      2        CDW     PIRA      730      257        539       191      TRUE
+    #>   3      0                          491      NaN        491         0     FALSE
+    #>   4      1        CDI               586       77         77        98     FALSE
+    #>   4      2        CDW     PIRA      586      129        304       282      TRUE
+    #>   5      1        CDW     PIRA      637      140        140       497      TRUE
+    #>   6      1        CDI               491      120        120       232     FALSE
+    #>   7      1        CDW     PIRA      779      372        372       407      TRUE
     ```
 
     where: `nevent` is the cumulative event count for each subject;
@@ -259,7 +246,7 @@ the package vignettes (make sure to enable `build_vignettes` during
 [installation](#install)).
 
 ``` r
-browseVignettes('msprog')
+browseVignettes("msprog")
 ```
 
 <a id="citation"></a>
@@ -270,7 +257,7 @@ If you use the `msprog` package, please use the `citation()` function to
 obtain the correct reference:
 
 ``` r
-citation('msprog')
+citation("msprog")
 #> To cite package 'msprog' in publications use:
 #> 
 #>   Montobbio N, Carmisciano L, Signori A, Ponzano M, Schiavetti I, Bovis

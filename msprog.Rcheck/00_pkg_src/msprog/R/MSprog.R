@@ -521,7 +521,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     while (iref > 1 && !valid_ref) {
       iref <- iref - 1
       #
-      if (skip_local_extrema != 'none') {
+      if (skip_local_extrema != "none") {
         prec <- if (iref == 1) data_id[[value_col]][iref] else data_id[[value_col]][iref - 1]
         prec2 <- if (iref <= 2) -1 else data_id[[value_col]][iref - 2]
         subs <- if (iref == nvisits) data_id[[value_col]][iref] else data_id[[value_col]][iref + 1]
@@ -777,7 +777,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       if (n_iter > 10000) {stop('Something got stuck: infinite loop')}
 
       # Set baseline (skip if local extremum or within relapse influence)
-      if (skip_local_extrema!='none') {
+      if (skip_local_extrema!="none") {
         prec <- if (bl_idx == 1) data_id[[value_col]][bl_idx] else data_id[[value_col]][bl_idx - 1]
         prec2 <- if (bl_idx <= 2) -1 else data_id[[value_col]][bl_idx - 2]
         subs <- if (bl_idx == nvisits) data_id[[value_col]][bl_idx] else data_id[[value_col]][bl_idx + 1]
@@ -801,7 +801,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         }
         bl_idx <- bl_idx + 1
         #
-        if (skip_local_extrema != 'none') {
+        if (bl_idx <= nvisits & skip_local_extrema != "none") {
           prec <- if (bl_idx == 1) data_id[[value_col]][bl_idx] else data_id[[value_col]][bl_idx - 1]
           prec2 <- if (bl_idx <= 2) -1 else data_id[[value_col]][bl_idx - 2]
           subs <- if (bl_idx==nvisits) data_id[[value_col]][bl_idx] else data_id[[value_col]][bl_idx + 1]
