@@ -5,16 +5,16 @@
 
 > [!WARNING]
 > 🚧 **This repository is under active development. Please make sure you are using the latest version of the package (check by running `utils::packageVersion('msprog')`) -- or at least v0.2.0, which is functionally stable, though some minor aspects may still change ahead of a full stable release on CRAN.** 🚧
-
-<br>
-
-> **Latest version:**
 >
+> **Latest version:**
+> 
 > ``` r
 > utils::packageVersion('msprog')
 > #> [1] '0.2.6'
 > ```
->
+
+<br>
+
 > 📣 **What’s new**  
 > Calculation speed-up + confirmation dates/values in output
 
