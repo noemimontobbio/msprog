@@ -486,7 +486,7 @@ Clinically meaningful threshold for EDSS change (delta function): default for ED
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  0.378 0.015 0.394 0 0 
+Time elapsed:  0.355 0.016 0.375 0 0 
 > grDevices::dev.off()
 null device 
           1 

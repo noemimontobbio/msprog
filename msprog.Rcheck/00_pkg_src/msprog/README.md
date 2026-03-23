@@ -15,8 +15,8 @@
 
 <br>
 
-> 📣 **What’s new**  
-> Calculation speed-up + confirmation dates/values in output
+> 📣 **What’s new in latest version**  
+> Calculation ***speed-up*** + confirmation dates/values in output
 
 # msprog: reproducible assessment of disability course in MS
 

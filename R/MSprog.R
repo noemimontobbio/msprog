@@ -553,11 +553,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     ev <- list(
       event_type = "",
       event_index = NA_integer_,
-      date = if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA),
+      date = NaN, #if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA),
       value = NaN,
-      bl_date = if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA),
+      bl_date = NaN, #if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA),
       bl_value = NaN,
-      last_delta_date = if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA),
+      last_delta_date = NaN, #if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA),
       last_delta_value = NaN,
       bl2event = NaN,
       time2event = NaN,
@@ -565,9 +565,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       sust_last = FALSE #0L
     )
     for (cd in conf_days) {
-      ev[[paste0("conf", cd, "_date")]] <- if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA)
+      ev[[paste0("conf", cd, "_date")]] <- NaN #if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA)
       ev[[paste0("conf", cd, "_value")]] <- NaN
-      ev[[paste0("PIRA_conf", cd, "_date")]] <- if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA)
+      ev[[paste0("PIRA_conf", cd, "_date")]] <- NaN #if (!is.null(date_format) && date_format == "day") NaN else as.Date(NA)
       ev[[paste0("PIRA_conf", cd, "_value")]] <- NaN
     }
     ev
