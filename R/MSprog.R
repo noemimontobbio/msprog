@@ -561,7 +561,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       last_delta_value = NaN,
       bl2event = NaN,
       time2event = NaN,
-      sust_days = 0,
+      sust_days = NaN,
       sust_last = FALSE #0L
     )
     for (cd in conf_days) {
@@ -774,7 +774,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
       n_iter <- n_iter + 1
 
-      if (n_iter > 10000) {stop('Something got stuck: infinite loop')}
+      if (n_iter > 10000) {stop('Something got stuck!')}
 
       # Set baseline (skip if local extremum or within relapse influence)
       if (skip_local_extrema!="none") {
@@ -1028,9 +1028,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                            " (", display_date(data_id[[date_col]][sust_idx], global_start), ")")
             }
 
+            #####_ev_
             events[[length(events) + 1]] <- ev
             event_type <- c(event_type, ev$event_type)
             event_index <- c(event_index, ev$event_index)
+            #####_ev_
 
           } else {
             # If the event is NOT retained (as per `require_sust_days`), we proceed.
@@ -1163,7 +1165,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   if (data_id[['closest_rel_before']][change_idx] <= relapse_assoc[1]
                       || data_id[['closest_rel_after']][change_idx] <= relapse_assoc[2]) {
                     # A) Event is relapse-associated.
-                    if (event=='firstPIRA' && baseline %in% c('fixed', 'roving_impr')) {
+                    if (event == 'firstPIRA' && baseline %in% c('fixed', 'roving_impr')) {
                       search_idx <- change_idx + 1 # skip this event if only searching for PIRA with no CDW-driven re-baseline
                       next
                     }
@@ -1350,9 +1352,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                             )
                   }
 
+                  #####_ev_
                   events[[length(events) + 1]] <- ev
                   event_type <- c(event_type, ev$event_type)
                   event_index <- c(event_index, ev$event_index)
+                  #####_ev_
 
                   } else {
                     # If the event is NOT retained (as per `require_sust_days`), we proceed.
@@ -1700,39 +1704,43 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           "\nBaseline skipped if: ", ifelse(relapse_to_bl[1]>0, ifelse(is.null(renddate_col),
                 paste0("<", relapse_to_bl[1], " days from last relapse"),
                 "within duration of a relapse"), ""),
-              ifelse(relapse_to_bl[2]>0, paste0(ifelse(relapse_to_bl[1]>0, ", <", '<'),
+              ifelse(relapse_to_bl[2] > 0, paste0(ifelse(relapse_to_bl[1]>0, ", <", '<'),
                       relapse_to_bl[2], " days to next relapse"), ""),
           if (skip_local_extrema!='none') paste0(if (relapse_to_bl[1] == 0 && relapse_to_bl[2] == 0) "" else
                               ", or ", "local extremum") else "",
           if (relapse_to_bl[1]==0 && relapse_to_bl[2]==0 && skip_local_extrema=='none') "-" else "",
-          "\nEvent skipped if: ", ifelse(relapse_to_event[1]>0, ifelse(is.null(renddate_col),
+          "\nEvent skipped if: ", ifelse(relapse_to_event[1] > 0, ifelse(is.null(renddate_col),
                 paste0("<", relapse_to_event[1], " days from last relapse"),
                 "within last relapse duration"), ""),
-              ifelse(relapse_to_event[2]>0, paste0(ifelse(relapse_to_event[1]>0, ", <", '<'),
+              ifelse(relapse_to_event[2] > 0, paste0(ifelse(relapse_to_event[1]>0, ", <", '<'),
                     relapse_to_event[2], " days to next relapse"), ""),
-          if (relapse_to_event[1]==0 && relapse_to_event[2]==0) "-" else "",
+          if (relapse_to_event[1] == 0 && relapse_to_event[2]==0) "-" else "",
           "\nConfirmation visit skipped if: ", ifelse(relapse_to_conf[1]>0, ifelse(is.null(renddate_col),
                 paste0("<", relapse_to_conf[1], " days from last relapse"),
                 "within last relapse duration"), ""),
-              ifelse(relapse_to_conf[2]>0, paste0(ifelse(relapse_to_conf[1]>0, ", <", '<'),
+              ifelse(relapse_to_conf[2] > 0, paste0(ifelse(relapse_to_conf[1]>0, ", <", '<'),
                     relapse_to_conf[2], " days to next relapse"), ""),
           if (relapse_to_conf[1] == 0 && relapse_to_conf[2] == 0) "-" else "",
           "\nEvents detected: ", event))
     message('\n*Please use `print(output)` to display full info on event detection criteria*')
-    if (is.null(subjects) || length(subjects)>1) {
-        message("\n---\nTotal subjects: ", nsub,
-            "\n---\nSubjects with ",
-            if (event=='firstPIRA') "PIRA: " else if (event=='firstRAW') "RAW: " else "CDW: ",
-              sum(summary$CDW > 0), if (event %in% c('firstPIRA','firstRAW')) "" else paste0(" (PIRA: ", sum(summary$PIRA > 0),
-            "; RAW: ", sum(summary$RAW > 0), ")"))
-        if (!(event %in% c('firstCDW', 'firstPIRA', 'firstRAW'))) {
+    if (is.null(subjects) || length(subjects) > 1) {
+      message("\n---\nTotal subjects: ", nsub)
+      if (event != 'firstCDI') {
+        message("---\nSubjects with ",
+            if (event == 'firstPIRA') "PIRA: " else if (event == 'firstRAW') "RAW: " else "CDW: ",
+              sum(summary$CDW > 0),
+            if (event %in% c('firstPIRA','firstRAW')) ""
+            else paste0(" (PIRA: ", sum(summary$PIRA > 0), "; RAW: ", sum(summary$RAW > 0), ")")
+            )
+      }
+      if (!(event %in% c('firstCDW', 'firstPIRA', 'firstRAW'))) {
         message("Subjects with CDI: ", sum(summary$CDI > 0))
         }
-        if (event == 'multiple') {
-          message("---\nCDW events: ",
-            sum(summary$CDW), " (PIRA: ", sum(summary$PIRA), "; RAW: ", sum(summary$RAW), ")")
-          message("CDI events: ", sum(summary$CDI))
-        }
+      if (event == 'multiple') {
+        message("---\nCDW events: ",
+          sum(summary$CDW), " (PIRA: ", sum(summary$PIRA), "; RAW: ", sum(summary$RAW), ")")
+        message("CDI events: ", sum(summary$CDI))
+      }
       }
 
   }
@@ -1760,6 +1768,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   columns <- append(columns, "CDW_type", after = 3) # position 4
   columns <- append(columns, "total_fu", after = 4) # position 5
 
+  # Subset columns
   if (!include_dates) {
     columns <- columns[!endsWith(columns, "date")]
   }

@@ -182,7 +182,7 @@ accessed via the following attributes of the function output.
     #>   1      1        CDW     PIRA      534      292        292       242      TRUE
     #>   2      1        CDW      RAW      730      198        198        84     FALSE
     #>   2      2        CDW     PIRA      730      257        539       191      TRUE
-    #>   3      0                          491      NaN        491         0     FALSE
+    #>   3      0                          491      NaN        491       NaN     FALSE
     #>   4      1        CDI               586       77         77        98     FALSE
     #>   4      2        CDW     PIRA      586      129        304       282      TRUE
     #>   5      1        CDW     PIRA      637      140        140       497      TRUE

@@ -49,7 +49,7 @@ A [**Python version**](https://github.com/noemimontobbio/pymsprog) of the packag
 
 Its core function, `MSprog()`, detects and characterises the evolution of an outcome measure (Expanded Disability Status Scale, EDSS; Nine-Hole Peg Test, NHPT; Timed 25-Foot Walk, T25FW; Symbol Digit Modalities Test, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes (if any).
 
-The package also provides two toy datasets for function testing:
+The package also provides two toy datasets for function testing: 
 
 * `toydata_visits`: artificially generated EDSS and SDMT assessments for a small cohort of patients;
 * `toydata_relapses`: artificially generated relapse onset dates associated with the patients in `toydata_visits`.
