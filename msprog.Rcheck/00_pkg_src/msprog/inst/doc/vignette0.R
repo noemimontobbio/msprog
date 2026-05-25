@@ -19,14 +19,7 @@ knit_hooks$set(output = function(x, options) {
 })
 
 ## -----------------------------------------------------------------------------
-source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R')
-source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/value_milestone.R')
-source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R')
-source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R')
-source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R')
-load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData')
-load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData')
-library(dplyr)
+library(msprog)
 
 ## -----------------------------------------------------------------------------
 head(toydata_visits)

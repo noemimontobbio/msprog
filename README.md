@@ -11,14 +11,18 @@ Please make sure you are using the latest version of the package (check by runni
 > 
 > ``` r
 > utils::packageVersion("msprog")
-> #> [1] '0.2.7'
+> #> [1] '1.0.0'
 > ```
 
 <br>
 
-> 📣 **What’s new in latest versions**  
-> Calculation speed-up (from v0.2.6); `RAW_PIRA` flag to enable RAW/PIRA
-> classification (from v0.2.7).
+> 📣 **What’s new in latest versions**
+>
+> - **Soon available on CRAN** (supporting **R \>= 4.1.0**) (from
+>   v1.0.0).
+> - `RAW_PIRA` flag to explicitly enable RAW/PIRA classification (from
+>   v0.2.7).
+> - **Calculation speed-up** (from v0.2.6)
 
 # msprog: reproducible assessment of disability course in MS
 
@@ -225,7 +229,7 @@ output, **to be reported to ensure complete reproducibility**:
 ``` r
 print(output)
 #> ---
-#> msprog version: 0.2.7 
+#> msprog version: 1.0.0 
 #> ---
 #> MSprog() arguments:
 #> outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7, 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), RAW_PIRA=FALSE, relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,

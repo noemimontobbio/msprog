@@ -256,10 +256,10 @@ Subject #1: 8 visits, 0 relapses
 Baseline at visit no.1
 Searching for events from visit no.2 on
 Found EDSS change at visit no.5 (2022-07-12); potential confirmation visits available: no.
-Change not confirmed: proceed with search
+Not a confirmed change: proceed with search
 Searching for events from visit no.6 on
 Found EDSS change at visit no.6 (2022-11-06); potential confirmation visits available: no.
-Change not confirmed: proceed with search
+Not a confirmed change: proceed with search
 Searching for events from visit no.7 on
 Found EDSS change at visit no.7 (2022-12-10); potential confirmation visits available: no.8
 Found EDSS-CDW (visit no.7, 2022-12-10) confirmed at 84 days, sustained up to visit no.8 (2023-03-11)
@@ -286,7 +286,7 @@ Subject #3: 7 visits, 1 relapse
 Baseline at visit no.1
 Searching for events from visit no.2 on
 Found EDSS change at visit no.2 (2021-12-01); potential confirmation visits available: no.3
-Change not confirmed: proceed with search
+Not a confirmed change: proceed with search
 Searching for events from visit no.3 on
 No edss change in any subsequent visit: end process
 Event sequence: -
@@ -313,10 +313,10 @@ Found EDSS-CDW (visit no.3, 2021-11-01) confirmed at 84 days, sustained up to vi
 Baseline at visit no.4
 Searching for events from visit no.5 on
 Found EDSS change at visit no.5 (2022-04-30); potential confirmation visits available: no.6
-Change not confirmed: proceed with search
+Not a confirmed change: proceed with search
 Searching for events from visit no.6 on
 Found EDSS change at visit no.8 (2022-12-15); potential confirmation visits available: no.9
-Change not confirmed: proceed with search
+Not a confirmed change: proceed with search
 Searching for events from visit no.9 on
 No edss change in any subsequent visit: end process
 Event sequence: CDW
@@ -325,13 +325,13 @@ Subject #6: 7 visits, 1 relapse
 Baseline at visit no.1
 Searching for events from visit no.2 on
 Found EDSS change at visit no.3 (2022-02-15); potential confirmation visits available: no.
-Change not confirmed: proceed with search
+Not a confirmed change: proceed with search
 Searching for events from visit no.4 on
 Found EDSS change at visit no.4 (2022-09-03); potential confirmation visits available: no.
-Change not confirmed: proceed with search
+Not a confirmed change: proceed with search
 Searching for events from visit no.5 on
 Found EDSS change at visit no.5 (2022-10-05); potential confirmation visits available: no.
-Change not confirmed: proceed with search
+Not a confirmed change: proceed with search
 Searching for events from visit no.6 on
 Found EDSS change at visit no.6 (2022-12-22); potential confirmation visits available: no.7
 Found EDSS-CDW (visit no.6, 2022-12-22) confirmed at 84 days, sustained up to visit no.7 (2023-02-21)
@@ -344,10 +344,10 @@ Subject #7: 9 visits, 1 relapse
 Baseline at visit no.1
 Searching for events from visit no.2 on
 Found EDSS change at visit no.3 (2021-09-11); potential confirmation visits available: no.4
-Change not confirmed: proceed with search
+Not a confirmed change: proceed with search
 Searching for events from visit no.4 on
 Found EDSS change at visit no.5 (2022-03-17); potential confirmation visits available: no.
-Change not confirmed: proceed with search
+Not a confirmed change: proceed with search
 Searching for events from visit no.6 on
 Found EDSS change at visit no.6 (2022-07-22); potential confirmation visits available: no.7
 Found EDSS-CDW (visit no.6, 2022-07-22) confirmed at 84 days, sustained up to visit no.9 (2023-04-28)
@@ -377,7 +377,7 @@ CDW events: 7
 CDI events: 1
 > print(output) # textual description of parameters used to obtain output
 ---
-msprog version: 0.2.7 
+msprog version: 1.0.0 
 ---
 MSprog() arguments:
 outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(30, 30), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), RAW_PIRA=FALSE, relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
@@ -458,7 +458,7 @@ Clinically meaningful threshold for EDSS change (delta function): default for ED
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  0.402 0.015 0.428 0 0 
+Time elapsed:  0.404 0.013 0.429 0 0 
 > grDevices::dev.off()
 null device 
           1 
