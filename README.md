@@ -4,19 +4,21 @@
 <br>
 
 > [!WARNING]
-> 🚧 **This repository is under active development. 🚧 Please make sure you are using the latest version of the package (check by running `utils::packageVersion('msprog')`) -- or at least v0.2.0, which is functionally stable, though some minor aspects may still change ahead of a full stable release on CRAN.** 
+> **🚧 This repository is under active development. 🚧 <br>
+Please make sure you are using the latest version of the package (check by running `utils::packageVersion('msprog')`) -- or at least v0.2.0, which is functionally stable, though some minor aspects may still change ahead of a full stable release on CRAN.** 
 >
 > **Latest version:**
 > 
 > ``` r
 > utils::packageVersion("msprog")
-> #> [1] '0.2.6'
+> #> [1] '0.2.7'
 > ```
 
 <br>
 
-> 📣 **What’s new in latest version**  
-> Calculation speed-up + confirmation dates/values in output
+> 📣 **What’s new in latest versions**  
+> Calculation speed-up (from v0.2.6); `RAW_PIRA` flag to enable RAW/PIRA
+> classification (from v0.2.7).
 
 # msprog: reproducible assessment of disability course in MS
 
@@ -131,7 +133,7 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> ---
 #> Total subjects: 7
 #> ---
-#> Subjects with CDW: 4 (PIRA: 3; RAW: 1)
+#> Subjects with CDW: 4
 ```
 
 Several qualitative and quantitative options for event detection are
@@ -163,10 +165,10 @@ output <- MSprog(toydata_visits,                                      # provide 
 #> ---
 #> Total subjects: 7
 #> ---
-#> Subjects with CDW: 5 (PIRA: 5; RAW: 1)
+#> Subjects with CDW: 5
 #> Subjects with CDI: 2
 #> ---
-#> CDW events: 6 (PIRA: 5; RAW: 1)
+#> CDW events: 6
 #> CDI events: 2
 ```
 
@@ -178,16 +180,16 @@ accessed via the following attributes of the function output.
 
     ``` r
     print(output$results, row.names=FALSE)
-    #>  id nevent event_type CDW_type total_fu bl2event time2event sust_days sust_last
-    #>   1      1        CDW     PIRA      534      292        292       242      TRUE
-    #>   2      1        CDW      RAW      730      198        198        84     FALSE
-    #>   2      2        CDW     PIRA      730      257        539       191      TRUE
-    #>   3      0                          491      NaN        491       NaN     FALSE
-    #>   4      1        CDI               586       77         77        98     FALSE
-    #>   4      2        CDW     PIRA      586      129        304       282      TRUE
-    #>   5      1        CDW     PIRA      637      140        140       497      TRUE
-    #>   6      1        CDI               491      120        120       232     FALSE
-    #>   7      1        CDW     PIRA      779      372        372       407      TRUE
+    #>  id nevent event_type total_fu bl2event time2event sust_days sust_last
+    #>   1      1        CDW      534      292        292       242      TRUE
+    #>   2      1        CDW      730      198        198        84     FALSE
+    #>   2      2        CDW      730      257        539       191      TRUE
+    #>   3      0                 491      NaN        491       NaN     FALSE
+    #>   4      1        CDI      586       77         77        98     FALSE
+    #>   4      2        CDW      586      129        304       282      TRUE
+    #>   5      1        CDW      637      140        140       497      TRUE
+    #>   6      1        CDI      491      120        120       232     FALSE
+    #>   7      1        CDW      779      372        372       407      TRUE
     ```
 
     where: `nevent` is the cumulative event count for each subject;
@@ -202,14 +204,14 @@ accessed via the following attributes of the function output.
 
     ``` r
     print(output$event_count)
-    #>   event_sequence CDI CDW RAW PIRA
-    #> 1           PIRA   0   1   0    1
-    #> 2      RAW, PIRA   0   2   1    1
-    #> 3                  0   0   0    0
-    #> 4      CDI, PIRA   1   1   0    1
-    #> 5           PIRA   0   1   0    1
-    #> 6            CDI   1   0   0    0
-    #> 7           PIRA   0   1   0    1
+    #>   event_sequence CDI CDW
+    #> 1            CDW   0   1
+    #> 2       CDW, CDW   0   2
+    #> 3                  0   0
+    #> 4       CDI, CDW   1   1
+    #> 5            CDW   0   1
+    #> 6            CDI   1   0
+    #> 7            CDW   0   1
     ```
 
     where: `event_sequence` specifies the order of the events; the other
@@ -223,16 +225,16 @@ output, **to be reported to ensure complete reproducibility**:
 ``` r
 print(output)
 #> ---
-#> msprog version: 0.2.6 
+#> msprog version: 0.2.7 
 #> ---
 #> MSprog() arguments:
-#> outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7, 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
+#> outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7, 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), RAW_PIRA=FALSE, relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
 #> delta_fun=NULL
 #> 
 #> Textual description of applied criteria:
-#> We detected all confirmed EDSS changes (in chronological order) confirmed over 84 days (with a lower tolerance of 7 days and an upper tolerance of 730.5 days). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first eligible confirmation visit for the event that triggered the re-baseline. Whenever the current baseline fell within 30 days after the onset of a relapse, it was moved to the next eligible visit. A confirmed EDSS worsening event was labelled as relapse-associated worsening (RAW) if occurring within 90 days after the onset of a relapse. A confirmed EDSS worsening event was labelled as progression independent of relapse activity (PIRA) if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation. 
+#> We detected all confirmed EDSS changes (in chronological order) confirmed over 84 days (with a lower tolerance of 7 days and an upper tolerance of 730.5 days). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first eligible confirmation visit for the event that triggered the re-baseline. Whenever the current baseline fell within 30 days after the onset of a relapse, it was moved to the next eligible visit. 
 #> ---
-#> Clinically meaningful threshold for EDSS change (delta function): default for EDSS (check by typing ?compute_delta).
+#> Clinically meaningful threshold for EDSS change (delta function): default for EDSS (1.5 if baseline=0, 1.0 if 0.0<baseline<=5.0, 0.5 if baseline>5.0)
 ```
 
 <br />

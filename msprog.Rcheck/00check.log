@@ -9,7 +9,7 @@
 * using option ‘--as-cran’
 * checking for file ‘msprog/DESCRIPTION’ ... OK
 * checking extension type ... Package
-* this is package ‘msprog’ version ‘0.2.6’
+* this is package ‘msprog’ version ‘0.2.7’
 * package encoding: UTF-8
 * checking CRAN incoming feasibility ... [3s/19s] NOTE
 Maintainer: ‘Noemi Montobbio <noemi.montobbio@gmail.com>’

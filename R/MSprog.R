@@ -28,7 +28,7 @@
 #' @param relapse Optional data frame containing longitudinal data, including: subject ID and relapse date.
 #' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data.
 #' @param rdate_col Name of onset date column for relapse data, if different from outcome data.
-#' @param renddate_col Name of end date column for relapse data (if present).
+#' @param renddate_col Name of end date column for relapse data (if applicable).
 #' @param subjects Subset of subjects (list of IDs). If none is specified, all subjects listed in `data` are included.
 #' @param delta_fun Custom function specifying the minimum clinically meaningful
 #' change in the outcome measure from the provided reference value.
@@ -46,10 +46,13 @@
 #' \item `"firstCDW"` (first CDW, default).
 #' \item `"firstCDI"` (first CDI).
 #' \item `"multiple"` (all confirmed events in chronological order).
-#' \item `"firstPIRA"` (first PIRA).
-#' \item `"firstRAW"` (first RAW).
+#' \item `"firstPIRA"` (first progression independent of relapse activity, PIRA).
+#' \item `"firstRAW"` (first relapse-associated worsening, RAW).
 #' \item `"first"` (only the very first confirmed event -- CDI or CDW).
 #' }
+#' @param RAW_PIRA If `TRUE`, further classify CDW events based on their timing
+#' with respect to relapses (RAW, PIRA). The argument is ignored if `event` is set
+#' to `"firstCDI"` (not relevant) or to `"firstRAW"`/`"firstPIRA"` (always enabled).
 #' @param baseline Specifies the baseline scheme. Must be one of the following.
 #' \itemize{
 #' \item `"fixed"`: first valid outcome value, default.
@@ -172,6 +175,7 @@
 #' (maximum distance from \emph{last} relapse onset, maximum distance from \emph{next} relapse onset).
 #' If relapse end dates are available (`renddate_col`), the maximum distance from last relapse
 #' is automatically set to the specific relapse duration.
+#' The argument is ignored if RAW events are not detected (e.g., if `event='firstCDW'` and `RAW_PIRA=FALSE`).
 #' @param relapse_indep Specifies relapse-free intervals for PIRA definition.
 #' Must be a named list
 #' \cr`list(prec=list(p0, p1), event=list(e0, e1), conf=list(c0, c1))`\cr
@@ -187,6 +191,7 @@
 #' See [relapse_indep_from_bounds()] function docs for more details on how to define the intervals.
 #' If relapse end dates are available (`renddate_col`), it is possible to also define PIRA based on those
 #' by setting `use_end_dates=TRUE` in [relapse_indep_from_bounds()].
+#' The argument is ignored if PIRA events are not detected (e.g., if `event='firstCDW'` and `RAW_PIRA=FALSE`).
 #' @param impute_last_visit Imputation probability for worsening events occurring
 #' at the last available visit (i.e., with no confirmation).
 #' Unconfirmed worsening events occurring at the last visit are never imputed if `impute_last_visit=0`;
@@ -226,7 +231,7 @@
 #'  }
 #'
 #' @references
-#' \[1\] M\"uller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli \"O, et al.
+#' \[1\] Müller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli Ö, et al.
 #' Harmonizing definitions for progression independent of relapse activity in multiple sclerosis: A systematic review.
 #' JAMA Neurol. 2023;80:1232--45. \cr\cr
 #' \[2\] Kappos L, Wolinsky JS, Giovannoni G, Arnold DL, Wang Q, Bernasconi C, et al.
@@ -274,7 +279,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, renddate_col=NULL,
                    subjects=NULL, delta_fun=NULL, worsening=NULL,
                    event=c('firstCDW', 'firstCDI', 'multiple', 'firstPIRA', 'firstRAW', 'first'),
-                   baseline=c('fixed', 'roving', 'roving_impr', 'roving_wors'),
+                   RAW_PIRA=FALSE, baseline=c('fixed', 'roving', 'roving_impr', 'roving_wors'),
                    proceed_from=c('firstconf', 'event'),
                    sub_threshold_rebl=c('none', 'event', 'improvement', 'worsening'),
                    bl_geq=FALSE, relapse_rebl=FALSE, skip_local_extrema=c('none', 'strict', 'all'),
@@ -326,6 +331,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   proceed_from <- match.arg(proceed_from)
   sub_threshold_rebl <- match.arg(sub_threshold_rebl)
   skip_local_extrema <- match.arg(skip_local_extrema)
+
+  if (event %in% c('firstCDW', 'multiple', 'first')) {
+    rawpira <- RAW_PIRA
+  } else {
+    rawpira <- if (event == 'firstCDI') FALSE else TRUE
+  }
 
   # end of checks
   ###########################
@@ -873,11 +884,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       if (is.na(change_idx) || change_idx > nvisits) {
         proceed <- 0
         if (verbose == 2) {
-          message("No ", if (outcome != "custom") outcome else "outcome", " change in any subsequent visit: end process")
+          message("No ", if (outcome != "custom") outcome else "outcome",
+                  " change in any subsequent visit: end process")
         }
       } else if (relapse_rebl && !is.na(irel) && irel <= nrel
                  && data_id[[date_col]][change_idx]
-                    > relapse_dates[irel] + (if (event=='firstPIRA') 0 else relapse_assoc[1])) {
+                    > relapse_dates[irel] + (if (event == 'firstPIRA') 0 else relapse_assoc[1])) {
         # If `relapse_rebl`is enabled and the detected change from baseline has crossed the next relapse,
         # the baseline needs to be moved after that relapse (post-relapse re-baseline below).
         # (unless search_idx is after the relapse but within its influence as per `relapse_assoc[0]`: could be a RAW)
@@ -1160,10 +1172,12 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                                                        if (change_idx == nvisits) NULL else conf_idx)
                   lastdelta <- data_id[lastdelta_idx,]
 
+                  # Last visit where worsening is sustained
                   sust_idx <- if (is.na(next_nonsust)) nvisits else next_nonsust - 1
 
-                  if (data_id[['closest_rel_before']][change_idx] <= relapse_assoc[1]
-                      || data_id[['closest_rel_after']][change_idx] <= relapse_assoc[2]) {
+                  if (rawpira
+                      & (data_id[['closest_rel_before']][change_idx] <= relapse_assoc[1]
+                      || data_id[['closest_rel_after']][change_idx] <= relapse_assoc[2])) {
                     # A) Event is relapse-associated.
                     if (event == 'firstPIRA' && baseline %in% c('fixed', 'roving_impr')) {
                       search_idx <- change_idx + 1 # skip this event if only searching for PIRA with no CDW-driven re-baseline
@@ -1176,7 +1190,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     # event_type <- c(event_type, 'RAW')
                     # event_index <- c(event_index, change_idx)
                     #####_ev_
-                  } else {
+                  } else if (rawpira) {
                     # B) event is not relapse-associated.
                     if (event=='firstRAW' && baseline %in% c('fixed', 'roving_impr')) {
                       search_idx <- change_idx + 1 # skip this event if only searching for RAW with no CDW-driven re-baseline
@@ -1274,7 +1288,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                       # event_type <- c(event_type, 'PIRA')
                       # event_index <- c(event_index, change_idx)
                       #####_ev_
-                    } else {
+                    } else { # undefined CDW
                       #####_ev_
                       ev$event_type <- "CDW"
                       ev$event_index <- change_idx
@@ -1283,6 +1297,9 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                       # event_index <- c(event_index, change_idx)
                       #####_ev_
                     }
+                  } else { # no rawpira
+                    ev$event_type <- "CDW"
+                    ev$event_index <- change_idx
                   }
 
                   # Store info:
@@ -1729,7 +1746,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         message("---\nSubjects with ",
             if (event == 'firstPIRA') "PIRA: " else if (event == 'firstRAW') "RAW: " else "CDW: ",
               sum(summary$CDW > 0),
-            if (event %in% c('firstPIRA','firstRAW')) ""
+            if (event %in% c('firstPIRA','firstRAW') | !rawpira) ""
             else paste0(" (PIRA: ", sum(summary$PIRA > 0), "; RAW: ", sum(summary$RAW > 0), ")")
             )
       }
@@ -1738,7 +1755,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         }
       if (event == 'multiple') {
         message("---\nCDW events: ",
-          sum(summary$CDW), " (PIRA: ", sum(summary$PIRA), "; RAW: ", sum(summary$RAW), ")")
+          sum(summary$CDW), if (rawpira) paste0(" (PIRA: ", sum(summary$PIRA), "; RAW: ", sum(summary$RAW), ")") else "")
         message("CDI events: ", sum(summary$CDI))
       }
       }
@@ -1777,20 +1794,20 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
 
   scolumns <- names(summary)
-  if (event=='firstPIRA') {
-    scolumns <- c('PIRA')
-  } else if (event=='firstRAW') {
-    scolumns <- c('RAW')
+  if (event == "firstPIRA") {
+    scolumns <- c("PIRA")
+  } else if (event == "firstRAW") {
+    scolumns <- c("RAW")
     columns <- columns[!startsWith(columns, "PIRA")]
-  } else if (event == 'firstCDW') {
-    scolumns <- scolumns[scolumns!='CDI']
+  } else if (event == "firstCDW") {
+    scolumns <- scolumns[scolumns != "CDI"]
   } else if (event == 'firstCDI') {
     scolumns <- c('CDI')
     columns <- columns[!startsWith(columns, "PIRA")]
   }
-
-  if (event %in% c('firstRAW', 'firstCDI')) {
-    columns <- columns[!startsWith(columns, "PIRA")]  # remove PIRA confirmation columns from extended results
+  if (!rawpira) {
+    scolumns <- scolumns[!scolumns %in% c("PIRA", "RAW")]
+    columns <- columns[!startsWith(columns, "PIRA") & (columns != 'CDW_type')]
   }
 
   summary <- summary[scolumns]
@@ -1816,6 +1833,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                 conf_days=conf_days, conf_tol_days=conf_tol_days,
                 require_sust_days=require_sust_days, check_intermediate=check_intermediate,
                 relapse_to_bl=relapse_to_bl, relapse_to_event=relapse_to_event, relapse_to_conf=relapse_to_conf,
+                RAW_PIRA=RAW_PIRA, rawpira=rawpira,
                 relapse_assoc=relapse_assoc, relapse_indep=relapse_indep, renddate_col=renddate_col,
                 sub_threshold_rebl=sub_threshold_rebl, bl_geq=bl_geq, relapse_rebl=relapse_rebl,
                 impute_last_visit=impute_last_visit, delta_fun=delta_fun,

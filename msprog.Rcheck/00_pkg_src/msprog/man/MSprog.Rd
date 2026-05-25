@@ -18,6 +18,7 @@ MSprog(
   delta_fun = NULL,
   worsening = NULL,
   event = c("firstCDW", "firstCDI", "multiple", "firstPIRA", "firstRAW", "first"),
+  RAW_PIRA = FALSE,
   baseline = c("fixed", "roving", "roving_impr", "roving_wors"),
   proceed_from = c("firstconf", "event"),
   sub_threshold_rebl = c("none", "event", "improvement", "worsening"),
@@ -71,7 +72,7 @@ The latter can be replaced by a custom function using the \code{delta_fun} argum
 
 \item{rdate_col}{Name of onset date column for relapse data, if different from outcome data.}
 
-\item{renddate_col}{Name of end date column for relapse data (if present).}
+\item{renddate_col}{Name of end date column for relapse data (if applicable).}
 
 \item{subjects}{Subset of subjects (list of IDs). If none is specified, all subjects listed in \code{data} are included.}
 
@@ -93,10 +94,14 @@ and to \code{"decrease"} if \code{outcome} is set to \code{"sdmt"}.}
 \item \code{"firstCDW"} (first CDW, default).
 \item \code{"firstCDI"} (first CDI).
 \item \code{"multiple"} (all confirmed events in chronological order).
-\item \code{"firstPIRA"} (first PIRA).
-\item \code{"firstRAW"} (first RAW).
+\item \code{"firstPIRA"} (first progression independent of relapse activity, PIRA).
+\item \code{"firstRAW"} (first relapse-associated worsening, RAW).
 \item \code{"first"} (only the very first confirmed event -- CDI or CDW).
 }}
+
+\item{RAW_PIRA}{If \code{TRUE}, further classify CDW events based on their timing
+with respect to relapses (RAW, PIRA). The argument is ignored if \code{event} is set
+to \code{"firstCDI"} (not relevant) or to \code{"firstRAW"}/\code{"firstPIRA"} (always enabled).}
 
 \item{baseline}{Specifies the baseline scheme. Must be one of the following.
 \itemize{
@@ -233,7 +238,8 @@ is automatically set to the specific relapse duration, unless \code{relapse_to_c
 Can be an integer (maximum distance from \emph{last} relapse onset) or list-like of length 2
 (maximum distance from \emph{last} relapse onset, maximum distance from \emph{next} relapse onset).
 If relapse end dates are available (\code{renddate_col}), the maximum distance from last relapse
-is automatically set to the specific relapse duration.}
+is automatically set to the specific relapse duration.
+The argument is ignored if RAW events are not detected (e.g., if \code{event='firstCDW'} and \code{RAW_PIRA=FALSE}).}
 
 \item{relapse_indep}{Specifies relapse-free intervals for PIRA definition.
 Must be a named list
@@ -249,7 +255,8 @@ interval bounds into a named list correctly, by calling:
 \cr\code{relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1)}\cr
 See \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}} function docs for more details on how to define the intervals.
 If relapse end dates are available (\code{renddate_col}), it is possible to also define PIRA based on those
-by setting \code{use_end_dates=TRUE} in \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}}.}
+by setting \code{use_end_dates=TRUE} in \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}}.
+The argument is ignored if PIRA events are not detected (e.g., if \code{event='firstCDW'} and \code{RAW_PIRA=FALSE}).}
 
 \item{impute_last_visit}{Imputation probability for worsening events occurring
 at the last available visit (i.e., with no confirmation).
@@ -336,7 +343,7 @@ print(output$results) # extended info on each event for all subjects
 print(output$event_count) # summary of event sequence for each subject
 }
 \references{
-[1] M\"uller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli \"O, et al.
+[1] Müller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli Ö, et al.
 Harmonizing definitions for progression independent of relapse activity in multiple sclerosis: A systematic review.
 JAMA Neurol. 2023;80:1232--45. \cr\cr
 [2] Kappos L, Wolinsky JS, Giovannoni G, Arnold DL, Wang Q, Bernasconi C, et al.

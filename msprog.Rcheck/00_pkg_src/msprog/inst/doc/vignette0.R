@@ -19,7 +19,14 @@ knit_hooks$set(output = function(x, options) {
 })
 
 ## -----------------------------------------------------------------------------
-library(msprog)
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R')
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/value_milestone.R')
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R')
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R')
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R')
+load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData')
+load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData')
+library(dplyr)
 
 ## -----------------------------------------------------------------------------
 head(toydata_visits)
@@ -114,6 +121,24 @@ knitr::include_graphics(paste0(getwd(), 'unscheduled.png'))
 
 ## ----echo=FALSE, out.width="50%", fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `p0`, `p1`, `e0`, `e1`, `c0`, `c1`.*"----
 knitr::include_graphics(paste0(getwd(), 'relapse_indep_def.png'))
+
+## -----------------------------------------------------------------------------
+output <- MSprog(data=toydata_visits,
+                 subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
+                 event='multiple', RAW_PIRA=TRUE, baseline='roving', 
+                 relapse=toydata_relapses) 
+
+## -----------------------------------------------------------------------------
+# print(output$event_count)
+DT::datatable(output$event_count, 
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
+              )
+
+## -----------------------------------------------------------------------------
+# print(output$results, row.names=FALSE)
+DT::datatable(output$results, rownames=F,
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
+              )
 
 ## -----------------------------------------------------------------------------
 output <- MSprog(data=toydata_visits, 

@@ -24,9 +24,23 @@ print.MSprogOutput <- function(x, web=FALSE, ...) {
   s <- x$settings
   outcome <- if (s$outcome=="custom") "outcome" else toupper(s$outcome)
 
-  keep <- setdiff(names(s), c("validconf_p", "delta_fun"))
+  keep <- setdiff(names(s), c("validconf_p", "delta_fun", "rawpira"))
   cat("\nMSprog() arguments:\n", paste0(paste(keep, s[keep], sep="="), collapse=", "),
       ",\ndelta_fun=", as.character(s["delta_fun"]), sep="")
+
+  # %%%%%%%%%%%%%
+  # DELTA FUNCTION
+  # %%%%%%%%%%%%%
+
+  if (!is.null(s$delta_fun)) {
+    delta_text <- "user-specified (`delta_fun` argument above)."
+  } else if (s$outcome == 'edss') {
+    delta_text <- "default for EDSS (1.5 if baseline=0, 1.0 if 0.0<baseline<=5.0, 0.5 if baseline>5.0)"
+  } else if (s$outcome %in% c('nhpt', 't25fw')) {
+    delta_text <- paste("default for", toupper(s$outcome), "(20% of baseline)")
+  } else if (s$outcome == 'sdmt') {
+    delta_text <- "default for SDMT (either 4 points or 20% of baseline)"
+  }
 
   # %%%%%%%%%%%%%
   # EVENT
@@ -192,59 +206,65 @@ print.MSprogOutput <- function(x, web=FALSE, ...) {
   # RAW & PIRA
   # %%%%%%%%%%%%%
 
-  # RAW
-  raw_text <- paste0("A confirmed ", outcome,
-                     " worsening event was labelled as relapse-associated worsening (RAW) if occurring within ",
-                     if (is.null(s$renddate_col))
-                       paste0(s$relapse_assoc[1], " days after the onset of a relapse")
-                     else "a relapse (between onset and end)",
-                     if (s$relapse_assoc[2] > 0) paste0(", or within ", s$relapse_assoc[2], " days before the onset of a relapse") else "",
-                     ". ")
+  if (s$rawpira) {
 
-  # PIRA
-  if (length(s$relapse_indep[["event"]]) == 2) {
-    # "prec" event
-    prec <- if (s$relapse_indep[["prec_type"]] == "baseline") "the baseline"
-            else if (s$relapse_indep[["prec_type"]] == "last") "the last visit preceding the event"
-            else paste0("the last pre-worsening visit")
-    # PIRA definition
-    pira_def <- ""
-    for (point in c("prec", "event", "conf")) {
-      if (!(is.null(s$relapse_indep[[point]][[1]]) & is.null(s$relapse_indep[[point]][[2]]))
-          & !((!is.null(s$relapse_indep[[point]][[1]]) && (s$relapse_indep[[point]][[1]]==0))
-              & (!is.null(s$relapse_indep[[point]][[2]]) && (s$relapse_indep[[point]][[2]]==0)))) {
-        pp <- if (point == "prec") prec else if (point == "event") "the event" else "confirmation"
-        pira_def <- paste0(pira_def,
-                           if (!is.null(s$relapse_indep[[point]][[1]]))
-                             paste0("from ", if (s$relapse_indep[[point]][[1]]>0) paste0(s$relapse_indep[[point]][[1]], " days before ") else "", pp)
-                           else "")
-        pira_def <-  paste0(pira_def,
-                            if (!is.null(s$relapse_indep[[point]][[2]]))
-                              paste0(" to ",
-                                     if (s$relapse_indep[[point]][[2]] > 0)
-                                       paste0(s$relapse_indep[[point]][[2]], " days after ")
-                                     else "",
-                                     pp, ", or ")
-                            else "")
+    # RAW
+    raw_text <- paste0("A confirmed ", outcome,
+                       " worsening event was labelled as relapse-associated worsening (RAW) if occurring within ",
+                       if (is.null(s$renddate_col))
+                         paste0(s$relapse_assoc[1], " days after the onset of a relapse")
+                       else "a relapse (between onset and end)",
+                       if (s$relapse_assoc[2] > 0) paste0(", or within ", s$relapse_assoc[2], " days before the onset of a relapse") else "",
+                       ". ")
+
+    # PIRA
+    if (length(s$relapse_indep[["event"]]) == 2) {
+      # "prec" event
+      prec <- if (s$relapse_indep[["prec_type"]] == "baseline") "the baseline"
+              else if (s$relapse_indep[["prec_type"]] == "last") "the last visit preceding the event"
+              else paste0("the last pre-worsening visit")
+      # PIRA definition
+      pira_def <- ""
+      for (point in c("prec", "event", "conf")) {
+        if (!(is.null(s$relapse_indep[[point]][[1]]) & is.null(s$relapse_indep[[point]][[2]]))
+            & !((!is.null(s$relapse_indep[[point]][[1]]) && (s$relapse_indep[[point]][[1]]==0))
+                & (!is.null(s$relapse_indep[[point]][[2]]) && (s$relapse_indep[[point]][[2]]==0)))) {
+          pp <- if (point == "prec") prec else if (point == "event") "the event" else "confirmation"
+          pira_def <- paste0(pira_def,
+                             if (!is.null(s$relapse_indep[[point]][[1]]))
+                               paste0("from ", if (s$relapse_indep[[point]][[1]]>0) paste0(s$relapse_indep[[point]][[1]], " days before ") else "", pp)
+                             else "")
+          pira_def <-  paste0(pira_def,
+                              if (!is.null(s$relapse_indep[[point]][[2]]))
+                                paste0(" to ",
+                                       if (s$relapse_indep[[point]][[2]] > 0)
+                                         paste0(s$relapse_indep[[point]][[2]], " days after ")
+                                       else "",
+                                       pp, ", or ")
+                              else "")
+        }
       }
+      pira_def <- gsub(".{5}$", "", pira_def)
     }
-    pira_def <- gsub(".{5}$", "", pira_def)
+    # Full PIRA text
+    pira_text <- paste0("A confirmed ", outcome,
+                        " worsening event was labelled as progression independent of relapse activity (PIRA) if ",
+                        if (length(s$relapse_indep[["event"]]) == 2)
+                          paste0("no relapses started in the interval ", pira_def, ". ")
+                        else paste0("it did not occur within a relapse (onset to end)",
+                                    if (s$relapse_indep[["event"]] > 0)
+                                      paste0(", or less than ", s$relapse_indep[["event"]], " days before a relapse")
+                                    else "",
+                                    ", and the confirmation did not occur within a relapse",
+                                    if (s$relapse_indep[["conf"]] > 0)
+                                      paste0(", or less than ", s$relapse_indep[["conf"]], " days before a relapse")
+                                    else "",
+                                    ". ")
+                        )
+  } else {
+    raw_text <- ""
+    pira_text <- ""
   }
-  # Full PIRA text
-  pira_text <- paste0("A confirmed ", outcome,
-                      " worsening event was labelled as progression independent of relapse activity (PIRA) if ",
-                      if (length(s$relapse_indep[["event"]]) == 2)
-                        paste0("no relapses started in the interval ", pira_def, ". ")
-                      else paste0("it did not occur within a relapse (onset to end)",
-                                  if (s$relapse_indep[["event"]] > 0)
-                                    paste0(", or less than ", s$relapse_indep[["event"]], " days before a relapse")
-                                  else "",
-                                  ", and the confirmation did not occur within a relapse",
-                                  if (s$relapse_indep[["conf"]] > 0)
-                                    paste0(", or less than ", s$relapse_indep[["conf"]], " days before a relapse")
-                                  else "",
-                                  ". ")
-                      )
 
 
   # %%%%%%%%%%%%%
@@ -253,17 +273,15 @@ print.MSprogOutput <- function(x, web=FALSE, ...) {
 
   text <- paste0(conf_text, baseline_text,
                  imputation_text, sustained_text, rel_to_event_text,
-                 if (s$event!="firstPIRA") raw_text else "",
-                 if (s$event!="firstRAW") pira_text else "")
+                 if (s$event != "firstPIRA") raw_text else "",
+                 if (s$event != "firstRAW") pira_text else "")
 
   cat("\n\nTextual description of applied criteria:\n", text, sep="")
   if (s$outcome=="outcome") {
     cat("\n---\nDirection of worsening: ", s$worsening)
   }
-  cat("\n---\nClinically meaningful threshold for", outcome, "change (delta function):",
-      if (is.null(s$delta_fun)) paste("default for", outcome,
-            ifelse(web, '(see "Outcome definition" section)', "(check by typing ?compute_delta)."))
-      else "user-specified (`delta_fun` argument above).")
+  cat("\n---\nClinically meaningful threshold for", outcome,
+      "change (delta function):", delta_text)
 
 }
 

@@ -42,21 +42,20 @@ knit_hooks$set(output = function(x, options) {
 
 This vignette illustrates how to use the `msprog` package to analyse the evolution of disability in multiple sclerosis (MS) based on repeated assessments through time of an outcome measure (EDSS, NHPT, T25FW, SDMT; or any custom outcome measure). We'll start by illustrating the type of [input data](#input) needed, and by giving a [minimal working example](#example) to introduce the main function and facilitate the reading of the document. We'll then move on to a more detailed description of the different parameter configurations.
 
-```{r}
-library(msprog)
-```
-
 <!-- ```{r} -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/value_milestone.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R') -->
-<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData') -->
-<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData') -->
-<!-- library(dplyr) -->
+<!-- library(msprog) -->
 <!-- ``` -->
 
+```{r}
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R')
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/value_milestone.R')
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R')
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R')
+source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R')
+load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData')
+load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData')
+library(dplyr)
+```
 
 # Input data {#input}
 
@@ -75,7 +74,7 @@ head(toydata_visits)
 
 <br />
 
-For relapsing MS patients, an additional data frame object with the onset dates of relapses is needed to correctly assess disease course, and to characterise worsening events as relapse-associated or relapse-independent. The dataset should contain (at least) the following columns:
+For relapsing MS patients, an additional data frame object with the onset dates of relapses is needed to correctly assess disease course (and possibly to characterise worsening events as relapse-associated or relapse-independent). The dataset should contain (at least) the following columns:
 
 * Subject IDs
 * Relapse onset dates.
@@ -89,8 +88,11 @@ Dates are interpreted as calendar days (e.g., YYYY-mm-dd) by default, but can op
 
 # Minimal example {#example}
 
-The core block of `msprog` is the `MSprog()` function. Given data on visits and relapses in the form specified above, `MSprog()` detects the confirmed disability worsening (CDW) or improvement (CDI) events for each subject for the outcome of interest. 
-By default, `MSprog()` detects the first CDW. We can test it on the EDSS toy data...
+The core block of `msprog` is the `MSprog()` function. Given data on visits and relapses[^rnames] in the form specified above, `MSprog()` detects the confirmed disability worsening (CDW) or improvement (CDI) events for each subject for the outcome of interest. If specified, CDW events can be further [classified](#rawpira) based on their timing with respect to relapses and identified as relapse-associated worsening ([RAW](#raw)) or progression independent of relapse activity ([PIRA](#pira), see [@lublin2014; @kappos2018; @silent2019]).
+
+[^rnames]: If the names of columns with subject ID and date in the relapse database are different from the main database, they must be specified using arguments `rsubj_col` and `rdate_col`.
+
+By default, `MSprog()` only detects the first CDW. We can test it on the EDSS toy data...
 ```{r}
 output_edss <- MSprog(data=toydata_visits, # data on visits
                  subj_col='id', value_col='EDSS', date_col='date', # specify column names
@@ -119,7 +121,7 @@ DT::datatable(output_edss$results, rownames=F,
               options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 ```
-    where: `nevent` is the cumulative event count for each subject; `event_type` and `CDW_type` characterise the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^timeto]; `bl2event` is the number of days from current baseline to event; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
+    where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^timeto]; `bl2event` is the number of days from current baseline to event; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
 2. `event_count`: a data frame summarising event counts for each subject, and the event sequence (where relevant). Here's what it looks like for the EDSS-based computation above:
 ```{r, indent="     "}
@@ -128,16 +130,15 @@ DT::datatable(output_edss$event_count,
               options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 ```
-    where: `event_sequence` specifies the order of the events; the other columns count the events of each kind (CDW; relapse-associated worsening, [RAW](#raw); progression independent of relapse activity, [PIRA](#pira), see [@lublin2014; @kappos2018; @silent2019]; CDI column is omitted).[^seq]
+    where: `event_sequence` specifies the order of the events and `CDW` counts CDW events.
 
+**Note.** In this example, we called `MSprog()` without specifying the `event` argument - which defaults to `firstCDW` (only detect the first CDW event). For this reason, (1) in `output_edss$results`, `nevent` can only be 0 or 1; (2) in `output_edss$event_count`, `event_sequence` can contain a maximum of one event, CDW count can only be 0 or 1, and CDI column is omitted. In a multiple-event setting (`event=multiple`), more than one event per subject can be detected. See [the relevant section](#multiple).
 
 Additionally, by applying the `print` method to the `MSprog()` output, the user can print out the full list of function arguments, as well as a short paragraph describing the complete set of applied criteria, to be reported to ensure complete reproducibility. In our example:
 ```{r, linewidth=90}
 print(output_edss)
 ```
 
-
-[^seq]: In this example, we did not specify the argument `event` - which defaults to `firstCDW` (only detect the first CDW event). For this reason, (1) `event_sequence` can contain a maximum of one event; (2) `nevent` in `output_edss$results` can only be 0 or 1; (3) CDI column is omitted. In a multiple-event setting (`event=multiple`), more than one event per subject can be detected. See [the relevant section](#multiple).
 [^timeto]: For subjects with no confirmed events, `time2event` is the total follow-up length. To omit these subjects, set `include_stable=FALSE` in `MSprog()`.
 
 
@@ -209,7 +210,7 @@ The assessment of the disability evolution strongly depends on the choices made 
 
 * *Improvement-based roving baseline* (`baseline='roving_impr'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed improvement. This scheme is suitable for a **first-CDW setting** to discard fluctuations around the baseline [@muller2023], but **not recommended for clinical trial data** as it may break the randomisation. 
 
-* *Worsening-based roving baseline* (`baseline='roving_wors'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed worsening. This scheme is suitable when the endpoint of interest is **a specific type of CDW**: for instance, when searching specifically for PIRA events, the reference should be moved after any previous RAW event; when searching specifically for RAW events, the reference should be moved after any previous PIRA event. 
+* *Worsening-based roving baseline* (`baseline='roving_wors'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed worsening. This scheme is suitable when the endpoint of interest is **a [specific type](#input) of CDW**. For instance, when searching specifically for PIRA events, the reference should be moved after any previous RAW event; when searching specifically for RAW events, the reference should be moved after any previous PIRA event. 
 
 **Note.** If the baseline data is stored in a separate file, the user should merge it with the main data frame containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the beginning of the data frame (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). 
 <!-- <span style="color: red;">The possibility to directly input a separate file for baseline data may be added in the future.</span> -->
@@ -265,7 +266,7 @@ DT::datatable(output$results, rownames=F,
               options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 ```
-The baseline has now been moved to the confirmation visit of the first CDI event (visit 3, EDSS=3.5). With respect to this baseline, a subsequent PIRA event is detected at visit 4 (EDSS=5), confirmed at visit 5.
+The baseline has now been moved to the confirmation visit of the first CDI event (visit 3, EDSS=3.5). With respect to this baseline, a subsequent CDW event is detected at visit 4 (EDSS=5), confirmed at visit 5.
 
 <br>
 
@@ -334,11 +335,11 @@ The `require_sust_days` argument may be of use in the following scenarios.
 * Sustained disability worsening can be required to exclude transient accumulation of disability (e.g., as a consequence of relapses) followed by complete recovery.
 
 
-# Relapse-based classification of CDW events
+# Relapse-based classification of CDW events {#rawpira}
 
-When relevant, relapse data is to be provided using the optional `relapse` argument in `MSprog()`. It should be given as a data frame containing subject IDs and relapse onset dates (see ["Input data"](#input))[^rnames].
+Detected CDW events may be further categorised based on their timing with respect to relapses[^reldata] and identified as RAW or PIRA. This has to be explicitly enabled by setting the flag `RAW_PIRA=TRUE` in `MSprog()` (unless the endpoint of interest is already `firstPIRA` or `firstRAW`). On top of that, the definitions used to label a CDW as RAW or as PIRA are controlled by arguments `relapse_assoc` and `relapse_indep`, as detailed below.
 
-[^rnames]: If the names of "subject ID" and "date" columns in the relapse database are different from the main database, they must be specified using arguments `rsubj_col` and `rdate_col`.
+[^reldata]: Relapse data is to be provided using the optional `relapse` argument in `MSprog()`. It should be given as a data frame containing subject IDs and relapse onset dates (see ["Input data"](#input)). If the names of columns with subject ID and date in the relapse database are different from the main database, they must be specified using arguments `rsubj_col` and `rdate_col`.
 
 ## Relapse-associated worsening (RAW) {#raw}
 
@@ -363,7 +364,7 @@ output <- MSprog(...
                  relapse_indep=relapse_indep_from_bounds(p0, p1, e0, e1, c0, c1),
                  ...)
 ```
-where: `p0` and `p1` specify the interval around a visit preceding the event (can be the current reference, the last visit before event onset, or the last visit before event onset with a clinically meaningful score distance from it [^pira]); `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If the right end (`b1` or `e1`) is `NULL`, the interval is assumed to extend up to the left end of the next interval. If the left end is `NULL`  (`e0` or `c0`), the interval is assumed to extend up to the right end of the previous interval. 
+where: `p0` and `p1` specify the interval around a visit preceding the event (can be the current reference, the last visit before event onset, or the last visit before event onset with a clinically meaningful score distance from it [^pira]); `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If both ends of an interval are 0 (e.g., if both `p0=0` and `p1=0`), the checkpoint is ignored. To merge two intervals together, set both the right end of the first interval and the left end of the second interval to `NULL` (e.g., "between baseline and event onset": `p1=NULL` and `e0=NULL`). 
 
 ```{r echo=FALSE, out.width="50%", fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `p0`, `p1`, `e0`, `e1`, `c0`, `c1`.*"}
 knitr::include_graphics(paste0(getwd(), 'relapse_indep_def.png'))
@@ -375,6 +376,34 @@ For example, in @muller2023, the authors recommend an absence of relapses during
 
 For more details and examples on PIRA computation, please refer to the dedicated package vignette *Assessing progression independent of relapse activity (PIRA) in MS*.
 
+## Example
+
+The following code detects multiple events with the `RAW_PIRA` flag enabled. 
+```{r}
+output <- MSprog(data=toydata_visits,
+                 subj_col='id', value_col='EDSS', date_col='date', outcome='edss', 
+                 event='multiple', RAW_PIRA=TRUE, baseline='roving', 
+                 relapse=toydata_relapses) 
+```
+<br />
+The `output$event_count` data frame (and the summary printed out by the function) 
+now includes RAW and PIRA counts:
+```{r}
+# print(output$event_count)
+DT::datatable(output$event_count, 
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
+              )
+```
+
+<br />
+In the `output$results` data frame, each CDW event is now further characterised by a `CDW_type` column:
+```{r}
+# print(output$results, row.names=FALSE)
+DT::datatable(output$results, rownames=F,
+              options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
+              )
+```
+<br />
 
 
 # `MSprog()` outputs

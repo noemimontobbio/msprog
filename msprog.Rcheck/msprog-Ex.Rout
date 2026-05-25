@@ -69,41 +69,31 @@ Events detected: multiple
 ---
 Total subjects: 7
 ---
-Subjects with CDW: 6 (PIRA: 5; RAW: 2)
+Subjects with CDW: 6
 Subjects with CDI: 1
 ---
-CDW events: 7 (PIRA: 5; RAW: 2)
+CDW events: 7
 CDI events: 1
 > print(output$results) # extended info on each event for all subjects
-  id nevent event_type CDW_type total_fu bl2event time2event sust_days
-1  1      1        CDW     PIRA      534      443        443        91
-2  2      1        CDW      RAW      730      198        198        84
-3  2      2        CDW     PIRA      730      257        539       191
-4  3      0                          491      NaN        491         0
-5  4      1        CDI               586       77         77        98
-6  4      2        CDW     PIRA      586      129        304       282
-7  5      1        CDW     PIRA      637      140        140       497
-8  6      1        CDW      RAW      491      430        430        61
-9  7      1        CDW     PIRA      779      499        499       280
-  sust_last
-1      TRUE
-2     FALSE
-3      TRUE
-4     FALSE
-5     FALSE
-6      TRUE
-7      TRUE
-8      TRUE
-9      TRUE
+  id nevent event_type total_fu bl2event time2event sust_days sust_last
+1  1      1        CDW      534      443        443        91      TRUE
+2  2      1        CDW      730      198        198        84     FALSE
+3  2      2        CDW      730      257        539       191      TRUE
+4  3      0                 491      NaN        491       NaN     FALSE
+5  4      1        CDI      586       77         77        98     FALSE
+6  4      2        CDW      586      129        304       282      TRUE
+7  5      1        CDW      637      140        140       497      TRUE
+8  6      1        CDW      491      430        430        61      TRUE
+9  7      1        CDW      779      499        499       280      TRUE
 > print(output$event_count) # summary of event sequence for each subject
-  event_sequence CDI CDW RAW PIRA
-1           PIRA   0   1   0    1
-2      RAW, PIRA   0   2   1    1
-3                  0   0   0    0
-4      CDI, PIRA   1   1   0    1
-5           PIRA   0   1   0    1
-6            RAW   0   1   1    0
-7           PIRA   0   1   0    1
+  event_sequence CDI CDW
+1            CDW   0   1
+2       CDW, CDW   0   2
+3                  0   0
+4       CDI, CDW   1   1
+5            CDW   0   1
+6            CDW   0   1
+7            CDW   0   1
 > # 2. SDMT course
 > output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
 +     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
@@ -123,37 +113,29 @@ Events detected: multiple
 ---
 Total subjects: 7
 ---
-Subjects with CDW: 5 (PIRA: 4; RAW: 0)
+Subjects with CDW: 5
 Subjects with CDI: 0
 ---
-CDW events: 5 (PIRA: 4; RAW: 0)
+CDW events: 5
 CDI events: 0
 > print(output$results) # extended info on each event for all subjects
-  id nevent event_type  CDW_type total_fu bl2event time2event sust_days
-1  1      1        CDW      PIRA      534      443        443        91
-2  2      1        CDW undefined      730      640        640        90
-3  3      0                           491      NaN        491         0
-4  4      1        CDW      PIRA      586       77         77       509
-5  5      1        CDW      PIRA      637      549        549        88
-6  6      0                           491      NaN        491         0
-7  7      1        CDW      PIRA      779      674        674       105
-  sust_last
-1      TRUE
-2      TRUE
-3     FALSE
-4      TRUE
-5      TRUE
-6     FALSE
-7      TRUE
+  id nevent event_type total_fu bl2event time2event sust_days sust_last
+1  1      1        CDW      534      443        443        91      TRUE
+2  2      1        CDW      730      640        640        90      TRUE
+3  3      0                 491      NaN        491       NaN     FALSE
+4  4      1        CDW      586       77         77       509      TRUE
+5  5      1        CDW      637      549        549        88      TRUE
+6  6      0                 491      NaN        491       NaN     FALSE
+7  7      1        CDW      779      674        674       105      TRUE
 > print(output$event_count) # summary of event sequence for each subject
-  event_sequence CDI CDW RAW PIRA
-1           PIRA   0   1   0    1
-2            CDW   0   1   0    0
-3                  0   0   0    0
-4           PIRA   0   1   0    1
-5           PIRA   0   1   0    1
-6                  0   0   0    0
-7           PIRA   0   1   0    1
+  event_sequence CDI CDW
+1            CDW   0   1
+2            CDW   0   1
+3                  0   0
+4            CDW   0   1
+5            CDW   0   1
+6                  0   0
+7            CDW   0   1
 > # 3. SDMT course, with a custom delta function
 > my_sdmt_delta <- function(reference_value) {min(c(reference_value/10, 3))}
 > output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
@@ -175,41 +157,31 @@ Events detected: multiple
 ---
 Total subjects: 7
 ---
-Subjects with CDW: 5 (PIRA: 4; RAW: 1)
+Subjects with CDW: 5
 Subjects with CDI: 1
 ---
-CDW events: 6 (PIRA: 4; RAW: 1)
+CDW events: 6
 CDI events: 1
 > print(output$results) # extended info on each event for all subjects
-  id nevent event_type  CDW_type total_fu bl2event time2event sust_days
-1  1      1        CDW      PIRA      534      443        443        91
-2  2      1        CDI                730      198        198        84
-3  2      2        CDW      PIRA      730       89        371       359
-4  2      3        CDW undefined      730      186        640        90
-5  3      0                           491      NaN        491         0
-6  4      1        CDW      PIRA      586       77         77       509
-7  5      1        CDW      PIRA      637      549        549        88
-8  6      0                           491      NaN        491         0
-9  7      1        CDW       RAW      779      185        185       187
-  sust_last
-1      TRUE
-2     FALSE
-3      TRUE
-4      TRUE
-5     FALSE
-6      TRUE
-7      TRUE
-8     FALSE
-9     FALSE
+  id nevent event_type total_fu bl2event time2event sust_days sust_last
+1  1      1        CDW      534      443        443        91      TRUE
+2  2      1        CDI      730      198        198        84     FALSE
+3  2      2        CDW      730       89        371       359      TRUE
+4  2      3        CDW      730      186        640        90      TRUE
+5  3      0                 491      NaN        491       NaN     FALSE
+6  4      1        CDW      586       77         77       509      TRUE
+7  5      1        CDW      637      549        549        88      TRUE
+8  6      0                 491      NaN        491       NaN     FALSE
+9  7      1        CDW      779      185        185       187     FALSE
 > print(output$event_count) # summary of event sequence for each subject
-  event_sequence CDI CDW RAW PIRA
-1           PIRA   0   1   0    1
-2 CDI, PIRA, CDW   1   2   0    1
-3                  0   0   0    0
-4           PIRA   0   1   0    1
-5           PIRA   0   1   0    1
-6                  0   0   0    0
-7            RAW   0   1   1    0
+  event_sequence CDI CDW
+1            CDW   0   1
+2  CDI, CDW, CDW   1   2
+3                  0   0
+4            CDW   0   1
+5            CDW   0   1
+6                  0   0
+7            CDW   0   1
 > 
 > 
 > 
@@ -290,25 +262,25 @@ Found EDSS change at visit no.6 (2022-11-06); potential confirmation visits avai
 Change not confirmed: proceed with search
 Searching for events from visit no.7 on
 Found EDSS change at visit no.7 (2022-12-10); potential confirmation visits available: no.8
-Found EDSS-CDW (PIRA) (visit no.7, 2022-12-10) confirmed at 84 days, sustained up to visit no.8 (2023-03-11)
+Found EDSS-CDW (visit no.7, 2022-12-10) confirmed at 84 days, sustained up to visit no.8 (2023-03-11)
 Baseline at visit no.8
 Searching for events from visit no.- on
 No edss change in any subsequent visit: end process
-Event sequence: PIRA
+Event sequence: CDW
 
 Subject #2: 10 visits, 2 relapses
 Baseline at visit no.1
 Searching for events from visit no.2 on
 Found EDSS change at visit no.4 (2021-06-12); potential confirmation visits available: no.5
-Found EDSS-CDW (RAW) (visit no.4, 2021-06-12) confirmed at 84 days, sustained up to visit no.5 (2021-09-04)
+Found EDSS-CDW (visit no.4, 2021-06-12) confirmed at 84 days, sustained up to visit no.5 (2021-09-04)
 Baseline at visit no.5
 Searching for events from visit no.6 on
 Found EDSS change at visit no.8 (2022-05-19); potential confirmation visits available: no.9
-Found EDSS-CDW (PIRA) (visit no.8, 2022-05-19) confirmed at 84 days, sustained up to visit no.10 (2022-11-26)
+Found EDSS-CDW (visit no.8, 2022-05-19) confirmed at 84 days, sustained up to visit no.10 (2022-11-26)
 Baseline at visit no.9
 Searching for events from visit no.10 on
 No edss change in any subsequent visit: end process
-Event sequence: RAW, PIRA
+Event sequence: CDW, CDW
 
 Subject #3: 7 visits, 1 relapse
 Baseline at visit no.1
@@ -327,17 +299,17 @@ Found EDSS-CDI (visit no.2, 2021-12-04) confirmed at 84 days, sustained up to vi
 Baseline at visit no.3
 Searching for events from visit no.4 on
 Found EDSS change at visit no.4 (2022-07-19); potential confirmation visits available: no.5
-Found EDSS-CDW (PIRA) (visit no.4, 2022-07-19) confirmed at 84 days, sustained up to visit no.7 (2023-04-27)
+Found EDSS-CDW (visit no.4, 2022-07-19) confirmed at 84 days, sustained up to visit no.7 (2023-04-27)
 Baseline at visit no.5
 Searching for events from visit no.6 on
 No edss change in any subsequent visit: end process
-Event sequence: CDI, PIRA
+Event sequence: CDI, CDW
 
 Subject #5: 9 visits, 0 relapses
 Baseline at visit no.1
 Searching for events from visit no.2 on
 Found EDSS change at visit no.3 (2021-11-01); potential confirmation visits available: no.4
-Found EDSS-CDW (PIRA) (visit no.3, 2021-11-01) confirmed at 84 days, sustained up to visit no.9 (2023-03-13)
+Found EDSS-CDW (visit no.3, 2021-11-01) confirmed at 84 days, sustained up to visit no.9 (2023-03-13)
 Baseline at visit no.4
 Searching for events from visit no.5 on
 Found EDSS change at visit no.5 (2022-04-30); potential confirmation visits available: no.6
@@ -347,7 +319,7 @@ Found EDSS change at visit no.8 (2022-12-15); potential confirmation visits avai
 Change not confirmed: proceed with search
 Searching for events from visit no.9 on
 No edss change in any subsequent visit: end process
-Event sequence: PIRA
+Event sequence: CDW
 
 Subject #6: 7 visits, 1 relapse
 Baseline at visit no.1
@@ -362,11 +334,11 @@ Found EDSS change at visit no.5 (2022-10-05); potential confirmation visits avai
 Change not confirmed: proceed with search
 Searching for events from visit no.6 on
 Found EDSS change at visit no.6 (2022-12-22); potential confirmation visits available: no.7
-Found EDSS-CDW (RAW) (visit no.6, 2022-12-22) confirmed at 84 days, sustained up to visit no.7 (2023-02-21)
+Found EDSS-CDW (visit no.6, 2022-12-22) confirmed at 84 days, sustained up to visit no.7 (2023-02-21)
 Baseline at visit no.7
 Searching for events from visit no.- on
 No edss change in any subsequent visit: end process
-Event sequence: RAW
+Event sequence: CDW
 
 Subject #7: 9 visits, 1 relapse
 Baseline at visit no.1
@@ -378,11 +350,11 @@ Found EDSS change at visit no.5 (2022-03-17); potential confirmation visits avai
 Change not confirmed: proceed with search
 Searching for events from visit no.6 on
 Found EDSS change at visit no.6 (2022-07-22); potential confirmation visits available: no.7
-Found EDSS-CDW (PIRA) (visit no.6, 2022-07-22) confirmed at 84 days, sustained up to visit no.9 (2023-04-28)
+Found EDSS-CDW (visit no.6, 2022-07-22) confirmed at 84 days, sustained up to visit no.9 (2023-04-28)
 Baseline at visit no.7
 Searching for events from visit no.8 on
 No edss change in any subsequent visit: end process
-Event sequence: PIRA
+Event sequence: CDW
 
 ---
 Outcome: edss
@@ -398,23 +370,23 @@ Events detected: multiple
 ---
 Total subjects: 7
 ---
-Subjects with CDW: 6 (PIRA: 5; RAW: 2)
+Subjects with CDW: 6
 Subjects with CDI: 1
 ---
-CDW events: 7 (PIRA: 5; RAW: 2)
+CDW events: 7
 CDI events: 1
 > print(output) # textual description of parameters used to obtain output
 ---
-msprog version: 0.2.6 
+msprog version: 0.2.7 
 ---
 MSprog() arguments:
-outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(30, 30), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
+outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(30, 30), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), RAW_PIRA=FALSE, relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
 delta_fun=NULL
 
 Textual description of applied criteria:
-We detected all confirmed EDSS changes (in chronological order) confirmed over 84 days (with a lower tolerance of 30 days and an upper tolerance of 30 days). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first eligible confirmation visit for the event that triggered the re-baseline. Whenever the current baseline fell within 30 days after the onset of a relapse, it was moved to the next eligible visit. A confirmed EDSS worsening event was labelled as relapse-associated worsening (RAW) if occurring within 90 days after the onset of a relapse. A confirmed EDSS worsening event was labelled as progression independent of relapse activity (PIRA) if no relapses started in the interval from 90 days before the event to 30 days after the event, or from 90 days before confirmation to 30 days after confirmation. 
+We detected all confirmed EDSS changes (in chronological order) confirmed over 84 days (with a lower tolerance of 30 days and an upper tolerance of 30 days). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first eligible confirmation visit for the event that triggered the re-baseline. Whenever the current baseline fell within 30 days after the onset of a relapse, it was moved to the next eligible visit. 
 ---
-Clinically meaningful threshold for EDSS change (delta function): default for EDSS (check by typing ?compute_delta).> 
+Clinically meaningful threshold for EDSS change (delta function): default for EDSS (1.5 if baseline=0, 1.0 if 0.0<baseline<=5.0, 0.5 if baseline>5.0)> 
 > 
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
@@ -486,7 +458,7 @@ Clinically meaningful threshold for EDSS change (delta function): default for ED
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  0.355 0.016 0.375 0 0 
+Time elapsed:  0.402 0.015 0.428 0 0 
 > grDevices::dev.off()
 null device 
           1 

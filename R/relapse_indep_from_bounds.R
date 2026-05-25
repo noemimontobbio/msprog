@@ -15,8 +15,8 @@
 #' }
 #'
 #' If both ends of an interval are 0 (e.g., if both `p0=0` and `p1=0`), the checkpoint is ignored.
-#' If the right end is `NULL`, the interval is assumed to extend up to the left end of the next interval.
-#' If the left end is `NULL`, the interval is assumed to extend up to the right end of the previous interval.
+#' To merge two intervals together, set both the right end of the first interval and the left end of the
+#' second interval to `NULL` (e.g., "between baseline and event onset": `p1=NULL` and `e0=NULL`).
 #' Here are some examples:
 #' \itemize{
 #' \item No relapses from 90dd before to 30dd after the event, and from 90dd before to 30dd after the confirmation \[1\]:
@@ -49,7 +49,7 @@
 #' This option is only relevant when relapse \emph{end} dates are provided.
 #'
 #' @references
-#' \[1\] M\"uller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli \"O, et al.
+#' \[1\] Müller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli Ö, et al.
 #' Harmonizing definitions for progression independent of relapse activity in multiple sclerosis: A systematic review.
 #' JAMA Neurol. 2023;80:1232--45. \cr\cr
 #' \[2\] Kappos L, Wolinsky JS, Giovannoni G, Arnold DL, Wang Q, Bernasconi C, et al.
