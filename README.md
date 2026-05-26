@@ -5,7 +5,7 @@
 
 > [!WARNING]
 > **🚧 This repository is under active development. 🚧 <br>
-Please make sure you are using the latest version of the package (check by running `utils::packageVersion('msprog')`) -- or at least v0.2.0, which is functionally stable, though some minor aspects may still change ahead of a full stable release on CRAN.** 
+Please make sure you are using the latest version of the package (check by running `utils::packageVersion("msprog")`) -- or at least v0.2.0, which is functionally stable, though some minor aspects may still change ahead of a full stable release on CRAN.** 
 >
 > **Latest version:**
 > 
@@ -36,9 +36,9 @@ Please make sure you are using the latest version of the package (check by runni
 <img src="man/figures/logo_R.png" width="150"/>
 </p>
 
-`msprog` is an R package providing tools for exhaustive and reproducible
-analysis of disability course in multiple sclerosis (MS) from
-longitudinal data \[[1](#ref-msprog2024)\]. A [**Python
+`msprog` is an R package providing tools for reproducible analysis of
+disability course in multiple sclerosis (MS) from longitudinal data
+\[[1](#ref-msprog2024)\]. A [**Python
 version**](https://github.com/noemimontobbio/pymsprog) of the package is
 available as well.
 
@@ -146,7 +146,7 @@ complement to the results to ensure reproducibility. For example,
 instead of only detecting the first confirmed disability worsening (CDW)
 event for each subject, we can detect *all* disability events
 sequentially by moving the baseline after each event
-(`event='multiple', baseline='roving'`)\`:
+(`event="multiple", baseline="roving"`)\`:
 
 ``` r
 output <- MSprog(toydata_visits,                                      # provide data on visits

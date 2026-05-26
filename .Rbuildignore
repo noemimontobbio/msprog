@@ -9,3 +9,5 @@
 ^\.Rd2pdf.*$
 ^doc$
 ^Meta$
+^\.positai$
+^\.claude$

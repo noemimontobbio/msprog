@@ -13,17 +13,20 @@ the results of event detection and associated metadata.
 Objects of class \code{"MSprogOutput"} are lists with the following elements:
 
 \describe{
-\item{\code{event_count}}{A data frame containing the event sequence detected for each subject, and the counts for each event type}
-\item{\code{results}}{A data frame with extended info on each event for all subjects}
-\item{\code{settings}}{A list containing all the arguments used to compute the output}
-\item{\code{unconfirmed}}{A data frame with info on unconfirmed events (initial change from baseline, but no confirmation) for all subjects.}
+\item{\code{event_count}}{A data frame containing event counts for each subject
+(and the event sequence in case of multiple events).}
+\item{\code{results}}{A data frame with extended info on each event for all subjects.}
+\item{\code{settings}}{A list containing all the arguments used to compute the output.}
+\item{\code{unconfirmed}}{A data frame with info on unconfirmed events
+(initial change from baseline, but no confirmation) for all subjects.}
 }
 }
 
 \section{\code{event_count} data frame}{
 
 \describe{
-\item{event_sequence}{Sequence of detected events (if any), in chronological order.}
+\item{event_sequence}{Sequence of detected events (if any), in chronological order
+(only displayed in multiple-event setting).}
 \item{CDI}{Count of confirmed disability improvement (CDI) events.}
 \item{CDW}{Count of confirmed disability worsening (CDW) events.}
 \item{RAW}{Count of relapse-associated worsening (RAW) events.}

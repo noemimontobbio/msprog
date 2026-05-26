@@ -304,7 +304,8 @@ with \code{time2event} = total follow up.}
 \value{
 An object of class \code{MSprogOutput} with the following attributes:
 \itemize{
-\item{\code{event_count}: a data frame containing the event sequence detected for each subject, and the counts for each event type.}
+\item{\code{event_count}: a data frame containing event counts for each subject
+(and the event sequence in case of multiple events).}
 \item{\code{results}: a data frame with extended info on each event for all subjects.}
 \item{\code{settings}: a list containing all the arguments used to compute the output.}
 \item{\code{unconfirmed}: a data frame with info on unconfirmed events (initial change from baseline, but no confirmation)
@@ -326,13 +327,13 @@ output <- MSprog(toydata_visits, subj_col='id', value_col='EDSS', date_col='date
     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=1)
 print(output$results) # extended info on each event for all subjects
-print(output$event_count) # summary of event sequence for each subject
+print(output$event_count) # event counts for each subject
 # 2. SDMT course
 output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=1)
 print(output$results) # extended info on each event for all subjects
-print(output$event_count) # summary of event sequence for each subject
+print(output$event_count) # event counts for each subject
 # 3. SDMT course, with a custom delta function
 my_sdmt_delta <- function(reference_value) {min(c(reference_value/10, 3))}
 output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
@@ -340,7 +341,7 @@ output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date
     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=1)
 print(output$results) # extended info on each event for all subjects
-print(output$event_count) # summary of event sequence for each subject
+print(output$event_count) # event counts for each subject
 }
 \references{
 [1] Müller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli Ö, et al.

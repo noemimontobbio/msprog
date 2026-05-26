@@ -123,16 +123,23 @@ DT::datatable(output_edss$results, rownames=F,
 ```
     where: `nevent` is the cumulative event count for each subject; `event_type` characterises the event; `total_fu` is the number of days from start to end of follow-up; `time2event` is the number of days from start of follow-up to event[^timeto]; `bl2event` is the number of days from current baseline to event; `sust_days` is the number of days for which the event was sustained; `sust_last` reports whether the event was sustained until the last visit.
 
-2. `event_count`: a data frame summarising event counts for each subject, and the event sequence (where relevant). Here's what it looks like for the EDSS-based computation above:
+2. `event_count`: a data frame summarising event counts for each subject. Here's what it looks like for the EDSS-based computation above:
 ```{r, indent="     "}
 # print(output_edss$event_count)
 DT::datatable(output_edss$event_count,
               options = list(dom='t', scrollX=T, scrollY=F, paging = FALSE)
               )
 ```
-    where: `event_sequence` specifies the order of the events and `CDW` counts CDW events.
+    where `CDW` counts CDW events.
 
-**Note.** In this example, we called `MSprog()` without specifying the `event` argument - which defaults to `firstCDW` (only detect the first CDW event). For this reason, (1) in `output_edss$results`, `nevent` can only be 0 or 1; (2) in `output_edss$event_count`, `event_sequence` can contain a maximum of one event, CDW count can only be 0 or 1, and CDI column is omitted. In a multiple-event setting (`event=multiple`), more than one event per subject can be detected. See [the relevant section](#multiple).
+> **Note.** In this example, we called `MSprog()` without specifying the `event` argument - which defaults to `firstCDW` (only detect the first CDW event). For this reason, 
+> 
+> 1. In `output_edss$results`, `nevent` can only be 0 or 1.
+> 2. In `output_edss$event_count`, CDW count can only be 0 or 1, and CDI column is omitted. 
+> 
+> In a multiple-event setting (`event="multiple2`), more than one event per subject can be detected, and `event_count` also includes the event sequence for each subject. See [the relevant section](#multiple).
+
+<br>
 
 Additionally, by applying the `print` method to the `MSprog()` output, the user can print out the full list of function arguments, as well as a short paragraph describing the complete set of applied criteria, to be reported to ensure complete reproducibility. In our example:
 ```{r, linewidth=90}
@@ -212,12 +219,12 @@ The assessment of the disability evolution strongly depends on the choices made 
 
 * *Worsening-based roving baseline* (`baseline='roving_wors'`): the baseline visit is initially set as the first available assessment, then updated after each confirmed worsening. This scheme is suitable when the endpoint of interest is **a [specific type](#input) of CDW**. For instance, when searching specifically for PIRA events, the reference should be moved after any previous RAW event; when searching specifically for RAW events, the reference should be moved after any previous PIRA event. 
 
-**Note.** If the baseline data is stored in a separate file, the user should merge it with the main data frame containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the beginning of the data frame (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). 
+> **Note.** If the baseline data is stored in a separate file, the user should merge it with the main data frame containing longitudinal visit data. This can be done by inserting the baseline date and outcome value for each subject at the beginning of the data frame (not necessarily next to the other visits from the same subject -- they will be grouped by subject ID). 
 <!-- <span style="color: red;">The possibility to directly input a separate file for baseline data may be added in the future.</span> -->
 
 ## Additional options
 
-* For roving baseline schemes, the re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='event'`, for instance, rebaseline can be triggered by *any* confirmed change, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold improvement events are used to move the baseline, but not listed in the event sequence.
+* For roving baseline schemes, the re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='event'`, for instance, rebaseline can be triggered by *any* confirmed change, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold improvement events are used to move the baseline, but not considered in event count.
 
 * When a roving baseline is used, the reference is moved after a previously detected event. The new reference may be set at the date of the previous event (`proceed_from='event'`), or at the first confirmation visit of such event (`proceed_from='firstconf'`, default).
 
@@ -277,7 +284,7 @@ Other valid values for the `event` argument are:
 * `'firstPIRA'`: first PIRA event
 * `'firstRAW'`: first RAW event.
 
-**Note.** if, for example, `'event=firstPIRA'`, all non-PIRA events *preceding* the first PIRA are actually detected -- although not reported. This allows to combine this scenario with a roving baseline scheme, where the baseline is moved after every confirmed non-PIRA event. For instance, if a RAW event occurs first, the subsequent worsening would be counted from the re-baselined outcome value after the RAW.
+> **Note.** if, for example, `'event=firstPIRA'`, all non-PIRA events *preceding* the first PIRA are actually detected -- although not reported. This allows to combine this scenario with a roving baseline scheme, where the baseline is moved after every confirmed non-PIRA event. For instance, if a RAW event occurs first, the subsequent worsening would be counted from the re-baselined outcome value after the RAW.
 
 
 
@@ -297,7 +304,7 @@ i.e., the confirmation visit must lie between 24 weeks after the event, and 36 w
 
 [^lrtol]: `conf_tol_days` can also be specified as a single integer if symmetric lower and upper tolerance is desired.
 
-**Note.** "Confirmed over 12 *or more* weeks" (i.e., no upper bound) $\neq$ "sustained over the whole follow up".<br> Setting no upper bound to the confirmation interval means that **the first visit *at least* 12 weeks after the initial change is selected as confirmation visit**. The confirmation window is then defined as the interval between the initial worsening and that confirmation visit, and scores are checked therein.
+> **Note.** "Confirmed over 12 *or more* weeks" (i.e., no upper bound) $\neq$ "sustained over the whole follow up".<br> Setting no upper bound to the confirmation interval means that **the first visit *at least* 12 weeks after the initial change is selected as confirmation visit**. The confirmation window is then defined as the interval between the initial worsening and that confirmation visit, and scores are checked therein.
 
 ## Additional options
 
