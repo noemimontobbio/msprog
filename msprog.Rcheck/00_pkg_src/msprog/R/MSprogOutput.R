@@ -7,15 +7,18 @@
 #' Objects of class `"MSprogOutput"` are lists with the following elements:
 #'
 #' \describe{
-#' \item{`event_count`}{A data frame containing the event sequence detected for each subject, and the counts for each event type}
-#' \item{`results`}{A data frame with extended info on each event for all subjects}
-#' \item{`settings`}{A list containing all the arguments used to compute the output}
-#' \item{`unconfirmed`}{A data frame with info on unconfirmed events (initial change from baseline, but no confirmation) for all subjects.}
+#' \item{`event_count`}{A data frame containing event counts for each subject
+#' (and the event sequence in case of multiple events).}
+#' \item{`results`}{A data frame with extended info on each event for all subjects.}
+#' \item{`settings`}{A list containing all the arguments used to compute the output.}
+#' \item{`unconfirmed`}{A data frame with info on unconfirmed events
+#' (initial change from baseline, but no confirmation) for all subjects.}
 #' }
 #'
 #' @section `event_count` data frame:
 #' \describe{
-#'   \item{event_sequence}{Sequence of detected events (if any), in chronological order.}
+#'   \item{event_sequence}{Sequence of detected events (if any), in chronological order
+#'   (only displayed in multiple-event setting).}
 #'   \item{CDI}{Count of confirmed disability improvement (CDI) events.}
 #'   \item{CDW}{Count of confirmed disability worsening (CDW) events.}
 #'   \item{RAW}{Count of relapse-associated worsening (RAW) events.}
@@ -41,9 +44,9 @@
 #'   \item{last_delta_value}{Last outcome value before event onset at a clinically meaningful score distance from it.}
 #'   \item{conf`<conf_days>`_date}{Date of `<conf_days>`-day confirmation visit for the event.}
 #'   \item{conf`<conf_days>`_value}{Outcome value at `<conf_days>`-day confirmation visit.}
-#'   \item{PIRA_conf`<conf_days>`_date}{For PIRA events, date of `<conf_days>`-day confirmation visit
+#'   \item{PIRA_conf`<conf_days>`_date}{When relevant, date of `<conf_days>`-day confirmation visit for PIRA
 #'   (could be different from CDW confirmation visit if the PIRA definition includes confirmation-related constraints on relapses).}
-#'   \item{PIRA_conf`<conf_days>`_value}{For PIRA events, outcome value at `<conf_days>`-day confirmation visit
+#'   \item{PIRA_conf`<conf_days>`_value}{When relevant, outcome value at `<conf_days>`-day confirmation visit for PIRA
 #'   (could be different from CDW confirmation visit if the PIRA definition includes confirmation-related constraints on relapses).}
 #'   \item{sust_days}{Number of days for which the event was sustained.}
 #'   \item{sust_last}{Whether the event was sustained up to the end of follow-up.}

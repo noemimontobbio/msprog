@@ -58,7 +58,7 @@ or (iii) the last visit before event onset with a clinically meaningful score di
 (i.e., for an outcome \code{x} with "higher score" = "worse", the last visit \code{i} such that \code{x[event] - x[i] >= delta_fun(x[i])},
 and same for the confirmation visit).}
 \item{\code{"event"}: the disability worsening event onset.}
-\item{\code{"conf"}: the (first available) confirmation visit.}
+\item{\code{"conf"}: an eligible confirmation visit.}
 }
 }
 \details{
@@ -67,7 +67,7 @@ To merge two intervals together, set both the right end of the first interval an
 second interval to \code{NULL} (e.g., "between baseline and event onset": \code{p1=NULL} and \code{e0=NULL}).
 Here are some examples:
 \itemize{
-\item No relapses from 90dd before to 30dd after the event, and from 90dd before to 30dd after the confirmation [1]:
+\item No relapses from 90dd before to 30dd after the event, and from 90dd before to 30dd after confirmation [1]:
 \cr\code{relapse_indep_from_bounds(e0=90,e1=30,c0=90,c1=30)}.
 \item No relapses between baseline and confirmation (high-specificity definition from [1]):
 \cr\code{relapse_indep_from_bounds(p0=0,p1=NULL,e0=NULL,e1=NULL,c0=NULL,c1=0)}.

@@ -23,7 +23,7 @@ print.MSprogOutput <- function(x, ...) {
   s <- x$settings
   outcome <- if (s$outcome=="custom") "outcome" else toupper(s$outcome)
 
-  keep <- setdiff(names(s), c("validconf_p", "delta_fun", "rawpira"))
+  keep <- setdiff(names(s), c("validconf_p", "delta_fun", "rawpira", "impute_max_fu"))
   cat("\nMSprog() arguments:\n", paste0(paste(keep, s[keep], sep="="), collapse=", "),
       ",\ndelta_fun=", as.character(s["delta_fun"]), sep="")
 
@@ -129,12 +129,12 @@ print.MSprogOutput <- function(x, ...) {
                             else " worsening or improvement event. ",
                             # Proceed from
                             "The new baseline was set at ",
-                            if (s$proceed_from=="event") "the event"
+                            if (s$proceed_from=="event") "the onset of the event"
                             else "the first eligible confirmation visit for the event",
                             " that triggered the re-baseline. ",
                             # Sub-threshold
                             if (s$sub_threshold_rebl!="none")
-                                   paste0("Rebaseline was also triggered by confirmed \"sub-threshold\" ", s$sub_threshold_rebl,
+                                   paste0("Rebaseline was also triggered by any confirmed \"sub-threshold\" ", s$sub_threshold_rebl,
                                           ", i.e., when the shift in the ", outcome,
                                           " value was below the clinically meaningful threshold. ")
                             else "",
@@ -169,10 +169,10 @@ print.MSprogOutput <- function(x, ...) {
   # OTHER OPTIONS
   # %%%%%%%%%%%%%
 
-  imputation_text <- if (s$impute_last_visit>0)
-    paste0("In case of ", outcome, " worsening at the last visit, CDW was imputed ",
-           if (s$impute_last_visit<Inf & s$impute_last_visit>=1)
-             paste0("for patients terminating follow-up before day ", s$impute_last_visit)
+  imputation_text <- if (s$impute_last_visit > 0)
+    paste0("In case of ", outcome, " worsening at the last visit, CDW was imputed",
+           if (s$impute_max_fu < Inf)
+             paste0(" for patients terminating follow-up before day ", s$impute_max_fu)
            else "",
            if (s$impute_last_visit < 1)
              paste0(" with a probability of ", s$impute_last_visit)

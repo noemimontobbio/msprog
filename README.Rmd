@@ -32,7 +32,7 @@ Please make sure you are using the latest version of the package (check your ins
 
 <br>
 
-> 📣 **What’s new in latest versions**  
+> 📣 **What’s new in latest versions**
 > 
 > * **Soon available on CRAN** (supporting **R >= 4.1.0**) (from v1.0.0).
 > * `RAW_PIRA` flag to explicitly enable RAW/PIRA classification (from v0.2.7).

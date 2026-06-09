@@ -45,11 +45,11 @@ Recent studies [@kappos2018; @silent2019; @kuhlmann2023] have highlighted the co
 1. a visit preceding the event: can be (i) the current reference, (ii) the last visit before event onset,
 or (iii) the last visit before event onset with a clinically meaningful score distance from it [^extrema];
 2. the initial disability worsening (event onset);
-3. the (first) confirmation visit.
+3. an eligible confirmation visit.
 
 [^extrema]: if `skip_local_extrema` is not `"none"` in `msprog::MSprog()`, local extrema are excluded from (iii).
 
-For example, in @kappos2020, an absence of relapses was required between the reference visit and 30 days after the event, and during the 30 days before and 30 days after the confirmation visit for a CDW event to be considered as PIRA; in @cagol2022, the authors required an absence of relapses during the 90 days before the event and between the event and the confirmation visit; in @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation visit; when a high specificity is desired, they recommend an absence of relapses in the whole period between the reference visit and the confirmation visit; in @muller2025, the authors recommend an absence of relapses since the last visit preceding the event (up to the event).
+For example, in @kappos2020, an absence of relapses was required between the reference visit and 30 days after the event, and during the 30 days before and 30 days after confirmation for a CDW event to be considered as PIRA; in @cagol2022, the authors required an absence of relapses during the 90 days before the event and between the event and the confirmation visit; in @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after confirmation; when a high specificity is desired, they recommend an absence of relapses in the whole period between reference and confirmation; in @muller2025, the authors recommend an absence of relapses since the last visit preceding the event (up to the event), and during the 30 days before confirmation.
 
 Such an approach is easily integrated into the `msprog::MSprog()` function through its argument `relapse_indep`, allowing to specify custom relapse-free intervals based on *any subset* of the checkpoints 1-3, thus allowing to replicate any of the above-mentioned definitions. The `relapse_indep` argument must be provided in the form produced by function `msprog::relapse_indep_from_bounds()`, as follows:
 ``` {r, eval=FALSE}
@@ -69,7 +69,7 @@ knitr::include_graphics(paste0(getwd(), 'relapse_indep_def.png'))
 Some examples are provided below.
 <br/ >
 
-* No relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation visit [@muller2023]:
+* No relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after confirmation [@muller2023]:
   ``` {r}
   relapse_indep <- relapse_indep_from_bounds(p0=0, p1=0,   # baseline
                                             e0=90, e1=30, # event
@@ -81,7 +81,7 @@ Some examples are provided below.
   ```
   <br/ >
   
-* No relapses in the whole period between the reference visit and the confirmation visit [@muller2023]:
+* No relapses in the whole period between reference and confirmation [@muller2023]:
   ``` {r}
   relapse_indep <- relapse_indep_from_bounds(p0=0, p1=NULL,    # baseline
                                             e0=NULL, e1=NULL, # event
@@ -93,7 +93,7 @@ Some examples are provided below.
   ```
   <br/ >
   
-* No relapses was required between the reference visit and 30 days after the event, and during the 30 days before and 30 days after the confirmation visit [@kappos2020]:
+* No relapses between the reference visit and 30 days after the event, and during the 30 days before and 30 days after confirmation [@kappos2020]:
   ``` {r}
   relapse_indep <- relapse_indep_from_bounds(p0=0, p1=NULL,  # baseline
                                             e0=NULL, e1=30, # event
@@ -144,7 +144,7 @@ head(toydata_relapses)
 
 The following code detects, for each subject in the toy dataset, the first EDSS PIRA event (`event='firstPIRA'`) confirmed over $\geq$ 12 or $\geq$ 24 weeks (`conf_days=c(7*12, 7*24)`, `conf_tol_days=c(0, Inf)`), for two different definitions of PIRA. We set `verbose=2` to print an extended log of the computations performed.
 
-1. Roving baseline, and absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation @muller2023:
+1. Roving baseline, and absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after confirmation @muller2023:
 ```{r, indent="    "}
 output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
                relapse=toydata_relapses, 
@@ -159,7 +159,7 @@ DT::datatable(output$results, rownames=F,
 ```
     <br>
     
-2. Post-relapse re-baseline, and absence of relapses between the reference visit and 30 days after the event, and during the 30 days before and 30 days after the confirmation @kappos2020:
+2. Post-relapse re-baseline, and absence of relapses between the reference visit and 30 days after the event, and during the 30 days before and 30 days after confirmation @kappos2020:
 ```{r, indent="    "}
 output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss',
                relapse=toydata_relapses,

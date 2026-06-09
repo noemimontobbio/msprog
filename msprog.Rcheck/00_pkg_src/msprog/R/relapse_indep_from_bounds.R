@@ -11,7 +11,7 @@
 #' (i.e., for an outcome `x` with "higher score" = "worse", the last visit `i` such that `x[event] - x[i] >= delta_fun(x[i])`,
 #' and same for the confirmation visit).}
 #' \item{`"event"`: the disability worsening event onset.}
-#' \item{`"conf"`: the (first available) confirmation visit.}
+#' \item{`"conf"`: an eligible confirmation visit.}
 #' }
 #'
 #' If both ends of an interval are 0 (e.g., if both `p0=0` and `p1=0`), the checkpoint is ignored.
@@ -19,7 +19,7 @@
 #' second interval to `NULL` (e.g., "between baseline and event onset": `p1=NULL` and `e0=NULL`).
 #' Here are some examples:
 #' \itemize{
-#' \item No relapses from 90dd before to 30dd after the event, and from 90dd before to 30dd after the confirmation \[1\]:
+#' \item No relapses from 90dd before to 30dd after the event, and from 90dd before to 30dd after confirmation \[1\]:
 #' \cr`relapse_indep_from_bounds(e0=90,e1=30,c0=90,c1=30)`.
 #' \item No relapses between baseline and confirmation (high-specificity definition from \[1\]):
 #' \cr`relapse_indep_from_bounds(p0=0,p1=NULL,e0=NULL,e1=NULL,c0=NULL,c1=0)`.

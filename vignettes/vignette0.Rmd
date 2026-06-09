@@ -224,7 +224,7 @@ The assessment of the disability evolution strongly depends on the choices made 
 
 ## Additional options
 
-* For roving baseline schemes, the re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='event'`, for instance, rebaseline can be triggered by *any* confirmed change, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold improvement events are used to move the baseline, but not considered in event count.
+* For roving baseline schemes, the re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl="change"`, for instance, rebaseline can be triggered by *any* confirmed change, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold improvement events are used to move the baseline, but not considered in event count.
 
 * When a roving baseline is used, the reference is moved after a previously detected event. The new reference may be set at the date of the previous event (`proceed_from='event'`), or at the first available confirmation visit for such event (`proceed_from='firstconf'`, default).
 

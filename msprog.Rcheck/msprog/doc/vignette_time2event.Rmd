@@ -24,14 +24,14 @@ knitr::opts_chunk$set(
 
 ```{r wrap-hook, include=FALSE}
 library(knitr)
-hook_output = knit_hooks$get('output')
+hook_output = knit_hooks$get("output")
 knit_hooks$set(output = function(x, options) {
   # this hook is used only when the linewidth option is not NULL
   if (!is.null(n <- options$linewidth)) {
     x = xfun::split_lines(x) #substring(x, 4, nchar(x)))
     # any lines wider than n should be wrapped
     if (any(nchar(x) > n)) x = strwrap(x, width = n)
-    x = paste0(paste(x, collapse = '\n#> '), '\n')
+    x = paste0(paste(x, collapse = "\n#> "), "\n")
   }
   hook_output(x, options)
 })
@@ -50,12 +50,13 @@ head(toydata_relapses)
 ```
 
 <!-- ```{r} -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R') -->
-<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData') -->
-<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData') -->
+<!-- source("/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R") -->
+<!-- source("/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R") -->
+<!-- source("/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R") -->
+<!-- source("/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R") -->
+<!-- load("/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData") -->
+<!-- load("/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData") -->
+<!-- source("/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/value_milestone.R") -->
 <!-- library(dplyr) -->
 <!-- ``` -->
 
@@ -64,9 +65,9 @@ head(toydata_relapses)
 Given the relative rarity of disability worsening events in MS, it is quite common to use the **time to *first* confirmed disability worsening** as an endpoint of interest. This is the case especially in clinical trials, where follow-up periods are often limited to 2-3 years. Survival times may be computed using the following code:
 ```{r}
 output_edss <- MSprog(toydata_visits,
-                 subj_col='id', value_col='EDSS', date_col='date',
-                 outcome='edss',
-                 event='firstCDW',   # <--- only detect first CDW event
+                 subj_col="id", value_col="EDSS", date_col="date",
+                 outcome="edss",
+                 event="firstCDW",   # <--- only detect first CDW event
                  relapse=toydata_relapses,
                  verbose=0)
 ```
@@ -81,19 +82,19 @@ To access the time-to-event data, we need to extract the `results` attribute fro
 res <- output_edss$results
 # print(res, row.names=FALSE)
 DT::datatable(res, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom="t", scrollX=T, scrollY="200px", paging = FALSE)
               )
 ```
 
-If we were to conduct a survival analysis with censoring, we would be interested in the `'time2event'` column (time to CDW, in days) and in the `'nevent'` column (1 if the event occurred, 0 otherwise):
+If we were to conduct a survival analysis with censoring, we would be interested in the `"time2event"` column (time to CDW, in days) and in the `"nevent"` column (1 if the event occurred, 0 otherwise):
 ```{r}
-survival_data <- res[c('id', 'time2event', 'nevent')]
+survival_data <- res[c("id", "time2event", "nevent")]
 # print(survival_data, row.names=FALSE)
 DT::datatable(survival_data, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom="t", scrollX=T, scrollY="200px", paging = FALSE)
               )
 ```
-Note that, in a more general multiple-event setting, the `'nevent'` column would contain the count of events for each subject. Here, since we're stopping at the first event, this number can only be 0 (no event) or 1 (event).
+Note that, in a more general multiple-event setting, the `"nevent"` column would contain the count of events for each subject. Here, since we're stopping at the first event, this number can only be 0 (no event) or 1 (event).
 
 The data is now ready to use for survival analysis. Here's an example code that one may use to plot Kaplan-Meier curves from `survival_data`:
 ```{r, eval=FALSE}
@@ -109,28 +110,23 @@ survfit2(Surv(time2event, nevent) ~ 1, data=survival_data) %>%
 
 ## Time to disability milestone
 
-<!-- ```{r} -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/value_milestone.R') -->
-<!-- library(dplyr) -->
-<!-- ``` -->
-
 Instead of studying disability worsening with respect to a baseline value, one can focus on the time taken to reach a specific disability milestone. This can be computed using `msprog::value_milestone()`.
 
 The following code detects the time to EDSS $\geq$ 4.5 for all subjects in our toy data. Similar to `MSprog()`, we can set `verbose=2` to display progress info.
 ```{r}
 vm <- value_milestone(toydata_visits, milestone=4.5,
-                 subj_col='id', value_col='EDSS', date_col='date',
-                 outcome='edss', relapse=toydata_relapses,
+                 subj_col="id", value_col="EDSS", date_col="date",
+                 outcome="edss", relapse=toydata_relapses,
                  verbose=2)
 ```
 
 For example, subject `2` reached EDSS=4.5 at their third visit, on date 2021-03-24:
 ```{r}
-print(toydata_visits[toydata_visits$id==2, c('date', 'EDSS')], row.names=FALSE)
+print(toydata_visits[toydata_visits$id==2, c("date", "EDSS")], row.names=FALSE)
 ```
 Subject `4` had EDSS=4.5 at their first visit, but it was not confirmed; the first confirmed value $\geq$ 4.5 was found at the fourth visit, on date 2022-07-19:
 ```{r}
-print(toydata_visits[toydata_visits$id==4, c('date', 'EDSS')], row.names=FALSE)
+print(toydata_visits[toydata_visits$id==4, c("date", "EDSS")], row.names=FALSE)
 ```
 
 
@@ -138,14 +134,14 @@ The function returned the following data frame:
 ```{r}
 # print(vm)
 DT::datatable(vm, 
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom="t", scrollX=T, scrollY="200px", paging = FALSE)
               )
 ```
-where: `'date'` contains the date of the first confirmed EDSS $\geq$ 4.5 (or last date of follow-up if milestone was not reached or not confirmed); `'EDSS'` contains the first EDSS value $\geq$ 4.5, if present, otherwise no value; `'time2event'` contains the time to reach EDSS $\geq$ 4.5 (or total follow-up length if not reached or not confirmed); `'observed'` indicates whether EDSS $\geq$ 4.5 was reached (1) or not (0).
+where: `"date"` contains the date of the first confirmed EDSS $\geq$ 4.5 (or last date of follow-up if milestone was not reached or not confirmed); `"EDSS"` contains the first EDSS value $\geq$ 4.5, if present, otherwise no value; `"time2event"` contains the time to reach EDSS $\geq$ 4.5 (or total follow-up length if not reached or not confirmed); `"observed"` indicates whether EDSS $\geq$ 4.5 was reached (1) or not (0).
 
 Please refer to the documentation (by typing `?value_milestone`) for a complete illustration of each of the function arguments and their default values.
 
-As before, for survival analysis we would need the `'time2event'` column (time to reach EDSS $\geq$ 4.5, in days) and the `'observed'` column (1 if the milestone was reached, 0 otherwise).
+As before, for survival analysis we would need the `"time2event"` column (time to reach EDSS $\geq$ 4.5, in days) and the `"observed"` column (1 if the milestone was reached, 0 otherwise).
 
 ## Multiple events
 
@@ -153,14 +149,14 @@ In studies with longer follow-ups, it can be informative to analyse *recurrent e
 
 The following code extracts multiple EDSS events from our toy data with a **roving baseline** scheme (i.e., the baseline is updated after each event to the first available confirmation visit).
 ```{r}
-output <- MSprog(toydata_visits, 'id', 'EDSS', 'date', 'edss', relapse=toydata_relapses,
-                event='multiple', baseline='roving',  # <--- detect multiple events with a roving baseline
+output <- MSprog(toydata_visits, "id", "EDSS", "date", "edss", relapse=toydata_relapses,
+                event="multiple", baseline="roving",  # <--- detect multiple events with a roving baseline
                 verbose=0)
-survival_data <- output$results[c('id', 'nevent', 'time2event')]
+survival_data <- output$results[c("id", "nevent", "time2event")]
 # print(survival_data, row.names=FALSE)
 DT::datatable(survival_data, rownames=F,
-              options = list(dom='t', scrollX=T, scrollY="200px", paging = FALSE)
+              options = list(dom="t", scrollX=T, scrollY="200px", paging = FALSE)
               )
 ```
-Note that the `event` argument is set to `multiple`, and that the results can contain more than one row for the same subject, with the `'nevent'` column keeping track of cumulative event count.
+Note that the `event` argument is set to `multiple`, and that the results can contain more than one row for the same subject, with the `"nevent"` column keeping track of cumulative event count.
 

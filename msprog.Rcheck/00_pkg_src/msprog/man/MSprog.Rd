@@ -248,7 +248,7 @@ specifying the intervals around (any subset of) three checkpoints:
 \enumerate{
 \item a preceding visit, e.g., baseline or last visit before the worsening (\code{p0} and \code{p1})
 \item the event onset (\code{e0} and \code{e1})
-\item the first available confirmation visit (\code{c0} and \code{c1}).
+\item an eligible confirmation visit (\code{c0} and \code{c1}).
 }
 The auxiliary function \code{relapse_indep_from_bounds()} can be used to organise
 interval bounds into a named list correctly, by calling:
@@ -280,7 +280,7 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 \item event onset (\code{'date'} column)
 \item the current baseline (\code{'bl_date'} column)
 \item the last visit before event onset at a clinically meaningful score distance from it (\code{'last_delta_date'} column)
-\item the confirmation visit(s) (\code{'conf<c>_date'} and \code{'PIRA_conf<c>_date'} columns for each \code{c} in \code{conf_days})
+\item the confirmation visit(s) (\code{'conf<c>_date'} column and, when relevant, \code{'PIRA_conf<c>_date'} column for each \code{c} in \code{conf_days})
 }}
 
 \item{include_values}{If \code{TRUE},  \code{output$results} will include the outcome value at:
@@ -288,7 +288,7 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 \item event onset (\code{'value'} column)
 \item the current baseline (\code{'bl_value'} column)
 \item the last visit before event onset at a clinically meaningful score distance from it (\code{'last_delta_value'} column)
-\item the confirmation visit(s) (\code{'conf<c>_value'} and \code{'PIRA_conf<c>_value'} columns for each \code{c} in \code{conf_days})
+\item the confirmation visit(s) (\code{'conf<c>_value'} column and, when relevant, \code{'PIRA_conf<c>_value'} column for each \code{c} in \code{conf_days})
 }}
 
 \item{include_stable}{If \code{TRUE}, subjects with no confirmed events are included in \code{output$results},
@@ -304,7 +304,8 @@ with \code{time2event} = total follow up.}
 \value{
 An object of class \code{MSprogOutput} with the following attributes:
 \itemize{
-\item{\code{event_count}: a data frame containing the event sequence detected for each subject, and the counts for each event type.}
+\item{\code{event_count}: a data frame containing event counts for each subject
+(and the event sequence in case of multiple events).}
 \item{\code{results}: a data frame with extended info on each event for all subjects.}
 \item{\code{settings}: a list containing all the arguments used to compute the output.}
 \item{\code{unconfirmed}: a data frame with info on unconfirmed events (initial change from baseline, but no confirmation)
@@ -326,13 +327,13 @@ output <- MSprog(toydata_visits, subj_col='id', value_col='EDSS', date_col='date
     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=1)
 print(output$results) # extended info on each event for all subjects
-print(output$event_count) # summary of event sequence for each subject
+print(output$event_count) # event counts for each subject
 # 2. SDMT course
 output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=1)
 print(output$results) # extended info on each event for all subjects
-print(output$event_count) # summary of event sequence for each subject
+print(output$event_count) # event counts for each subject
 # 3. SDMT course, with a custom delta function
 my_sdmt_delta <- function(reference_value) {min(c(reference_value/10, 3))}
 output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
@@ -340,7 +341,7 @@ output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date
     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
     event='multiple', baseline='roving', verbose=1)
 print(output$results) # extended info on each event for all subjects
-print(output$event_count) # summary of event sequence for each subject
+print(output$event_count) # event counts for each subject
 }
 \references{
 [1] Müller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli Ö, et al.

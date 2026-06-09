@@ -83,7 +83,7 @@
 #' Must be one of the following.
 #' \itemize{
 #' \item `"none"` (default): only use *clinically meaningful* confirmed changes for re-baseline.
-#' \item `"event"`: any confirmed sub-threshold event can potentially trigger a re-baseline.
+#' \item `"change"`: any confirmed sub-threshold change can potentially trigger a re-baseline.
 #' \item `"improvement"`: any confirmed sub-threshold improvement can potentially trigger a re-baseline.
 #' \item `"worsening"`: any confirmed sub-threshold worsening can potentially trigger a re-baseline.
 #' }
@@ -279,11 +279,11 @@
 MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, renddate_col=NULL,
                    subjects=NULL, delta_fun=NULL, worsening=NULL,
-                   event=c('firstCDW', 'firstCDI', 'multiple', 'firstPIRA', 'firstRAW', 'first'),
-                   RAW_PIRA=FALSE, baseline=c('fixed', 'roving', 'roving_impr', 'roving_wors'),
-                   proceed_from=c('firstconf', 'event'),
-                   sub_threshold_rebl=c('none', 'event', 'improvement', 'worsening'),
-                   bl_geq=FALSE, relapse_rebl=FALSE, skip_local_extrema=c('none', 'strict', 'all'),
+                   event=c("firstCDW", "firstCDI", "multiple", "firstPIRA", "firstRAW", "first"),
+                   RAW_PIRA=FALSE, baseline=c("fixed", "roving", "roving_impr", "roving_wors"),
+                   proceed_from=c("firstconf", "event"),
+                   sub_threshold_rebl=c("none", "change", "improvement", "worsening"),
+                   bl_geq=FALSE, relapse_rebl=FALSE, skip_local_extrema=c("none", "strict", "all"),
                    validconf_col=NULL, conf_days=12*7, conf_tol_days=c(7,2*365.25),
                    require_sust_days=0, check_intermediate=T,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30,
@@ -511,7 +511,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
   if (impute_last_visit < 0) {
     stop("`impute_last_visit` must be nonnegative")
-  } else if (impute_last_visit<=1) {
+  } else if (impute_last_visit <= 1) {
     # If impute_last_visit is a probability, set no limit to follow-up length (Inf)
     impute_max_fu <- Inf
   } else {
@@ -1101,7 +1101,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             isevent_loc(data_id[[value_col]][x], bl=bl[[value_col]], type="impr", st=TRUE))), # (sub-threshold) improvement is confirmed over (all visits up to) first valid date
             isevent_loc(data_id[[value_col]][conf_idx[[1]]], bl=bl[[value_col]], type="impr", st=TRUE)) # (sub-threshold) improvement is confirmed at first valid date
           && baseline %in% c("roving", "roving_impr") #_r_#
-          && sub_threshold_rebl %in% c("event", "improvement")
+          && sub_threshold_rebl %in% c("change", "improvement")
               ) {
               newref <- if (proceed_from=="firstconf") conf_idx[[1]] else change_idx
 
@@ -1127,7 +1127,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                function(x) isevent_loc(data_id[[value_col]][x], bl=bl[[value_col]], type="wors"))),  # worsening is confirmed at (all visits up to) first valid date
               isevent_loc(data_id[[value_col]][conf_idx[[1]]], bl=bl[[value_col]], type="wors")) # worsening is confirmed at first valid date
           ) || (data_id[[date_col]][change_idx] - data_id[[date_col]][1] <= impute_max_fu
-                && rbinom(1,1,impute_last_visit)
+                && rbinom(1, 1, impute_last_visit)
                 && change_idx == nvisits))
          ) {
                  if (change_idx == nvisits) {  # i.e., when imputing event at last visit
@@ -1449,7 +1449,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                       isevent_loc(data_id[[value_col]][x], bl=bl[[value_col]], type="wors", st=TRUE))), # (sub-threshold) worsening confirmed over (all visits up to) first valid date
                     isevent_loc(data_id[[value_col]][conf_idx[[1]]], bl=bl[[value_col]], type="wors", st=TRUE))  # (sub-threshold) worsening confirmed at first valid date
                && baseline %in% c("roving", "roving_wors")
-               && sub_threshold_rebl %in% c("event", "worsening")
+               && sub_threshold_rebl %in% c("change", "worsening")
                ) {
                   newref <- if (proceed_from=="firstconf") conf_idx[[1]] else change_idx
 
@@ -1726,7 +1726,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           paste(conf_days, collapse=", "), " days (-", conf_tol_days[1], " days, +",
           conf_tol_days[2], " days)\nBaseline: ", baseline,
           ifelse(baseline!="fixed" && sub_threshold_rebl!="none",
-                 paste0(" (include sub-threshold ", sub_threshold_rebl, "s)"), ""),
+                 paste0(" (include confirmed sub-threshold ", sub_threshold_rebl, "s)"), ""),
           ifelse(relapse_rebl, ", and post-relapse re-baseline", ""),
           "\nBaseline skipped if: ", ifelse(relapse_to_bl[1]>0, ifelse(is.null(renddate_col),
                 paste0("<", relapse_to_bl[1], " days from last relapse"),
@@ -1846,7 +1846,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                 RAW_PIRA=RAW_PIRA, rawpira=rawpira,
                 relapse_assoc=relapse_assoc, relapse_indep=relapse_indep, renddate_col=renddate_col,
                 sub_threshold_rebl=sub_threshold_rebl, bl_geq=bl_geq, relapse_rebl=relapse_rebl,
-                impute_last_visit=impute_last_visit, delta_fun=delta_fun,
+                impute_last_visit=impute_last_visit, impute_max_fu=impute_max_fu, delta_fun=delta_fun,
                 worsening=worsening, bl_geq=bl_geq)
 
   output <- list(event_count=summary, results=results_df, settings=settings, unconfirmed=unconfirmed)

@@ -5,22 +5,23 @@
 
 > [!WARNING]
 > **🚧 This repository is under active development. 🚧 <br>
-Please make sure you are using the latest version of the package (check by running `utils::packageVersion('msprog')`) -- or at least v0.2.0, which is functionally stable, though some minor aspects may still change ahead of a full stable release on CRAN.** 
+Please make sure you are using the latest version of the package (check your installed version by running `utils::packageVersion("msprog")`).** 
 >
 > **Latest version:**
 > 
 > ``` r
 > utils::packageVersion("msprog")
-> #> [1] '0.2.7'
+> #> [1] '1.0.0'
 > ```
 
 <br>
 
 > 📣 **What’s new in latest versions**
 >
-> - **Soon available on CRAN** (with support for **R \>= 4.1.0**) (from
+> - **Soon available on CRAN** (supporting **R \>= 4.1.0**) (from
 >   v1.0.0).
-> - `RAW_PIRA` flag to enable RAW/PIRA classification (from v0.2.7).
+> - `RAW_PIRA` flag to explicitly enable RAW/PIRA classification (from
+>   v0.2.7).
 > - **Calculation speed-up** (from v0.2.6)
 
 # msprog: reproducible assessment of disability course in MS
@@ -35,9 +36,9 @@ Please make sure you are using the latest version of the package (check by runni
 <img src="man/figures/logo_R.png" width="150"/>
 </p>
 
-`msprog` is an R package providing tools for exhaustive and reproducible
-analysis of disability course in multiple sclerosis (MS) from
-longitudinal data \[[1](#ref-msprog2024)\]. A [**Python
+`msprog` is an R package providing tools for reproducible analysis of
+disability course in multiple sclerosis (MS) from longitudinal data
+\[[1](#ref-msprog2024)\]. A [**Python
 version**](https://github.com/noemimontobbio/pymsprog) of the package is
 available as well.
 
@@ -145,7 +146,7 @@ complement to the results to ensure reproducibility. For example,
 instead of only detecting the first confirmed disability worsening (CDW)
 event for each subject, we can detect *all* disability events
 sequentially by moving the baseline after each event
-(`event='multiple', baseline='roving'`)\`:
+(`event="multiple", baseline="roving"`)\`:
 
 ``` r
 output <- MSprog(toydata_visits,                                      # provide data on visits
@@ -228,7 +229,7 @@ output, **to be reported to ensure complete reproducibility**:
 ``` r
 print(output)
 #> ---
-#> msprog version: 0.2.7 
+#> msprog version: 1.0.0 
 #> ---
 #> MSprog() arguments:
 #> outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7, 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), RAW_PIRA=FALSE, relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,

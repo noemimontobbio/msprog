@@ -183,7 +183,7 @@
 #' \enumerate{
 #' \item a preceding visit, e.g., baseline or last visit before the worsening (`p0` and `p1`)
 #' \item the event onset (`e0` and `e1`)
-#' \item the first available confirmation visit (`c0` and `c1`).
+#' \item an eligible confirmation visit (`c0` and `c1`).
 #' }
 #' The auxiliary function `relapse_indep_from_bounds()` can be used to organise
 #' interval bounds into a named list correctly, by calling:
@@ -212,14 +212,14 @@
 #' \item event onset (`'date'` column)
 #' \item the current baseline (`'bl_date'` column)
 #' \item the last visit before event onset at a clinically meaningful score distance from it (`'last_delta_date'` column)
-#' \item the confirmation visit(s) (`'conf<c>_date'` and `'PIRA_conf<c>_date'` columns for each `c` in `conf_days`)
+#' \item the confirmation visit(s) (`'conf<c>_date'` column and, when relevant, `'PIRA_conf<c>_date'` column for each `c` in `conf_days`)
 #' }
 #' @param include_values If `TRUE`,  `output$results` will include the outcome value at:
 #' \itemize{
 #' \item event onset (`'value'` column)
 #' \item the current baseline (`'bl_value'` column)
 #' \item the last visit before event onset at a clinically meaningful score distance from it (`'last_delta_value'` column)
-#' \item the confirmation visit(s) (`'conf<c>_value'` and `'PIRA_conf<c>_value'` columns for each `c` in `conf_days`)
+#' \item the confirmation visit(s) (`'conf<c>_value'` column and, when relevant, `'PIRA_conf<c>_value'` column for each `c` in `conf_days`)
 #' }
 #' @param include_stable If `TRUE`, subjects with no confirmed events are included in `output$results`,
 #' with `time2event` = total follow up.
@@ -242,7 +242,8 @@
 #'
 #' @return An object of class `MSprogOutput` with the following attributes:
 #' \itemize{
-#' \item{`event_count`: a data frame containing the event sequence detected for each subject, and the counts for each event type.}
+#' \item{`event_count`: a data frame containing event counts for each subject
+#' (and the event sequence in case of multiple events).}
 #' \item{`results`: a data frame with extended info on each event for all subjects.}
 #' \item{`settings`: a list containing all the arguments used to compute the output.}
 #' \item{`unconfirmed`: a data frame with info on unconfirmed events (initial change from baseline, but no confirmation)
@@ -260,13 +261,13 @@
 #'     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=1)
 #' print(output$results) # extended info on each event for all subjects
-#' print(output$event_count) # summary of event sequence for each subject
+#' print(output$event_count) # event counts for each subject
 #' # 2. SDMT course
 #' output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
 #'     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=1)
 #' print(output$results) # extended info on each event for all subjects
-#' print(output$event_count) # summary of event sequence for each subject
+#' print(output$event_count) # event counts for each subject
 #' # 3. SDMT course, with a custom delta function
 #' my_sdmt_delta <- function(reference_value) {min(c(reference_value/10, 3))}
 #' output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
@@ -274,7 +275,7 @@
 #'     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
 #'     event='multiple', baseline='roving', verbose=1)
 #' print(output$results) # extended info on each event for all subjects
-#' print(output$event_count) # summary of event sequence for each subject
+#' print(output$event_count) # event counts for each subject
 MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    relapse=NULL, rsubj_col=NULL, rdate_col=NULL, renddate_col=NULL,
                    subjects=NULL, delta_fun=NULL, worsening=NULL,
@@ -1705,8 +1706,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     summary[subjid, "event_sequence"] <- paste(event_type, collapse=", ")
 
     if (verbose == 2) {
-      message("Event sequence: ", ifelse(length(events) > 0,
-                                paste(event_type, collapse=", "), "-"))
+      if (event == "multiple") {
+        message("Event sequence: ", if (length(events) > 0) paste(event_type, collapse=", ") else "-")
+      } else {
+        message("Event: ", if (length(events) > 0) paste(event_type, collapse=", ") else "-")
+      }
     }
 
   } # end for (subjid in all_subj)
@@ -1806,7 +1810,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     scolumns <- c("RAW")
     columns <- columns[!startsWith(columns, "PIRA")]
   } else if (event == "firstCDW") {
-    scolumns <- scolumns[scolumns != "CDI"]
+    scolumns <- scolumns[!scolumns %in% c("event_sequence", "CDI")]
   } else if (event == "firstCDI") {
     scolumns <- c("CDI")
     columns <- columns[!startsWith(columns, "PIRA")]

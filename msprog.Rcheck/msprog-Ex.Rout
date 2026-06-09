@@ -85,7 +85,7 @@ CDI events: 1
 7  5      1        CDW      637      140        140       497      TRUE
 8  6      1        CDW      491      430        430        61      TRUE
 9  7      1        CDW      779      499        499       280      TRUE
-> print(output$event_count) # summary of event sequence for each subject
+> print(output$event_count) # event counts for each subject
   event_sequence CDI CDW
 1            CDW   0   1
 2       CDW, CDW   0   2
@@ -127,7 +127,7 @@ CDI events: 0
 5  5      1        CDW      637      549        549        88      TRUE
 6  6      0                 491      NaN        491       NaN     FALSE
 7  7      1        CDW      779      674        674       105      TRUE
-> print(output$event_count) # summary of event sequence for each subject
+> print(output$event_count) # event counts for each subject
   event_sequence CDI CDW
 1            CDW   0   1
 2            CDW   0   1
@@ -173,7 +173,7 @@ CDI events: 1
 7  5      1        CDW      637      549        549        88      TRUE
 8  6      0                 491      NaN        491       NaN     FALSE
 9  7      1        CDW      779      185        185       187     FALSE
-> print(output$event_count) # summary of event sequence for each subject
+> print(output$event_count) # event counts for each subject
   event_sequence CDI CDW
 1            CDW   0   1
 2  CDI, CDW, CDW   1   2
@@ -458,7 +458,7 @@ Clinically meaningful threshold for EDSS change (delta function): default for ED
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  0.404 0.013 0.429 0 0 
+Time elapsed:  0.414 0.015 0.441 0 0 
 > grDevices::dev.off()
 null device 
           1 
