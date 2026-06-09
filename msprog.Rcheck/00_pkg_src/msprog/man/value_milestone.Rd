@@ -27,15 +27,15 @@ value_milestone(
 )
 }
 \arguments{
-\item{data}{Data frame containing longitudinal data, including: subject ID, outcome value, date of visit.}
+\item{data}{Data frame containing longitudinal data, including: subject IDs, outcome values, visit dates.}
 
 \item{milestone}{Disability milestone (outcome value to check data against).}
 
-\item{subj_col}{Name of data column with subject ID.}
+\item{subj_col}{Name of data column with subject IDs.}
 
-\item{value_col}{Name of data column with outcome value.}
+\item{value_col}{Name of data column with outcome values.}
 
-\item{date_col}{Name of data column with date of visit.}
+\item{date_col}{Name of data column with visit dates.}
 
 \item{outcome}{Specifies the outcome type. Must be one of the following:
 \itemize{
@@ -45,7 +45,7 @@ value_milestone(
 \item \code{"sdmt"} (Symbol Digit Modalities Test)
 \item \code{"custom"} (only accepted when specifying argument \code{worsening}).
 }
-Outcome type triggers internal checks on value range and
+When it's not set to \code{"custom"}, outcome type triggers internal checks on value range and
 determines the direction of worsening (see \code{worsening} argument).}
 
 \item{worsening}{The direction of worsening (\code{"increase"} if higher values correspond to worse disease course, \code{"decrease"} otherwise).\if{html}{\out{<br />}}
@@ -53,25 +53,25 @@ The given value is only used when \code{outcome} is set to \code{"custom"}. Othe
 \code{"increase"} if \code{outcome} is set to \code{"edss"}, \code{"nhpt"}, \code{"t25fw"},
 and to \code{"decrease"} if \code{outcome} is set to \code{"sdmt"}.}
 
-\item{relapse}{Optional data frame containing longitudinal data, including: subject ID and relapse date.}
+\item{relapse}{Optional data frame containing longitudinal data, including subject IDs and relapse onset dates.}
 
-\item{rsubj_col}{Name of subject column for relapse data, if different from outcome data.}
+\item{rsubj_col}{Name of subject ID column in the \code{relapse} data frame, if different from the one in \code{data}.}
 
-\item{rdate_col}{Name of date column for relapse data, if different from outcome data.}
+\item{rdate_col}{Name of date column in the \code{relapse} data frame, if different from the date column in \code{data}.}
 
-\item{validconf_col}{Name of data column specifying which visits can (\code{TRUE}) or cannot (\code{FALSE}) be used as confirmation visits.
-The input data does not necessarily have to include such a column.
-If \code{validconf_col=NULL}, all visits are potentially used as confirmation visits.}
+\item{validconf_col}{Name of data column, if any, specifying which visits can
+(\code{TRUE}) or cannot (\code{FALSE}) be used as confirmation visits.
+If not specified (\code{validconf_col=NULL}), all visits are potentially used as confirmation visits.}
 
 \item{conf_days}{Period before confirmation (days). Can be a single value, or
-list-like of any length if considering multiple windows.
+vector of any length if considering multiple windows.
 If \code{length(conf_days) > 1} (e.g., \code{conf_days=c(12*7, 24*7)}),
 the function retains milestones confirmed at \emph{either} time point (e.g.,
-"confirmed at 12 \emph{or} 24 weeks") with the relative tolerance (as per \code{conf_tol_days}).}
+"confirmed over 12 \emph{or} 24 weeks") with their relative tolerance (as per \code{conf_tol_days}).}
 
 \item{conf_tol_days}{Tolerance window for confirmation visit (days); can be
-an integer (same lower and upper tolerance)
-or list-like of length 2 (different lower and upper tolerance).
+an integer (equal lower and upper tolerance)
+or vector of length 2 (different lower and upper tolerance).
 The right end of the interval can be set to \code{Inf} (confirmation window unbounded on the right
 -- e.g., "confirmed over 12 \emph{or more} weeks").}
 
@@ -82,13 +82,13 @@ If \code{require_sust_days=Inf}, values are retained only when sustained for the
 
 \item{relapse_to_event}{Minimum distance (days) from the onset of a relapse
 for the milestone to be considered reached.
-Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+Can be an integer (minimum distance from \emph{last} relapse onset) or vector of length 2
 (minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 Note that setting the distance to zero means retaining the event regardless of surrounding relapses.}
 
 \item{relapse_to_conf}{Minimum distance (days) from the onset of a relapse
 for a visit to be a valid confirmation visit.
-Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+Can be an integer (minimum distance from \emph{last} relapse onset) or vector of length 2
 (minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 Note that setting the distance to zero means using any visit for confirmation regardless of surrounding relapses.}
 
@@ -101,11 +101,12 @@ they are imputed with probability \code{p}, \verb{0<p<1}, if \code{impute_last_v
 If a value \code{N>1} is passed, unconfirmed values exceeding the milestone are imputed only if occurring within \code{N} days of follow-up
 (e.g., in case of early discontinuation).}
 
-\item{date_format}{Format of dates in the input data. Can be:
+\item{date_format}{Format of dates in the \code{date_col} and \code{rdate_col} columns of the input data.
+Can be specified as:
 \itemize{
-\item \code{"day"} if dates are given as "days from start" (the starting point can be different for each subject
--- e.g., days from randomisation in a clinical trial); negative values are accepted.
 \item Standard format for dates (e.g., \code{"\%d-\%m-\%Y"}; see \code{\link[=strptime]{strptime()}} docs for correct syntax).
+\item \code{"day"} if dates in are given as "days from start" (the starting point can be different for each subject
+-- e.g., days from randomisation in a clinical trial); negative values are accepted.
 }
 If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer it automatically.}
 
@@ -119,9 +120,12 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 \value{
 A data frame containing the following columns:
 \itemize{
-\item \verb{<date_col>}: the date of first reaching or exceeding the milestone with confirmation (or last date of follow-up if milestone is not reached or not confirmed)
-\item \verb{<value_col}: the first value  reaching or exceeding the milestone with confirmation, if present, otherwise no value
-\item \code{"time2event"}: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached or not confirmed)
+\item \verb{<date_col>}: the date of first reaching or exceeding the milestone with confirmation
+(or last date of follow-up if milestone is not reached or not confirmed).
+\item \verb{<value_col}: the first value  reaching or exceeding the milestone with confirmation,
+if present, otherwise no value.
+\item \code{"time2event"}: the time taken to reach or exceed the milestone (or total
+follow-up length if milestone is not reached or not confirmed).
 \item \code{"observed"}: whether the milestone was reached with confirmation (1) or not (0).
 }
 }

@@ -8,10 +8,10 @@
 #' Several qualitative and quantitative options are given as arguments that can be set
 #' by the user and reported as a complement to the results to ensure reproducibility.
 #'
-#' @param data Data frame containing longitudinal data, including: subject ID, outcome value, date of visit.
-#' @param subj_col Name of data column with subject ID.
-#' @param value_col Name of data column with outcome value.
-#' @param date_col Name of data column with date of visit.
+#' @param data Data frame containing longitudinal data, including: subject IDs, outcome values, visit dates.
+#' @param subj_col Name of data column with subject IDs.
+#' @param value_col Name of data column with outcome values.
+#' @param date_col Name of data column with visit dates.
 #' @param outcome Specifies the outcome type. Must be one of the following:
 #' \itemize{
 #'  \item `"edss"` (Expanded Disability Status Scale)
@@ -20,16 +20,16 @@
 #'  \item `"sdmt"` (Symbol Digit Modalities Test)
 #'  \item `"custom"` (only accepted when specifying custom `delta_fun` and `worsening`).
 #'  }
-#'  Outcome type triggers internal checks on value range,
+#'  When it's not set to `"custom"`, outcome type triggers internal checks on value range,
 #'  determines the direction of worsening (see `worsening` argument),
 #'  and selects the default definition of clinically meaningful change given
 #'  the reference value (using the built-in function [compute_delta()]).
 #'  The latter can be replaced by a custom function using the `delta_fun` argument.
-#' @param relapse Optional data frame containing longitudinal data, including: subject ID and relapse date.
-#' @param rsubj_col Name of subject ID column for relapse data, if different from outcome data.
-#' @param rdate_col Name of onset date column for relapse data, if different from outcome data.
-#' @param renddate_col Name of end date column for relapse data (if applicable).
-#' @param subjects Subset of subjects (list of IDs). If none is specified, all subjects listed in `data` are included.
+#' @param relapse Optional data frame containing longitudinal data, including subject IDs and relapse onset dates.
+#' @param rsubj_col Name of subject ID column in the `relapse` data frame, if different from the one in `data`.
+#' @param rdate_col Name of relapse onset date column in the `relapse` data frame, if different from the date column in `data`.
+#' @param renddate_col Name of relapse \emph{end} date column in the `relapse` data frame (if applicable).
+#' @param subjects Subset of subjects (a vector or list of IDs). If none is specified, all subjects listed in `data` are included.
 #' @param delta_fun Custom function specifying the minimum clinically meaningful
 #' change in the outcome measure from the provided reference value.
 #' The function provided must take a numeric value (reference score) as input,
@@ -55,13 +55,13 @@
 #' to `"firstCDI"` (not relevant) or to `"firstRAW"`/`"firstPIRA"` (always enabled).
 #' @param baseline Specifies the baseline scheme. Must be one of the following.
 #' \itemize{
-#' \item `"fixed"`: first valid outcome value, default.
+#' \item `"fixed"`: first eligible outcome value; recommended for randomised data (default).
 #' \item `"roving"`: updated after each CDI or CDW event to the visit determined by `proceed_from`;
 #' suitable for a multiple-event setting (i.e., when `event` is set to `"multiple"`)
 #' or when searching for a specific type of CDW
-#' (i.e., when `event` is set to `"firstPIRA"` or `"firstRAW"`) -- not recommended for randomised data.
+#' (i.e., when `event` is set to `"firstPIRA"` or `"firstRAW"`).
 #' \item `"roving_impr"`: updated after every CDI (to the visit determined by `proceed_from`);
-#' suitable for a first-CDW setting to discard fluctuations around baseline -- not recommended for multiple events, or for randomised data.
+#' suitable for a first-CDW setting to discard fluctuations around baseline; not recommended for multiple events.
 #' \item `"roving_wors"`: updated after every CDW (to the visit determined by `proceed_from`);
 #' suitable when searching for a specific type of CDW (i.e., when `event` is set to `"firstPIRA"` or `"firstRAW"`).
 #' }
@@ -88,12 +88,12 @@
 #' \item `"worsening"`: any confirmed sub-threshold worsening can potentially trigger a re-baseline.
 #' }
 #' See `delta_fun` argument and [compute_delta()] function for more details.
-#' @param bl_geq This argument is only used if the baseline is moved.
+#' @param bl_geq This argument is only used if relapse-based re-baseline is enabled (`relapse_rebl=TRUE`).
 #' If `TRUE`, the new reference value must always be greater or equal than the previous one;
 #' when it is not, the old reference value is assigned to it \[2\].
 #' @param relapse_rebl If `TRUE`, re-baseline after every relapse \[2\].
 #' @param skip_local_extrema This argument is only used if the baseline is moved.
-#' It controls function behaviour in the presence of local minima or maxima.
+#' It controls re-baseline behaviour in the presence of local minima or maxima.
 #'
 #' A visit `i` is a local minimum point for outcome `x` if
 #'
@@ -118,18 +118,18 @@
 #' \item `"strict"`: the baseline cannot be placed at a \emph{strict} local minimum or maximum.
 #' \item `"all"`: the baseline cannot be placed at a local minimum or maximum.
 #' }
-#' @param validconf_col Name of data column specifying which visits can (`TRUE`) or cannot (`FALSE`) be used as confirmation visits.
-#' The input data does not necessarily have to include such a column.
-#' If `validconf_col=NULL`, all visits are potentially used as confirmation visits.
+#' @param validconf_col Name of data column, if any, specifying which visits can
+#' (`TRUE`) or cannot (`FALSE`) be used as confirmation visits.
+#' If not specified (`validconf_col=NULL`), all visits are potentially used as confirmation visits.
 #' @param conf_days Period before confirmation (days). Can be a single value, or
-#' list-like of any length if considering multiple windows.
+#' vector of any length if considering multiple windows.
 #' If `length(conf_days) > 1` (e.g., `conf_days=c(12*7, 24*7)`),
 #' the function detects events confirmed at \emph{either} time point (e.g.,
-#' "confirmed at 12 \emph{or} 24 weeks") with the relative tolerance (as per `conf_tol_days`).
+#' "confirmed over 12 \emph{or} 24 weeks") with their relative tolerance (as per `conf_tol_days`).
 #' @param conf_tol_days Tolerance window for confirmation visit (days).
-#' Can be an integer (same lower and upper tolerance)
-#' or list-like of length 2 (different lower and upper tolerance).
-#' The right end of the interval (upper tolerance) can be set to `Inf`
+#' Can be an integer (equal lower and upper tolerance)
+#' or vector of length 2 (different lower and upper tolerance).
+#' The right end of the interval (upper tolerance) may be set to `Inf`
 #' (confirmation window unbounded on the right
 #' -- e.g., "confirmed over 12 *or more* weeks").
 #' @param require_sust_days Minimum number of days over which a confirmed change must be sustained
@@ -145,7 +145,7 @@
 #' events will be confirmed \emph{only at} the specified confirmation visit
 #' (and \emph{only at the end} of the period defined by `require_sust_days`, if any).
 #' @param relapse_to_bl Minimum distance (days) from the onset of a relapse for a visit to be used as baseline.
-#' Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+#' Can be an integer (minimum distance from \emph{last} relapse onset) or vector of length 2
 #' (minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 #' Note that setting the distance to zero means keeping the baseline where it is regardless of surrounding relapses.
 #'
@@ -153,17 +153,17 @@
 #' is automatically set to the specific relapse duration, unless `relapse_to_bl` (or `relapse_to_bl[1]`) is zero
 #' (in which case relapse timing does not affect baseline placement).
 #'
-#' If the designated baseline does not respect this constraint, the baseline is moved to the next available visit.
+#' If the designated baseline does not satisfy this constraint, the baseline is moved to the next available visit.
 #' @param relapse_to_event Minimum distance (days) from the onset of a relapse for an event to be considered as such.
-#' Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+#' Can be an integer (minimum distance from \emph{last} relapse onset) or vector of length 2
 #' (minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 #' Note that setting the distance to zero means retaining the event regardless of surrounding relapses.
 #'
 #' If relapse end dates are available (`renddate_col`), the minimum distance from last relapse onset
 #' is automatically set to the specific relapse duration, unless `relapse_to_event` (or `relapse_to_event[1]`) is zero
 #' (in which case relapse timing does not affect event validation).
-#' @param relapse_to_conf Minimum distance (days) from the onset of a relapse for a visit to be a valid confirmation visit.
-#' Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+#' @param relapse_to_conf Minimum distance (days) from the onset of a relapse for a visit to be an eligible confirmation visit.
+#' Can be an integer (minimum distance from \emph{last} relapse onset) or vector of length 2
 #' (minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 #' Note that setting the distance to zero means using any visit for confirmation regardless of surrounding relapses.
 #'
@@ -171,11 +171,11 @@
 #' is automatically set to the specific relapse duration, unless `relapse_to_conf` (or `relapse_to_conf[1]`) is zero
 #' (in which case relapse timing does not affect selection of confirmation visits).
 #' @param relapse_assoc Maximum distance (days) from the onset of a relapse for a CDW event to be classified as RAW.
-#' Can be an integer (maximum distance from \emph{last} relapse onset) or list-like of length 2
+#' Can be an integer (maximum distance from \emph{last} relapse onset) or vector of length 2
 #' (maximum distance from \emph{last} relapse onset, maximum distance from \emph{next} relapse onset).
 #' If relapse end dates are available (`renddate_col`), the maximum distance from last relapse
 #' is automatically set to the specific relapse duration.
-#' The argument is ignored if RAW events are not detected (e.g., if `event='firstCDW'` and `RAW_PIRA=FALSE`).
+#' The argument is ignored if RAW events are not detected (e.g., if `event="firstCDW"` and `RAW_PIRA=FALSE`).
 #' @param relapse_indep Specifies relapse-free intervals for PIRA definition.
 #' Must be a named list
 #' \cr`list(prec=list(p0, p1), event=list(e0, e1), conf=list(c0, c1))`\cr
@@ -191,7 +191,7 @@
 #' See [relapse_indep_from_bounds()] function docs for more details on how to define the intervals.
 #' If relapse end dates are available (`renddate_col`), it is possible to also define PIRA based on those
 #' by setting `use_end_dates=TRUE` in [relapse_indep_from_bounds()].
-#' The argument is ignored if PIRA events are not detected (e.g., if `event='firstCDW'` and `RAW_PIRA=FALSE`).
+#' The argument is ignored if PIRA events are not detected (e.g., if `event="firstCDW"` and `RAW_PIRA=FALSE`).
 #' @param impute_last_visit Imputation probability for worsening events occurring
 #' at the last available visit (i.e., with no confirmation).
 #' Unconfirmed worsening events occurring at the last visit are never imputed if `impute_last_visit=0`;
@@ -203,23 +203,23 @@
 #' Can be specified as:
 #' \itemize{
 #' \item Standard format for dates (e.g., \code{"\%d-\%m-\%Y"}; see [strptime()] docs for correct syntax).
-#' \item `'day'` if dates in are given as "days from start" (the starting point can be different for each subject
+#' \item `"day"` if dates in are given as "days from start" (the starting point can be different for each subject
 #' -- e.g., days from randomisation in a clinical trial); negative values are accepted.
 #' }
 #' If not specified, function [as.Date()] will try to infer it automatically.
 #' @param include_dates If `TRUE`, `output$results` will include the dates of:
 #' \itemize{
-#' \item event onset (`'date'` column)
-#' \item the current baseline (`'bl_date'` column)
-#' \item the last visit before event onset at a clinically meaningful score distance from it (`'last_delta_date'` column)
-#' \item the confirmation visit(s) (`'conf<c>_date'` column and, when relevant, `'PIRA_conf<c>_date'` column for each `c` in `conf_days`)
+#' \item event onset (`"date"` column)
+#' \item the current baseline (`"bl_date"` column)
+#' \item the last visit before event onset with a clinically meaningful score difference from it (`"last_delta_date"` column)
+#' \item the confirmation visit(s) (`"conf<c>_date"` column and, when relevant, `"PIRA_conf<c>_date"` column for each `c` in `conf_days`)
 #' }
 #' @param include_values If `TRUE`,  `output$results` will include the outcome value at:
 #' \itemize{
-#' \item event onset (`'value'` column)
-#' \item the current baseline (`'bl_value'` column)
-#' \item the last visit before event onset at a clinically meaningful score distance from it (`'last_delta_value'` column)
-#' \item the confirmation visit(s) (`'conf<c>_value'` column and, when relevant, `'PIRA_conf<c>_value'` column for each `c` in `conf_days`)
+#' \item event onset (`"value"` column)
+#' \item the current baseline (`"bl_value"` column)
+#' \item the last visit before event onset with a clinically meaningful score difference from it (`"last_delta_value"` column)
+#' \item the confirmation visit(s) (`"conf<c>_value"` column and, when relevant, `"PIRA_conf<c>_value"` column for each `c` in `conf_days`)
 #' }
 #' @param include_stable If `TRUE`, subjects with no confirmed events are included in `output$results`,
 #' with `time2event` = total follow up.
@@ -257,23 +257,23 @@
 #' @export
 #' @examples
 #' # 1. EDSS course
-#' output <- MSprog(toydata_visits, subj_col='id', value_col='EDSS', date_col='date', outcome='edss',
+#' output <- MSprog(toydata_visits, subj_col="id", value_col="EDSS", date_col="date", outcome="edss",
 #'     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
-#'     event='multiple', baseline='roving', verbose=1)
+#'     event="multiple", baseline="roving", verbose=1)
 #' print(output$results) # extended info on each event for all subjects
 #' print(output$event_count) # event counts for each subject
 #' # 2. SDMT course
-#' output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
+#' output <- MSprog(toydata_visits, subj_col="id", value_col="SDMT", date_col="date", outcome="sdmt",
 #'     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
-#'     event='multiple', baseline='roving', verbose=1)
+#'     event="multiple", baseline="roving", verbose=1)
 #' print(output$results) # extended info on each event for all subjects
 #' print(output$event_count) # event counts for each subject
 #' # 3. SDMT course, with a custom delta function
 #' my_sdmt_delta <- function(reference_value) {min(c(reference_value/10, 3))}
-#' output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
+#' output <- MSprog(toydata_visits, subj_col="id", value_col="SDMT", date_col="date", outcome="sdmt",
 #'     delta_fun=my_sdmt_delta,
 #'     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
-#'     event='multiple', baseline='roving', verbose=1)
+#'     event="multiple", baseline="roving", verbose=1)
 #' print(output$results) # extended info on each event for all subjects
 #' print(output$event_count) # event counts for each subject
 MSprog <- function(data, subj_col, value_col, date_col, outcome,
@@ -337,6 +337,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     rawpira <- RAW_PIRA
   } else {
     rawpira <- if (event == "firstCDI") FALSE else TRUE
+  }
+
+  # `bl_geq` only used when rebaselining after relapses
+  if (!relapse_rebl) {
+    bl_geq <- FALSE
   }
 
   # end of checks
@@ -526,7 +531,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
              sub_threshold=st, delta_fun=delta_fun)
   }
 
-  # Define function detecting last_delta
+  # Define function detecting last_delta (last visit with clinically meaningful score difference from event)
   find_last_delta_idx <- function(data_id, change_idx, conf_idx, direction=c("wors", "impr")) {
     valid_ref <- FALSE
     iref <- change_idx
@@ -974,7 +979,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           # If the event is retained (as per `require_sust_days`), we store the info:
           if (valid_ev) {
 
-            # Find last visit at clinically meaningful score distance from event
+            # Find last visit with clinically meaningful score difference from event
             lastdelta_idx <- find_last_delta_idx(data_id, change_idx,
                                   if (change_idx == nvisits) NULL else conf_idx,
                                   direction="impr")
@@ -1169,7 +1174,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   ev <- make_empty_event()
                   #####_ev_
 
-                  # Find last visit at clinically meaningful score distance from event
+                  # Find last visit with clinically meaningful score difference from event
                   lastdelta_idx <- find_last_delta_idx(data_id, change_idx,
                                                        if (change_idx == nvisits) NULL else conf_idx,
                                                        direction="wors")
@@ -1849,7 +1854,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                 relapse_assoc=relapse_assoc, relapse_indep=relapse_indep, renddate_col=renddate_col,
                 sub_threshold_rebl=sub_threshold_rebl, bl_geq=bl_geq, relapse_rebl=relapse_rebl,
                 impute_last_visit=impute_last_visit, impute_max_fu=impute_max_fu, delta_fun=delta_fun,
-                worsening=worsening, bl_geq=bl_geq)
+                worsening=worsening)
 
   output <- list(event_count=summary, results=results_df, settings=settings, unconfirmed=unconfirmed)
   class(output) <- "MSprogOutput"

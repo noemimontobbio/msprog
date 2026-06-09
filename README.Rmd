@@ -38,7 +38,7 @@ Please make sure you are using the latest version of the package (check your ins
 > * `RAW_PIRA` flag to explicitly enable RAW/PIRA classification (from v0.2.7).
 > * **Calculation speed-up** (from v0.2.6)
 
-# msprog: reproducible assessment of disability course in MS 
+# msprog: reproducible assessment of disability course in MS
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml)

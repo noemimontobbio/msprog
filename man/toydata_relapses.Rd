@@ -5,17 +5,17 @@
 \alias{toydata_relapses}
 \title{Synthetic Relapse Data}
 \format{
-An object of class \code{data.frame}.
+An object of class \code{data.frame}, with columns:
 \describe{
-\item{id}{Subject ID.}
-\item{date}{The relapse date.}
+\item{id}{Subject IDs.}
+\item{date}{Relapse onset dates.}
 }
 }
 \usage{
 data(toydata_relapses)
 }
 \description{
-Artificially generated relapse dates for some example patients in \link{toydata_visits}
+Artificially generated relapse onset dates for some example patients in \link{toydata_visits}
 to illustrate the use of the package.
 }
 \examples{

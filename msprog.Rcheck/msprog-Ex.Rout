@@ -51,9 +51,9 @@ Type 'q()' to quit R.
 > ### ** Examples
 > 
 > # 1. EDSS course
-> output <- MSprog(toydata_visits, subj_col='id', value_col='EDSS', date_col='date', outcome='edss',
+> output <- MSprog(toydata_visits, subj_col="id", value_col="EDSS", date_col="date", outcome="edss",
 +     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
-+     event='multiple', baseline='roving', verbose=1)
++     event="multiple", baseline="roving", verbose=1)
 
 ---
 Outcome: edss
@@ -95,9 +95,9 @@ CDI events: 1
 6            CDW   0   1
 7            CDW   0   1
 > # 2. SDMT course
-> output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
+> output <- MSprog(toydata_visits, subj_col="id", value_col="SDMT", date_col="date", outcome="sdmt",
 +     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
-+     event='multiple', baseline='roving', verbose=1)
++     event="multiple", baseline="roving", verbose=1)
 
 ---
 Outcome: sdmt
@@ -138,10 +138,10 @@ CDI events: 0
 7            CDW   0   1
 > # 3. SDMT course, with a custom delta function
 > my_sdmt_delta <- function(reference_value) {min(c(reference_value/10, 3))}
-> output <- MSprog(toydata_visits, subj_col='id', value_col='SDMT', date_col='date', outcome='sdmt',
+> output <- MSprog(toydata_visits, subj_col="id", value_col="SDMT", date_col="date", outcome="sdmt",
 +     delta_fun=my_sdmt_delta,
 +     relapse=toydata_relapses, conf_days=12*7, conf_tol_days=30,
-+     event='multiple', baseline='roving', verbose=1)
++     event="multiple", baseline="roving", verbose=1)
 
 ---
 Outcome: sdmt
@@ -458,7 +458,7 @@ Clinically meaningful threshold for EDSS change (delta function): default for ED
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  0.372 0.015 0.392 0 0 
+Time elapsed:  0.353 0.014 0.372 0 0 
 > grDevices::dev.off()
 null device 
           1 

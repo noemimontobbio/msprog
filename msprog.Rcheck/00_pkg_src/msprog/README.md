@@ -5,7 +5,7 @@
 
 > [!WARNING]
 > **🚧 This repository is under active development. 🚧 <br>
-Please make sure you are using the latest version of the package (check your installed version by running `utils::packageVersion("msprog")`).** 
+Please make sure you are using the latest version of the package (check your installed version by running `utils::packageVersion("msprog")`).**
 >
 > **Latest version:**
 > 

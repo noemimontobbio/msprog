@@ -7,7 +7,7 @@
 #' three data-driven checkpoints.
 #' \enumerate{
 #' \item{`"prec"`: a visit preceding the event: can be (i) the current baseline, (ii) the last visit before event onset,
-#' or (iii) the last visit before event onset with a clinically meaningful score distance from the event score
+#' or (iii) the last visit before event onset with a clinically meaningful score difference from it
 #' (i.e., for an outcome `x` with "higher score" = "worse", the last visit `i` such that `x[event] - x[i] >= delta_fun(x[i])`,
 #' and same for the confirmation visit).}
 #' \item{`"event"`: the disability worsening event onset.}
@@ -37,16 +37,17 @@
 #' \itemize{
 #' \item{`"baseline"`: the current baseline.}
 #' \item{`"last"`: the last visit before event onset.}
-#' \item{`"last_delta2`: the last visit before event onset with a clinically
-#' meaningful score distance from the event score, i.e., for an outcome `x` with
+#' \item{`"last_delta`: the last visit before event onset with a clinically
+#' meaningful score difference from it -- i.e., for an outcome `x` with
 #' "higher score" = "worse", the last visit `i` where
-#' \cr`x[event] - x[i] >= delta_fun(x[i])`\cr
+#' \cr`x[event onset] - x[i] >= delta_fun(x[i])`\cr
 #' and
 #' \cr`x[confirmation] - x[i] >= delta_fun(x[i])`.\cr}
 #' }
 #' @param use_end_dates If `TRUE`, only the right bounds `e1` and `c1` are used,
 #' as the left bounds will be defined by the onset-to-end interval of each relapse.
-#' This option is only relevant when relapse \emph{end} dates are provided.
+#' This option is only relevant when relapse \emph{end} dates are provided
+#' (see `renddate_col` argument in [MSprog()]).
 #'
 #' @references
 #' \[1\] Müller J, Cagol A, Lorscheider J, Tsagkas C, Benkert P, Yaldizli Ö, et al.

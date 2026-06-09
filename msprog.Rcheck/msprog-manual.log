@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.5)  9 JUN 2026 15:01
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.5)  9 JUN 2026 17:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -347,8 +347,8 @@ File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count294
 \l__pdf_internal_box=\box58
 )
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpPEJV3i/Rd2pdf2297
-4b8ef983/Rd2.aux)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzUi8ZU/Rd2pdf3c13
+41fea830/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -386,10 +386,10 @@ LaTeX Font Info:    ... okay on input line 8.
 )
 Package hyperref Info: Link coloring ON on input line 8.
 
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpPEJV3i/Rd2pdf2297
-4b8ef983/Rd2.out)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpPEJV3i/Rd2pdf2297
-4b8ef983/Rd2.out)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzUi8ZU/Rd2pdf3c13
+41fea830/Rd2.out)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzUi8ZU/Rd2pdf3c13
+41fea830/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -419,8 +419,8 @@ LaTeX Font Info:    Trying to load font information for U+rsfs on input line 32
 (/usr/local/texlive/2024/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpPEJV3i/Rd2pdf2297
-4b8ef983/Rd2.toc)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzUi8ZU/Rd2pdf3c13
+41fea830/Rd2.toc)
 \tf@toc=\write5
 \openout5 = `Rd2.toc'.
 
@@ -490,22 +490,25 @@ an trig-ger a re-baseline.
  []
 
 [6]
-Overfull \hbox (59.76906pt too wide) in paragraph at lines 387--392
-\T1/ptm/m/n/10 length if con-sid-er-ing mul-ti-ple win-dows. If []\T1/zi4/m/n/1
-0 length(conf_days) > 1 []\T1/ptm/m/n/10 (e.g., []\T1/zi4/m/n/10 conf_days=c(12
-*7,
+Overfull \hbox (35.528pt too wide) in paragraph at lines 347--350
+[]\T1/ptm/m/n/10 This ar-gu-ment is only used if relapse-based re-baseline is e
+n-abled ([]\T1/zi4/m/n/10 relapse_rebl=TRUE[]\T1/ptm/m/n/10 ).
  []
 
-[7]
-LaTeX Font Info:    Trying to load font information for TS1+zi4 on input line 4
-48.
- (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
-File: ts1zi4.fd 2018/01/14 TS1/zi4 (Inconsolata)
-)
-LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 448.
 
-[8{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
+Overfull \hbox (32.86931pt too wide) in paragraph at lines 387--392
+\T1/ptm/m/n/10 if con-sid-er-ing mul-ti-ple win-dows. If []\T1/zi4/m/n/10 lengt
+h(conf_days) > 1 []\T1/ptm/m/n/10 (e.g., []\T1/zi4/m/n/10 conf_days=c(12*7,
+ []
+
+
+Overfull \hbox (7.55864pt too wide) in paragraph at lines 387--392
+\T1/ptm/m/n/10 firmed over 12 \T1/ptm/m/it/10 or \T1/ptm/m/n/10 24 weeks") with
+ their rel-a-tive tol-er-ance (as per []\T1/zi4/m/n/10 conf_tol_days[]\T1/ptm/m
+/n/10 ). 
+ []
+
+[7] [8]
 Overfull \hbox (59.70943pt too wide) in paragraph at lines 470--477
 []\T1/zi4/m/n/10 impute_last_visit=1[]\T1/ptm/m/n/10 ; they are im-puted with p
 rob-a-bil-ity []\T1/zi4/m/n/10 p[]\T1/ptm/m/n/10 , \T1/zi4/m/n/10 0<p<1\T1/ptm/
@@ -514,9 +517,9 @@ m/n/10 , if []\T1/zi4/m/n/10 impute_last_visit=p[]\T1/ptm/m/n/10 .
 
 
 Overfull \hbox (78.43878pt too wide) in paragraph at lines 496--497
-[]\T1/ptm/m/n/10 the con-fir-ma-tion visit(s) ([]\TS1/zi4/m/n/10 '\T1/zi4/m/n/1
-0 conf<c>_date\TS1/zi4/m/n/10 ' []\T1/ptm/m/n/10 col-umn and, when rel-e-vant, 
-[]\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 PIRA_conf<c>_date\TS1/zi4/m/n/10 '
+[]\T1/ptm/m/n/10 the con-fir-ma-tion visit(s) ([]\T1/zi4/m/n/10 "conf<c>_date" 
+[]\T1/ptm/m/n/10 col-umn and, when rel-e-vant, []\T1/zi4/m/n/10 "PIRA_conf<c>_d
+ate"
  []
 
 [9]
@@ -524,73 +527,70 @@ Underfull \hbox (badness 10000) in paragraph at lines 544--551
 
  []
 
-LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
-(Font)              scaled to size 9.0pt on input line 556.
 
 Overfull \hbox (36.76248pt too wide) in paragraph at lines 556--556
- []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
-zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
-/n/9 EDSS\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
- date\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , outcome=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 edss
-\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ,[] 
+ []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="EDS
+S", date_col="date", outcome="edss",[] 
  []
 
 
 Overfull \hbox (36.76248pt too wide) in paragraph at lines 562--562
- []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
-zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
-/n/9 SDMT\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
- date\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , outcome=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 sdmt
-\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ,[] 
+ []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="SDM
+T", date_col="date", outcome="sdmt",[] 
  []
 
 
 Overfull \hbox (36.76248pt too wide) in paragraph at lines 569--569
- []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col=\TS1/zi4/m/n/9 '\T1/
-zi4/m/n/9 id\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , value_col=\TS1/zi4/m/n/9 '\T1/zi4/m
-/n/9 SDMT\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , date_col=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9
- date\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , outcome=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 sdmt
-\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ,[] 
+ []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="SDM
+T", date_col="date", outcome="sdmt",[] 
  []
 
 [10]
+LaTeX Font Info:    Trying to load font information for TS1+zi4 on input line 6
+16.
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
+File: ts1zi4.fd 2018/01/14 TS1/zi4 (Inconsolata)
+)
+LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
+(Font)              scaled to size 10.0pt on input line 616.
+
 Overfull \hbox (21.45517pt too wide) in paragraph at lines 638--640
 \T1/ptm/m/n/10 PIRA (could be dif-fer-ent from CDW con-fir-ma-tion visit if the
  PIRA def-i-ni-tion in-cludes confirmation-
  []
 
-[11] [12]
+[11{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
+[12]
 Underfull \hbox (badness 10000) in paragraph at lines 758--764
 
  []
 
 [13]
-Underfull \hbox (badness 10000) in paragraph at lines 797--804
+Underfull \hbox (badness 10000) in paragraph at lines 798--805
 
  []
 
 [14] [15] [16]
-Overfull \hbox (59.76906pt too wide) in paragraph at lines 956--961
-\T1/ptm/m/n/10 length if con-sid-er-ing mul-ti-ple win-dows. If []\T1/zi4/m/n/1
-0 length(conf_days) > 1 []\T1/ptm/m/n/10 (e.g., []\T1/zi4/m/n/10 conf_days=c(12
-*7,
+Overfull \hbox (32.86931pt too wide) in paragraph at lines 957--962
+\T1/ptm/m/n/10 if con-sid-er-ing mul-ti-ple win-dows. If []\T1/zi4/m/n/10 lengt
+h(conf_days) > 1 []\T1/ptm/m/n/10 (e.g., []\T1/zi4/m/n/10 conf_days=c(12*7,
  []
 
 
-Overfull \hbox (9.71843pt too wide) in paragraph at lines 956--961
-\T1/ptm/m/n/10 "con-firmed at 12 \T1/ptm/m/it/10 or \T1/ptm/m/n/10 24 weeks") w
-ith the rel-a-tive tol-er-ance (as per []\T1/zi4/m/n/10 conf_tol_days[]\T1/ptm/
-m/n/10 ). 
+Overfull \hbox (26.07854pt too wide) in paragraph at lines 957--962
+\T1/ptm/m/n/10 "con-firmed over 12 \T1/ptm/m/it/10 or \T1/ptm/m/n/10 24 weeks")
+ with their rel-a-tive tol-er-ance (as per []\T1/zi4/m/n/10 conf_tol_days[]\T1/
+ptm/m/n/10 ). 
  []
 
 [17]
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpPEJV3i/Rd2pdf2297
-4b8ef983/Rd2.ind [18] [19
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzUi8ZU/Rd2pdf3c13
+41fea830/Rd2.ind [18] [19
 
 
 ])
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpPEJV3i/Rd2pdf2297
-4b8ef983/Rd2.aux)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzUi8ZU/Rd2pdf3c13
+41fea830/Rd2.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
@@ -599,13 +599,13 @@ Package rerunfilecheck Info: File `Rd2.out' has not changed.
 (rerunfilecheck)             Checksum: 46EBF436E1C96B9F5AD160026A4E3516;1245.
  ) 
 Here is how much of TeX's memory you used:
- 10632 strings out of 474116
- 161130 string characters out of 5743683
+ 10631 strings out of 474116
+ 161117 string characters out of 5743683
  1940187 words of memory out of 5000000
- 32712 multiletter control sequences out of 15000+600000
- 592514 words of font info for 81 fonts, out of 8000000 for 9000
+ 32711 multiletter control sequences out of 15000+600000
+ 592225 words of font info for 80 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 92i,5n,95p,326b,719s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 92i,5n,95p,326b,717s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 pdfTeX warning (dest): name{Rfn.as.Date} has been referenced but does not exist
 , replaced by a fixed one
@@ -620,10 +620,10 @@ y10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></
 usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/
 texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/20
 24/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (19 pages, 135997 bytes).
+Output written on Rd2.pdf (19 pages, 136526 bytes).
 PDF statistics:
- 306 PDF objects out of 1000 (max. 8388607)
- 269 compressed objects within 3 object streams
+ 307 PDF objects out of 1000 (max. 8388607)
+ 270 compressed objects within 3 object streams
  97 named destinations out of 1000 (max. 500000)
  81 words of extra memory for PDF output out of 10000 (max. 10000000)
 

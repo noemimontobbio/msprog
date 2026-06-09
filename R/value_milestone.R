@@ -12,11 +12,11 @@
 #' confirmation visit reach or exceed the milestone.
 #' }
 #'
-#' @param data Data frame containing longitudinal data, including: subject ID, outcome value, date of visit.
+#' @param data Data frame containing longitudinal data, including: subject IDs, outcome values, visit dates.
 #' @param milestone Disability milestone (outcome value to check data against).
-#' @param subj_col Name of data column with subject ID.
-#' @param value_col Name of data column with outcome value.
-#' @param date_col Name of data column with date of visit.
+#' @param subj_col Name of data column with subject IDs.
+#' @param value_col Name of data column with outcome values.
+#' @param date_col Name of data column with visit dates.
 #' @param outcome Specifies the outcome type. Must be one of the following:
 #' \itemize{
 #'  \item `"edss"` (Expanded Disability Status Scale)
@@ -25,26 +25,26 @@
 #'  \item `"sdmt"` (Symbol Digit Modalities Test)
 #'  \item `"custom"` (only accepted when specifying argument `worsening`).
 #'  }
-#'  Outcome type triggers internal checks on value range and
+#'  When it's not set to `"custom"`, outcome type triggers internal checks on value range and
 #'  determines the direction of worsening (see `worsening` argument).
 #' @param worsening The direction of worsening (`"increase"` if higher values correspond to worse disease course, `"decrease"` otherwise).<br />
 #' The given value is only used when `outcome` is set to `"custom"`. Otherwise, `worsening` is automatically set to
 #' `"increase"` if `outcome` is set to `"edss"`, `"nhpt"`, `"t25fw"`,
 #'  and to `"decrease"` if `outcome` is set to `"sdmt"`.
-#' @param relapse Optional data frame containing longitudinal data, including: subject ID and relapse date.
-#' @param rsubj_col Name of subject column for relapse data, if different from outcome data.
-#' @param rdate_col Name of date column for relapse data, if different from outcome data.
-#' @param validconf_col Name of data column specifying which visits can (`TRUE`) or cannot (`FALSE`) be used as confirmation visits.
-#' The input data does not necessarily have to include such a column.
-#' If `validconf_col=NULL`, all visits are potentially used as confirmation visits.
+#' @param relapse Optional data frame containing longitudinal data, including subject IDs and relapse onset dates.
+#' @param rsubj_col Name of subject ID column in the `relapse` data frame, if different from the one in `data`.
+#' @param rdate_col Name of date column in the `relapse` data frame, if different from the date column in `data`.
+#' @param validconf_col Name of data column, if any, specifying which visits can
+#' (`TRUE`) or cannot (`FALSE`) be used as confirmation visits.
+#' If not specified (`validconf_col=NULL`), all visits are potentially used as confirmation visits.
 #' @param conf_days Period before confirmation (days). Can be a single value, or
-#' list-like of any length if considering multiple windows.
+#' vector of any length if considering multiple windows.
 #' If `length(conf_days) > 1` (e.g., `conf_days=c(12*7, 24*7)`),
 #' the function retains milestones confirmed at \emph{either} time point (e.g.,
-#' "confirmed at 12 \emph{or} 24 weeks") with the relative tolerance (as per `conf_tol_days`).
+#' "confirmed over 12 \emph{or} 24 weeks") with their relative tolerance (as per `conf_tol_days`).
 #' @param conf_tol_days Tolerance window for confirmation visit (days); can be
-#' an integer (same lower and upper tolerance)
-#' or list-like of length 2 (different lower and upper tolerance).
+#' an integer (equal lower and upper tolerance)
+#' or vector of length 2 (different lower and upper tolerance).
 #' The right end of the interval can be set to `Inf` (confirmation window unbounded on the right
 #' -- e.g., "confirmed over 12 \emph{or more} weeks").
 #' @param require_sust_days Minimum number of days over which the milestone must be sustained
@@ -53,12 +53,12 @@
 #' If `require_sust_days=Inf`, values are retained only when sustained for the remainder of the follow-up period.
 #' @param relapse_to_event Minimum distance (days) from the onset of a relapse
 #' for the milestone to be considered reached.
-#' Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+#' Can be an integer (minimum distance from \emph{last} relapse onset) or vector of length 2
 #' (minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 #' Note that setting the distance to zero means retaining the event regardless of surrounding relapses.
 #' @param relapse_to_conf Minimum distance (days) from the onset of a relapse
 #' for a visit to be a valid confirmation visit.
-#' Can be an integer (minimum distance from \emph{last} relapse onset) or list-like of length 2
+#' Can be an integer (minimum distance from \emph{last} relapse onset) or vector of length 2
 #' (minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 #' Note that setting the distance to zero means using any visit for confirmation regardless of surrounding relapses.
 #' @param impute_last_visit Imputation probability when the milestone is reached
@@ -69,11 +69,12 @@
 #' they are imputed with probability `p`, `0<p<1`, if `impute_last_visit=p`.
 #' If a value `N>1` is passed, unconfirmed values exceeding the milestone are imputed only if occurring within `N` days of follow-up
 #' (e.g., in case of early discontinuation).
-#' @param date_format Format of dates in the input data. Can be:
+#' @param date_format Format of dates in the `date_col` and `rdate_col` columns of the input data.
+#' Can be specified as:
 #' \itemize{
-#' \item `"day"` if dates are given as "days from start" (the starting point can be different for each subject
-#' -- e.g., days from randomisation in a clinical trial); negative values are accepted.
 #' \item Standard format for dates (e.g., \code{"\%d-\%m-\%Y"}; see [strptime()] docs for correct syntax).
+#' \item `"day"` if dates in are given as "days from start" (the starting point can be different for each subject
+#' -- e.g., days from randomisation in a clinical trial); negative values are accepted.
 #' }
 #' If not specified, function [as.Date()] will try to infer it automatically.
 #' @param verbose, One of:
@@ -84,9 +85,12 @@
 #'  }
 #' @return A data frame containing the following columns:
 #' \itemize{
-#' \item `<date_col>`: the date of first reaching or exceeding the milestone with confirmation (or last date of follow-up if milestone is not reached or not confirmed)
-#' \item `<value_col`: the first value  reaching or exceeding the milestone with confirmation, if present, otherwise no value
-#' \item `"time2event"`: the time taken to reach or exceed the milestone (or total follow-up length if milestone is not reached or not confirmed)
+#' \item `<date_col>`: the date of first reaching or exceeding the milestone with confirmation
+#' (or last date of follow-up if milestone is not reached or not confirmed).
+#' \item `<value_col`: the first value  reaching or exceeding the milestone with confirmation,
+#' if present, otherwise no value.
+#' \item `"time2event"`: the time taken to reach or exceed the milestone (or total
+#' follow-up length if milestone is not reached or not confirmed).
 #' \item `"observed"`: whether the milestone was reached with confirmation (1) or not (0).
 #' }
 #' @importFrom stats complete.cases

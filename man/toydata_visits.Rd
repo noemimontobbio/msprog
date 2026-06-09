@@ -5,19 +5,19 @@
 \alias{toydata_visits}
 \title{Synthetic Longitudinal EDSS and SDMT Data}
 \format{
-An object of class \code{data.frame}.
+An object of class \code{data.frame}, with columns:
 \describe{
-\item{id}{Subject ID.}
-\item{date}{The visit date.}
-\item{EDSS}{A value between 0 and 10.}
-\item{SDMT}{A value between 0 and 110.}
+\item{id}{Subject IDs.}
+\item{date}{Visit dates.}
+\item{EDSS}{Synthetic EDSS scores (values between 0 and 10).}
+\item{SDMT}{Synthetic SDMT scores (values between 0 and 110).}
 }
 }
 \usage{
 data(toydata_visits)
 }
 \description{
-Artificially generated toy data set providing Extended Disability Status Scale (EDSS)
+Artificially generated toy data set including Extended Disability Status Scale (EDSS)
 and Symbol Digit Modalities Test (SDMT) scores in a small cohort of example patients
 to illustrate the use of the package.
 }

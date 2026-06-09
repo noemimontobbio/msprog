@@ -32,17 +32,18 @@ relapse_indep_from_bounds(
 \itemize{
 \item{\code{"baseline"}: the current baseline.}
 \item{\code{"last"}: the last visit before event onset.}
-\item{\verb{"last_delta2}: the last visit before event onset with a clinically
-meaningful score distance from the event score, i.e., for an outcome \code{x} with
+\item{\verb{"last_delta}: the last visit before event onset with a clinically
+meaningful score difference from it -- i.e., for an outcome \code{x} with
 "higher score" = "worse", the last visit \code{i} where
-\cr\code{x[event] - x[i] >= delta_fun(x[i])}\cr
+\cr\verb{x[event onset] - x[i] >= delta_fun(x[i])}\cr
 and
 \cr\code{x[confirmation] - x[i] >= delta_fun(x[i])}.\cr}
 }}
 
 \item{use_end_dates}{If \code{TRUE}, only the right bounds \code{e1} and \code{c1} are used,
 as the left bounds will be defined by the onset-to-end interval of each relapse.
-This option is only relevant when relapse \emph{end} dates are provided.}
+This option is only relevant when relapse \emph{end} dates are provided
+(see \code{renddate_col} argument in \code{\link[=MSprog]{MSprog()}}).}
 }
 \value{
 A named list to be given as argument \code{relapse_indep} to function \code{\link[=MSprog]{MSprog()}}.
@@ -54,7 +55,7 @@ The relapse-free intervals may be anchored to (any subset of) the following
 three data-driven checkpoints.
 \enumerate{
 \item{\code{"prec"}: a visit preceding the event: can be (i) the current baseline, (ii) the last visit before event onset,
-or (iii) the last visit before event onset with a clinically meaningful score distance from the event score
+or (iii) the last visit before event onset with a clinically meaningful score difference from it
 (i.e., for an outcome \code{x} with "higher score" = "worse", the last visit \code{i} such that \code{x[event] - x[i] >= delta_fun(x[i])},
 and same for the confirmation visit).}
 \item{\code{"event"}: the disability worsening event onset.}

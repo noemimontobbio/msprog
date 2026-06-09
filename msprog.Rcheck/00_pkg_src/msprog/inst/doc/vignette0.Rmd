@@ -230,11 +230,9 @@ The assessment of the disability evolution strongly depends on the choices made 
 
 * If the baseline visit occurs in the vicinity of a clinical relapse, the reference value may be overestimated. The `relapse_to_bl` argument allows to specify the minimum accepted distance (in days) of the baseline visit from the onset of a previous relapse. For instance, if `baseline='fixed'` and `relapse_to_bl=30`, the baseline visit is chosen as the first available visit satisfying the requirement of "no relapses within the preceding 30 days". If two values are provided, they are interpreted as intervals before *and after* the event -- e.g., `relapse_to_bl=c(30, 2)` implements the constraint of "no relapses within the preceding 30 days or within the following 2 days". If relapse **end dates** are available (may be provided as an additional column in the relapse file whose name is specified by argument `renddate_col` in `MSprog()`), the first value of `relapse_to_bl` is overwritten by the relapse duration, unless it was set to 0 (in which case it stays 0 and the baseline is **not** moved based on the influence of previous relapses). If the `baseline` argument is set to a roving scheme, all the above applies to every baseline change as well. 
 
-* On top of the chosen baseline scheme, *post-relapse re-baseline* @kappos2020 can be applied by setting `relapse_rebl=TRUE` in `MSprog()`. If this is enabled, the onset of each relapse prompts a re-baseline to the next available visit following the relapse and out of its influence (as per `relapse_to_bl`). 
+* On top of the chosen baseline scheme, *post-relapse re-baseline* @kappos2020 can be applied by setting `relapse_rebl=TRUE` in `MSprog()`. If this is enabled, the onset of each relapse prompts a re-baseline to the next available visit following the relapse and out of its influence (as per `relapse_to_bl`). As an additional constraint, the updated baseline can be forced to have a score greater than or equal to the previous baseline by setting `bl_geq=TRUE` in `MSprog()`.
 
 * Due to fluctuations in the data, the new reference value following a re-baseline may fall at a local minimum or maximum of the disability trajectory. These may be excluded for consideration as baseline visits using the `skip_local_extrema` argument in `MSprog()`.
-
-* Finally, as an additional constraint, an updated baseline can be forced to have a score greater than or equal to the previous baseline by setting `bl_geq=TRUE` in `MSprog()`.
 
 <br>
 
