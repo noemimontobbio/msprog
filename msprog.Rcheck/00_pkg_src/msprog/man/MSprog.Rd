@@ -21,7 +21,7 @@ MSprog(
   RAW_PIRA = FALSE,
   baseline = c("fixed", "roving", "roving_impr", "roving_wors"),
   proceed_from = c("firstconf", "event"),
-  sub_threshold_rebl = c("none", "event", "improvement", "worsening"),
+  sub_threshold_rebl = c("none", "change", "improvement", "worsening"),
   bl_geq = FALSE,
   relapse_rebl = FALSE,
   skip_local_extrema = c("none", "strict", "all"),
@@ -135,7 +135,7 @@ trigger a re-baseline.
 Must be one of the following.
 \itemize{
 \item \code{"none"} (default): only use \emph{clinically meaningful} confirmed changes for re-baseline.
-\item \code{"event"}: any confirmed sub-threshold event can potentially trigger a re-baseline.
+\item \code{"change"}: any confirmed sub-threshold change can potentially trigger a re-baseline.
 \item \code{"improvement"}: any confirmed sub-threshold improvement can potentially trigger a re-baseline.
 \item \code{"worsening"}: any confirmed sub-threshold worsening can potentially trigger a re-baseline.
 }

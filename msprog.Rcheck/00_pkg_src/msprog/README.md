@@ -9,9 +9,8 @@ Please make sure you are using the latest version of the package (check your ins
 >
 > **Latest version:**
 > 
-> ``` r
-> utils::packageVersion("msprog")
-> #> [1] '1.0.0'
+> ```
+> 1.0.0
 > ```
 
 <br>
@@ -122,23 +121,27 @@ output <- MSprog(toydata_visits,                                      # provide 
                  subj_col="id", value_col="EDSS", date_col="date",    # specify column names
                  outcome="edss",                                      # specify outcome type
                  relapse=toydata_relapses)                            # provide data on relapses
-#> 
-#> ---
-#> Outcome: edss
-#> Confirmation over: 84 days (-7 days, +730.5 days)
-#> Baseline: fixed
-#> Baseline skipped if: <30 days from last relapse
-#> Event skipped if: -
-#> Confirmation visit skipped if: <30 days from last relapse
-#> Events detected: firstCDW
-#> 
-#> *Please use `print(output)` to display full info on event detection criteria*
-#> 
-#> ---
-#> Total subjects: 7
-#> ---
-#> Subjects with CDW: 4
 ```
+
+
+    ---
+    Outcome: edss
+    Confirmation over: 84 days (-7 days, +730.5 days)
+    Baseline: fixed
+    Baseline skipped if: <30 days from last relapse
+    Event skipped if: -
+    Confirmation visit skipped if: <30 days from last relapse
+    Events detected: firstCDW
+
+
+    *Please use `print(output)` to display full info on event detection criteria*
+
+
+    ---
+    Total subjects: 7
+
+    ---
+    Subjects with CDW: 4
 
 Several qualitative and quantitative options for event detection are
 given as arguments that can be set by the user and reported as a
@@ -154,27 +157,34 @@ output <- MSprog(toydata_visits,                                      # provide 
                  outcome="edss",                                      # specify outcome type
                  event="multiple", baseline="roving",                 # modify default options
                  relapse=toydata_relapses)                            # provide data on relapses
-#> 
-#> ---
-#> Outcome: edss
-#> Confirmation over: 84 days (-7 days, +730.5 days)
-#> Baseline: roving
-#> Baseline skipped if: <30 days from last relapse
-#> Event skipped if: -
-#> Confirmation visit skipped if: <30 days from last relapse
-#> Events detected: multiple
-#> 
-#> *Please use `print(output)` to display full info on event detection criteria*
-#> 
-#> ---
-#> Total subjects: 7
-#> ---
-#> Subjects with CDW: 5
-#> Subjects with CDI: 2
-#> ---
-#> CDW events: 6
-#> CDI events: 2
 ```
+
+
+    ---
+    Outcome: edss
+    Confirmation over: 84 days (-7 days, +730.5 days)
+    Baseline: roving
+    Baseline skipped if: <30 days from last relapse
+    Event skipped if: -
+    Confirmation visit skipped if: <30 days from last relapse
+    Events detected: multiple
+
+
+    *Please use `print(output)` to display full info on event detection criteria*
+
+
+    ---
+    Total subjects: 7
+
+    ---
+    Subjects with CDW: 5
+
+    Subjects with CDI: 2
+
+    ---
+    CDW events: 6
+
+    CDI events: 2
 
 The function prints out a concise report of the results, and of the
 options used to obtain them. Full tabulation of the results can be
@@ -184,17 +194,18 @@ accessed via the following attributes of the function output.
 
     ``` r
     print(output$results, row.names=FALSE)
-    #>  id nevent event_type total_fu bl2event time2event sust_days sust_last
-    #>   1      1        CDW      534      292        292       242      TRUE
-    #>   2      1        CDW      730      198        198        84     FALSE
-    #>   2      2        CDW      730      257        539       191      TRUE
-    #>   3      0                 491      NaN        491       NaN     FALSE
-    #>   4      1        CDI      586       77         77        98     FALSE
-    #>   4      2        CDW      586      129        304       282      TRUE
-    #>   5      1        CDW      637      140        140       497      TRUE
-    #>   6      1        CDI      491      120        120       232     FALSE
-    #>   7      1        CDW      779      372        372       407      TRUE
     ```
+
+         id nevent event_type total_fu bl2event time2event sust_days sust_last
+          1      1        CDW      534      292        292       242      TRUE
+          2      1        CDW      730      198        198        84     FALSE
+          2      2        CDW      730      257        539       191      TRUE
+          3      0                 491      NaN        491       NaN     FALSE
+          4      1        CDI      586       77         77        98     FALSE
+          4      2        CDW      586      129        304       282      TRUE
+          5      1        CDW      637      140        140       497      TRUE
+          6      1        CDI      491      120        120       232     FALSE
+          7      1        CDW      779      372        372       407      TRUE
 
     where: `nevent` is the cumulative event count for each subject;
     `event_type` and `CDW_type` characterise the event; `time2event` is
@@ -208,15 +219,16 @@ accessed via the following attributes of the function output.
 
     ``` r
     print(output$event_count)
-    #>   event_sequence CDI CDW
-    #> 1            CDW   0   1
-    #> 2       CDW, CDW   0   2
-    #> 3                  0   0
-    #> 4       CDI, CDW   1   1
-    #> 5            CDW   0   1
-    #> 6            CDI   1   0
-    #> 7            CDW   0   1
     ```
+
+          event_sequence CDI CDW
+        1            CDW   0   1
+        2       CDW, CDW   0   2
+        3                  0   0
+        4       CDI, CDW   1   1
+        5            CDW   0   1
+        6            CDI   1   0
+        7            CDW   0   1
 
     where: `event_sequence` specifies the order of the events; the other
     columns count the events of each type.
@@ -228,18 +240,19 @@ output, **to be reported to ensure complete reproducibility**:
 
 ``` r
 print(output)
-#> ---
-#> msprog version: 1.0.0 
-#> ---
-#> MSprog() arguments:
-#> outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7, 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), RAW_PIRA=FALSE, relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
-#> delta_fun=NULL
-#> 
-#> Textual description of applied criteria:
-#> We detected all confirmed EDSS changes (in chronological order) confirmed over 84 days (with a lower tolerance of 7 days and an upper tolerance of 730.5 days). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first eligible confirmation visit for the event that triggered the re-baseline. Whenever the current baseline fell within 30 days after the onset of a relapse, it was moved to the next eligible visit. 
-#> ---
-#> Clinically meaningful threshold for EDSS change (delta function): default for EDSS (1.5 if baseline=0, 1.0 if 0.0<baseline<=5.0, 0.5 if baseline>5.0)
 ```
+
+    ---
+    msprog version: 1.0.0 
+    ---
+    MSprog() arguments:
+    outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7, 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), RAW_PIRA=FALSE, relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
+    delta_fun=NULL
+
+    Textual description of applied criteria:
+    We detected all confirmed EDSS changes (in chronological order) confirmed over 84 days (with a lower tolerance of 7 days and an upper tolerance of 730.5 days). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first eligible confirmation visit for the event that triggered the re-baseline. Whenever the current baseline fell within 30 days after the onset of a relapse, it was moved to the next eligible visit. 
+    ---
+    Clinically meaningful threshold for EDSS change (delta function): default for EDSS (1.5 if baseline=0, 1.0 if 0.0<baseline<=5.0, 0.5 if baseline>5.0)
 
 <br />
 
@@ -264,28 +277,29 @@ obtain the correct reference:
 
 ``` r
 citation("msprog")
-#> To cite package 'msprog' in publications use:
-#> 
-#>   Montobbio N, Carmisciano L, Signori A, Ponzano M, Schiavetti I, Bovis
-#>   F, Sormani MP (2024). "Creating an automated tool for a consistent
-#>   and repeatable evaluation of disability progression in clinical
-#>   studies for Multiple Sclerosis." _Mult Scler._, *30*(9), 1185-1192.
-#>   doi:10.1177/13524585241243157
-#>   <https://doi.org/10.1177/13524585241243157>.
-#> 
-#> A BibTeX entry for LaTeX users is
-#> 
-#>   @Article{,
-#>     title = {Creating an automated tool for a consistent and repeatable evaluation of disability progression in clinical studies for Multiple Sclerosis},
-#>     author = {Noemi Montobbio and Luca Carmisciano and Alessio Signori and Marta Ponzano and Irene Schiavetti and Francesca Bovis and Maria Pia Sormani},
-#>     journal = {Mult Scler.},
-#>     year = {2024},
-#>     volume = {30},
-#>     number = {9},
-#>     pages = {1185-1192},
-#>     doi = {10.1177/13524585241243157},
-#>   }
 ```
+
+    To cite package 'msprog' in publications use:
+
+      Montobbio N, Carmisciano L, Signori A, Ponzano M, Schiavetti I, Bovis
+      F, Sormani MP (2024). "Creating an automated tool for a consistent
+      and repeatable evaluation of disability progression in clinical
+      studies for Multiple Sclerosis." _Mult Scler._, *30*(9), 1185-1192.
+      doi:10.1177/13524585241243157
+      <https://doi.org/10.1177/13524585241243157>.
+
+    A BibTeX entry for LaTeX users is
+
+      @Article{,
+        title = {Creating an automated tool for a consistent and repeatable evaluation of disability progression in clinical studies for Multiple Sclerosis},
+        author = {Noemi Montobbio and Luca Carmisciano and Alessio Signori and Marta Ponzano and Irene Schiavetti and Francesca Bovis and Maria Pia Sormani},
+        journal = {Mult Scler.},
+        year = {2024},
+        volume = {30},
+        number = {9},
+        pages = {1185-1192},
+        doi = {10.1177/13524585241243157},
+      }
 
 ## References
 

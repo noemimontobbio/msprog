@@ -23,7 +23,7 @@ print.MSprogOutput <- function(x, ...) {
   s <- x$settings
   outcome <- if (s$outcome=="custom") "outcome" else toupper(s$outcome)
 
-  keep <- setdiff(names(s), c("validconf_p", "delta_fun", "rawpira"))
+  keep <- setdiff(names(s), c("validconf_p", "delta_fun", "rawpira", "impute_max_fu"))
   cat("\nMSprog() arguments:\n", paste0(paste(keep, s[keep], sep="="), collapse=", "),
       ",\ndelta_fun=", as.character(s["delta_fun"]), sep="")
 
@@ -129,12 +129,12 @@ print.MSprogOutput <- function(x, ...) {
                             else " worsening or improvement event. ",
                             # Proceed from
                             "The new baseline was set at ",
-                            if (s$proceed_from=="event") "the event"
+                            if (s$proceed_from=="event") "the onset of the event"
                             else "the first eligible confirmation visit for the event",
                             " that triggered the re-baseline. ",
                             # Sub-threshold
                             if (s$sub_threshold_rebl!="none")
-                                   paste0("Rebaseline was also triggered by confirmed \"sub-threshold\" ", s$sub_threshold_rebl,
+                                   paste0("Rebaseline was also triggered by any confirmed \"sub-threshold\" ", s$sub_threshold_rebl,
                                           ", i.e., when the shift in the ", outcome,
                                           " value was below the clinically meaningful threshold. ")
                             else "",
@@ -169,10 +169,10 @@ print.MSprogOutput <- function(x, ...) {
   # OTHER OPTIONS
   # %%%%%%%%%%%%%
 
-  imputation_text <- if (s$impute_last_visit>0)
-    paste0("In case of ", outcome, " worsening at the last visit, CDW was imputed ",
-           if (s$impute_last_visit<Inf & s$impute_last_visit>=1)
-             paste0("for patients terminating follow-up before day ", s$impute_last_visit)
+  imputation_text <- if (s$impute_last_visit > 0)
+    paste0("In case of ", outcome, " worsening at the last visit, CDW was imputed",
+           if (s$impute_max_fu < Inf)
+             paste0(" for patients terminating follow-up before day ", s$impute_max_fu)
            else "",
            if (s$impute_last_visit < 1)
              paste0(" with a probability of ", s$impute_last_visit)
@@ -209,7 +209,7 @@ print.MSprogOutput <- function(x, ...) {
 
     # RAW
     raw_text <- paste0("A confirmed ", outcome,
-                       " worsening event was labelled as relapse-associated worsening (RAW) if occurring within ",
+                       " worsening event was labelled as RAW if occurring within ",
                        if (is.null(s$renddate_col))
                          paste0(s$relapse_assoc[1], " days after the onset of a relapse")
                        else "a relapse (between onset and end)",
@@ -220,8 +220,8 @@ print.MSprogOutput <- function(x, ...) {
     if (length(s$relapse_indep[["event"]]) == 2) {
       # "prec" event
       prec <- if (s$relapse_indep[["prec_type"]] == "baseline") "the baseline"
-              else if (s$relapse_indep[["prec_type"]] == "last") "the last visit preceding the event"
-              else paste0("the last pre-worsening visit")
+              else if (s$relapse_indep[["prec_type"]] == "last") "the last visit preceding the event up"
+              else paste0("the last pre-worsening visit (last visit preceding the event with a clinically meaningful score difference from it) up")
       # PIRA definition
       pira_def <- ""
       for (point in c("prec", "event", "conf")) {
@@ -247,7 +247,7 @@ print.MSprogOutput <- function(x, ...) {
     }
     # Full PIRA text
     pira_text <- paste0("A confirmed ", outcome,
-                        " worsening event was labelled as progression independent of relapse activity (PIRA) if ",
+                        " worsening event was labelled as PIRA if ",
                         if (length(s$relapse_indep[["event"]]) == 2)
                           paste0("no relapses started in the interval ", pira_def, ". ")
                         else paste0("it did not occur within a relapse (onset to end)",

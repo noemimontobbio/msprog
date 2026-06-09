@@ -18,7 +18,7 @@ VignetteBuilder: knitr
 Suggests: knitr, rmarkdown, xfun, DT
 License: MIT + file LICENSE
 NeedsCompilation: no
-Packaged: 2026-06-09 09:45:19 UTC; nmontobbio
+Packaged: 2026-06-09 13:00:26 UTC; nmontobbio
 Author: Noemi Montobbio [aut, cre] (<https://orcid.org/0000-0003-0302-393X>),
   Francesca Bovis [rev],
   Luca Carmisciano [rev]

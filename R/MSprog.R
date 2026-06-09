@@ -527,7 +527,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   }
 
   # Define function detecting last_delta
-  find_last_delta_idx <- function(data_id, change_idx, conf_idx) {
+  find_last_delta_idx <- function(data_id, change_idx, conf_idx, direction=c("wors", "impr")) {
     valid_ref <- FALSE
     iref <- change_idx
     while (iref > 1 && !valid_ref) {
@@ -547,13 +547,13 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         local_extr <- FALSE
       }
       event_ok <- isevent_loc(data_id[[value_col]][change_idx],
-                              bl=data_id[[value_col]][iref], type="wors")
+                              bl=data_id[[value_col]][iref], type=direction)
       if (is.null(conf_idx)) {
         conf_ok <- TRUE
       } else {
         conf_ok <- if (check_intermediate) all(sapply((change_idx + 1):conf_idx[[1]],
-                          function(x) isevent_loc(data_id[[value_col]][x], bl=data_id[[value_col]][iref], type="wors"))  # worsening is confirmed at (all visits up to) first valid date
-                      ) else isevent_loc(data_id[[value_col]][conf_idx[[1]]], bl=data_id[[value_col]][iref], type="wors") # worsening is confirmed at first valid date
+                          function(x) isevent_loc(data_id[[value_col]][x], bl=data_id[[value_col]][iref], type=direction))  # change is confirmed at (all visits up to) first valid date
+                      ) else isevent_loc(data_id[[value_col]][conf_idx[[1]]], bl=data_id[[value_col]][iref], type=direction) # change is confirmed at first valid date
       }
       valid_ref <- event_ok && conf_ok && !local_extr
     }
@@ -976,7 +976,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
             # Find last visit at clinically meaningful score distance from event
             lastdelta_idx <- find_last_delta_idx(data_id, change_idx,
-                                  if (change_idx == nvisits) NULL else conf_idx)
+                                  if (change_idx == nvisits) NULL else conf_idx,
+                                  direction="impr")
             lastdelta <- data_id[lastdelta_idx,]
 
             sust_idx <- if (is.na(next_nonsust)) nvisits else next_nonsust - 1
@@ -1170,7 +1171,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
                   # Find last visit at clinically meaningful score distance from event
                   lastdelta_idx <- find_last_delta_idx(data_id, change_idx,
-                                                       if (change_idx == nvisits) NULL else conf_idx)
+                                                       if (change_idx == nvisits) NULL else conf_idx,
+                                                       direction="wors")
                   lastdelta <- data_id[lastdelta_idx,]
 
                   # Last visit where worsening is sustained

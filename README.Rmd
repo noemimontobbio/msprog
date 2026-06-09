@@ -10,8 +10,8 @@ link-citations: true
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
+  collapse = FALSE,
+  comment = "", # "#>",
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
@@ -22,11 +22,11 @@ knitr::opts_chunk$set(
 ```{=markdown}
 > [!WARNING]
 > **🚧 This repository is under active development. 🚧 <br>
-Please make sure you are using the latest version of the package (check your installed version by running `utils::packageVersion("msprog")`).** 
+Please make sure you are using the latest version of the package (check your installed version by running `utils::packageVersion("msprog")`).**
 >
 > **Latest version:**
-> ```{r}
-> utils::packageVersion("msprog")
+> ```{r echo=FALSE}
+> message(utils::packageVersion("msprog"))
 > ```
 ```
 
