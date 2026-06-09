@@ -8,7 +8,6 @@
 #' obtain the output.
 #'
 #' @param x An object of class `"MSprogOutput"` (result of a call to [MSprog()]).
-#' @param web Adapt for printing in web app.
 #' @param ... Optional arguments for `print` methods. They are ignored in this function.
 #'
 #' @export
@@ -17,7 +16,7 @@
 #'     relapse=toydata_relapses, conf_days=7*12, conf_tol_days=30,
 #'     event="multiple", baseline="roving", verbose=2)
 #' print(output) # textual description of parameters used to obtain output
-print.MSprogOutput <- function(x, web=FALSE, ...) {
+print.MSprogOutput <- function(x, ...) {
 
   cat('---\nmsprog version:', as.character(utils::packageVersion("msprog")), '\n---')
 

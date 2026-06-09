@@ -54,9 +54,9 @@ included in the data frame (e.g., no CDI column if \code{event='firstCDW'} in \c
 \item{last_delta_value}{Last outcome value before event onset at a clinically meaningful score distance from it.}
 \item{conf\verb{<conf_days>}_date}{Date of \verb{<conf_days>}-day confirmation visit for the event.}
 \item{conf\verb{<conf_days>}_value}{Outcome value at \verb{<conf_days>}-day confirmation visit.}
-\item{PIRA_conf\verb{<conf_days>}_date}{For PIRA events, date of \verb{<conf_days>}-day confirmation visit
+\item{PIRA_conf\verb{<conf_days>}_date}{When relevant, date of \verb{<conf_days>}-day confirmation visit for PIRA
 (could be different from CDW confirmation visit if the PIRA definition includes confirmation-related constraints on relapses).}
-\item{PIRA_conf\verb{<conf_days>}_value}{For PIRA events, outcome value at \verb{<conf_days>}-day confirmation visit
+\item{PIRA_conf\verb{<conf_days>}_value}{When relevant, outcome value at \verb{<conf_days>}-day confirmation visit for PIRA
 (could be different from CDW confirmation visit if the PIRA definition includes confirmation-related constraints on relapses).}
 \item{sust_days}{Number of days for which the event was sustained.}
 \item{sust_last}{Whether the event was sustained up to the end of follow-up.}

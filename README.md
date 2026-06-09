@@ -5,7 +5,7 @@
 
 > [!WARNING]
 > **🚧 This repository is under active development. 🚧 <br>
-Please make sure you are using the latest version of the package (check by running `utils::packageVersion("msprog")`) -- or at least v0.2.0, which is functionally stable, though some minor aspects may still change ahead of a full stable release on CRAN.** 
+Please make sure you are using the latest version of the package (check your installed version by running `utils::packageVersion("msprog")`).** 
 >
 > **Latest version:**
 > 

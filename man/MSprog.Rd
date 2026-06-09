@@ -248,7 +248,7 @@ specifying the intervals around (any subset of) three checkpoints:
 \enumerate{
 \item a preceding visit, e.g., baseline or last visit before the worsening (\code{p0} and \code{p1})
 \item the event onset (\code{e0} and \code{e1})
-\item the first available confirmation visit (\code{c0} and \code{c1}).
+\item an eligible confirmation visit (\code{c0} and \code{c1}).
 }
 The auxiliary function \code{relapse_indep_from_bounds()} can be used to organise
 interval bounds into a named list correctly, by calling:
@@ -280,7 +280,7 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 \item event onset (\code{'date'} column)
 \item the current baseline (\code{'bl_date'} column)
 \item the last visit before event onset at a clinically meaningful score distance from it (\code{'last_delta_date'} column)
-\item the confirmation visit(s) (\code{'conf<c>_date'} and \code{'PIRA_conf<c>_date'} columns for each \code{c} in \code{conf_days})
+\item the confirmation visit(s) (\code{'conf<c>_date'} column and, when relevant, \code{'PIRA_conf<c>_date'} column for each \code{c} in \code{conf_days})
 }}
 
 \item{include_values}{If \code{TRUE},  \code{output$results} will include the outcome value at:
@@ -288,7 +288,7 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 \item event onset (\code{'value'} column)
 \item the current baseline (\code{'bl_value'} column)
 \item the last visit before event onset at a clinically meaningful score distance from it (\code{'last_delta_value'} column)
-\item the confirmation visit(s) (\code{'conf<c>_value'} and \code{'PIRA_conf<c>_value'} columns for each \code{c} in \code{conf_days})
+\item the confirmation visit(s) (\code{'conf<c>_value'} column and, when relevant, \code{'PIRA_conf<c>_value'} column for each \code{c} in \code{conf_days})
 }}
 
 \item{include_stable}{If \code{TRUE}, subjects with no confirmed events are included in \code{output$results},

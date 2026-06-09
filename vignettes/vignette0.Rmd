@@ -226,7 +226,7 @@ The assessment of the disability evolution strongly depends on the choices made 
 
 * For roving baseline schemes, the re-baseline procedure can be made finer through the `sub_threshold_rebl` argument in `MSprog()`: setting `sub_threshold_rebl='event'`, for instance, rebaseline can be triggered by *any* confirmed change, even if below [the clinically meaningful threshold](#outcome). In this case, the sub-threshold improvement events are used to move the baseline, but not considered in event count.
 
-* When a roving baseline is used, the reference is moved after a previously detected event. The new reference may be set at the date of the previous event (`proceed_from='event'`), or at the first confirmation visit of such event (`proceed_from='firstconf'`, default).
+* When a roving baseline is used, the reference is moved after a previously detected event. The new reference may be set at the date of the previous event (`proceed_from='event'`), or at the first available confirmation visit for such event (`proceed_from='firstconf'`, default).
 
 * If the baseline visit occurs in the vicinity of a clinical relapse, the reference value may be overestimated. The `relapse_to_bl` argument allows to specify the minimum accepted distance (in days) of the baseline visit from the onset of a previous relapse. For instance, if `baseline='fixed'` and `relapse_to_bl=30`, the baseline visit is chosen as the first available visit satisfying the requirement of "no relapses within the preceding 30 days". If two values are provided, they are interpreted as intervals before *and after* the event -- e.g., `relapse_to_bl=c(30, 2)` implements the constraint of "no relapses within the preceding 30 days or within the following 2 days". If relapse **end dates** are available (may be provided as an additional column in the relapse file whose name is specified by argument `renddate_col` in `MSprog()`), the first value of `relapse_to_bl` is overwritten by the relapse duration, unless it was set to 0 (in which case it stays 0 and the baseline is **not** moved based on the influence of previous relapses). If the `baseline` argument is set to a roving scheme, all the above applies to every baseline change as well. 
 
@@ -363,7 +363,7 @@ In most cases (see, e.g., [@kappos2020; @cagol2022; @muller2023]), relapse-free 
 
 * a visit preceding the event (e.g., baseline) 
 * the initial worsening 
-* the confirmation visit.
+* an eligible confirmation visit.
 
 The `relapse_indep` argument in `MSprog()` allows to specify custom relapse-free intervals. The auxiliary function `relapse_indep_from_bounds()` organises the given interval bounds into a named list to be given to `MSprog()` through the `relapse_indep` argument.
 ``` {r, eval=FALSE}
@@ -377,7 +377,7 @@ where: `p0` and `p1` specify the interval around a visit preceding the event (ca
 knitr::include_graphics(paste0(getwd(), 'relapse_indep_def.png'))
 ```
 
-For example, in @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after the confirmation visit for a CDW event to be considered as PIRA. This translates into: `p0<-0`, `p1<-0`, `e0<-90`, `e1<-30`, `c0<-90`, `c1<-30`. When a high specificity is desired, they recommend an absence of relapses in the whole period between the reference visit and the confirmation visit, which is implemented by setting: `p0<-0`, `p1<-NULL`, `e0<-NULL`, `e1<-NULL`, `c0<-NULL`, `c1<-0`. 
+For example, in @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after confirmation for a CDW event to be considered as PIRA. This translates into: `p0<-0`, `p1<-0`, `e0<-90`, `e1<-30`, `c0<-90`, `c1<-30`. When a high specificity is desired, they recommend an absence of relapses in the whole period between reference and confirmation, which is implemented by setting: `p0<-0`, `p1<-NULL`, `e0<-NULL`, `e1<-NULL`, `c0<-NULL`, `c1<-0`. 
 
 <br />
 
@@ -419,8 +419,8 @@ DT::datatable(output$results, rownames=F,
 
 The `results` attribute provides extended info on each event for all subjects. The following arguments can be used to control the information included.
 
-* `include_dates`: if `TRUE`, the results will include the dates of: event onset; baseline; last visit before event onset at clinically meaningful score distance from it; confirmation visit.
-* `include_value`: if `TRUE`, the results will include the outcome value at: event onset; baseline; last visit before event onset at clinically meaningful score distance from it; confirmation visit.
+* `include_dates`: if `TRUE`, the results will include the dates of: event onset; baseline; last visit before event onset at clinically meaningful score distance from it; first confirmation visit.
+* `include_value`: if `TRUE`, the results will include the outcome value at: event onset; baseline; last visit before event onset at clinically meaningful score distance from it; first confirmation visit.
 * `include_stable`: if `TRUE`, subjects with no confirmed events are included in the results, with `time2event` = total follow up.
 
 

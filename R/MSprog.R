@@ -183,7 +183,7 @@
 #' \enumerate{
 #' \item a preceding visit, e.g., baseline or last visit before the worsening (`p0` and `p1`)
 #' \item the event onset (`e0` and `e1`)
-#' \item the first available confirmation visit (`c0` and `c1`).
+#' \item an eligible confirmation visit (`c0` and `c1`).
 #' }
 #' The auxiliary function `relapse_indep_from_bounds()` can be used to organise
 #' interval bounds into a named list correctly, by calling:
@@ -212,14 +212,14 @@
 #' \item event onset (`'date'` column)
 #' \item the current baseline (`'bl_date'` column)
 #' \item the last visit before event onset at a clinically meaningful score distance from it (`'last_delta_date'` column)
-#' \item the confirmation visit(s) (`'conf<c>_date'` and `'PIRA_conf<c>_date'` columns for each `c` in `conf_days`)
+#' \item the confirmation visit(s) (`'conf<c>_date'` column and, when relevant, `'PIRA_conf<c>_date'` column for each `c` in `conf_days`)
 #' }
 #' @param include_values If `TRUE`,  `output$results` will include the outcome value at:
 #' \itemize{
 #' \item event onset (`'value'` column)
 #' \item the current baseline (`'bl_value'` column)
 #' \item the last visit before event onset at a clinically meaningful score distance from it (`'last_delta_value'` column)
-#' \item the confirmation visit(s) (`'conf<c>_value'` and `'PIRA_conf<c>_value'` columns for each `c` in `conf_days`)
+#' \item the confirmation visit(s) (`'conf<c>_value'` column and, when relevant, `'PIRA_conf<c>_value'` column for each `c` in `conf_days`)
 #' }
 #' @param include_stable If `TRUE`, subjects with no confirmed events are included in `output$results`,
 #' with `time2event` = total follow up.
