@@ -60,7 +60,7 @@
 #'
 #' @return A named list to be given as argument `relapse_indep` to function [MSprog()].
 #' @export relapse_indep_from_bounds
-relapse_indep_from_bounds <- function(p0=0, p1=0, e0=0, e1=0, c0=0, c1=0, prec_type='baseline', use_end_dates=F) {
+relapse_indep_from_bounds <- function(p0=0, p1=0, e0=0, e1=0, c0=0, c1=0, prec_type='baseline', use_end_dates=FALSE) {
   if (!(prec_type %in% c("baseline", "last", "last_delta"))) {
     stop('invalid value for `prec_type` argument, please provide one of: "baseline", "last", "last_delta"')
   }
