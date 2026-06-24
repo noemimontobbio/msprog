@@ -22,6 +22,8 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/noemimontobbio/msprog/actions/workflows/R-CMD-check.yaml)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/msprog)](https://CRAN.R-project.org/package=msprog)
 <!-- badges: end -->
 
 <p align="center">
@@ -255,11 +257,9 @@ print(output)
 A complete tutorial on `MSprog()` usage is available as a [package
 vignette](https://cran.r-project.org/web/packages/msprog/vignettes/vignette0.html).
 
-<br>
-
 <a id="vignette"></a>
 
-### 🔍 Vignettes
+## 🔍 Vignettes
 
 Package vignettes provide detailed guidance on function usage and best
 practices through examples. They can be accessed from the [package
@@ -271,7 +271,7 @@ browseVignettes("msprog")
 
 <a id="citation"></a>
 
-### Citation
+## Citation
 
 If you use the `msprog` package, please use the `citation()` function to
 obtain the correct reference:
