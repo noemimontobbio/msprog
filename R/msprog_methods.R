@@ -10,6 +10,8 @@
 #' @param x An object of class `"MSprogOutput"` (result of a call to [MSprog()]).
 #' @param ... Optional arguments for `print` methods. They are ignored in this function.
 #'
+#' @return Invisibly returns `x`.
+#'
 #' @export
 #' @examples
 #' output <- MSprog(toydata_visits, "id", "EDSS", "date", "edss",
@@ -281,6 +283,8 @@ print.MSprogOutput <- function(x, ...) {
   }
   cat("\n---\nClinically meaningful threshold for", outcome,
       "change (delta function):", delta_text)
+
+  invisible(x)
 
 }
 

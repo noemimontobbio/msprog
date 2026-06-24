@@ -1,7 +1,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^README.Rmd
-^LICENSE.txt
+^README.Rmd$
+^README.md$
+^LICENSE.txt$
 ^LICENSE\.md$
 ^README\.Rmd$
 ^\.github$

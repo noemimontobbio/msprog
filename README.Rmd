@@ -19,22 +19,25 @@ knitr::opts_chunk$set(
 
 <br>
 
+```{r echo=FALSE}
+x <- utils::packageVersion("msprog")
+cran_version <- tryCatch(
+  available.packages(repos = "https://cloud.r-project.org")["msprog", "Version"],
+  error = function(e) substr(x, 1, nchar(x) - 5)
+)
+```
+
 ```{=markdown}
 > [!WARNING]
-> **🚧 This repository is under active development. 🚧 <br>
-Please make sure you are using the latest version of the package (check your installed version by running `utils::packageVersion("msprog")`).**
->
-> **Latest version:**
-> ```{r echo=FALSE}
-> message(utils::packageVersion("msprog"))
-> ```
+> **🚧 This repository is under active development. 🚧 <br> Please make sure you are using the latest stable version available on CRAN (`r cran_version`).
+> Check your installed version by running `utils::packageVersion("msprog")`.**
 ```
 
 <br>
 
 > 📣 **What’s new in latest versions**
 > 
-> * **Soon available on CRAN** (supporting **R >= 4.1.0**) (from v1.0.0).
+> * **Now available on CRAN** (supporting **R >= 4.1.0**) (from v1.0.0).
 > * `RAW_PIRA` flag to explicitly enable RAW/PIRA classification (from v0.2.7).
 > * **Calculation speed-up** (from v0.2.6)
 
@@ -48,8 +51,12 @@ Please make sure you are using the latest version of the package (check your ins
   <img src="man/figures/logo_R.png" width="150"/>
 </p>
 
+[📦 **CRAN package page**](https://cran.r-project.org/package=msprog)<br>
+[📖 **Documentation**](https://cran.r-project.org/web/packages/msprog/msprog.pdf)<br>
+<!-- [🔍 **Vignettes**](link) -->
+
 `msprog` is an R package providing tools for reproducible analysis of disability course in multiple sclerosis (MS) from longitudinal data [@msprog2024].
-A [**Python version**](https://github.com/noemimontobbio/pymsprog) of the package is available as well. 
+A [**Python version**](https://pymsprog.readthedocs.io/en/stable/) of the package is available as well. 
 
 Its core function, `MSprog()`, detects and characterises the evolution of an outcome measure (Expanded Disability Status Scale, EDSS; Nine-Hole Peg Test, NHPT; Timed 25-Foot Walk, T25FW; Symbol Digit Modalities Test, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes (if any).
 
@@ -58,7 +65,8 @@ The package also provides two toy datasets for function testing:
 * `toydata_visits`: artificially generated EDSS and SDMT assessments for a small cohort of patients;
 * `toydata_relapses`: artificially generated relapse onset dates associated with the patients in `toydata_visits`.
 
-Please refer to the documentation for function usage (e.g. `?MSprog`) and data structure (e.g. `?toydata_visits`). The whole documentation can be found in the [reference manual (PDF)](msprog.pdf). Additionally, a detailed tutorial providing examples and best-practice tips is available as a [package vignette](#vignette): *Analysing disability course in MS*.
+Please refer to the documentation for function usage (e.g. `?MSprog`) and data structure (e.g. `?toydata_visits`). 
+The whole documentation can be found in the [reference manual (PDF)](https://cran.r-project.org/web/packages/msprog/msprog.pdf). For detailed indications on usage and best practices, please refer to the [package vignettes](#vignette).
 
 The computation can be run locally in R (see installation instructions below), or online via a user-friendly [web application](https://msprog.shinyapps.io/msprog/).
 
@@ -70,27 +78,26 @@ The computation can be run locally in R (see installation instructions below), o
 
 ## Installation
 
-You can install the development version of `msprog` from GitHub by running the command below.
-If using RStudio, please make sure to restart the R session right before running the installation. 
+The **current stable release** of `msprog` is available on CRAN. To install it, run:
+``` r
+install.packages("msprog")
+```
 
-<!-- When package is live on CRAN:  -->
-<!-- 1) Add CRAN instructions -->
-<!-- 2) Specify branch for development version (e.g., dev branch) -->
-<!-- 3) No vignette building for dev version (?) -->
+Alternatively, you can install the **development version** of `msprog` from GitHub as follows.
 
 Using `remotes`:
 ``` r
 # install.packages("remotes") # if not already installed
-remotes::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
+remotes::install_github("noemimontobbio/msprog")
 ```
 
 or using `devtools`:
 ``` r
 # install.packages("devtools") # if not already installed
-devtools::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
+devtools::install_github("noemimontobbio/msprog")
 ```
 
-## Getting started
+## 🚀 Getting started
 
 The `MSprog()` function detects the events sequentially by scanning the outcome values in chronological order.
 
@@ -145,12 +152,15 @@ Additionally, applying the `print` method to the `MSprog()` output prints out th
 print(output)
 ```
 
-<br />
+A complete tutorial on `MSprog()` usage is available as a [package vignette](https://cran.r-project.org/web/packages/msprog/vignettes/vignette0.html).
+
+<br>
 
 <a id="vignette"></a>
 
-### Vignettes
-For detailed indications on usage and best practices, please refer to the package vignettes (make sure to enable `build_vignettes` during [installation](#install)). 
+### 🔍 Vignettes
+
+Package vignettes provide detailed guidance on function usage and best practices through examples. They can be accessed from the [package webpage](https://cran.r-project.org/package=msprog), or by typing:
 ```{r, message=FALSE}
 browseVignettes("msprog")
 ```

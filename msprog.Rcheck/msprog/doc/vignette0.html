@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noemi Montobbio" />
 
-<meta name="date" content="2026-06-09" />
+<meta name="date" content="2026-06-18" />
 
 <title>Analysing disability course in MS</title>
 
@@ -2866,7 +2866,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Analysing disability course in MS</h1>
 <h4 class="author">Noemi Montobbio</h4>
-<h4 class="date">2026-06-09</h4>
+<h4 class="date">2026-06-18</h4>
 
 
 <div id="TOC">
@@ -2919,13 +2919,13 @@ to a more detailed description of the different parameter
 configurations.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(msprog)</span></code></pre></div>
 <!-- ```{r} -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/value_milestone.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R') -->
-<!-- source('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R') -->
-<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData') -->
-<!-- load('/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData') -->
+<!-- source("/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/MSprog.R") -->
+<!-- source("/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/value_milestone.R") -->
+<!-- source("/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/event_testing.R") -->
+<!-- source("/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/relapse_indep_from_bounds.R") -->
+<!-- source("/Users/nmontobbio/code/MSprog/R-MSprog/msprog/R/msprog_methods.R") -->
+<!-- load("/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_visits.RData") -->
+<!-- load("/Users/nmontobbio/code/MSprog/R-MSprog/msprog/data/toydata_relapses.RData") -->
 <!-- library(dplyr) -->
 <!-- ``` -->
 <div id="input" class="section level1" number="1">
@@ -2978,7 +2978,7 @@ relapse onset dates associated with the patients in
 <p>Dates are interpreted as calendar days (e.g., YYYY-mm-dd) by default,
 but can optionally be provided as number of days “from start” (starting
 point can be different across subjects – e.g., days from randomisation
-in a clinical trial): see <code>&#39;visit_day&#39;</code> column in the toy
+in a clinical trial): see <code>&quot;visit_day&quot;</code> column in the toy
 datasets, and <a href="#example">SDMT example below</a>. Disability
 assessment dates and relapse dates must be given in the same format.</p>
 </div>
@@ -2993,8 +2993,8 @@ relapses and identified as relapse-associated worsening (<a href="#raw">RAW</a>)
 <p>By default, <code>MSprog()</code> only detects the first CDW. We can
 test it on the EDSS toy data…</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>output_edss <span class="ot">&lt;-</span> <span class="fu">MSprog</span>(<span class="at">data=</span>toydata_visits, <span class="co"># data on visits</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&#39;id&#39;</span>, <span class="at">value_col=</span><span class="st">&#39;EDSS&#39;</span>, <span class="at">date_col=</span><span class="st">&#39;date&#39;</span>, <span class="co"># specify column names</span></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                 <span class="at">outcome=</span><span class="st">&#39;edss&#39;</span>, <span class="co"># specify outcome type</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&quot;id&quot;</span>, <span class="at">value_col=</span><span class="st">&quot;EDSS&quot;</span>, <span class="at">date_col=</span><span class="st">&quot;date&quot;</span>, <span class="co"># specify column names</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                 <span class="at">outcome=</span><span class="st">&quot;edss&quot;</span>, <span class="co"># specify outcome type</span></span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                 <span class="at">relapse=</span>toydata_relapses) <span class="co"># data on relapses</span></span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
@@ -3014,10 +3014,10 @@ test it on the EDSS toy data…</p>
 <span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt; Subjects with CDW: 4</span></span></code></pre></div>
 <p>…or on the SDMT toy data:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>output_sdmt <span class="ot">&lt;-</span> <span class="fu">MSprog</span>(<span class="at">data=</span>toydata_visits, <span class="co"># data on visits</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&#39;id&#39;</span>, <span class="at">value_col=</span><span class="st">&#39;SDMT&#39;</span>, <span class="at">date_col=</span><span class="st">&#39;visit_day&#39;</span>, <span class="co"># specify column names</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>                 <span class="at">outcome=</span><span class="st">&#39;sdmt&#39;</span>, <span class="co"># specify outcome type</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&quot;id&quot;</span>, <span class="at">value_col=</span><span class="st">&quot;SDMT&quot;</span>, <span class="at">date_col=</span><span class="st">&quot;visit_day&quot;</span>, <span class="co"># specify column names</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>                 <span class="at">outcome=</span><span class="st">&quot;sdmt&quot;</span>, <span class="co"># specify outcome type</span></span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>                 <span class="at">relapse=</span>toydata_relapses, <span class="co"># data on relapses</span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>                 <span class="at">date_format=</span><span class="st">&#39;day&#39;</span>) <span class="co"># specify that dates are given as days</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>                 <span class="at">date_format=</span><span class="st">&quot;day&quot;</span>) <span class="co"># specify that dates are given as days</span></span>
 <span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
 <span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; Outcome: sdmt</span></span>
@@ -3034,9 +3034,9 @@ test it on the EDSS toy data…</p>
 <span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; Total subjects: 7</span></span>
 <span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; Subjects with CDW: 5</span></span></code></pre></div>
-<p>Note that, in the SDMT example, <code>&#39;visit_day&#39;</code> is used as
+<p>Note that, in the SDMT example, <code>&quot;visit_day&quot;</code> is used as
 date column. For the <code>MSprog()</code> function to interpret it
-correctly, we need to specify <code>date_format=&#39;day&#39;</code> (note that
+correctly, we need to specify <code>date_format=&quot;day&quot;</code> (note that
 this also applies to relapse dates).</p>
 <p>The function prints out concise info (the <code>verbose</code>
 argument can be used to control the amount of info printed out – see <a href="#progressinfo">the relevant section</a>).</p>
@@ -3047,10 +3047,10 @@ attributes of the function output.</p>
 subjects. In our example:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># print(output_edss$results, row.names=FALSE)</span></span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(output_edss<span class="sc">$</span>results, <span class="at">rownames=</span>F,</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&quot;t&quot;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-55ee6c2f99628d1a1238" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-55ee6c2f99628d1a1238">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],[1,1,0,0,1,0,1],["CDW","CDW","","","CDW","","CDW"],[534,730,491,586,637,491,779],[292,198,null,null,140,null,372],[292,198,491,586,140,491,372],[242,84,null,null,497,null,407],[true,false,false,false,true,false,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>total_fu<\/th>\n      <th>bl2event<\/th>\n      <th>time2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,3,4,5,6]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"total_fu","targets":3},{"name":"bl2event","targets":4},{"name":"time2event","targets":5},{"name":"sust_days","targets":6},{"name":"sust_last","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-a328e55ee1ec7b4b63f0" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-a328e55ee1ec7b4b63f0">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],[1,1,0,0,1,0,1],["CDW","CDW","","","CDW","","CDW"],[534,730,491,586,637,491,779],[292,198,null,null,140,null,372],[292,198,491,586,140,491,372],[242,84,null,null,497,null,407],[true,false,false,false,true,false,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>total_fu<\/th>\n      <th>bl2event<\/th>\n      <th>time2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,3,4,5,6]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"total_fu","targets":3},{"name":"bl2event","targets":4},{"name":"time2event","targets":5},{"name":"sust_days","targets":6},{"name":"sust_last","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>where: <code>nevent</code> is the cumulative event count for each
 subject; <code>event_type</code> characterises the event;
 <code>total_fu</code> is the number of days from start to end of
@@ -3064,11 +3064,10 @@ for each subject. Here’s what it looks like for the EDSS-based
 computation above:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># print(output_edss$event_count)</span></span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(output_edss<span class="sc">$</span>event_count,</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&quot;t&quot;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-3ad2e113cdb7c39b607d" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-3ad2e113cdb7c39b607d">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],[1,1,0,0,1,0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>CDW<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":1},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"CDW","targets":1}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-<p>where <code>CDW</code> counts CDW events.</p></li>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-9585fbfe47b7ce946c78" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-9585fbfe47b7ce946c78">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],[1,1,0,0,1,0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>CDW<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":1},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"CDW","targets":1}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script></li>
 </ol>
 <blockquote>
 <p><strong>Note.</strong> In this example, we called
@@ -3081,7 +3080,7 @@ event). For this reason,</p>
 <li>In <code>output_edss$event_count</code>, CDW count can only be 0 or
 1, and CDI column is omitted.</li>
 </ol>
-<p>In a multiple-event setting (<code>event=&quot;multiple2</code>), more
+<p>In a multiple-event setting (<code>event=&quot;multiple&quot;</code>), more
 than one event per subject can be detected, and <code>event_count</code>
 also includes the event sequence for each subject. See <a href="#multiple">the relevant section</a>.</p>
 </blockquote>
@@ -3096,11 +3095,11 @@ reproducibility. In our example:</p>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; #&gt; msprog version: 1.0.0</span></span>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; #&gt; ---</span></span>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; #&gt; MSprog() arguments:</span></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; #&gt; outcome=edss, event=firstCDW, baseline=fixed, proceed_from=firstconf,</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; #&gt; outcome=edss, event=firstCDW, RAW_PIRA=FALSE, baseline=fixed, proceed_from=firstconf,</span></span>
 <span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7,</span></span>
 <span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0),</span></span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), RAW_PIRA=FALSE, relapse_assoc=c(90,</span></span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt; 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30),</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), relapse_assoc=c(90, 0),</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt; relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30),</span></span>
 <span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co">#&gt; prec_type = &quot;baseline&quot;), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE,</span></span>
 <span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt; relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,</span></span>
 <span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; #&gt; delta_fun=NULL</span></span>
@@ -3145,15 +3144,15 @@ value <span class="math inline">\(x\)</span>. Default settings are
 implemented in <code>msprog</code> for the most used disability scales
 (see <span class="citation">[<a href="#ref-lorscheider2016">4</a>–<a href="#ref-strober2019">7</a>]</span>):</p>
 <ul>
-<li><p><code>outcome=&#39;edss&#39;</code>: Expanded Disability Status Scale
+<li><p><code>outcome=&quot;edss&quot;</code>: Expanded Disability Status Scale
 (EDSS). <span class="math inline">\(\delta(x)=\begin{cases} 1.5 \quad
 \text{ if } x=0\\1 \quad\;\;\; \text{ if } 0 &lt; x \leq 5\\0.5 \quad
 \text{ if } x&gt;5\end{cases}\)</span>;</p></li>
-<li><p><code>outcome=&#39;nhpt&#39;</code>: Nine-Hole Peg Test (NHPT), for
+<li><p><code>outcome=&quot;nhpt&quot;</code>: Nine-Hole Peg Test (NHPT), for
 either the dominant or the non-dominant hand. <span class="math inline">\(\delta=\)</span> 20% of reference score;</p></li>
-<li><p><code>outcome=&#39;t25fw&#39;</code>: Timed 25-Foot Walk (T25FW). <span class="math inline">\(\delta=\)</span> 20% of the reference
+<li><p><code>outcome=&quot;t25fw&quot;</code>: Timed 25-Foot Walk (T25FW). <span class="math inline">\(\delta=\)</span> 20% of the reference
 score;</p></li>
-<li><p><code>outcome=&#39;sdmt&#39;</code>: Symbol Digit Modalities Test (SDMT).
+<li><p><code>outcome=&quot;sdmt&quot;</code>: Symbol Digit Modalities Test (SDMT).
 <span class="math inline">\(\delta=\)</span> either 4 points or 20% of
 the reference score.</p></li>
 </ul>
@@ -3161,11 +3160,11 @@ the reference score.</p></li>
 <code>compute_delta()</code> function. For example, if the baseline EDSS
 score is 4, by default a clinically meaningful EDSS worsening will
 correspond to an increase by (at least):</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">compute_delta</span>(<span class="dv">4</span>, <span class="at">outcome=</span><span class="st">&#39;edss&#39;</span>))</span>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">compute_delta</span>(<span class="dv">4</span>, <span class="at">outcome=</span><span class="st">&quot;edss&quot;</span>))</span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span></code></pre></div>
 <p>If the baseline T25FW score is 10, the minimum clinically relevant
 change will be:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">compute_delta</span>(<span class="dv">10</span>, <span class="at">outcome=</span><span class="st">&#39;t25fw&#39;</span>))</span>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">compute_delta</span>(<span class="dv">10</span>, <span class="at">outcome=</span><span class="st">&quot;t25fw&quot;</span>))</span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="co">#&gt; [1] 2</span></span></code></pre></div>
 <div id="customising-clinically-relevant-change" class="section level2" number="3.1">
 <h2><span class="header-section-number">3.1</span> Customising
@@ -3186,13 +3185,13 @@ starting from a baseline of 50 using our custom function, and compare it
 with the default function:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">my_sdmt_delta</span>(<span class="dv">50</span>)) <span class="co"># my delta</span></span>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">compute_delta</span>(<span class="dv">50</span>, <span class="at">outcome=</span><span class="st">&#39;sdmt&#39;</span>)) <span class="co"># default delta</span></span>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">compute_delta</span>(<span class="dv">50</span>, <span class="at">outcome=</span><span class="st">&quot;sdmt&quot;</span>)) <span class="co"># default delta</span></span>
 <span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co">#&gt; [1] 4</span></span></code></pre></div>
 <p>We can then compute:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">MSprog</span>(...</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>                <span class="at">outcome=</span><span class="st">&#39;sdmt&#39;</span>, <span class="at">delta_fun=</span>my_sdmt_delta,</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>                <span class="at">outcome=</span><span class="st">&quot;sdmt&quot;</span>, <span class="at">delta_fun=</span>my_sdmt_delta,</span>
 <span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>                 ...)</span></code></pre></div>
-<p>Specifying <code>outcome=&#39;sdmt&#39;</code>, the outcomes values will be
+<p>Specifying <code>outcome=&quot;sdmt&quot;</code>, the outcomes values will be
 checked internally to verify that they are in the correct range for
 SDMT.</p></li>
 <li><p><strong>The outcome of interest is not among the ones listed
@@ -3201,8 +3200,8 @@ above.</strong> In this case, we set <code>outcome=&quot;custom&quot;</code>, an
 custom outcomes, the direction of worsening must be specified as well
 (i.e., whether increasing or decreasing values of the outcome are
 interpreted as a worsening). This can be done by setting the
-<code>worsening</code> argument to either <code>&#39;increase&#39;</code> or
-<code>&#39;decrease&#39;</code>. Note that the provided <code>worsening</code>
+<code>worsening</code> argument to either <code>&quot;increase&quot;</code> or
+<code>&quot;decrease&quot;</code>. Note that the provided <code>worsening</code>
 argument is only used by <code>MSprog()</code> when <code>outcome</code>
 is set to <code>&quot;custom&quot;</code>. Otherwise, <code>worsening</code> is
 automatically set to <code>&quot;increase&quot;</code> if <code>outcome</code> is
@@ -3221,23 +3220,23 @@ is controlled by the <code>baseline</code> argument in
 <code>MSprog()</code>. The following alternative baseline schemes can be
 adopted.</p>
 <ul>
-<li><p><em>Fixed baseline</em> (<code>baseline=&#39;fixed&#39;</code>, default):
+<li><p><em>Fixed baseline</em> (<code>baseline=&quot;fixed&quot;</code>, default):
 the baseline visit is set to be the first available assessment.</p></li>
-<li><p><em>Roving baseline</em> (<code>baseline=&#39;roving&#39;</code>): the
+<li><p><em>Roving baseline</em> (<code>baseline=&quot;roving&quot;</code>): the
 baseline visit is initially set as the first available assessment, then
 updated after each event. This scheme is recommended in a
 <strong>“multiple events” setting</strong> <span class="citation">[<a href="#ref-kappos2018">2</a>]</span> (see <a href="#multiple">example
 below</a>), but <strong>not recommended for clinical trial data</strong>
 as it may break the randomisation.</p></li>
 <li><p><em>Improvement-based roving baseline</em>
-(<code>baseline=&#39;roving_impr&#39;</code>): the baseline visit is initially
+(<code>baseline=&quot;roving_impr&quot;</code>): the baseline visit is initially
 set as the first available assessment, then updated after each confirmed
 improvement. This scheme is suitable for a <strong>first-CDW
 setting</strong> to discard fluctuations around the baseline <span class="citation">[<a href="#ref-muller2023">8</a>]</span>, but
 <strong>not recommended for clinical trial data</strong> as it may break
 the randomisation.</p></li>
 <li><p><em>Worsening-based roving baseline</em>
-(<code>baseline=&#39;roving_wors&#39;</code>): the baseline visit is initially
+(<code>baseline=&quot;roving_wors&quot;</code>): the baseline visit is initially
 set as the first available assessment, then updated after each confirmed
 worsening. This scheme is suitable when the endpoint of interest is
 <strong>a <a href="#input">specific type</a> of CDW</strong>. For
@@ -3268,14 +3267,14 @@ threshold</a>. In this case, the sub-threshold improvement events are
 used to move the baseline, but not considered in event count.</p></li>
 <li><p>When a roving baseline is used, the reference is moved after a
 previously detected event. The new reference may be set at the date of
-the previous event (<code>proceed_from=&#39;event&#39;</code>), or at the first
+the previous event (<code>proceed_from=&quot;event&quot;</code>), or at the first
 available confirmation visit for such event
-(<code>proceed_from=&#39;firstconf&#39;</code>, default).</p></li>
+(<code>proceed_from=&quot;firstconf&quot;</code>, default).</p></li>
 <li><p>If the baseline visit occurs in the vicinity of a clinical
 relapse, the reference value may be overestimated. The
 <code>relapse_to_bl</code> argument allows to specify the minimum
 accepted distance (in days) of the baseline visit from the onset of a
-previous relapse. For instance, if <code>baseline=&#39;fixed&#39;</code> and
+previous relapse. For instance, if <code>baseline=&quot;fixed&quot;</code> and
 <code>relapse_to_bl=30</code>, the baseline visit is chosen as the first
 available visit satisfying the requirement of “no relapses within the
 preceding 30 days”. If two values are provided, they are interpreted as
@@ -3317,13 +3316,13 @@ to use a fixed baseline (at the time of randomisation).</strong></p>
 <div id="multiple" class="section level2" number="4.2">
 <h2><span class="header-section-number">4.2</span> Multiple events</h2>
 <p>The <code>event</code> argument allows to specify which events to
-detect. By default, it is set to <code>&#39;firstCDW&#39;</code> (only detect
-the first CDW event). It can be set to <code>&#39;multiple&#39;</code> to
+detect. By default, it is set to <code>&quot;firstCDW&quot;</code> (only detect
+the first CDW event). It can be set to <code>&quot;multiple&quot;</code> to
 sequentially detect all CDW or CDI events.</p>
 <p>For example, extracting multiple EDSS events for subject
 <code>4</code> from <code>toydata_visits</code> with a
 <strong>fixed</strong> baseline would result in the following.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">print</span>(toydata_visits[toydata_visits<span class="sc">$</span>id<span class="sc">==</span><span class="dv">4</span>, <span class="fu">c</span>(<span class="st">&#39;date&#39;</span>, <span class="st">&#39;EDSS&#39;</span>)]) <span class="co"># EDSS visits</span></span>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">print</span>(toydata_visits[toydata_visits<span class="sc">$</span>id<span class="sc">==</span><span class="dv">4</span>, <span class="fu">c</span>(<span class="st">&quot;date&quot;</span>, <span class="st">&quot;EDSS&quot;</span>)]) <span class="co"># EDSS visits</span></span>
 <span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="co">#&gt; # A tibble: 7 × 2</span></span>
 <span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt;   date        EDSS</span></span>
 <span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co">#&gt;   &lt;date&gt;     &lt;dbl&gt;</span></span>
@@ -3336,17 +3335,17 @@ sequentially detect all CDW or CDI events.</p>
 <span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co">#&gt; 7 2023-04-27   5</span></span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a></span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">MSprog</span>(<span class="at">data=</span>toydata_visits, </span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&#39;id&#39;</span>, <span class="at">value_col=</span><span class="st">&#39;EDSS&#39;</span>, <span class="at">date_col=</span><span class="st">&#39;date&#39;</span>, <span class="at">outcome=</span><span class="st">&#39;edss&#39;</span>, </span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&quot;id&quot;</span>, <span class="at">value_col=</span><span class="st">&quot;EDSS&quot;</span>, <span class="at">date_col=</span><span class="st">&quot;date&quot;</span>, <span class="at">outcome=</span><span class="st">&quot;edss&quot;</span>, </span>
 <span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>                 <span class="at">subjects=</span><span class="dv">4</span>,</span>
 <span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>                 <span class="at">relapse=</span>toydata_relapses, </span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>                 <span class="at">event=</span><span class="st">&#39;multiple&#39;</span>, <span class="at">baseline=</span><span class="st">&#39;fixed&#39;</span>,  <span class="co"># &lt;---</span></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>                 <span class="at">event=</span><span class="st">&quot;multiple&quot;</span>, <span class="at">baseline=</span><span class="st">&quot;fixed&quot;</span>,  <span class="co"># &lt;---</span></span>
 <span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>                 <span class="at">verbose=</span><span class="dv">0</span>)</span>
 <span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="co"># print(output$results, row.names=FALSE) # results</span></span>
 <span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(output<span class="sc">$</span>results, <span class="at">rownames=</span>F,</span>
-<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&quot;t&quot;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-dcc3dc55fc8392186be3" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-dcc3dc55fc8392186be3">{"x":{"filter":"none","vertical":false,"data":[["4"],[1],["CDI"],[586],[77],[77],[98],[false]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>total_fu<\/th>\n      <th>bl2event<\/th>\n      <th>time2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,3,4,5,6]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"total_fu","targets":3},{"name":"bl2event","targets":4},{"name":"time2event","targets":5},{"name":"sust_days","targets":6},{"name":"sust_last","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-2e6d4553e3a98d01df69" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-2e6d4553e3a98d01df69">{"x":{"filter":"none","vertical":false,"data":[["4"],[1],["CDI"],[586],[77],[77],[98],[false]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>total_fu<\/th>\n      <th>bl2event<\/th>\n      <th>time2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,3,4,5,6]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"total_fu","targets":3},{"name":"bl2event","targets":4},{"name":"time2event","targets":5},{"name":"sust_days","targets":6},{"name":"sust_last","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>With these settings, the EDSS improvement at visit 2 (EDSS=3.5,
 confirmed at visit 3) does not trigger a re-baseline. The algorithm
 keeps searching for events from after the confirmation visit, evaluating
@@ -3355,17 +3354,17 @@ the changes <strong>relative to the original baseline</strong>
 the other hand, adopting a <strong>roving</strong> baseline scheme we
 get:</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">MSprog</span>(<span class="at">data=</span>toydata_visits, </span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&#39;id&#39;</span>, <span class="at">value_col=</span><span class="st">&#39;EDSS&#39;</span>, <span class="at">date_col=</span><span class="st">&#39;date&#39;</span>, <span class="at">outcome=</span><span class="st">&#39;edss&#39;</span>, </span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&quot;id&quot;</span>, <span class="at">value_col=</span><span class="st">&quot;EDSS&quot;</span>, <span class="at">date_col=</span><span class="st">&quot;date&quot;</span>, <span class="at">outcome=</span><span class="st">&quot;edss&quot;</span>, </span>
 <span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>                 <span class="at">subjects=</span><span class="dv">4</span>,</span>
 <span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>                 <span class="at">relapse=</span>toydata_relapses, </span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>                 <span class="at">event=</span><span class="st">&#39;multiple&#39;</span>, <span class="at">baseline=</span><span class="st">&#39;roving&#39;</span>,  <span class="co"># &lt;---</span></span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>                 <span class="at">event=</span><span class="st">&quot;multiple&quot;</span>, <span class="at">baseline=</span><span class="st">&quot;roving&quot;</span>,  <span class="co"># &lt;---</span></span>
 <span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>                 <span class="at">verbose=</span><span class="dv">0</span>)</span>
 <span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a><span class="co"># print(output$results, row.names=FALSE) # results</span></span>
 <span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(output<span class="sc">$</span>results, <span class="at">rownames=</span>F,</span>
-<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&quot;t&quot;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-dc2a151f9c55bb02a10a" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-dc2a151f9c55bb02a10a">{"x":{"filter":"none","vertical":false,"data":[["4","4"],[1,2],["CDI","CDW"],[586,586],[77,129],[77,304],[98,282],[false,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>total_fu<\/th>\n      <th>bl2event<\/th>\n      <th>time2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,3,4,5,6]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"total_fu","targets":3},{"name":"bl2event","targets":4},{"name":"time2event","targets":5},{"name":"sust_days","targets":6},{"name":"sust_last","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-915cea05c8716e1314b3" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-915cea05c8716e1314b3">{"x":{"filter":"none","vertical":false,"data":[["4","4"],[1,2],["CDI","CDW"],[586,586],[77,129],[77,304],[98,282],[false,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>total_fu<\/th>\n      <th>bl2event<\/th>\n      <th>time2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,3,4,5,6]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"total_fu","targets":3},{"name":"bl2event","targets":4},{"name":"time2event","targets":5},{"name":"sust_days","targets":6},{"name":"sust_last","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>The baseline has now been moved to the confirmation visit of the
 first CDI event (visit 3, EDSS=3.5). With respect to this baseline, a
 subsequent CDW event is detected at visit 4 (EDSS=5), confirmed at visit
@@ -3373,15 +3372,15 @@ subsequent CDW event is detected at visit 4 (EDSS=5), confirmed at visit
 <p><br></p>
 <p>Other valid values for the <code>event</code> argument are:</p>
 <ul>
-<li><code>&#39;first&#39;</code>: only the very first confirmed event – CDI or
+<li><code>&quot;first&quot;</code>: only the very first confirmed event – CDI or
 CDW</li>
-<li><code>&#39;firstCDI&#39;</code>: first CDI event</li>
-<li><code>&#39;firstPIRA&#39;</code>: first PIRA event</li>
-<li><code>&#39;firstRAW&#39;</code>: first RAW event.</li>
+<li><code>&quot;firstCDI&quot;</code>: first CDI event</li>
+<li><code>&quot;firstPIRA&quot;</code>: first PIRA event</li>
+<li><code>&quot;firstRAW&quot;</code>: first RAW event.</li>
 </ul>
 <blockquote>
 <p><strong>Note.</strong> if, for example,
-<code>&#39;event=firstPIRA&#39;</code>, all non-PIRA events <em>preceding</em>
+<code>&quot;event=firstPIRA&quot;</code>, all non-PIRA events <em>preceding</em>
 the first PIRA are actually detected – although not reported. This
 allows to combine this scenario with a roving baseline scheme, where the
 baseline is moved after every confirmed non-PIRA event. For instance, if
@@ -3488,7 +3487,7 @@ confirmation visits. The name of such column must be specified using the
 <p>In the example depicted in Figure 2, unscheduled visits can be
 excluded from consideration as confirmation visits by setting:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">MSprog</span>(...</span>
-<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>                 <span class="at">validconf_col=</span><span class="st">&#39;scheduled&#39;</span>,</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>                 <span class="at">validconf_col=</span><span class="st">&quot;scheduled&quot;</span>,</span>
 <span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>                 ...)</span></code></pre></div></li>
 </ul>
 </div>
@@ -3587,10 +3586,10 @@ the <code>relapse_indep</code> argument.</p>
 <p>where: <code>p0</code> and <code>p1</code> specify the interval
 around a visit preceding the event (can be the current reference, the
 last visit before event onset, or the last visit before event onset with
-a clinically meaningful score distance from it [^pira]); <code>e0</code>
-and <code>e1</code> specify the interval around the event;
-<code>c0</code> and <code>c1</code> specify the interval around the
-confirmation visit; see Figure 1. If both ends of an interval are 0
+a clinically meaningful score difference from it [^pira]);
+<code>e0</code> and <code>e1</code> specify the interval around the
+event; <code>c0</code> and <code>c1</code> specify the interval around
+the confirmation visit; see Figure 1. If both ends of an interval are 0
 (e.g., if both <code>p0=0</code> and <code>p1=0</code>), the checkpoint
 is ignored. To merge two intervals together, set both the right end of
 the first interval and the left end of the second interval to
@@ -3625,8 +3624,8 @@ relapse activity (PIRA) in MS</em>.</p>
 <p>The following code detects multiple events with the
 <code>RAW_PIRA</code> flag enabled.</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">MSprog</span>(<span class="at">data=</span>toydata_visits,</span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&#39;id&#39;</span>, <span class="at">value_col=</span><span class="st">&#39;EDSS&#39;</span>, <span class="at">date_col=</span><span class="st">&#39;date&#39;</span>, <span class="at">outcome=</span><span class="st">&#39;edss&#39;</span>, </span>
-<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>                 <span class="at">event=</span><span class="st">&#39;multiple&#39;</span>, <span class="at">RAW_PIRA=</span><span class="cn">TRUE</span>, <span class="at">baseline=</span><span class="st">&#39;roving&#39;</span>, </span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&quot;id&quot;</span>, <span class="at">value_col=</span><span class="st">&quot;EDSS&quot;</span>, <span class="at">date_col=</span><span class="st">&quot;date&quot;</span>, <span class="at">outcome=</span><span class="st">&quot;edss&quot;</span>, </span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>                 <span class="at">event=</span><span class="st">&quot;multiple&quot;</span>, <span class="at">RAW_PIRA=</span><span class="cn">TRUE</span>, <span class="at">baseline=</span><span class="st">&quot;roving&quot;</span>, </span>
 <span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>                 <span class="at">relapse=</span>toydata_relapses) </span>
 <span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
@@ -3653,18 +3652,18 @@ summary printed out by the function) now includes RAW and PIRA
 counts:</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="co"># print(output$event_count)</span></span>
 <span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(output<span class="sc">$</span>event_count, </span>
-<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&quot;t&quot;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-4c6efb94c123040e12fc" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-4c6efb94c123040e12fc">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],["PIRA","RAW, PIRA","","CDI, PIRA","PIRA","CDI","PIRA"],[0,0,0,1,0,1,0],[1,2,0,1,1,0,1],[0,1,0,0,0,0,0],[1,1,0,1,1,0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>event_sequence<\/th>\n      <th>CDI<\/th>\n      <th>CDW<\/th>\n      <th>RAW<\/th>\n      <th>PIRA<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"event_sequence","targets":1},{"name":"CDI","targets":2},{"name":"CDW","targets":3},{"name":"RAW","targets":4},{"name":"PIRA","targets":5}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-0bc679c627ae359a2acd" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-0bc679c627ae359a2acd">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],["PIRA","RAW, PIRA","","CDI, PIRA","PIRA","CDI","PIRA"],[0,0,0,1,0,1,0],[1,2,0,1,1,0,1],[0,1,0,0,0,0,0],[1,1,0,1,1,0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>event_sequence<\/th>\n      <th>CDI<\/th>\n      <th>CDW<\/th>\n      <th>RAW<\/th>\n      <th>PIRA<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"event_sequence","targets":1},{"name":"CDI","targets":2},{"name":"CDW","targets":3},{"name":"RAW","targets":4},{"name":"PIRA","targets":5}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p><br /> In the <code>output$results</code> data frame, each CDW event
 is now further characterised by a <code>CDW_type</code> column:</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co"># print(output$results, row.names=FALSE)</span></span>
 <span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(output<span class="sc">$</span>results, <span class="at">rownames=</span>F,</span>
-<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&quot;t&quot;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-ff75fca731dcaa512b2b" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-ff75fca731dcaa512b2b">{"x":{"filter":"none","vertical":false,"data":[["1","2","2","3","4","4","5","6","7"],[1,1,2,0,1,2,1,1,1],["CDW","CDW","CDW","","CDI","CDW","CDW","CDI","CDW"],["PIRA","RAW","PIRA","","","PIRA","PIRA","","PIRA"],[534,730,730,491,586,586,637,491,779],[292,198,257,null,77,129,140,120,372],[292,198,539,491,77,304,140,120,372],[242,84,191,null,98,282,497,232,407],[true,false,true,false,false,true,true,false,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>CDW_type<\/th>\n      <th>total_fu<\/th>\n      <th>bl2event<\/th>\n      <th>time2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,4,5,6,7]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"CDW_type","targets":3},{"name":"total_fu","targets":4},{"name":"bl2event","targets":5},{"name":"time2event","targets":6},{"name":"sust_days","targets":7},{"name":"sust_last","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-83b590e5f97511500318" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-83b590e5f97511500318">{"x":{"filter":"none","vertical":false,"data":[["1","2","2","3","4","4","5","6","7"],[1,1,2,0,1,2,1,1,1],["CDW","CDW","CDW","","CDI","CDW","CDW","CDI","CDW"],["PIRA","RAW","PIRA","","","PIRA","PIRA","","PIRA"],[534,730,730,491,586,586,637,491,779],[292,198,257,null,77,129,140,120,372],[292,198,539,491,77,304,140,120,372],[242,84,191,null,98,282,497,232,407],[true,false,true,false,false,true,true,false,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>CDW_type<\/th>\n      <th>total_fu<\/th>\n      <th>bl2event<\/th>\n      <th>time2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,4,5,6,7]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"CDW_type","targets":3},{"name":"total_fu","targets":4},{"name":"bl2event","targets":5},{"name":"time2event","targets":6},{"name":"sust_days","targets":7},{"name":"sust_last","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p><br /></p>
 </div>
 </div>
@@ -3680,11 +3679,11 @@ the information included.</p>
 <ul>
 <li><code>include_dates</code>: if <code>TRUE</code>, the results will
 include the dates of: event onset; baseline; last visit before event
-onset at clinically meaningful score distance from it; first
+onset at clinically meaningful score difference from it; first
 confirmation visit.</li>
 <li><code>include_value</code>: if <code>TRUE</code>, the results will
 include the outcome value at: event onset; baseline; last visit before
-event onset at clinically meaningful score distance from it; first
+event onset at clinically meaningful score difference from it; first
 confirmation visit.</li>
 <li><code>include_stable</code>: if <code>TRUE</code>, subjects with no
 confirmed events are included in the results, with
@@ -3692,16 +3691,16 @@ confirmed events are included in the results, with
 </ul>
 <p>For example:</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">MSprog</span>(<span class="at">data=</span>toydata_visits, </span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>                      <span class="at">subj_col=</span><span class="st">&#39;id&#39;</span>, <span class="at">value_col=</span><span class="st">&#39;EDSS&#39;</span>, <span class="at">date_col=</span><span class="st">&#39;date&#39;</span>, </span>
-<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>                      <span class="at">outcome=</span><span class="st">&#39;edss&#39;</span>, <span class="at">relapse=</span>toydata_relapses, <span class="at">verbose=</span><span class="dv">0</span>,</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>                      <span class="at">subj_col=</span><span class="st">&quot;id&quot;</span>, <span class="at">value_col=</span><span class="st">&quot;EDSS&quot;</span>, <span class="at">date_col=</span><span class="st">&quot;date&quot;</span>, </span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>                      <span class="at">outcome=</span><span class="st">&quot;edss&quot;</span>, <span class="at">relapse=</span>toydata_relapses, <span class="at">verbose=</span><span class="dv">0</span>,</span>
 <span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>                      <span class="at">include_dates=</span>T, <span class="at">include_value=</span>T, <span class="at">include_stable=</span>F) <span class="co"># &lt;---- !</span></span>
 <span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a></span>
 <span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a><span class="co"># print(output$results, row.names=FALSE)</span></span>
 <span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(output<span class="sc">$</span>results, <span class="at">rownames=</span>F,</span>
-<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&quot;t&quot;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb23-9"><a href="#cb23-9" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-f841af60c424187fcdac" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-f841af60c424187fcdac">{"x":{"filter":"none","vertical":false,"data":[["1","2","5","7"],[1,1,1,1],["CDW","CDW","CDW","CDW"],[534,730,637,779],["2022-07-12","2021-06-12","2021-11-01","2022-03-17"],[6,5.5,5,4.5],["2021-09-23","2020-11-26","2021-06-14","2021-03-10"],[5.5,4,4,3.5],["2022-04-27","2020-12-30","2021-09-12","2021-12-02"],[5.5,4,4,3.5],[292,198,140,372],[292,198,140,372],[242,84,497,407],[true,false,true,true],["2022-11-06","2021-09-04","2022-01-17","2022-07-22"],[6,5,5.5,4.5]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>total_fu<\/th>\n      <th>date<\/th>\n      <th>value<\/th>\n      <th>bl_date<\/th>\n      <th>bl_value<\/th>\n      <th>last_delta_date<\/th>\n      <th>last_delta_value<\/th>\n      <th>bl2event<\/th>\n      <th>time2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n      <th>conf84_date<\/th>\n      <th>conf84_value<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,3,5,7,9,10,11,12,15]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"total_fu","targets":3},{"name":"date","targets":4},{"name":"value","targets":5},{"name":"bl_date","targets":6},{"name":"bl_value","targets":7},{"name":"last_delta_date","targets":8},{"name":"last_delta_value","targets":9},{"name":"bl2event","targets":10},{"name":"time2event","targets":11},{"name":"sust_days","targets":12},{"name":"sust_last","targets":13},{"name":"conf84_date","targets":14},{"name":"conf84_value","targets":15}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-475641ea96e655163845" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-475641ea96e655163845">{"x":{"filter":"none","vertical":false,"data":[["1","2","5","7"],[1,1,1,1],["CDW","CDW","CDW","CDW"],[534,730,637,779],["2022-07-12","2021-06-12","2021-11-01","2022-03-17"],[6,5.5,5,4.5],["2021-09-23","2020-11-26","2021-06-14","2021-03-10"],[5.5,4,4,3.5],["2022-04-27","2020-12-30","2021-09-12","2021-12-02"],[5.5,4,4,3.5],[292,198,140,372],[292,198,140,372],[242,84,497,407],[true,false,true,true],["2022-11-06","2021-09-04","2022-01-17","2022-07-22"],[6,5,5.5,4.5]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>total_fu<\/th>\n      <th>date<\/th>\n      <th>value<\/th>\n      <th>bl_date<\/th>\n      <th>bl_value<\/th>\n      <th>last_delta_date<\/th>\n      <th>last_delta_value<\/th>\n      <th>bl2event<\/th>\n      <th>time2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n      <th>conf84_date<\/th>\n      <th>conf84_value<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,3,5,7,9,10,11,12,15]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"total_fu","targets":3},{"name":"date","targets":4},{"name":"value","targets":5},{"name":"bl_date","targets":6},{"name":"bl_value","targets":7},{"name":"last_delta_date","targets":8},{"name":"last_delta_value","targets":9},{"name":"bl2event","targets":10},{"name":"time2event","targets":11},{"name":"sust_days","targets":12},{"name":"sust_last","targets":13},{"name":"conf84_date","targets":14},{"name":"conf84_value","targets":15}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="progressinfo" class="section level2" number="7.2">
 <h2><span class="header-section-number">7.2</span> Printing progress
@@ -3713,8 +3712,8 @@ out by the <code>MSprog()</code> function. When setting
 info. When setting <code>verbose=2</code>, the function prints out an
 extended log of the ongoing computations. See the example below.</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">MSprog</span>(<span class="at">data=</span>toydata_visits, </span>
-<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&#39;id&#39;</span>, <span class="at">value_col=</span><span class="st">&#39;EDSS&#39;</span>, <span class="at">date_col=</span><span class="st">&#39;date&#39;</span>, <span class="at">outcome=</span><span class="st">&#39;edss&#39;</span>,</span>
-<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>                 <span class="at">event=</span><span class="st">&#39;multiple&#39;</span>, <span class="at">baseline=</span><span class="st">&#39;roving&#39;</span>, </span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&quot;id&quot;</span>, <span class="at">value_col=</span><span class="st">&quot;EDSS&quot;</span>, <span class="at">date_col=</span><span class="st">&quot;date&quot;</span>, <span class="at">outcome=</span><span class="st">&quot;edss&quot;</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>                 <span class="at">event=</span><span class="st">&quot;multiple&quot;</span>, <span class="at">baseline=</span><span class="st">&quot;roving&quot;</span>, </span>
 <span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a>                 <span class="at">relapse=</span>toydata_relapses, <span class="at">verbose=</span><span class="dv">2</span>)</span>
 <span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a><span class="co">#&gt; Subject #1: 8 visits, 0 relapses</span></span>
@@ -3834,10 +3833,10 @@ not confirmed) are stored in <code>output$unconfirmed</code>. In this
 example, this looks like:</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="co"># print(output$unconfirmed, row.names=FALSE)</span></span>
 <span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(output<span class="sc">$</span>unconfirmed, <span class="at">rownames=</span>F,</span>
-<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&#39;t&#39;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&quot;t&quot;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span>F, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-5a9f6d3fc8be80009ea9" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-5a9f6d3fc8be80009ea9">{"x":{"filter":"none","vertical":false,"data":[["3","5","5","6","6","7"],["2021-12-01","2022-04-30","2022-12-15","2022-12-22","2023-02-21","2021-09-11"],[4.5,5,5,6,6,5],["2021-10-18","2022-01-17","2022-01-17","2022-09-03","2022-09-03","2021-03-10"],[3.5,5.5,5.5,4.5,4.5,3.5],[null,null,null,4,65,-0],[365,null,null,null,null,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>date<\/th>\n      <th>value<\/th>\n      <th>bl_date<\/th>\n      <th>bl_value<\/th>\n      <th>closest_rel_before<\/th>\n      <th>closest_rel_after<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[2,4,5,6]},{"name":"id","targets":0},{"name":"date","targets":1},{"name":"value","targets":2},{"name":"bl_date","targets":3},{"name":"bl_value","targets":4},{"name":"closest_rel_before","targets":5},{"name":"closest_rel_after","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-8c6defd55b4d151d5022" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-8c6defd55b4d151d5022">{"x":{"filter":"none","vertical":false,"data":[["3","5","5","6","6","7"],["2021-12-01","2022-04-30","2022-12-15","2022-12-22","2023-02-21","2021-09-11"],[4.5,5,5,6,6,5],["2021-10-18","2022-01-17","2022-01-17","2022-09-03","2022-09-03","2021-03-10"],[3.5,5.5,5.5,4.5,4.5,3.5],[null,null,null,4,65,-0],[365,null,null,null,null,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>date<\/th>\n      <th>value<\/th>\n      <th>bl_date<\/th>\n      <th>bl_value<\/th>\n      <th>closest_rel_before<\/th>\n      <th>closest_rel_after<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":false,"paging":false,"columnDefs":[{"className":"dt-right","targets":[2,4,5,6]},{"name":"id","targets":0},{"name":"date","targets":1},{"name":"value","targets":2},{"name":"bl_date","targets":3},{"name":"bl_value","targets":4},{"name":"closest_rel_before","targets":5},{"name":"closest_rel_after","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <div id="time-to-disability-milestone" class="section level1" number="8">
@@ -3851,8 +3850,8 @@ package, <code>value_milestone()</code>.</p>
 <p>The following code detects the time to EDSS <span class="math inline">\(\geq\)</span> 6 for each subject in the toy
 data.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>vm <span class="ot">&lt;-</span> <span class="fu">value_milestone</span>(toydata_visits, <span class="at">milestone=</span><span class="dv">6</span>,</span>
-<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&#39;id&#39;</span>, <span class="at">value_col=</span><span class="st">&#39;EDSS&#39;</span>, <span class="at">date_col=</span><span class="st">&#39;date&#39;</span>,</span>
-<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>                 <span class="at">outcome=</span><span class="st">&#39;edss&#39;</span>, <span class="at">relapse=</span>toydata_relapses,</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>                 <span class="at">subj_col=</span><span class="st">&quot;id&quot;</span>, <span class="at">value_col=</span><span class="st">&quot;EDSS&quot;</span>, <span class="at">date_col=</span><span class="st">&quot;date&quot;</span>,</span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>                 <span class="at">outcome=</span><span class="st">&quot;edss&quot;</span>, <span class="at">relapse=</span>toydata_relapses,</span>
 <span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>                 <span class="at">verbose=</span><span class="dv">0</span>)</span></code></pre></div>
 <p>The function returns a data frame indexed by subject IDs:</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">print</span>(vm)</span>
@@ -3864,12 +3863,12 @@ data.</p>
 <span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a><span class="co">#&gt; 5 2023-03-13  NaN        637    FALSE</span></span>
 <span id="cb27-8"><a href="#cb27-8" tabindex="-1"></a><span class="co">#&gt; 6 2023-02-21  NaN        491    FALSE</span></span>
 <span id="cb27-9"><a href="#cb27-9" tabindex="-1"></a><span class="co">#&gt; 7 2023-04-28  NaN        779    FALSE</span></span></code></pre></div>
-<p>where: <code>&#39;date&#39;</code> contains the date of the first confirmed
+<p>where: <code>&quot;date&quot;</code> contains the date of the first confirmed
 EDSS <span class="math inline">\(\geq\)</span> 6 (or last date of
 follow-up if milestone is not reached or not confirmed);
-<code>&#39;EDSS&#39;</code> contains the first EDSS value <span class="math inline">\(\geq\)</span> 6, if present, otherwise no value;
-<code>&#39;time2event&#39;</code> contains the time to reach EDSS <span class="math inline">\(\geq\)</span> 6 (or total follow-up length if not
-reached or not confirmed); <code>&#39;observed&#39;</code> indicates whether
+<code>&quot;EDSS&quot;</code> contains the first EDSS value <span class="math inline">\(\geq\)</span> 6, if present, otherwise no value;
+<code>&quot;time2event&quot;</code> contains the time to reach EDSS <span class="math inline">\(\geq\)</span> 6 (or total follow-up length if not
+reached or not confirmed); <code>&quot;observed&quot;</code> indicates whether
 EDSS <span class="math inline">\(\geq\)</span> 6 was reached (1) or not
 (0).</p>
 <p>Several arguments controlling the behaviour of the
@@ -4016,9 +4015,9 @@ confirmation visits falling within the 12-week window (unless
 <code>relapse</code> argument in <code>MSprog()</code>. It should be
 given as a data frame containing subject IDs and relapse onset dates
 (see <a href="#input">“Input data”</a>). If the names of columns with
-subject ID and date in the relapse database are different from the main
-database, they must be specified using arguments <code>rsubj_col</code>
-and <code>rdate_col</code>.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+subject IDs and dates in the relapse database are different from the
+main database, they must be specified using arguments
+<code>rsubj_col</code> and <code>rdate_col</code>.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 

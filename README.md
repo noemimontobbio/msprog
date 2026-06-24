@@ -4,20 +4,14 @@
 <br>
 
 > [!WARNING]
-> **🚧 This repository is under active development. 🚧 <br>
-Please make sure you are using the latest version of the package (check your installed version by running `utils::packageVersion("msprog")`).**
->
-> **Latest version:**
-> 
-> ```
-> 1.0.0
-> ```
+> **🚧 This repository is under active development. 🚧 <br> Please make sure you are using the latest stable version available on CRAN (1.0.0).
+> Check your installed version by running `utils::packageVersion("msprog")`.**
 
 <br>
 
 > 📣 **What’s new in latest versions**
 >
-> - **Soon available on CRAN** (supporting **R \>= 4.1.0**) (from
+> - **Now available on CRAN** (supporting **R \>= 4.1.0**) (from
 >   v1.0.0).
 > - `RAW_PIRA` flag to explicitly enable RAW/PIRA classification (from
 >   v0.2.7).
@@ -35,10 +29,15 @@ Please make sure you are using the latest version of the package (check your ins
 <img src="man/figures/logo_R.png" width="150"/>
 </p>
 
+[📦 **CRAN package
+page**](https://cran.r-project.org/package=msprog)<br> [📖
+**Documentation**](https://cran.r-project.org/web/packages/msprog/msprog.pdf)<br>
+<!-- [🔍 **Vignettes**](link) -->
+
 `msprog` is an R package providing tools for reproducible analysis of
 disability course in multiple sclerosis (MS) from longitudinal data
 \[[1](#ref-msprog2024)\]. A [**Python
-version**](https://github.com/noemimontobbio/pymsprog) of the package is
+version**](https://pymsprog.readthedocs.io/en/stable/) of the package is
 available as well.
 
 Its core function, `MSprog()`, detects and characterises the evolution
@@ -57,9 +56,10 @@ The package also provides two toy datasets for function testing:
 
 Please refer to the documentation for function usage (e.g. `?MSprog`)
 and data structure (e.g. `?toydata_visits`). The whole documentation can
-be found in the [reference manual (PDF)](msprog.pdf). Additionally, a
-detailed tutorial providing examples and best-practice tips is available
-as a [package vignette](#vignette): *Analysing disability course in MS*.
+be found in the [reference manual
+(PDF)](https://cran.r-project.org/web/packages/msprog/msprog.pdf). For
+detailed indications on usage and best practices, please refer to the
+[package vignettes](#vignette).
 
 The computation can be run locally in R (see installation instructions
 below), or online via a user-friendly [web
@@ -75,33 +75,31 @@ contact: noemi.montobbio@unige.it**. Any feedback is highly appreciated!
 
 ## Installation
 
-You can install the development version of `msprog` from GitHub by
-running the command below. If using RStudio, please make sure to restart
-the R session right before running the installation.
+The **current stable release** of `msprog` is available on CRAN. To
+install it, run:
 
-<!-- When package is live on CRAN:  -->
+``` r
+install.packages("msprog")
+```
 
-<!-- 1) Add CRAN instructions -->
-
-<!-- 2) Specify branch for development version (e.g., dev branch) -->
-
-<!-- 3) No vignette building for dev version (?) -->
+Alternatively, you can install the **development version** of `msprog`
+from GitHub as follows.
 
 Using `remotes`:
 
 ``` r
 # install.packages("remotes") # if not already installed
-remotes::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
+remotes::install_github("noemimontobbio/msprog")
 ```
 
 or using `devtools`:
 
 ``` r
 # install.packages("devtools") # if not already installed
-devtools::install_github("noemimontobbio/msprog", build_vignettes=TRUE)
+devtools::install_github("noemimontobbio/msprog")
 ```
 
-## Getting started
+## 🚀 Getting started
 
 The `MSprog()` function detects the events sequentially by scanning the
 outcome values in chronological order.
@@ -246,7 +244,7 @@ print(output)
     msprog version: 1.0.0 
     ---
     MSprog() arguments:
-    outcome=edss, event=multiple, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7, 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), RAW_PIRA=FALSE, relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
+    outcome=edss, event=multiple, RAW_PIRA=FALSE, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7, 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
     delta_fun=NULL
 
     Textual description of applied criteria:
@@ -254,15 +252,18 @@ print(output)
     ---
     Clinically meaningful threshold for EDSS change (delta function): default for EDSS (1.5 if baseline=0, 1.0 if 0.0<baseline<=5.0, 0.5 if baseline>5.0)
 
-<br />
+A complete tutorial on `MSprog()` usage is available as a [package
+vignette](https://cran.r-project.org/web/packages/msprog/vignettes/vignette0.html).
+
+<br>
 
 <a id="vignette"></a>
 
-### Vignettes
+### 🔍 Vignettes
 
-For detailed indications on usage and best practices, please refer to
-the package vignettes (make sure to enable `build_vignettes` during
-[installation](#install)).
+Package vignettes provide detailed guidance on function usage and best
+practices through examples. They can be accessed from the [package
+webpage](https://cran.r-project.org/package=msprog), or by typing:
 
 ``` r
 browseVignettes("msprog")

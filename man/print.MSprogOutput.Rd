@@ -11,6 +11,9 @@
 
 \item{...}{Optional arguments for \code{print} methods. They are ignored in this function.}
 }
+\value{
+Invisibly returns \code{x}.
+}
 \description{
 \code{print} method for class \code{"MSprogOutput"}.
 }

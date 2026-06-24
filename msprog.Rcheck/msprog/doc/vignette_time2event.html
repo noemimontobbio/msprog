@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noemi Montobbio" />
 
-<meta name="date" content="2026-06-09" />
+<meta name="date" content="2026-06-18" />
 
 <title>Time to event</title>
 
@@ -2844,7 +2844,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Time to event</h1>
 <h4 class="author">Noemi Montobbio</h4>
-<h4 class="date">2026-06-09</h4>
+<h4 class="date">2026-06-18</h4>
 
 
 <div id="TOC">
@@ -2924,11 +2924,11 @@ expected.</p>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; #&gt; msprog version: 1.0.0</span></span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; #&gt; ---</span></span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; #&gt; MSprog() arguments:</span></span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; #&gt; outcome=edss, event=firstCDW, baseline=fixed, proceed_from=firstconf,</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; #&gt; outcome=edss, event=firstCDW, RAW_PIRA=FALSE, baseline=fixed, proceed_from=firstconf,</span></span>
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7,</span></span>
 <span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0),</span></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), RAW_PIRA=FALSE, relapse_assoc=c(90,</span></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30),</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), relapse_assoc=c(90, 0),</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30),</span></span>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; prec_type = &quot;baseline&quot;), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE,</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; #&gt; delta_fun=NULL</span></span>
@@ -2950,8 +2950,8 @@ expected.</p>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(res, <span class="at">rownames=</span>F,</span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&quot;t&quot;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span><span class="st">&quot;200px&quot;</span>, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-123797fad69887f8580b" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-123797fad69887f8580b">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],[1,1,0,0,1,0,1],["CDW","CDW","","","CDW","","CDW"],[534,730,491,586,637,491,779],[292,198,null,null,140,null,372],[292,198,491,586,140,491,372],[242,84,null,null,497,null,407],[true,false,false,false,true,false,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>total_fu<\/th>\n      <th>bl2event<\/th>\n      <th>time2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,3,4,5,6]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"total_fu","targets":3},{"name":"bl2event","targets":4},{"name":"time2event","targets":5},{"name":"sust_days","targets":6},{"name":"sust_last","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-7251d9af31cd26f81dfd" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-7251d9af31cd26f81dfd">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],[1,1,0,0,1,0,1],["CDW","CDW","","","CDW","","CDW"],[534,730,491,586,637,491,779],[292,198,null,null,140,null,372],[292,198,491,586,140,491,372],[242,84,null,null,497,null,407],[true,false,false,false,true,false,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>event_type<\/th>\n      <th>total_fu<\/th>\n      <th>bl2event<\/th>\n      <th>time2event<\/th>\n      <th>sust_days<\/th>\n      <th>sust_last<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,3,4,5,6]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"event_type","targets":2},{"name":"total_fu","targets":3},{"name":"bl2event","targets":4},{"name":"time2event","targets":5},{"name":"sust_days","targets":6},{"name":"sust_last","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>If we were to conduct a survival analysis with censoring, we would be
 interested in the <code>&quot;time2event&quot;</code> column (time to CDW, in
 days) and in the <code>&quot;nevent&quot;</code> column (1 if the event occurred,
@@ -2961,8 +2961,8 @@ days) and in the <code>&quot;nevent&quot;</code> column (1 if the event occurred
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(survival_data, <span class="at">rownames=</span>F,</span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&quot;t&quot;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span><span class="st">&quot;200px&quot;</span>, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-c62d94c5b22f811ea25a" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-c62d94c5b22f811ea25a">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],[292,198,491,586,140,491,372],[1,1,0,0,1,0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>time2event<\/th>\n      <th>nevent<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"name":"id","targets":0},{"name":"time2event","targets":1},{"name":"nevent","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-69ffa8dd616917d46268" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-69ffa8dd616917d46268">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],[292,198,491,586,140,491,372],[1,1,0,0,1,0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>time2event<\/th>\n      <th>nevent<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"name":"id","targets":0},{"name":"time2event","targets":1},{"name":"nevent","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>Note that, in a more general multiple-event setting, the
 <code>&quot;nevent&quot;</code> column would contain the count of events for each
 subject. Here, since we’re stopping at the first event, this number can
@@ -3070,8 +3070,8 @@ on date 2022-07-19:</p>
 <span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(vm, </span>
 <span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&quot;t&quot;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span><span class="st">&quot;200px&quot;</span>, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-b4054ffbc9eb3728ca9a" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-b4054ffbc9eb3728ca9a">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],["2021-09-23","2021-03-24","2023-02-21","2022-07-19","2021-11-01","2021-10-18","2022-03-17"],[5.5,4.5,null,5,5,5.5,4.5],[0,118,491,304,140,0,372],[true,true,false,true,true,true,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>date<\/th>\n      <th>EDSS<\/th>\n      <th>time2event<\/th>\n      <th>observed<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"date","targets":1},{"name":"EDSS","targets":2},{"name":"time2event","targets":3},{"name":"observed","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-cbc17a6c2ad000dcb2b3" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-cbc17a6c2ad000dcb2b3">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],["2021-09-23","2021-03-24","2023-02-21","2022-07-19","2021-11-01","2021-10-18","2022-03-17"],[5.5,4.5,null,5,5,5.5,4.5],[0,118,491,304,140,0,372],[true,true,false,true,true,true,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>date<\/th>\n      <th>EDSS<\/th>\n      <th>time2event<\/th>\n      <th>observed<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"date","targets":1},{"name":"EDSS","targets":2},{"name":"time2event","targets":3},{"name":"observed","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>where: <code>&quot;date&quot;</code> contains the date of the first confirmed
 EDSS <span class="math inline">\(\geq\)</span> 4.5 (or last date of
 follow-up if milestone was not reached or not confirmed);
@@ -3103,8 +3103,8 @@ updated after each event to the first available confirmation visit).</p>
 <span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(survival_data, <span class="at">rownames=</span>F,</span>
 <span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>              <span class="at">options =</span> <span class="fu">list</span>(<span class="at">dom=</span><span class="st">&quot;t&quot;</span>, <span class="at">scrollX=</span>T, <span class="at">scrollY=</span><span class="st">&quot;200px&quot;</span>, <span class="at">paging =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>              )</span></code></pre></div>
-<div class="datatables html-widget html-fill-item" id="htmlwidget-cbf3a82589fb89f56edf" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-cbf3a82589fb89f56edf">{"x":{"filter":"none","vertical":false,"data":[["1","2","2","3","4","4","5","6","7"],[1,1,2,0,1,2,1,1,1],[292,198,539,491,77,304,140,120,372]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>time2event<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"time2event","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-e16dca123b65cc02e739" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-e16dca123b65cc02e739">{"x":{"filter":"none","vertical":false,"data":[["1","2","2","3","4","4","5","6","7"],[1,1,2,0,1,2,1,1,1],[292,198,539,491,77,304,140,120,372]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>id<\/th>\n      <th>nevent<\/th>\n      <th>time2event<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","scrollX":true,"scrollY":"200px","paging":false,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"name":"id","targets":0},{"name":"nevent","targets":1},{"name":"time2event","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>Note that the <code>event</code> argument is set to
 <code>multiple</code>, and that the results can contain more than one
 row for the same subject, with the <code>&quot;nevent&quot;</code> column keeping

@@ -29,7 +29,7 @@ MSprog(
   conf_days = 12 * 7,
   conf_tol_days = c(7, 2 * 365.25),
   require_sust_days = 0,
-  check_intermediate = T,
+  check_intermediate = TRUE,
   relapse_to_bl = 30,
   relapse_to_event = 0,
   relapse_to_conf = 30,

@@ -285,7 +285,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    sub_threshold_rebl=c("none", "change", "improvement", "worsening"),
                    bl_geq=FALSE, relapse_rebl=FALSE, skip_local_extrema=c("none", "strict", "all"),
                    validconf_col=NULL, conf_days=12*7, conf_tol_days=c(7,2*365.25),
-                   require_sust_days=0, check_intermediate=T,
+                   require_sust_days=0, check_intermediate=TRUE,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30,
                    relapse_assoc=90, relapse_indep=NULL,
                    impute_last_visit=0, date_format=NULL,
@@ -1763,7 +1763,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
         message("---\nSubjects with ",
             if (event == "firstPIRA") "PIRA: " else if (event == "firstRAW") "RAW: " else "CDW: ",
               sum(summary$CDW > 0),
-            if (event %in% c("firstPIRA","firstRAW") | !rawpira) ""
+            if (event %in% c("firstPIRA", "firstRAW") | !rawpira) ""
             else paste0(" (PIRA: ", sum(summary$PIRA > 0), "; RAW: ", sum(summary$RAW > 0), ")")
             )
       }
@@ -1844,17 +1844,17 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       warning(w)
   }
 
-  settings <- list(outcome=outcome, event=event, baseline=baseline, proceed_from=proceed_from,
-                validconf_p=if (is.null(validconf_col)) 1 else mean(data[[validconf_col]]),
-                validconf_col=validconf_col, skip_local_extrema=skip_local_extrema,
-                conf_days=conf_days, conf_tol_days=conf_tol_days,
-                require_sust_days=require_sust_days, check_intermediate=check_intermediate,
-                relapse_to_bl=relapse_to_bl, relapse_to_event=relapse_to_event, relapse_to_conf=relapse_to_conf,
-                RAW_PIRA=RAW_PIRA, rawpira=rawpira,
-                relapse_assoc=relapse_assoc, relapse_indep=relapse_indep, renddate_col=renddate_col,
-                sub_threshold_rebl=sub_threshold_rebl, bl_geq=bl_geq, relapse_rebl=relapse_rebl,
-                impute_last_visit=impute_last_visit, impute_max_fu=impute_max_fu, delta_fun=delta_fun,
-                worsening=worsening)
+  settings <- list(outcome=outcome, event=event, RAW_PIRA=RAW_PIRA, rawpira=rawpira,
+                   baseline=baseline, proceed_from=proceed_from,
+                   validconf_p=if (is.null(validconf_col)) 1 else mean(data[[validconf_col]]),
+                   validconf_col=validconf_col, skip_local_extrema=skip_local_extrema,
+                   conf_days=conf_days, conf_tol_days=conf_tol_days,
+                   require_sust_days=require_sust_days, check_intermediate=check_intermediate,
+                   relapse_to_bl=relapse_to_bl, relapse_to_event=relapse_to_event, relapse_to_conf=relapse_to_conf,
+                   relapse_assoc=relapse_assoc, relapse_indep=relapse_indep, renddate_col=renddate_col,
+                   sub_threshold_rebl=sub_threshold_rebl, bl_geq=bl_geq, relapse_rebl=relapse_rebl,
+                   impute_last_visit=impute_last_visit, impute_max_fu=impute_max_fu, delta_fun=delta_fun,
+                   worsening=worsening)
 
   output <- list(event_count=summary, results=results_df, settings=settings, unconfirmed=unconfirmed)
   class(output) <- "MSprogOutput"
