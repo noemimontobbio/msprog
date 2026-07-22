@@ -25,7 +25,7 @@
 #'   \item{PIRA}{Count of progression independent of relapse activity (PIRA) events.}
 #' }
 #' Note: depending on computation settings, some of the above columns may not be
-#' included in the data frame (e.g., no CDI column if `event='firstCDW'` in [MSprog()]).
+#' included in the data frame (e.g., no CDI column if `event="firstCDW"` in [MSprog()]).
 #'
 #' @section `results` data frame:
 #' \describe{
@@ -38,6 +38,8 @@
 #'   \item{bl2event}{Number of days from baseline to event onset.}
 #'   \item{date}{Date of event onset.}
 #'   \item{value}{Outcome value at event onset.}
+#'   \item{initial_bl_date}{Date of initial baseline for the subject (first eligible baseline visit).}
+#'   \item{initial_bl_value}{Outcome value at initial baseline (first eligible baseline visit).}
 #'   \item{bl_date}{Date of baseline for the event.}
 #'   \item{bl_value}{Outcome value at baseline.}
 #'   \item{last_delta_date}{Date of last visit before event onset at a clinically meaningful score distance from it.}
@@ -64,7 +66,7 @@
 #'   \item{closest_rel_before}{Distance in days from the last relapse before the outcome change (if any).}
 #'   \item{closest_rel_after}{Distance in days from the next relapse after the outcome change (if any).}
 #'  }
-#'  Note: in first-event scenarios (e.g., `event='firstCDW'`), the event search stops as soon as
+#'  Note: in first-event scenarios (e.g., `event="firstCDW"`), the event search stops as soon as
 #'  the first confirmed event is found -- in this case, the `unconfirmed` data frame only reports
 #'  unconfirmed outcome changes occurring *before* detecting a confirmed event.
 #'

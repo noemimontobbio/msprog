@@ -33,7 +33,7 @@ Objects of class \code{"MSprogOutput"} are lists with the following elements:
 \item{PIRA}{Count of progression independent of relapse activity (PIRA) events.}
 }
 Note: depending on computation settings, some of the above columns may not be
-included in the data frame (e.g., no CDI column if \code{event='firstCDW'} in \code{\link[=MSprog]{MSprog()}}).
+included in the data frame (e.g., no CDI column if \code{event="firstCDW"} in \code{\link[=MSprog]{MSprog()}}).
 }
 
 \section{\code{results} data frame}{
@@ -48,6 +48,8 @@ included in the data frame (e.g., no CDI column if \code{event='firstCDW'} in \c
 \item{bl2event}{Number of days from baseline to event onset.}
 \item{date}{Date of event onset.}
 \item{value}{Outcome value at event onset.}
+\item{initial_bl_date}{Date of initial baseline for the subject (first eligible baseline visit).}
+\item{initial_bl_value}{Outcome value at initial baseline (first eligible baseline visit).}
 \item{bl_date}{Date of baseline for the event.}
 \item{bl_value}{Outcome value at baseline.}
 \item{last_delta_date}{Date of last visit before event onset at a clinically meaningful score distance from it.}
@@ -76,7 +78,7 @@ Note: some of the columns may not be included, depending on computation settings
 \item{closest_rel_before}{Distance in days from the last relapse before the outcome change (if any).}
 \item{closest_rel_after}{Distance in days from the next relapse after the outcome change (if any).}
 }
-Note: in first-event scenarios (e.g., \code{event='firstCDW'}), the event search stops as soon as
+Note: in first-event scenarios (e.g., \code{event="firstCDW"}), the event search stops as soon as
 the first confirmed event is found -- in this case, the \code{unconfirmed} data frame only reports
 unconfirmed outcome changes occurring \emph{before} detecting a confirmed event.
 }

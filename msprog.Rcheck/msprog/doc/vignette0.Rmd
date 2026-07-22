@@ -417,8 +417,8 @@ DT::datatable(output$results, rownames=F,
 
 The `results` attribute provides extended info on each event for all subjects. The following arguments can be used to control the information included.
 
-* `include_dates`: if `TRUE`, the results will include the dates of: event onset; baseline; last visit before event onset at clinically meaningful score difference from it; first confirmation visit.
-* `include_value`: if `TRUE`, the results will include the outcome value at: event onset; baseline; last visit before event onset at clinically meaningful score difference from it; first confirmation visit.
+* `include_dates`: if `TRUE`, the results will include the dates of: event onset; initial baseline; current baseline; last visit before event onset at clinically meaningful score difference from it; first confirmation visit.
+* `include_value`: if `TRUE`, the results will include the outcome value at: event onset; initial baseline; current baseline; last visit before event onset at clinically meaningful score difference from it; first confirmation visit.
 * `include_stable`: if `TRUE`, subjects with no confirmed events are included in the results, with `time2event` = total follow up.
 
 

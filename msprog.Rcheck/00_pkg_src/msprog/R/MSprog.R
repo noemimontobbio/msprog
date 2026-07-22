@@ -210,6 +210,7 @@
 #' @param include_dates If `TRUE`, `output$results` will include the dates of:
 #' \itemize{
 #' \item event onset (`"date"` column)
+#' \item the initial baseline (`"initial_bl_date"` column)
 #' \item the current baseline (`"bl_date"` column)
 #' \item the last visit before event onset with a clinically meaningful score difference from it (`"last_delta_date"` column)
 #' \item the confirmation visit(s) (`"conf<c>_date"` column and, when relevant, `"PIRA_conf<c>_date"` column for each `c` in `conf_days`)
@@ -217,6 +218,7 @@
 #' @param include_values If `TRUE`,  `output$results` will include the outcome value at:
 #' \itemize{
 #' \item event onset (`"value"` column)
+#' \item the initial baseline (`"initial_bl_value"` column)
 #' \item the current baseline (`"bl_value"` column)
 #' \item the last visit before event onset with a clinically meaningful score difference from it (`"last_delta_value"` column)
 #' \item the confirmation visit(s) (`"conf<c>_value"` column and, when relevant, `"PIRA_conf<c>_value"` column for each `c` in `conf_days`)
@@ -677,6 +679,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
   unconf_idx <- 1
 
   total_fu <- setNames(rep(0, nsub), all_subj)
+  initial_bl_value <- setNames(rep(0, nsub), all_subj)
+  initial_bl_date <- setNames(rep(0, nsub), all_subj)
 
   for (subjid in all_subj) {
 
@@ -838,6 +842,11 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             message("Not enough visits left: end process")
           }
         }
+      }
+
+      if (n_iter == 1) {
+        initial_bl_date[subjid] <- if (is.na(bl_idx) || bl_idx > nvisits) NaN else data_id[[date_col]][bl_idx]
+        initial_bl_value[subjid] <- if (is.na(bl_idx) || bl_idx > nvisits) NaN else data_id[[value_col]][bl_idx]
       }
 
       # If `relapse_rebl` is enabled, update relapse index to next relapse after baseline
@@ -1630,6 +1639,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       subject_df[[subj_col]] <- subjid
       subject_df$nevent <- seq_len(nrow(subject_df))
       subject_df$total_fu <- total_fu[subjid]
+      subject_df$initial_bl_date <- initial_bl_date[subjid]
+      subject_df$initial_bl_value <- initial_bl_value[subjid]
 
     } else if (include_stable) {
       # 2. subject has no events but is included
@@ -1640,6 +1651,8 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       subject_df[[subj_col]] <- subjid
       subject_df$nevent <- 0
       subject_df$total_fu <- total_fu[subjid]
+      subject_df$initial_bl_date <- initial_bl_date[subjid]
+      subject_df$initial_bl_value <- initial_bl_value[subjid]
 
     } else {
       # 3. subject has no events and is excluded
@@ -1795,12 +1808,16 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
   columns <- names(results_df)
   # Reorder columns
-  to_move <- c(subj_col, "nevent", "total_fu", "CDW_type")
+  to_move <- c(subj_col, "nevent", "total_fu", "CDW_type", "initial_bl_date", "initial_bl_value")
   columns <- columns[!columns %in% to_move]
   columns <- c(subj_col, setdiff(columns, subj_col)) # move in front
-  columns <- append(columns, "nevent", after = 1) # position 2
-  columns <- append(columns, "CDW_type", after = 3) # position 4
-  columns <- append(columns, "total_fu", after = 4) # position 5
+  columns <- append(columns, "nevent", after=1) # position 2
+  # after "event_type":
+  columns <- append(columns, "CDW_type", after=match("event_type", columns))
+  columns <- append(columns, "total_fu", after=match("event_type", columns) + 1)
+  # after "date"/"value":
+  columns <- append(columns, "initial_bl_date", after=match("value", columns))
+  columns <- append(columns, "initial_bl_value", after=match("value", columns) + 1)
 
   # Subset columns
   if (!include_dates) {

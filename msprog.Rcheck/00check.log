@@ -9,12 +9,12 @@
 * using option ‘--as-cran’
 * checking for file ‘msprog/DESCRIPTION’ ... OK
 * checking extension type ... Package
-* this is package ‘msprog’ version ‘1.0.0’
+* this is package ‘msprog’ version ‘1.0.0.9000’
 * package encoding: UTF-8
-* checking CRAN incoming feasibility ... [3s/13s] NOTE
+* checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Noemi Montobbio <noemi.montobbio@gmail.com>’
 
-New submission
+Version contains large components (1.0.0.9000)
 * checking package namespace information ... OK
 * checking package dependencies ... OK
 * checking if this is a source package ... OK

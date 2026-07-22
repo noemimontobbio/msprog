@@ -1,7 +1,8 @@
 Package: msprog
 Type: Package
-Title: Reproducible Assessment of Disability Course in MS
-Version: 1.0.0
+Title: Reproducible Assessment of Disability Course in Multiple
+        Sclerosis
+Version: 1.0.0.9000
 Authors@R: c(
     person(given="Noemi", family="Montobbio", , email="noemi.montobbio@gmail.com", role=c("aut", "cre"),
            comment=c(ORCID = "0000-0003-0302-393X")),
@@ -9,11 +10,13 @@ Authors@R: c(
     person(given="Luca", family="Carmisciano", role = c("rev")))
 Description: Analyse disability course in multiple sclerosis (MS) from
     longitudinal data. The package provides a flexible framework for
-    identifying disability events under user-specified criteria, allowing 
+    identifying disability events under user-specified criteria, allowing
     adaptation to different study designs and endpoints. Tools are included
-    to facilitate transparent and reproducible reporting of the settings 
-    used in the analysis. For an introduction to the package and illustrative 
+    to facilitate transparent and reproducible reporting of the settings
+    used in the analysis. For an introduction to the package and illustrative
     applications, see Montobbio et al. (2024) <doi:10.1177/13524585241243157>.
+URL: https://github.com/noemimontobbio/msprog
+BugReports: https://github.com/noemimontobbio/msprog/issues
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
@@ -24,9 +27,9 @@ VignetteBuilder: knitr
 Suggests: knitr, rmarkdown, xfun, DT
 License: MIT + file LICENSE
 NeedsCompilation: no
-Packaged: 2026-06-18 13:50:49 UTC; nmontobbio
+Packaged: 2026-07-22 11:27:36 UTC; nmontobbio
 Author: Noemi Montobbio [aut, cre] (<https://orcid.org/0000-0003-0302-393X>),
   Francesca Bovis [rev],
   Luca Carmisciano [rev]
 Maintainer: Noemi Montobbio <noemi.montobbio@gmail.com>
-Built: R 4.4.0; ; 2026-06-18 13:51:43 UTC; unix
+Built: R 4.4.0; ; 2026-07-22 11:28:11 UTC; unix

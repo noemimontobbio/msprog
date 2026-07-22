@@ -14,6 +14,8 @@ Description: Analyse disability course in multiple sclerosis (MS) from
     to facilitate transparent and reproducible reporting of the settings
     used in the analysis. For an introduction to the package and illustrative
     applications, see Montobbio et al. (2024) <doi:10.1177/13524585241243157>.
+URL: https://github.com/noemimontobbio/msprog
+BugReports: https://github.com/noemimontobbio/msprog/issues
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

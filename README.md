@@ -11,11 +11,10 @@
 
 > 📣 **What’s new in latest versions**
 >
+> - Info on initial baseline (first eligible baseline visit) in results
+>   data frame ([development version](#devel))
 > - **Now available on CRAN** (supporting **R \>= 4.1.0**) (from
 >   v1.0.0).
-> - `RAW_PIRA` flag to explicitly enable RAW/PIRA classification (from
->   v0.2.7).
-> - **Calculation speed-up** (from v0.2.6)
 
 # msprog: reproducible assessment of disability course in MS
 
@@ -63,8 +62,8 @@ be found in the [reference manual
 detailed indications on usage and best practices, please refer to the
 [package vignettes](#vignette).
 
-The computation can be run locally in R (see installation instructions
-below), or online via a user-friendly [web
+The computation can be run locally in R (see [installation
+instructions](#install) below), or online via a user-friendly [web
 application](https://msprog.shinyapps.io/msprog/).
 
 **If you use this package in your work, please cite it [as
@@ -84,8 +83,8 @@ install it, run:
 install.packages("msprog")
 ```
 
-Alternatively, you can install the **development version** of `msprog`
-from GitHub as follows.
+<a id="devel"></a> Alternatively, you can install the **development
+version** of `msprog` from GitHub as follows.
 
 Using `remotes`:
 

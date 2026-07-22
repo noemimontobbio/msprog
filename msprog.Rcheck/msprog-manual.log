@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.5)  18 JUN 2026 15:52
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.5)  22 JUL 2026 13:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -347,8 +347,8 @@ File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count294
 \l__pdf_internal_box=\box58
 )
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpKGQRhh/Rd2pdf17cd
-6976eb55/Rd2.aux)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
+c84c003/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -386,41 +386,41 @@ LaTeX Font Info:    ... okay on input line 8.
 )
 Package hyperref Info: Link coloring ON on input line 8.
 
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpKGQRhh/Rd2pdf17cd
-6976eb55/Rd2.out)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpKGQRhh/Rd2pdf17cd
-6976eb55/Rd2.out)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
+c84c003/Rd2.out)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
+c84c003/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
-LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 38
+LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 29
 .
 
 (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 38.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 38.
+(Font)              scaled to size 10.0pt on input line 29.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 29.
 
 
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 38.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 29.
 
 
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Trying to load font information for U+rsfs on input line 38
+LaTeX Font Info:    Trying to load font information for U+rsfs on input line 29
 .
 
 (/usr/local/texlive/2024/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpKGQRhh/Rd2pdf17cd
-6976eb55/Rd2.toc [1
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
+c84c003/Rd2.toc [1
 
 
 {/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/loc
@@ -430,167 +430,168 @@ al/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/local/texlive/2024
 \openout5 = `Rd2.toc'.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 62--63
+Underfull \hbox (badness 10000) in paragraph at lines 65--66
 
  []
 
 LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 6
-5.
+8.
 (/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 9.0pt on input line 93.
+(Font)              scaled to size 9.0pt on input line 96.
  [2]
-Underfull \hbox (badness 10000) in paragraph at lines 125--126
+Underfull \hbox (badness 10000) in paragraph at lines 128--129
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 135--136
+Underfull \hbox (badness 10000) in paragraph at lines 138--139
 
  []
 
 
-Overfull \hbox (25.02924pt too wide) in paragraph at lines 142--144
+Overfull \hbox (25.02924pt too wide) in paragraph at lines 145--147
 []\T1/zi4/m/n/10 "custom" []\T1/ptm/m/n/10 (only ac-cepted when spec-i-fy-ing n
 on-[]\T1/zi4/m/n/10 NULL worsening []\T1/ptm/m/n/10 -- and []\T1/zi4/m/n/10 del
 ta_fun
  []
 
 
-Overfull \hbox (9.16864pt too wide) in paragraph at lines 152--157
+Overfull \hbox (9.16864pt too wide) in paragraph at lines 155--160
 \T1/ptm/m/n/10 dis-ease course, []\T1/zi4/m/n/10 "decrease" []\T1/ptm/m/n/10 ot
 h-er-wise). This ar-gu-ment is only used when []\T1/zi4/m/n/10 outcome
  []
 
 [3] [4]
-Overfull \hbox (14.51942pt too wide) in paragraph at lines 253--254
+Overfull \hbox (14.51942pt too wide) in paragraph at lines 256--257
 []\T1/zi4/m/n/10 "custom" []\T1/ptm/m/n/10 (only ac-cepted when spec-i-fy-ing c
 us-tom []\T1/zi4/m/n/10 delta_fun []\T1/ptm/m/n/10 and []\T1/zi4/m/n/10 worseni
 ng[]\T1/ptm/m/n/10 ). 
  []
 
 [5]
-Overfull \hbox (39.09814pt too wide) in paragraph at lines 311--313
+Overfull \hbox (39.09814pt too wide) in paragraph at lines 314--316
 []\T1/zi4/m/n/10 "roving_impr"[]\T1/ptm/m/n/10 : up-dated af-ter ev-ery CDI (to
  the visit de-ter-mined by []\T1/zi4/m/n/10 proceed_from[]\T1/ptm/m/n/10 );
  []
 
 
-Overfull \hbox (69.26788pt too wide) in paragraph at lines 322--323
+Overfull \hbox (69.26788pt too wide) in paragraph at lines 325--326
 []\T1/ptm/m/n/10 from the next visit af-ter the first qual-i-fy-ing con-fir-ma-
 tion visit if []\T1/zi4/m/n/10 proceed_from="firstconf" 
  []
 
 
-Overfull \hbox (7.10724pt too wide) in paragraph at lines 337--342
+Overfull \hbox (7.10724pt too wide) in paragraph at lines 340--345
 \T1/ptm/m/n/10 come mea-sure be-low the clin-i-cally mean-ing-ful thresh-old) c
 an trig-ger a re-baseline.
  []
 
 [6]
-Overfull \hbox (35.528pt too wide) in paragraph at lines 353--356
+Overfull \hbox (35.528pt too wide) in paragraph at lines 356--359
 []\T1/ptm/m/n/10 This ar-gu-ment is only used if relapse-based re-baseline is e
 n-abled ([]\T1/zi4/m/n/10 relapse_rebl=TRUE[]\T1/ptm/m/n/10 ).
  []
 
 
-Overfull \hbox (32.86931pt too wide) in paragraph at lines 393--398
+Overfull \hbox (32.86931pt too wide) in paragraph at lines 396--401
 \T1/ptm/m/n/10 if con-sid-er-ing mul-ti-ple win-dows. If []\T1/zi4/m/n/10 lengt
 h(conf_days) > 1 []\T1/ptm/m/n/10 (e.g., []\T1/zi4/m/n/10 conf_days=c(12*7,
  []
 
 
-Overfull \hbox (7.55864pt too wide) in paragraph at lines 393--398
+Overfull \hbox (7.55864pt too wide) in paragraph at lines 396--401
 \T1/ptm/m/n/10 firmed over 12 \T1/ptm/m/it/10 or \T1/ptm/m/n/10 24 weeks") with
  their rel-a-tive tol-er-ance (as per []\T1/zi4/m/n/10 conf_tol_days[]\T1/ptm/m
 /n/10 ). 
  []
 
 [7] [8]
-Overfull \hbox (59.70943pt too wide) in paragraph at lines 476--483
+Overfull \hbox (59.70943pt too wide) in paragraph at lines 479--486
 []\T1/zi4/m/n/10 impute_last_visit=1[]\T1/ptm/m/n/10 ; they are im-puted with p
 rob-a-bil-ity []\T1/zi4/m/n/10 p[]\T1/ptm/m/n/10 , \T1/zi4/m/n/10 0<p<1\T1/ptm/
 m/n/10 , if []\T1/zi4/m/n/10 impute_last_visit=p[]\T1/ptm/m/n/10 .
  []
 
 
-Overfull \hbox (78.43878pt too wide) in paragraph at lines 502--503
+Overfull \hbox (78.43878pt too wide) in paragraph at lines 506--507
 []\T1/ptm/m/n/10 the con-fir-ma-tion visit(s) ([]\T1/zi4/m/n/10 "conf<c>_date" 
 []\T1/ptm/m/n/10 col-umn and, when rel-e-vant, []\T1/zi4/m/n/10 "PIRA_conf<c>_d
 ate"
  []
 
 [9]
-Underfull \hbox (badness 10000) in paragraph at lines 550--557
+Underfull \hbox (badness 10000) in paragraph at lines 555--562
 
  []
 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 562--562
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 567--567
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="EDS
 S", date_col="date", outcome="edss",[] 
  []
 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 568--568
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 573--573
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="SDM
 T", date_col="date", outcome="sdmt",[] 
  []
 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 575--575
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 580--580
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="SDM
 T", date_col="date", outcome="sdmt",[] 
  []
 
 [10]
-LaTeX Font Info:    Trying to load font information for TS1+zi4 on input line 6
-22.
- (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
-File: ts1zi4.fd 2018/01/14 TS1/zi4 (Inconsolata)
-)
-LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 622.
-
-Overfull \hbox (21.45517pt too wide) in paragraph at lines 644--646
+Overfull \hbox (21.45517pt too wide) in paragraph at lines 651--653
 \T1/ptm/m/n/10 PIRA (could be dif-fer-ent from CDW con-fir-ma-tion visit if the
  PIRA def-i-ni-tion in-cludes confirmation-
  []
 
-[11{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
-[12]
-Underfull \hbox (badness 10000) in paragraph at lines 768--774
+[11]
+LaTeX Font Info:    Trying to load font information for TS1+zi4 on input line 6
+90.
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
+File: ts1zi4.fd 2018/01/14 TS1/zi4 (Inconsolata)
+)
+LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
+(Font)              scaled to size 10.0pt on input line 690.
+
+[12{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
+
+Underfull \hbox (badness 10000) in paragraph at lines 775--781
 
  []
 
 [13]
-Underfull \hbox (badness 10000) in paragraph at lines 808--815
+Underfull \hbox (badness 10000) in paragraph at lines 815--822
 
  []
 
 [14] [15] [16]
-Overfull \hbox (32.86931pt too wide) in paragraph at lines 967--972
+Overfull \hbox (32.86931pt too wide) in paragraph at lines 974--979
 \T1/ptm/m/n/10 if con-sid-er-ing mul-ti-ple win-dows. If []\T1/zi4/m/n/10 lengt
 h(conf_days) > 1 []\T1/ptm/m/n/10 (e.g., []\T1/zi4/m/n/10 conf_days=c(12*7,
  []
 
 
-Overfull \hbox (26.07854pt too wide) in paragraph at lines 967--972
+Overfull \hbox (26.07854pt too wide) in paragraph at lines 974--979
 \T1/ptm/m/n/10 "con-firmed over 12 \T1/ptm/m/it/10 or \T1/ptm/m/n/10 24 weeks")
  with their rel-a-tive tol-er-ance (as per []\T1/zi4/m/n/10 conf_tol_days[]\T1/
 ptm/m/n/10 ). 
  []
 
 [17]
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpKGQRhh/Rd2pdf17cd
-6976eb55/Rd2.ind [18] [19
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
+c84c003/Rd2.ind [18] [19
 
 
 ])
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpKGQRhh/Rd2pdf17cd
-6976eb55/Rd2.aux)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
+c84c003/Rd2.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
@@ -600,12 +601,12 @@ Package rerunfilecheck Info: File `Rd2.out' has not changed.
  ) 
 Here is how much of TeX's memory you used:
  10632 strings out of 474116
- 161128 string characters out of 5743683
- 1941187 words of memory out of 5000000
+ 161115 string characters out of 5743683
+ 1940187 words of memory out of 5000000
  32711 multiletter control sequences out of 15000+600000
  592225 words of font info for 80 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 92i,5n,95p,326b,717s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 92i,6n,95p,326b,735s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 pdfTeX warning (dest): name{Rfn.as.Date} has been referenced but does not exist
 , replaced by a fixed one
@@ -620,10 +621,10 @@ y10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></
 usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/
 texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/20
 24/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (19 pages, 136883 bytes).
+Output written on Rd2.pdf (19 pages, 137293 bytes).
 PDF statistics:
- 309 PDF objects out of 1000 (max. 8388607)
- 272 compressed objects within 3 object streams
+ 311 PDF objects out of 1000 (max. 8388607)
+ 274 compressed objects within 3 object streams
  98 named destinations out of 1000 (max. 500000)
  81 words of extra memory for PDF output out of 10000 (max. 10000000)
 

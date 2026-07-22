@@ -278,6 +278,7 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 \item{include_dates}{If \code{TRUE}, \code{output$results} will include the dates of:
 \itemize{
 \item event onset (\code{"date"} column)
+\item the initial baseline (\code{"initial_bl_date"} column)
 \item the current baseline (\code{"bl_date"} column)
 \item the last visit before event onset with a clinically meaningful score difference from it (\code{"last_delta_date"} column)
 \item the confirmation visit(s) (\code{"conf<c>_date"} column and, when relevant, \code{"PIRA_conf<c>_date"} column for each \code{c} in \code{conf_days})
@@ -286,6 +287,7 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 \item{include_values}{If \code{TRUE},  \code{output$results} will include the outcome value at:
 \itemize{
 \item event onset (\code{"value"} column)
+\item the initial baseline (\code{"initial_bl_value"} column)
 \item the current baseline (\code{"bl_value"} column)
 \item the last visit before event onset with a clinically meaningful score difference from it (\code{"last_delta_value"} column)
 \item the confirmation visit(s) (\code{"conf<c>_value"} column and, when relevant, \code{"PIRA_conf<c>_value"} column for each \code{c} in \code{conf_days})

@@ -12,7 +12,7 @@ relapse_indep_from_bounds(
   c0 = 0,
   c1 = 0,
   prec_type = "baseline",
-  use_end_dates = F
+  use_end_dates = FALSE
 )
 }
 \arguments{
