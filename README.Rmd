@@ -29,16 +29,17 @@ cran_version <- tryCatch(
 
 ```{=markdown}
 > [!WARNING]
-> **🚧 This repository is under active development. 🚧 <br> Please make sure you are using the latest stable version available on CRAN (`r cran_version`).
+> **🚧 This repository is under active development. 🚧 <br> Please make sure you are using at least the latest stable version available on CRAN (`r cran_version`).
 > Check your installed version by running `utils::packageVersion("msprog")`.**
 ```
 
 <br>
 
-> 📣 **What’s new in latest versions**
+> 📣 **What’s new**
 > 
-> * Info on initial baseline (first eligible baseline visit) in results data frame ([development version](#devel))
-> * **Now available on CRAN** (supporting **R >= 4.1.0**) (from v1.0.0).
+> * Updated [citation](#citation) (v1.0.1) --  **[new paper](https://doi.org/10.1177/13524585261478492) out now!**
+> * Info on initial baseline (first eligible baseline visit) in results data frame (v1.0.1) <!-- ([development version](#devel)) -->
+> * **Now available on CRAN** (supporting **R >= 4.1.0**) (v1.0.0).
 
 # msprog: reproducible assessment of disability course in MS
 
@@ -65,8 +66,14 @@ The package also provides two toy datasets for function testing:
 * `toydata_visits`: artificially generated EDSS and SDMT assessments for a small cohort of patients;
 * `toydata_relapses`: artificially generated relapse onset dates associated with the patients in `toydata_visits`.
 
-Please refer to the documentation for function usage (e.g. `?MSprog`) and data structure (e.g. `?toydata_visits`). 
-The whole documentation can be found in the [reference manual (PDF)](https://cran.r-project.org/web/packages/msprog/msprog.pdf). For detailed indications on usage and best practices, please refer to the [package vignettes](#vignette).
+Please refer to [**published guidelines**](https://doi.org/10.1177/13524585261478492)
+on recommended calculation settings according to study type and endpoint of interest.
+These recommendations are the result of a consensus process involving several 
+international MS research groups and conducted under the auspices of the 
+International Advisory Committee on Clinical Trials in MS (IACCTMS). 
+
+Refer to the documentation for function usage (e.g. `?MSprog`) and data structure (e.g. `?toydata_visits`). The whole documentation can be found in the [reference manual (PDF)](https://cran.r-project.org/web/packages/msprog/msprog.pdf). 
+Detailed indications and examples on function usage are available in the [package vignettes](#vignette).
 
 The computation can be run locally in R (see [installation instructions](#install) below), or online via a user-friendly [web application](https://msprog.shinyapps.io/msprog/).
 

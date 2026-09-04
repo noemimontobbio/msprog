@@ -62,7 +62,7 @@ where: `p0` and `p1` specify the interval around the preceding visit; `e0` and `
 [^enddates]: If **end dates** of relapses are available (may be provided as an additional column in the relapse file whose name is specified by argument `renddate_col` in `MSprog()`), the `use_end_dates` argument in `relapse_indep_from_bounds()` controls whether they are used for PIRA or not. The default is `use_end_dates=F`. If `use_end_dates=T`, the provided intervals are ignored and PIRA is defined by the event or the confirmation not falling within the duration (onset to end) of a relapse. 
 
 ```{r echo=FALSE, out.width="50%", fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `p0`, `p1`, `e0`, `e1`, `c0`, `c1`.*"}
-knitr::include_graphics(paste0(getwd(), 'relapse_indep_def.png'))
+knitr::include_graphics('./relapse_indep_def.png')
 ```
 
 <br/ >

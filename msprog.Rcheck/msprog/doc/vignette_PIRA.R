@@ -13,7 +13,7 @@ library(msprog)
 #                   ...)
 
 ## ----echo=FALSE, out.width="50%", fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `p0`, `p1`, `e0`, `e1`, `c0`, `c1`.*"----
-knitr::include_graphics(paste0(getwd(), 'relapse_indep_def.png'))
+knitr::include_graphics('./relapse_indep_def.png')
 
 ## -----------------------------------------------------------------------------
 relapse_indep <- relapse_indep_from_bounds(p0=0, p1=0,   # baseline

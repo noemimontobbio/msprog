@@ -81,104 +81,104 @@ No file Rd2.toc.
 [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/l
 ocal/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/local/texlive/20
 24/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}]
-Underfull \hbox (badness 10000) in paragraph at lines 65--66
+Underfull \hbox (badness 10000) in paragraph at lines 68--69
 
 (/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [2]
-Underfull \hbox (badness 10000) in paragraph at lines 128--129
+Underfull \hbox (badness 10000) in paragraph at lines 131--132
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 138--139
+Underfull \hbox (badness 10000) in paragraph at lines 141--142
 
 
-Overfull \hbox (25.02924pt too wide) in paragraph at lines 145--147
+Overfull \hbox (25.02924pt too wide) in paragraph at lines 148--150
 []\T1/zi4/m/n/10 "custom" []\T1/ptm/m/n/10 (only ac-cepted when spec-i-fy-ing n
 on-[]\T1/zi4/m/n/10 NULL worsening []\T1/ptm/m/n/10 -- and []\T1/zi4/m/n/10 del
 ta_fun
 
-Overfull \hbox (9.16864pt too wide) in paragraph at lines 155--160
+Overfull \hbox (9.16864pt too wide) in paragraph at lines 158--163
 \T1/ptm/m/n/10 dis-ease course, []\T1/zi4/m/n/10 "decrease" []\T1/ptm/m/n/10 ot
 h-er-wise). This ar-gu-ment is only used when []\T1/zi4/m/n/10 outcome
 [3] [4]
-Overfull \hbox (14.51942pt too wide) in paragraph at lines 256--257
+Overfull \hbox (14.51942pt too wide) in paragraph at lines 259--260
 []\T1/zi4/m/n/10 "custom" []\T1/ptm/m/n/10 (only ac-cepted when spec-i-fy-ing c
 us-tom []\T1/zi4/m/n/10 delta_fun []\T1/ptm/m/n/10 and []\T1/zi4/m/n/10 worseni
 ng[]\T1/ptm/m/n/10 ). 
 [5]
-Overfull \hbox (39.09814pt too wide) in paragraph at lines 314--316
+Overfull \hbox (39.09814pt too wide) in paragraph at lines 317--319
 []\T1/zi4/m/n/10 "roving_impr"[]\T1/ptm/m/n/10 : up-dated af-ter ev-ery CDI (to
  the visit de-ter-mined by []\T1/zi4/m/n/10 proceed_from[]\T1/ptm/m/n/10 );
 
-Overfull \hbox (69.26788pt too wide) in paragraph at lines 325--326
+Overfull \hbox (69.26788pt too wide) in paragraph at lines 328--329
 []\T1/ptm/m/n/10 from the next visit af-ter the first qual-i-fy-ing con-fir-ma-
 tion visit if []\T1/zi4/m/n/10 proceed_from="firstconf" 
 
-Overfull \hbox (7.10724pt too wide) in paragraph at lines 340--345
+Overfull \hbox (7.10724pt too wide) in paragraph at lines 343--348
 \T1/ptm/m/n/10 come mea-sure be-low the clin-i-cally mean-ing-ful thresh-old) c
 an trig-ger a re-baseline.
 [6]
-Overfull \hbox (35.528pt too wide) in paragraph at lines 356--359
+Overfull \hbox (35.528pt too wide) in paragraph at lines 359--362
 []\T1/ptm/m/n/10 This ar-gu-ment is only used if relapse-based re-baseline is e
 n-abled ([]\T1/zi4/m/n/10 relapse_rebl=TRUE[]\T1/ptm/m/n/10 ).
 
-Overfull \hbox (32.86931pt too wide) in paragraph at lines 396--401
+Overfull \hbox (32.86931pt too wide) in paragraph at lines 399--404
 \T1/ptm/m/n/10 if con-sid-er-ing mul-ti-ple win-dows. If []\T1/zi4/m/n/10 lengt
 h(conf_days) > 1 []\T1/ptm/m/n/10 (e.g., []\T1/zi4/m/n/10 conf_days=c(12*7,
 
-Overfull \hbox (7.55864pt too wide) in paragraph at lines 396--401
+Overfull \hbox (7.55864pt too wide) in paragraph at lines 399--404
 \T1/ptm/m/n/10 firmed over 12 \T1/ptm/m/it/10 or \T1/ptm/m/n/10 24 weeks") with
  their rel-a-tive tol-er-ance (as per []\T1/zi4/m/n/10 conf_tol_days[]\T1/ptm/m
 /n/10 ). 
 [7] [8]
-Overfull \hbox (59.70943pt too wide) in paragraph at lines 479--486
+Overfull \hbox (59.70943pt too wide) in paragraph at lines 482--489
 []\T1/zi4/m/n/10 impute_last_visit=1[]\T1/ptm/m/n/10 ; they are im-puted with p
 rob-a-bil-ity []\T1/zi4/m/n/10 p[]\T1/ptm/m/n/10 , \T1/zi4/m/n/10 0<p<1\T1/ptm/
 m/n/10 , if []\T1/zi4/m/n/10 impute_last_visit=p[]\T1/ptm/m/n/10 .
 
-Overfull \hbox (78.43878pt too wide) in paragraph at lines 506--507
+Overfull \hbox (78.43878pt too wide) in paragraph at lines 509--510
 []\T1/ptm/m/n/10 the con-fir-ma-tion visit(s) ([]\T1/zi4/m/n/10 "conf<c>_date" 
 []\T1/ptm/m/n/10 col-umn and, when rel-e-vant, []\T1/zi4/m/n/10 "PIRA_conf<c>_d
 ate"
 [9]
-Underfull \hbox (badness 10000) in paragraph at lines 555--562
+Underfull \hbox (badness 10000) in paragraph at lines 558--565
 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 567--567
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 570--570
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="EDS
 S", date_col="date", outcome="edss",[] 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 573--573
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 576--576
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="SDM
 T", date_col="date", outcome="sdmt",[] 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 580--580
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 583--583
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="SDM
 T", date_col="date", outcome="sdmt",[] 
 [10]
-Overfull \hbox (21.45517pt too wide) in paragraph at lines 651--653
+Overfull \hbox (21.45517pt too wide) in paragraph at lines 654--656
 \T1/ptm/m/n/10 PIRA (could be dif-fer-ent from CDW con-fir-ma-tion visit if the
  PIRA def-i-ni-tion in-cludes confirmation-
 [11] (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/ts1zi4.fd)
 [12{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
 
-Underfull \hbox (badness 10000) in paragraph at lines 775--781
+Underfull \hbox (badness 10000) in paragraph at lines 778--784
 
 [13]
-Underfull \hbox (badness 10000) in paragraph at lines 815--822
+Underfull \hbox (badness 10000) in paragraph at lines 818--825
 
 [14] [15] [16]
-Overfull \hbox (32.86931pt too wide) in paragraph at lines 974--979
+Overfull \hbox (32.86931pt too wide) in paragraph at lines 977--982
 \T1/ptm/m/n/10 if con-sid-er-ing mul-ti-ple win-dows. If []\T1/zi4/m/n/10 lengt
 h(conf_days) > 1 []\T1/ptm/m/n/10 (e.g., []\T1/zi4/m/n/10 conf_days=c(12*7,
 
-Overfull \hbox (26.07854pt too wide) in paragraph at lines 974--979
+Overfull \hbox (26.07854pt too wide) in paragraph at lines 977--982
 \T1/ptm/m/n/10 "con-firmed over 12 \T1/ptm/m/it/10 or \T1/ptm/m/n/10 24 weeks")
  with their rel-a-tive tol-er-ance (as per []\T1/zi4/m/n/10 conf_tol_days[]\T1/
 ptm/m/n/10 ). 
 [17]
 No file Rd2.ind.
 [18]
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
-c84c003/Rd2.aux)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzdpF30/Rd2pdfe274
+1e24721/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -198,7 +198,7 @@ zi4r.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb><
 /usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local
 /texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2
 024/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (18 pages, 124735 bytes).
+Output written on Rd2.pdf (18 pages, 124891 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.17 [TeX Live 2024] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (31 entries accepted, 0 rejected).
@@ -274,121 +274,121 @@ ty (/usr/local/texlive/2024/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
 Writing index file Rd2.idx
 (/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
-c84c003/Rd2.aux)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzdpF30/Rd2pdfe274
+1e24721/Rd2.aux)
 (/usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 )
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
-c84c003/Rd2.out)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
-c84c003/Rd2.out)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzdpF30/Rd2pdfe274
+1e24721/Rd2.out)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzdpF30/Rd2pdfe274
+1e24721/Rd2.out)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/jknapltx/ursfs.fd)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
-c84c003/Rd2.toc [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pd
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzdpF30/Rd2pdfe274
+1e24721/Rd2.toc [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pd
 ftex.map}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/
 local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}])
-Underfull \hbox (badness 10000) in paragraph at lines 65--66
+Underfull \hbox (badness 10000) in paragraph at lines 68--69
 
 (/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [2]
-Underfull \hbox (badness 10000) in paragraph at lines 128--129
+Underfull \hbox (badness 10000) in paragraph at lines 131--132
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 138--139
+Underfull \hbox (badness 10000) in paragraph at lines 141--142
 
 
-Overfull \hbox (25.02924pt too wide) in paragraph at lines 145--147
+Overfull \hbox (25.02924pt too wide) in paragraph at lines 148--150
 []\T1/zi4/m/n/10 "custom" []\T1/ptm/m/n/10 (only ac-cepted when spec-i-fy-ing n
 on-[]\T1/zi4/m/n/10 NULL worsening []\T1/ptm/m/n/10 -- and []\T1/zi4/m/n/10 del
 ta_fun
 
-Overfull \hbox (9.16864pt too wide) in paragraph at lines 155--160
+Overfull \hbox (9.16864pt too wide) in paragraph at lines 158--163
 \T1/ptm/m/n/10 dis-ease course, []\T1/zi4/m/n/10 "decrease" []\T1/ptm/m/n/10 ot
 h-er-wise). This ar-gu-ment is only used when []\T1/zi4/m/n/10 outcome
 [3] [4]
-Overfull \hbox (14.51942pt too wide) in paragraph at lines 256--257
+Overfull \hbox (14.51942pt too wide) in paragraph at lines 259--260
 []\T1/zi4/m/n/10 "custom" []\T1/ptm/m/n/10 (only ac-cepted when spec-i-fy-ing c
 us-tom []\T1/zi4/m/n/10 delta_fun []\T1/ptm/m/n/10 and []\T1/zi4/m/n/10 worseni
 ng[]\T1/ptm/m/n/10 ). 
 [5]
-Overfull \hbox (39.09814pt too wide) in paragraph at lines 314--316
+Overfull \hbox (39.09814pt too wide) in paragraph at lines 317--319
 []\T1/zi4/m/n/10 "roving_impr"[]\T1/ptm/m/n/10 : up-dated af-ter ev-ery CDI (to
  the visit de-ter-mined by []\T1/zi4/m/n/10 proceed_from[]\T1/ptm/m/n/10 );
 
-Overfull \hbox (69.26788pt too wide) in paragraph at lines 325--326
+Overfull \hbox (69.26788pt too wide) in paragraph at lines 328--329
 []\T1/ptm/m/n/10 from the next visit af-ter the first qual-i-fy-ing con-fir-ma-
 tion visit if []\T1/zi4/m/n/10 proceed_from="firstconf" 
 
-Overfull \hbox (7.10724pt too wide) in paragraph at lines 340--345
+Overfull \hbox (7.10724pt too wide) in paragraph at lines 343--348
 \T1/ptm/m/n/10 come mea-sure be-low the clin-i-cally mean-ing-ful thresh-old) c
 an trig-ger a re-baseline.
 [6]
-Overfull \hbox (35.528pt too wide) in paragraph at lines 356--359
+Overfull \hbox (35.528pt too wide) in paragraph at lines 359--362
 []\T1/ptm/m/n/10 This ar-gu-ment is only used if relapse-based re-baseline is e
 n-abled ([]\T1/zi4/m/n/10 relapse_rebl=TRUE[]\T1/ptm/m/n/10 ).
 
-Overfull \hbox (32.86931pt too wide) in paragraph at lines 396--401
+Overfull \hbox (32.86931pt too wide) in paragraph at lines 399--404
 \T1/ptm/m/n/10 if con-sid-er-ing mul-ti-ple win-dows. If []\T1/zi4/m/n/10 lengt
 h(conf_days) > 1 []\T1/ptm/m/n/10 (e.g., []\T1/zi4/m/n/10 conf_days=c(12*7,
 
-Overfull \hbox (7.55864pt too wide) in paragraph at lines 396--401
+Overfull \hbox (7.55864pt too wide) in paragraph at lines 399--404
 \T1/ptm/m/n/10 firmed over 12 \T1/ptm/m/it/10 or \T1/ptm/m/n/10 24 weeks") with
  their rel-a-tive tol-er-ance (as per []\T1/zi4/m/n/10 conf_tol_days[]\T1/ptm/m
 /n/10 ). 
 [7] [8]
-Overfull \hbox (59.70943pt too wide) in paragraph at lines 479--486
+Overfull \hbox (59.70943pt too wide) in paragraph at lines 482--489
 []\T1/zi4/m/n/10 impute_last_visit=1[]\T1/ptm/m/n/10 ; they are im-puted with p
 rob-a-bil-ity []\T1/zi4/m/n/10 p[]\T1/ptm/m/n/10 , \T1/zi4/m/n/10 0<p<1\T1/ptm/
 m/n/10 , if []\T1/zi4/m/n/10 impute_last_visit=p[]\T1/ptm/m/n/10 .
 
-Overfull \hbox (78.43878pt too wide) in paragraph at lines 506--507
+Overfull \hbox (78.43878pt too wide) in paragraph at lines 509--510
 []\T1/ptm/m/n/10 the con-fir-ma-tion visit(s) ([]\T1/zi4/m/n/10 "conf<c>_date" 
 []\T1/ptm/m/n/10 col-umn and, when rel-e-vant, []\T1/zi4/m/n/10 "PIRA_conf<c>_d
 ate"
 [9]
-Underfull \hbox (badness 10000) in paragraph at lines 555--562
+Underfull \hbox (badness 10000) in paragraph at lines 558--565
 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 567--567
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 570--570
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="EDS
 S", date_col="date", outcome="edss",[] 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 573--573
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 576--576
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="SDM
 T", date_col="date", outcome="sdmt",[] 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 580--580
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 583--583
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="SDM
 T", date_col="date", outcome="sdmt",[] 
 [10]
-Overfull \hbox (21.45517pt too wide) in paragraph at lines 651--653
+Overfull \hbox (21.45517pt too wide) in paragraph at lines 654--656
 \T1/ptm/m/n/10 PIRA (could be dif-fer-ent from CDW con-fir-ma-tion visit if the
  PIRA def-i-ni-tion in-cludes confirmation-
 [11] (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/ts1zi4.fd)
 [12{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
 
-Underfull \hbox (badness 10000) in paragraph at lines 775--781
+Underfull \hbox (badness 10000) in paragraph at lines 778--784
 
 [13]
-Underfull \hbox (badness 10000) in paragraph at lines 815--822
+Underfull \hbox (badness 10000) in paragraph at lines 818--825
 
 [14] [15] [16]
-Overfull \hbox (32.86931pt too wide) in paragraph at lines 974--979
+Overfull \hbox (32.86931pt too wide) in paragraph at lines 977--982
 \T1/ptm/m/n/10 if con-sid-er-ing mul-ti-ple win-dows. If []\T1/zi4/m/n/10 lengt
 h(conf_days) > 1 []\T1/ptm/m/n/10 (e.g., []\T1/zi4/m/n/10 conf_days=c(12*7,
 
-Overfull \hbox (26.07854pt too wide) in paragraph at lines 974--979
+Overfull \hbox (26.07854pt too wide) in paragraph at lines 977--982
 \T1/ptm/m/n/10 "con-firmed over 12 \T1/ptm/m/it/10 or \T1/ptm/m/n/10 24 weeks")
  with their rel-a-tive tol-er-ance (as per []\T1/zi4/m/n/10 conf_tol_days[]\T1/
 ptm/m/n/10 ). 
 [17]
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
-c84c003/Rd2.ind [18] [19])
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
-c84c003/Rd2.aux)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzdpF30/Rd2pdfe274
+1e24721/Rd2.ind [18] [19])
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzdpF30/Rd2pdfe274
+1e24721/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -409,7 +409,7 @@ y10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></
 usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/
 texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/20
 24/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (19 pages, 136910 bytes).
+Output written on Rd2.pdf (19 pages, 136988 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.17 [TeX Live 2024] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (31 entries accepted, 0 rejected).
@@ -485,121 +485,121 @@ ty (/usr/local/texlive/2024/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
 Writing index file Rd2.idx
 (/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
-c84c003/Rd2.aux)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzdpF30/Rd2pdfe274
+1e24721/Rd2.aux)
 (/usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 )
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
-c84c003/Rd2.out)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
-c84c003/Rd2.out)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzdpF30/Rd2pdfe274
+1e24721/Rd2.out)
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzdpF30/Rd2pdfe274
+1e24721/Rd2.out)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/jknapltx/ursfs.fd)
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
-c84c003/Rd2.toc [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pd
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzdpF30/Rd2pdfe274
+1e24721/Rd2.toc [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pd
 ftex.map}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/
 local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}])
-Underfull \hbox (badness 10000) in paragraph at lines 65--66
+Underfull \hbox (badness 10000) in paragraph at lines 68--69
 
 (/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [2]
-Underfull \hbox (badness 10000) in paragraph at lines 128--129
+Underfull \hbox (badness 10000) in paragraph at lines 131--132
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 138--139
+Underfull \hbox (badness 10000) in paragraph at lines 141--142
 
 
-Overfull \hbox (25.02924pt too wide) in paragraph at lines 145--147
+Overfull \hbox (25.02924pt too wide) in paragraph at lines 148--150
 []\T1/zi4/m/n/10 "custom" []\T1/ptm/m/n/10 (only ac-cepted when spec-i-fy-ing n
 on-[]\T1/zi4/m/n/10 NULL worsening []\T1/ptm/m/n/10 -- and []\T1/zi4/m/n/10 del
 ta_fun
 
-Overfull \hbox (9.16864pt too wide) in paragraph at lines 155--160
+Overfull \hbox (9.16864pt too wide) in paragraph at lines 158--163
 \T1/ptm/m/n/10 dis-ease course, []\T1/zi4/m/n/10 "decrease" []\T1/ptm/m/n/10 ot
 h-er-wise). This ar-gu-ment is only used when []\T1/zi4/m/n/10 outcome
 [3] [4]
-Overfull \hbox (14.51942pt too wide) in paragraph at lines 256--257
+Overfull \hbox (14.51942pt too wide) in paragraph at lines 259--260
 []\T1/zi4/m/n/10 "custom" []\T1/ptm/m/n/10 (only ac-cepted when spec-i-fy-ing c
 us-tom []\T1/zi4/m/n/10 delta_fun []\T1/ptm/m/n/10 and []\T1/zi4/m/n/10 worseni
 ng[]\T1/ptm/m/n/10 ). 
 [5]
-Overfull \hbox (39.09814pt too wide) in paragraph at lines 314--316
+Overfull \hbox (39.09814pt too wide) in paragraph at lines 317--319
 []\T1/zi4/m/n/10 "roving_impr"[]\T1/ptm/m/n/10 : up-dated af-ter ev-ery CDI (to
  the visit de-ter-mined by []\T1/zi4/m/n/10 proceed_from[]\T1/ptm/m/n/10 );
 
-Overfull \hbox (69.26788pt too wide) in paragraph at lines 325--326
+Overfull \hbox (69.26788pt too wide) in paragraph at lines 328--329
 []\T1/ptm/m/n/10 from the next visit af-ter the first qual-i-fy-ing con-fir-ma-
 tion visit if []\T1/zi4/m/n/10 proceed_from="firstconf" 
 
-Overfull \hbox (7.10724pt too wide) in paragraph at lines 340--345
+Overfull \hbox (7.10724pt too wide) in paragraph at lines 343--348
 \T1/ptm/m/n/10 come mea-sure be-low the clin-i-cally mean-ing-ful thresh-old) c
 an trig-ger a re-baseline.
 [6]
-Overfull \hbox (35.528pt too wide) in paragraph at lines 356--359
+Overfull \hbox (35.528pt too wide) in paragraph at lines 359--362
 []\T1/ptm/m/n/10 This ar-gu-ment is only used if relapse-based re-baseline is e
 n-abled ([]\T1/zi4/m/n/10 relapse_rebl=TRUE[]\T1/ptm/m/n/10 ).
 
-Overfull \hbox (32.86931pt too wide) in paragraph at lines 396--401
+Overfull \hbox (32.86931pt too wide) in paragraph at lines 399--404
 \T1/ptm/m/n/10 if con-sid-er-ing mul-ti-ple win-dows. If []\T1/zi4/m/n/10 lengt
 h(conf_days) > 1 []\T1/ptm/m/n/10 (e.g., []\T1/zi4/m/n/10 conf_days=c(12*7,
 
-Overfull \hbox (7.55864pt too wide) in paragraph at lines 396--401
+Overfull \hbox (7.55864pt too wide) in paragraph at lines 399--404
 \T1/ptm/m/n/10 firmed over 12 \T1/ptm/m/it/10 or \T1/ptm/m/n/10 24 weeks") with
  their rel-a-tive tol-er-ance (as per []\T1/zi4/m/n/10 conf_tol_days[]\T1/ptm/m
 /n/10 ). 
 [7] [8]
-Overfull \hbox (59.70943pt too wide) in paragraph at lines 479--486
+Overfull \hbox (59.70943pt too wide) in paragraph at lines 482--489
 []\T1/zi4/m/n/10 impute_last_visit=1[]\T1/ptm/m/n/10 ; they are im-puted with p
 rob-a-bil-ity []\T1/zi4/m/n/10 p[]\T1/ptm/m/n/10 , \T1/zi4/m/n/10 0<p<1\T1/ptm/
 m/n/10 , if []\T1/zi4/m/n/10 impute_last_visit=p[]\T1/ptm/m/n/10 .
 
-Overfull \hbox (78.43878pt too wide) in paragraph at lines 506--507
+Overfull \hbox (78.43878pt too wide) in paragraph at lines 509--510
 []\T1/ptm/m/n/10 the con-fir-ma-tion visit(s) ([]\T1/zi4/m/n/10 "conf<c>_date" 
 []\T1/ptm/m/n/10 col-umn and, when rel-e-vant, []\T1/zi4/m/n/10 "PIRA_conf<c>_d
 ate"
 [9]
-Underfull \hbox (badness 10000) in paragraph at lines 555--562
+Underfull \hbox (badness 10000) in paragraph at lines 558--565
 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 567--567
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 570--570
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="EDS
 S", date_col="date", outcome="edss",[] 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 573--573
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 576--576
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="SDM
 T", date_col="date", outcome="sdmt",[] 
 
-Overfull \hbox (36.76248pt too wide) in paragraph at lines 580--580
+Overfull \hbox (36.76248pt too wide) in paragraph at lines 583--583
  []\T1/zi4/m/n/9 output <- MSprog(toydata_visits, subj_col="id", value_col="SDM
 T", date_col="date", outcome="sdmt",[] 
 [10]
-Overfull \hbox (21.45517pt too wide) in paragraph at lines 651--653
+Overfull \hbox (21.45517pt too wide) in paragraph at lines 654--656
 \T1/ptm/m/n/10 PIRA (could be dif-fer-ent from CDW con-fir-ma-tion visit if the
  PIRA def-i-ni-tion in-cludes confirmation-
 [11] (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/ts1zi4.fd)
 [12{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
 
-Underfull \hbox (badness 10000) in paragraph at lines 775--781
+Underfull \hbox (badness 10000) in paragraph at lines 778--784
 
 [13]
-Underfull \hbox (badness 10000) in paragraph at lines 815--822
+Underfull \hbox (badness 10000) in paragraph at lines 818--825
 
 [14] [15] [16]
-Overfull \hbox (32.86931pt too wide) in paragraph at lines 974--979
+Overfull \hbox (32.86931pt too wide) in paragraph at lines 977--982
 \T1/ptm/m/n/10 if con-sid-er-ing mul-ti-ple win-dows. If []\T1/zi4/m/n/10 lengt
 h(conf_days) > 1 []\T1/ptm/m/n/10 (e.g., []\T1/zi4/m/n/10 conf_days=c(12*7,
 
-Overfull \hbox (26.07854pt too wide) in paragraph at lines 974--979
+Overfull \hbox (26.07854pt too wide) in paragraph at lines 977--982
 \T1/ptm/m/n/10 "con-firmed over 12 \T1/ptm/m/it/10 or \T1/ptm/m/n/10 24 weeks")
  with their rel-a-tive tol-er-ance (as per []\T1/zi4/m/n/10 conf_tol_days[]\T1/
 ptm/m/n/10 ). 
 [17]
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
-c84c003/Rd2.ind [18] [19])
-(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpUu2k7b/Rd2pdfc403
-c84c003/Rd2.aux) )
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzdpF30/Rd2pdfe274
+1e24721/Rd2.ind [18] [19])
+(/private/var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T/RtmpzdpF30/Rd2pdfe274
+1e24721/Rd2.aux) )
 (see the transcript file for additional information)
 pdfTeX warning (dest): name{Rfn.as.Date} has been referenced but does not exist
 , replaced by a fixed one
@@ -614,8 +614,8 @@ y10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></
 usr/local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/
 texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/20
 24/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (19 pages, 137293 bytes).
+Output written on Rd2.pdf (19 pages, 137317 bytes).
 Transcript written on Rd2.log.
 Saving output to ‘msprog-manual.pdf’ ...
 Done
-You may want to clean up by 'rm -Rf /var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T//RtmpUu2k7b/Rd2pdfc403c84c003'
+You may want to clean up by 'rm -Rf /var/folders/wk/mtx7h62d7bj495h_cqdk6gsr0000gn/T//RtmpzdpF30/Rd2pdfe2741e24721'

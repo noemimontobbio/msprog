@@ -4,17 +4,18 @@
 <br>
 
 > [!WARNING]
-> **🚧 This repository is under active development. 🚧 <br> Please make sure you are using the latest stable version available on CRAN (1.0.0).
+> **🚧 This repository is under active development. 🚧 <br> Please make sure you are using at least the latest stable version available on CRAN (1.0.0).
 > Check your installed version by running `utils::packageVersion("msprog")`.**
 
 <br>
 
-> 📣 **What’s new in latest versions**
+> 📣 **What’s new**
 >
+> - Updated [citation](#citation) (v1.0.1) – **[new
+>   paper](https://doi.org/10.1177/13524585261478492) out now!**
 > - Info on initial baseline (first eligible baseline visit) in results
->   data frame ([development version](#devel))
-> - **Now available on CRAN** (supporting **R \>= 4.1.0**) (from
->   v1.0.0).
+>   data frame (v1.0.1) <!-- ([development version](#devel)) -->
+> - **Now available on CRAN** (supporting **R \>= 4.1.0**) (v1.0.0).
 
 # msprog: reproducible assessment of disability course in MS
 
@@ -55,11 +56,19 @@ The package also provides two toy datasets for function testing:
 - `toydata_relapses`: artificially generated relapse onset dates
   associated with the patients in `toydata_visits`.
 
-Please refer to the documentation for function usage (e.g. `?MSprog`)
-and data structure (e.g. `?toydata_visits`). The whole documentation can
-be found in the [reference manual
-(PDF)](https://cran.r-project.org/web/packages/msprog/msprog.pdf). For
-detailed indications on usage and best practices, please refer to the
+Please refer to [**published
+guidelines**](https://doi.org/10.1177/13524585261478492) on recommended
+calculation settings according to study type and endpoint of interest.
+These recommendations are the result of a consensus process involving
+several international MS research groups and conducted under the
+auspices of the International Advisory Committee on Clinical Trials in
+MS (IACCTMS).
+
+Refer to the documentation for function usage (e.g. `?MSprog`) and data
+structure (e.g. `?toydata_visits`). The whole documentation can be found
+in the [reference manual
+(PDF)](https://cran.r-project.org/web/packages/msprog/msprog.pdf).
+Detailed indications and examples on function usage are available in the
 [package vignettes](#vignette).
 
 The computation can be run locally in R (see [installation
@@ -242,7 +251,7 @@ print(output)
 ```
 
     ---
-    msprog version: 1.0.0.9000 
+    msprog version: 1.0.1 
     ---
     MSprog() arguments:
     outcome=edss, event=multiple, RAW_PIRA=FALSE, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7, 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
@@ -281,24 +290,24 @@ citation("msprog")
 
     To cite package 'msprog' in publications use:
 
-      Montobbio N, Carmisciano L, Signori A, Ponzano M, Schiavetti I, Bovis
-      F, Sormani MP (2024). "Creating an automated tool for a consistent
-      and repeatable evaluation of disability progression in clinical
-      studies for Multiple Sclerosis." _Mult Scler._, *30*(9), 1185-1192.
-      doi:10.1177/13524585241243157
-      <https://doi.org/10.1177/13524585241243157>.
+      Montobbio N, Bovis F, Hofer L, Häring DA, Benkert P, Tur C, Kalincik
+      T, Sharmin S, Masot Llima A, Hernández Soria D, Salter A, Morocz I,
+      Wang Q, Kuhle J, Chappell S, Capra R, Cordioli C, D'Souza M, Coetzee
+      T, Montalban X, Arnold DL, Calabresi PA, Sormani MP (2026). "A
+      community-validated tool for clinical outcome calculation in multiple
+      sclerosis: Consensus development and scenario-specific
+      recommendations." _Multiple Sclerosis Journal_.
+      doi:10.1177/13524585261478492
+      <https://doi.org/10.1177/13524585261478492>.
 
     A BibTeX entry for LaTeX users is
 
       @Article{,
-        title = {Creating an automated tool for a consistent and repeatable evaluation of disability progression in clinical studies for Multiple Sclerosis},
-        author = {Noemi Montobbio and Luca Carmisciano and Alessio Signori and Marta Ponzano and Irene Schiavetti and Francesca Bovis and Maria Pia Sormani},
-        journal = {Mult Scler.},
-        year = {2024},
-        volume = {30},
-        number = {9},
-        pages = {1185-1192},
-        doi = {10.1177/13524585241243157},
+        title = {A community-validated tool for clinical outcome calculation in multiple sclerosis: Consensus development and scenario-specific recommendations},
+        author = {Noemi Montobbio and Francesca Bovis and Lisa Hofer and Dieter A. Häring and Pascal Benkert and Carmen Tur and Tomas Kalincik and Sifat Sharmin and Ariadna {Masot Llima} and Daniel {Hernández Soria} and Amber Salter and Istvan Morocz and Qing Wang and Jens Kuhle and Steven Chappell and Ruggero Capra and Cinzia Cordioli and Marcus D'Souza and Timothy Coetzee and Xavier Montalban and Douglas L. Arnold and Peter A. Calabresi and Maria P. Sormani},
+        journal = {Multiple Sclerosis Journal},
+        year = {2026},
+        doi = {10.1177/13524585261478492},
       }
 
 ## References

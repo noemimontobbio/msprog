@@ -100,7 +100,7 @@ DT::datatable(output$results, rownames=F,
               )
 
 ## ----echo=FALSE, out.width="40%", fig.cap = "*Figure 2. Example of data with unscheduled visits.*"----
-knitr::include_graphics(paste0(getwd(), "unscheduled.png"))
+knitr::include_graphics("./unscheduled.png")
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  output <- MSprog(...
@@ -113,7 +113,7 @@ knitr::include_graphics(paste0(getwd(), "unscheduled.png"))
 #                   ...)
 
 ## ----echo=FALSE, out.width="50%", fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `p0`, `p1`, `e0`, `e1`, `c0`, `c1`.*"----
-knitr::include_graphics(paste0(getwd(), "relapse_indep_def.png"))
+knitr::include_graphics("./relapse_indep_def.png")
 
 ## -----------------------------------------------------------------------------
 output <- MSprog(data=toydata_visits,

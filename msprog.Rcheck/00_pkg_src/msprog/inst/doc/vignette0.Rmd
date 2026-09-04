@@ -317,7 +317,7 @@ i.e., the confirmation visit must lie between 24 weeks after the event, and 36 w
 * In scenarios (e.g., a clinical trial) where disability course is compared between two cohorts with different relapse rates, there may be an imbalance in visit frequency between the two groups, due to unscheduled visits after relapses. This implies a higher probability of detecting outcome changes in the group with more assessments. Such issue is sometimes addressed by only using scheduled visits as confirmation visits [@hauser2017]. It is possible to implement this with `MSprog()` by including an additional column in the longitudinal data, specifying which visits can (`TRUE`) or cannot (`FALSE`) be used as confirmation visits. The name of such column must be specified using the `validconf_col` argument.
 
     ```{r echo=FALSE, out.width="40%", fig.cap = "*Figure 2. Example of data with unscheduled visits.*"}
-    knitr::include_graphics(paste0(getwd(), "unscheduled.png"))
+    knitr::include_graphics("./unscheduled.png")
     ```
 
     In the example depicted in Figure 2, unscheduled visits can be excluded from consideration as confirmation visits by setting:
@@ -372,7 +372,7 @@ output <- MSprog(...
 where: `p0` and `p1` specify the interval around a visit preceding the event (can be the current reference, the last visit before event onset, or the last visit before event onset with a clinically meaningful score difference from it [^pira]); `e0` and `e1` specify the interval around the event; `c0` and `c1` specify the interval around the confirmation visit; see Figure 1. If both ends of an interval are 0 (e.g., if both `p0=0` and `p1=0`), the checkpoint is ignored. To merge two intervals together, set both the right end of the first interval and the left end of the second interval to `NULL` (e.g., "between baseline and event onset": `p1=NULL` and `e0=NULL`). 
 
 ```{r echo=FALSE, out.width="50%", fig.cap = "*Figure 1. Relapse-free intervals characterising PIRA, as defined by arguments `p0`, `p1`, `e0`, `e1`, `c0`, `c1`.*"}
-knitr::include_graphics(paste0(getwd(), "relapse_indep_def.png"))
+knitr::include_graphics("./relapse_indep_def.png")
 ```
 
 For example, in @muller2023, the authors recommend an absence of relapses during the 90 days before and 30 days after the event, and during the 90 days before and 30 days after confirmation for a CDW event to be considered as PIRA. This translates into: `p0<-0`, `p1<-0`, `e0<-90`, `e1<-30`, `c0<-90`, `c1<-30`. When a high specificity is desired, they recommend an absence of relapses in the whole period between reference and confirmation, which is implemented by setting: `p0<-0`, `p1<-NULL`, `e0<-NULL`, `e1<-NULL`, `c0<-NULL`, `c1<-0`. 
