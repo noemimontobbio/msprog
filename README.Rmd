@@ -19,17 +19,18 @@ knitr::opts_chunk$set(
 
 <br>
 
-```{r echo=FALSE}
-x <- utils::packageVersion("msprog")
-cran_version <- tryCatch(
-  available.packages(repos = "https://cloud.r-project.org")["msprog", "Version"],
-  error = function(e) substr(x, 1, nchar(x) - 5)
-)
+```{r, include=FALSE}
+cran_version <- tryCatch({
+  packages <- suppressWarnings(
+    available.packages(repos = "https://cloud.r-project.org")
+  )
+  packages["msprog", "Version"]
+}, error = function(e) NA_character_)
 ```
 
 ```{=markdown}
 > [!WARNING]
-> **🚧 This repository is under active development. 🚧 <br> Please make sure you are using at least the latest stable version available on CRAN (`r cran_version`).
+> **🚧 This repository is under active development. 🚧 <br> Please make sure you are using at least the latest stable version available on CRAN`r if (is.na(cran_version)) "" else paste0(" (", cran_version, ")")`.
 > Check your installed version by running `utils::packageVersion("msprog")`.**
 ```
 

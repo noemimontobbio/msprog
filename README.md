@@ -3,11 +3,8 @@
 
 <br>
 
-    Warning: unable to access index for repository https://cloud.r-project.org/src/contrib:
-      cannot open URL 'https://cloud.r-project.org/src/contrib/PACKAGES'
-
 > [!WARNING]
-> **🚧 This repository is under active development. 🚧 <br> Please make sure you are using at least the latest stable version available on CRAN (1.0.1.9000).
+> **🚧 This repository is under active development. 🚧 <br> Please make sure you are using at least the latest stable version available on CRAN (1.0.1).
 > Check your installed version by running `utils::packageVersion("msprog")`.**
 
 <br>
