@@ -58,7 +58,7 @@ print.MSprogOutput <- function(x, ...) {
   } else if (s$event=="firstRAW") {
     event_text <- paste0("the first ", outcome, " RAW event")
   } else if (s$event=="multiple") {
-    event_text <- paste0("all confirmed ", outcome, " changes (in chronological order)")
+    event_text <- paste0("all confirmed outcome changes (in chronological order)")
   }
 
   # %%%%%%%%%%%%%
@@ -131,9 +131,13 @@ print.MSprogOutput <- function(x, ...) {
                             else " worsening or improvement event. ",
                             # Proceed from
                             "The new baseline was set at ",
-                            if (s$proceed_from=="event") "the onset of the event"
-                            else "the first eligible confirmation visit for the event",
-                            " that triggered the re-baseline. ",
+                            if (s$proceed_from=="event") "the onset of"
+                            else if (s$proceed_from=="firstconf") "the first eligible confirmation visit for"
+                            else paste0("the visit with ",
+                                        (if ((s$proceed_from=="best" && s$worsening=="increase")
+                                             || (s$proceed_from=="worst" && s$worsening=="decrease")) "lowest " else "highest "),
+                                        outcome, " value in the confirmation period of"),
+                            " the event that triggered the re-baseline. ",
                             # Sub-threshold
                             if (s$sub_threshold_rebl!="none")
                                    paste0("Rebaseline was also triggered by any confirmed \"sub-threshold\" ", s$sub_threshold_rebl,
@@ -171,13 +175,13 @@ print.MSprogOutput <- function(x, ...) {
   # OTHER OPTIONS
   # %%%%%%%%%%%%%
 
-  imputation_text <- if (s$impute_last_visit > 0)
+  imputation_text <- if (s$impute_last_worsening > 0)
     paste0("In case of ", outcome, " worsening at the last visit, CDW was imputed",
            if (s$impute_max_fu < Inf)
              paste0(" for patients terminating follow-up before day ", s$impute_max_fu)
            else "",
-           if (s$impute_last_visit < 1)
-             paste0(" with a probability of ", s$impute_last_visit)
+           if (s$impute_last_worsening < 1)
+             paste0(" with a probability of ", s$impute_last_worsening)
            else "",
            ". ") else ""
 
@@ -210,8 +214,7 @@ print.MSprogOutput <- function(x, ...) {
   if (s$rawpira) {
 
     # RAW
-    raw_text <- paste0("A confirmed ", outcome,
-                       " worsening event was labelled as RAW if occurring within ",
+    raw_text <- paste0("A confirmed worsening event was labelled as RAW if occurring within ",
                        if (is.null(s$renddate_col))
                          paste0(s$relapse_assoc[1], " days after the onset of a relapse")
                        else "a relapse (between onset and end)",
@@ -248,8 +251,7 @@ print.MSprogOutput <- function(x, ...) {
       pira_def <- gsub(".{5}$", "", pira_def)
     }
     # Full PIRA text
-    pira_text <- paste0("A confirmed ", outcome,
-                        " worsening event was labelled as PIRA if ",
+    pira_text <- paste0("A confirmed worsening event was labelled as PIRA if ",
                         if (length(s$relapse_indep[["event"]]) == 2)
                           paste0("no relapses started in the interval ", pira_def, ". ")
                         else paste0("it did not occur within a relapse (onset to end)",

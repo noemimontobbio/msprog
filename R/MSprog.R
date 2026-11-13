@@ -65,17 +65,17 @@
 #' \item `"roving_wors"`: updated after every CDW (to the visit determined by `proceed_from`);
 #' suitable when searching for a specific type of CDW (i.e., when `event` is set to `"firstPIRA"` or `"firstRAW"`).
 #' }
-#' @param proceed_from After detecting a confirmed disability event, continue searching:
-#' \itemize{
-#' \item from the next visit after the first qualifying confirmation visit if `proceed_from="firstconf"`
-#' \item from the next visit after the event onset if `proceed_from="event"`.
-#' }
-#' If `baseline` is set to `"roving"`, `"roving_impr"`, or `"roving_wors"`,
-#' when rebaselining after a confirmed disability event, the baseline is moved to:
+#' @param proceed_from This argument determines which visit $i_0$ to consider as the new starting point
+#' after detecting a confirmed disability event. The search resumes from visit $i_0 + 1$, regardless of
+#' the baseline scheme. In addition,if `baseline` is set to `"roving"`, `"roving_impr"`, or `"roving_wors"`,
+#' the baseline is moved to visit $i_0$ itself. Visit $i_0$ can be:
 #' \itemize{
 #' \item the first qualifying confirmation visit if `proceed_from="firstconf"`
-#' \item the event visit if `proceed_from="event"`.
+#' \item the event onset if `proceed_from="event"`
+#' \item the visit with the best score (e.g., lowest EDSS) within the confirmation interval if `proceed_from="best"`
+#' \item the visit with the worst score (e.g., highest EDSS) within the confirmation interval if `proceed_from="worst"`.
 #' }
+#' If `proceed_from` is set to `"best"` or `"worst"`, in case of identical scores, the latest visit is considered.
 #' @param sub_threshold_rebl This argument is only used if `baseline` is not set to `"fixed"`.
 #' It controls whether and which "sub-threshold" events (i.e., \emph{confirmed}
 #' changes in the outcome measure below the clinically meaningful threshold) can
@@ -192,11 +192,11 @@
 #' If relapse end dates are available (`renddate_col`), it is possible to also define PIRA based on those
 #' by setting `use_end_dates=TRUE` in [relapse_indep_from_bounds()].
 #' The argument is ignored if PIRA events are not detected (e.g., if `event="firstCDW"` and `RAW_PIRA=FALSE`).
-#' @param impute_last_visit Imputation probability for worsening events occurring
+#' @param impute_last_worsening Imputation probability for worsening events occurring
 #' at the last available visit (i.e., with no confirmation).
-#' Unconfirmed worsening events occurring at the last visit are never imputed if `impute_last_visit=0`;
-#' they are always imputed if `impute_last_visit=1`;
-#' they are imputed with probability `p`, `0<p<1`, if `impute_last_visit=p`.
+#' Unconfirmed worsening events occurring at the last visit are never imputed if `impute_last_worsening=0`;
+#' they are always imputed if `impute_last_worsening=1`;
+#' they are imputed with probability `p`, `0<p<1`, if `impute_last_worsening=p`.
 #' If a value `N>1` is passed, unconfirmed worsening events are imputed only if occurring within `N` days of follow-up
 #' (e.g., in case of early discontinuation).
 #' @param date_format Format of dates in the `date_col` and `rdate_col` columns of the input data.
@@ -225,10 +225,18 @@
 #' }
 #' @param include_stable If `TRUE`, subjects with no confirmed events are included in `output$results`,
 #' with `time2event` = total follow up.
+#' @param include_trajectory In a first-event search, whether to report the trajectory
+#' leading to the stopping event (e.g., the first CDW).
+#' Specifically, `output$results` and `output$event_count` include:
+#' \itemize{
+#'  \item{only the stopping event if `include_trajectory=FALSE`}
+#'  \item{all events up to the stopping event if `include_trajectory=TRUE`.}
+#'  }
+#'  If `event="multiple"`, all detected valid events are reported regardless of `include_trajectory`.
 #' @param verbose One of:
 #' \itemize{
-#'  \item{0 (print no info);}
-#'  \item{1 (print concise info, default);}
+#'  \item{0 (print no info)}
+#'  \item{1 (print concise info, default)}
 #'  \item{2 (print extended info).}
 #'  }
 #'
@@ -283,15 +291,16 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    subjects=NULL, delta_fun=NULL, worsening=NULL,
                    event=c("firstCDW", "firstCDI", "multiple", "firstPIRA", "firstRAW", "first"),
                    RAW_PIRA=FALSE, baseline=c("fixed", "roving", "roving_impr", "roving_wors"),
-                   proceed_from=c("firstconf", "event"),
+                   proceed_from=c("firstconf", "event", "best", "worst"),
                    sub_threshold_rebl=c("none", "change", "improvement", "worsening"),
                    bl_geq=FALSE, relapse_rebl=FALSE, skip_local_extrema=c("none", "strict", "all"),
                    validconf_col=NULL, conf_days=12*7, conf_tol_days=c(7,2*365.25),
                    require_sust_days=0, check_intermediate=TRUE,
                    relapse_to_bl=30, relapse_to_event=0, relapse_to_conf=30,
                    relapse_assoc=90, relapse_indep=NULL,
-                   impute_last_visit=0, date_format=NULL,
-                   include_dates=FALSE, include_values=FALSE, include_stable=TRUE,
+                   impute_last_worsening=0, date_format=NULL,
+                   include_dates=FALSE, include_values=FALSE,
+                   include_stable=TRUE, include_trajectory=FALSE,
                    verbose=1
                    ) {
 
@@ -516,15 +525,15 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
     worsening <- match.arg(worsening, c("increase", "decrease"))
   }
 
-  if (impute_last_visit < 0) {
-    stop("`impute_last_visit` must be nonnegative")
-  } else if (impute_last_visit <= 1) {
-    # If impute_last_visit is a probability, set no limit to follow-up length (Inf)
+  if (impute_last_worsening < 0) {
+    stop("`impute_last_worsening` must be nonnegative")
+  } else if (impute_last_worsening <= 1) {
+    # If impute_last_worsening is a probability, set no limit to follow-up length (Inf)
     impute_max_fu <- Inf
   } else {
-    # If impute_last_visit is a follow-up time, save the value and set probability to 1
-    impute_max_fu <- impute_last_visit
-    impute_last_visit <- 1
+    # If impute_last_worsening is a follow-up time, save the value and set probability to 1
+    impute_max_fu <- impute_last_worsening
+    impute_last_worsening <- 1
   }
 
   # Define local is_event() function
@@ -912,7 +921,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
       } else {
         if (change_idx == nvisits) {
           conf_idx <- list()
-          conf_t <- list() # for impute_last_visit
+          conf_t <- list() # for impute_last_worsening
           } else {
         conf_idx <- lapply(conf_window, function(t) {
           match_idx <- numeric(0)
@@ -1087,12 +1096,24 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
             if (length(x)) min(x)
           }))
 
-          if (baseline %in% c("roving", "roving_impr")) { #_r_#
-            # In a roving baseline setting, the baseline is moved after the confirmed event (even if it is not sustained):
-            newref <- if (proceed_from=="firstconf") conf_idx[[1]] else change_idx
-            bl_idx <- newref}
-          else if (valid_ev) {
-              newref <- if (proceed_from=="firstconf") conf_idx[[1]] else change_idx
+          if (valid_ev || (baseline %in% c("roving", "roving_impr"))) { #_r_#
+            # In a roving baseline setting, the baseline is moved after the confirmed event
+            # (even if it is not retained as per `require_sust_days`):
+            if (proceed_from=="firstconf") {
+              newref <- conf_idx[[1]]
+            } else if (proceed_from=="firstconf") {
+              newref <- change_idx
+            } else {
+              idx_reverse <- seq.int(conf_idx[[1]], change_idx) # to selects the last occurrence of the min/max
+              if ((proceed_from == "best" & worsening == "increase")
+                  || (proceed_from == "worst" & worsening == "decrease")) {
+                newref <- idx_reverse[which.min(data_id[[value_col]][idx_reverse])]
+              } else {
+                newref <- idx_reverse[which.max(data_id[[value_col]][idx_reverse])]
+              }
+            }
+            if (baseline %in% c("roving", "roving_impr")) {bl_idx <- newref}
+            # Note: if baseline is static, `newref` is only used to update search index.
             } else {
               # If the event is not retained (as per `require_sust_days`),
               # proceed with search starting from event, regardless of `proceed_from`:
@@ -1118,7 +1139,19 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
           && baseline %in% c("roving", "roving_impr") #_r_#
           && sub_threshold_rebl %in% c("change", "improvement")
               ) {
-              newref <- if (proceed_from=="firstconf") conf_idx[[1]] else change_idx
+              if (proceed_from=="firstconf") {
+                newref <- conf_idx[[1]]
+              } else if (proceed_from=="firstconf") {
+                newref <- change_idx
+              } else {
+                idx_reverse <- seq.int(conf_idx[[1]], change_idx) # to selects the last occurrence of the min/max
+                if ((proceed_from == "best" & worsening == "increase")
+                    || (proceed_from == "worst" & worsening == "decrease")) {
+                  newref <- idx_reverse[which.min(data_id[[value_col]][idx_reverse])]
+                } else {
+                  newref <- idx_reverse[which.max(data_id[[value_col]][idx_reverse])]
+                }
+              }
 
               # Set new baseline after event:
               bl_idx <- newref
@@ -1142,7 +1175,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                function(x) isevent_loc(data_id[[value_col]][x], bl=bl[[value_col]], type="wors"))),  # worsening is confirmed at (all visits up to) first valid date
               isevent_loc(data_id[[value_col]][conf_idx[[1]]], bl=bl[[value_col]], type="wors")) # worsening is confirmed at first valid date
           ) || (data_id[[date_col]][change_idx] - data_id[[date_col]][1] <= impute_max_fu
-                && rbinom(1, 1, impute_last_visit)
+                && rbinom(1, 1, impute_last_worsening)
                 && change_idx == nvisits))
          ) {
                  if (change_idx == nvisits) {  # i.e., when imputing event at last visit
@@ -1426,8 +1459,21 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                   }))
 
                   if (baseline %in% c("roving", "roving_wors")) {
-                    # In a roving baseline setting, the baseline is moved after the confirmed event (even if it is not sustained):
-                    newref <- if (proceed_from=="firstconf") conf_idx[[1]] else change_idx
+                    # In a roving baseline setting, the baseline is moved after the confirmed event
+                    # (even if it is not retained as per `require_sust_days`):
+                    if (proceed_from=="firstconf") {
+                      newref <- conf_idx[[1]]
+                    } else if (proceed_from=="firstconf") {
+                      newref <- change_idx
+                    } else {
+                      idx_reverse <- seq.int(conf_idx[[1]], change_idx) # to selects the last occurrence of the min/max
+                      if ((proceed_from == "best" & worsening == "increase")
+                          || (proceed_from == "worst" & worsening == "decrease")) {
+                        newref <- idx_reverse[which.min(data_id[[value_col]][idx_reverse])]
+                      } else {
+                        newref <- idx_reverse[which.max(data_id[[value_col]][idx_reverse])]
+                      }
+                    }
                     bl_idx <- newref
                     } else if (!valid_ev
                                || (ev$event_type != "PIRA" && event == "firstPIRA")
@@ -1439,7 +1485,19 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                     newref <- change_idx
                   } else {
                     # If baseline is static, only update `newref` (to be used for search index):
-                    newref <- if (proceed_from=="firstconf") conf_idx[[1]] else change_idx
+                    if (proceed_from=="firstconf") {
+                      newref <- conf_idx[[1]]
+                    } else if (proceed_from=="firstconf") {
+                      newref <- change_idx
+                    } else {
+                      idx_reverse <- seq.int(conf_idx[[1]], change_idx) # to selects the last occurrence of the min/max
+                      if ((proceed_from == "best" & worsening == "increase")
+                          || (proceed_from == "worst" & worsening == "decrease")) {
+                        newref <- idx_reverse[which.min(data_id[[value_col]][idx_reverse])]
+                      } else {
+                        newref <- idx_reverse[which.max(data_id[[value_col]][idx_reverse])]
+                      }
+                    }
                   }
 
                   # Move the search index.
@@ -1467,7 +1525,19 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                && baseline %in% c("roving", "roving_wors")
                && sub_threshold_rebl %in% c("change", "worsening")
                ) {
-                  newref <- if (proceed_from=="firstconf") conf_idx[[1]] else change_idx
+                  if (proceed_from=="firstconf") {
+                    newref <- conf_idx[[1]]
+                  } else if (proceed_from=="firstconf") {
+                    newref <- change_idx
+                  } else {
+                    idx_reverse <- seq.int(conf_idx[[1]], change_idx) # to selects the last occurrence of the min/max
+                    if ((proceed_from == "best" & worsening == "increase")
+                        || (proceed_from == "worst" & worsening == "decrease")) {
+                      newref <- idx_reverse[which.min(data_id[[value_col]][idx_reverse])]
+                    } else {
+                      newref <- idx_reverse[which.max(data_id[[value_col]][idx_reverse])]
+                    }
+                  }
 
                   # Set new baseline after the event:
                   bl_idx <- newref
@@ -1593,23 +1663,19 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
 
       event_type <- event_type[event_order]
 
-      if (startsWith(event, "first")) {
-        impr_idx <- which(event_type == "CDI")[1]
-        prog_idx <- which(event_type %in% c("CDW", "RAW", "PIRA"))[1]
-        raw_idx <- which(event_type == "RAW")[1]
-        pira_idx <- which(event_type == "PIRA")[1]
+      if (!include_trajectory && startsWith(event, "first")) {
 
         if (event == "firstCDI") {
-          first_events <- impr_idx
+          first_events <- which(event_type == "CDI")[1]
         } else if (event == "firstCDW") {
-          first_events <- prog_idx
+          first_events <- which(event_type %in% c("CDW", "RAW", "PIRA"))[1]
         } else if (event == "firstPIRA") {
-          first_events <- pira_idx
+          first_events <- which(event_type == "PIRA")[1]
         } else if (event == "firstRAW") {
-          first_events <- raw_idx
+          first_events <- which(event_type == "RAW")[1]
         }
 
-        if (event=="first") {
+        if (event == "first") {
           first_events <- 1
         } else {
           first_events <- unique(na.omit(first_events))
@@ -1870,7 +1936,7 @@ MSprog <- function(data, subj_col, value_col, date_col, outcome,
                    relapse_to_bl=relapse_to_bl, relapse_to_event=relapse_to_event, relapse_to_conf=relapse_to_conf,
                    relapse_assoc=relapse_assoc, relapse_indep=relapse_indep, renddate_col=renddate_col,
                    sub_threshold_rebl=sub_threshold_rebl, bl_geq=bl_geq, relapse_rebl=relapse_rebl,
-                   impute_last_visit=impute_last_visit, impute_max_fu=impute_max_fu, delta_fun=delta_fun,
+                   impute_last_worsening=impute_last_worsening, impute_max_fu=impute_max_fu, delta_fun=delta_fun,
                    worsening=worsening)
 
   output <- list(event_count=summary, results=results_df, settings=settings, unconfirmed=unconfirmed)

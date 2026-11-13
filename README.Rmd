@@ -37,9 +37,11 @@ cran_version <- tryCatch(
 
 > 📣 **What’s new**
 > 
+> * New options for rebaseline, see argument `proceed_from` ([development version](#devel))
 > * Updated [citation](#citation) (v1.0.1) --  **[new paper](https://doi.org/10.1177/13524585261478492) out now!**
-> * Info on initial baseline (first eligible baseline visit) in results data frame (v1.0.1) <!-- ([development version](#devel)) -->
+> * Info on initial baseline (first eligible baseline visit) in results data frame (v1.0.1) 
 > * **Now available on CRAN** (supporting **R >= 4.1.0**) (v1.0.0).
+<!-- ([development version](#devel)) -->
 
 # msprog: reproducible assessment of disability course in MS
 
@@ -56,7 +58,7 @@ cran_version <- tryCatch(
 [📖 **Documentation**](https://cran.r-project.org/web/packages/msprog/msprog.pdf)<br>
 <!-- [🔍 **Vignettes**](link) -->
 
-`msprog` is an R package providing tools for reproducible analysis of disability course in multiple sclerosis (MS) from longitudinal data [@msprog2024].
+`msprog` is an R package providing tools for reproducible analysis of disability course in multiple sclerosis (MS) from longitudinal data [@msprog2024, @msprog2026].
 A [**Python version**](https://pymsprog.readthedocs.io/en/stable/) of the package is available as well. 
 
 Its core function, `MSprog()`, detects and characterises the evolution of an outcome measure (Expanded Disability Status Scale, EDSS; Nine-Hole Peg Test, NHPT; Timed 25-Foot Walk, T25FW; Symbol Digit Modalities Test, SDMT; or any custom outcome measure) for one or more subjects, based on repeated assessments through time and on the dates of acute episodes (if any).

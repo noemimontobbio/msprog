@@ -20,7 +20,7 @@ MSprog(
   event = c("firstCDW", "firstCDI", "multiple", "firstPIRA", "firstRAW", "first"),
   RAW_PIRA = FALSE,
   baseline = c("fixed", "roving", "roving_impr", "roving_wors"),
-  proceed_from = c("firstconf", "event"),
+  proceed_from = c("firstconf", "event", "best", "worst"),
   sub_threshold_rebl = c("none", "change", "improvement", "worsening"),
   bl_geq = FALSE,
   relapse_rebl = FALSE,
@@ -35,11 +35,12 @@ MSprog(
   relapse_to_conf = 30,
   relapse_assoc = 90,
   relapse_indep = NULL,
-  impute_last_visit = 0,
+  impute_last_worsening = 0,
   date_format = NULL,
   include_dates = FALSE,
   include_values = FALSE,
   include_stable = TRUE,
+  include_trajectory = FALSE,
   verbose = 1
 )
 }
@@ -116,17 +117,17 @@ suitable for a first-CDW setting to discard fluctuations around baseline; not re
 suitable when searching for a specific type of CDW (i.e., when \code{event} is set to \code{"firstPIRA"} or \code{"firstRAW"}).
 }}
 
-\item{proceed_from}{After detecting a confirmed disability event, continue searching:
-\itemize{
-\item from the next visit after the first qualifying confirmation visit if \code{proceed_from="firstconf"}
-\item from the next visit after the event onset if \code{proceed_from="event"}.
-}
-If \code{baseline} is set to \code{"roving"}, \code{"roving_impr"}, or \code{"roving_wors"},
-when rebaselining after a confirmed disability event, the baseline is moved to:
+\item{proceed_from}{This argument determines which visit $i_0$ to consider as the new starting point
+after detecting a confirmed disability event. The search resumes from visit $i_0 + 1$, regardless of
+the baseline scheme. In addition,if \code{baseline} is set to \code{"roving"}, \code{"roving_impr"}, or \code{"roving_wors"},
+the baseline is moved to visit $i_0$ itself. Visit $i_0$ can be:
 \itemize{
 \item the first qualifying confirmation visit if \code{proceed_from="firstconf"}
-\item the event visit if \code{proceed_from="event"}.
-}}
+\item the event onset if \code{proceed_from="event"}
+\item the visit with the best score (e.g., lowest EDSS) within the confirmation interval if \code{proceed_from="best"}
+\item the visit with the worst score (e.g., highest EDSS) within the confirmation interval if \code{proceed_from="worst"}.
+}
+If \code{proceed_from} is set to \code{"best"} or \code{"worst"}, in case of identical scores, the latest visit is considered.}
 
 \item{sub_threshold_rebl}{This argument is only used if \code{baseline} is not set to \code{"fixed"}.
 It controls whether and which "sub-threshold" events (i.e., \emph{confirmed}
@@ -258,11 +259,11 @@ If relapse end dates are available (\code{renddate_col}), it is possible to also
 by setting \code{use_end_dates=TRUE} in \code{\link[=relapse_indep_from_bounds]{relapse_indep_from_bounds()}}.
 The argument is ignored if PIRA events are not detected (e.g., if \code{event="firstCDW"} and \code{RAW_PIRA=FALSE}).}
 
-\item{impute_last_visit}{Imputation probability for worsening events occurring
+\item{impute_last_worsening}{Imputation probability for worsening events occurring
 at the last available visit (i.e., with no confirmation).
-Unconfirmed worsening events occurring at the last visit are never imputed if \code{impute_last_visit=0};
-they are always imputed if \code{impute_last_visit=1};
-they are imputed with probability \code{p}, \verb{0<p<1}, if \code{impute_last_visit=p}.
+Unconfirmed worsening events occurring at the last visit are never imputed if \code{impute_last_worsening=0};
+they are always imputed if \code{impute_last_worsening=1};
+they are imputed with probability \code{p}, \verb{0<p<1}, if \code{impute_last_worsening=p}.
 If a value \code{N>1} is passed, unconfirmed worsening events are imputed only if occurring within \code{N} days of follow-up
 (e.g., in case of early discontinuation).}
 
@@ -296,10 +297,19 @@ If not specified, function \code{\link[=as.Date]{as.Date()}} will try to infer i
 \item{include_stable}{If \code{TRUE}, subjects with no confirmed events are included in \code{output$results},
 with \code{time2event} = total follow up.}
 
+\item{include_trajectory}{In a first-event search, whether to report the trajectory
+leading to the stopping event (e.g., the first CDW).
+Specifically, \code{output$results} and \code{output$event_count} include:
+\itemize{
+\item{only the stopping event if \code{include_trajectory=FALSE}}
+\item{all events up to the stopping event if \code{include_trajectory=TRUE}.}
+}
+If \code{event="multiple"}, all detected valid events are reported regardless of \code{include_trajectory}.}
+
 \item{verbose}{One of:
 \itemize{
-\item{0 (print no info);}
-\item{1 (print concise info, default);}
+\item{0 (print no info)}
+\item{1 (print concise info, default)}
 \item{2 (print extended info).}
 }}
 }

@@ -21,7 +21,7 @@ value_milestone(
   require_sust_days = 0,
   relapse_to_event = 0,
   relapse_to_conf = 30,
-  impute_last_visit = 0,
+  impute_last_worsening = 0,
   date_format = NULL,
   verbose = 0
 )
@@ -92,12 +92,12 @@ Can be an integer (minimum distance from \emph{last} relapse onset) or vector of
 (minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 Note that setting the distance to zero means using any visit for confirmation regardless of surrounding relapses.}
 
-\item{impute_last_visit}{Imputation probability when the milestone is reached
+\item{impute_last_worsening}{Imputation probability when the milestone is reached
 at the last available visit (i.e., with no confirmation).
 Unconfirmed values exceeding the milestone at the last visit are never imputed
-if \code{impute_last_visit=0};
-they are always imputed if \code{impute_last_visit=1};
-they are imputed with probability \code{p}, \verb{0<p<1}, if \code{impute_last_visit=p}.
+if \code{impute_last_worsening=0};
+they are always imputed if \code{impute_last_worsening=1};
+they are imputed with probability \code{p}, \verb{0<p<1}, if \code{impute_last_worsening=p}.
 If a value \code{N>1} is passed, unconfirmed values exceeding the milestone are imputed only if occurring within \code{N} days of follow-up
 (e.g., in case of early discontinuation).}
 

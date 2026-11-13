@@ -61,12 +61,12 @@
 #' Can be an integer (minimum distance from \emph{last} relapse onset) or vector of length 2
 #' (minimum distance from \emph{last} relapse onset, minimum distance from \emph{next} relapse onset).
 #' Note that setting the distance to zero means using any visit for confirmation regardless of surrounding relapses.
-#' @param impute_last_visit Imputation probability when the milestone is reached
+#' @param impute_last_worsening Imputation probability when the milestone is reached
 #' at the last available visit (i.e., with no confirmation).
 #' Unconfirmed values exceeding the milestone at the last visit are never imputed
-#' if `impute_last_visit=0`;
-#' they are always imputed if `impute_last_visit=1`;
-#' they are imputed with probability `p`, `0<p<1`, if `impute_last_visit=p`.
+#' if `impute_last_worsening=0`;
+#' they are always imputed if `impute_last_worsening=1`;
+#' they are imputed with probability `p`, `0<p<1`, if `impute_last_worsening=p`.
 #' If a value `N>1` is passed, unconfirmed values exceeding the milestone are imputed only if occurring within `N` days of follow-up
 #' (e.g., in case of early discontinuation).
 #' @param date_format Format of dates in the `date_col` and `rdate_col` columns of the input data.
@@ -101,7 +101,7 @@
 value_milestone <- function(data, milestone, subj_col, value_col, date_col, outcome,
                             worsening=NULL, relapse=NULL, rsubj_col=NULL, rdate_col=NULL,
                             validconf_col=NULL, conf_days=12*7, conf_tol_days=c(7, 2*365.25), require_sust_days=0,
-                            relapse_to_event=0, relapse_to_conf=30, impute_last_visit=0, date_format=NULL,
+                            relapse_to_event=0, relapse_to_conf=30, impute_last_worsening=0, date_format=NULL,
                             verbose=0) {
 
   ###########################
@@ -222,15 +222,15 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
     global_start <- NULL
   }
 
-  if (impute_last_visit<0) {
-    stop('`impute_last_visit` must be nonnegative')
-  } else if (impute_last_visit<=1) {
-    # If impute_last_visit is a probability, set no limit to follow-up length (Inf)
+  if (impute_last_worsening<0) {
+    stop('`impute_last_worsening` must be nonnegative')
+  } else if (impute_last_worsening<=1) {
+    # If impute_last_worsening is a probability, set no limit to follow-up length (Inf)
     impute_max_fu <- Inf
   } else {
-    # If impute_last_visit is a follow-up time, save the value and set probability to 1
-    impute_max_fu <- impute_last_visit
-    impute_last_visit <- 1
+    # If impute_last_worsening is a follow-up time, save the value and set probability to 1
+    impute_max_fu <- impute_last_worsening
+    impute_last_worsening <- 1
   }
 
   # Set direction of worsening
@@ -391,7 +391,7 @@ value_milestone <- function(data, milestone, subj_col, value_col, date_col, outc
                       all(data_id[(milestone_idx + 1):conf_idx[[1]], value_col] <= milestone)   # milestone is confirmed at (all visits up to) first valid date
             ) || (milestone_idx == nvisits  # milestone reached at last visit
                   && data_id[[date_col]][milestone_idx] - data_id[[date_col]][1] <= impute_max_fu  # visit below follow-up threshold
-                  && rbinom(1, 1, impute_last_visit)  # impute with probability `impute_last_visit`
+                  && rbinom(1, 1, impute_last_worsening)  # impute with probability `impute_last_worsening`
                   )
             ) {
 

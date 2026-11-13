@@ -3,19 +3,25 @@
 
 <br>
 
+    Warning: unable to access index for repository https://cloud.r-project.org/src/contrib:
+      cannot open URL 'https://cloud.r-project.org/src/contrib/PACKAGES'
+
 > [!WARNING]
-> **🚧 This repository is under active development. 🚧 <br> Please make sure you are using at least the latest stable version available on CRAN (1.0.0).
+> **🚧 This repository is under active development. 🚧 <br> Please make sure you are using at least the latest stable version available on CRAN (1.0.1.9000).
 > Check your installed version by running `utils::packageVersion("msprog")`.**
 
 <br>
 
 > 📣 **What’s new**
 >
+> - New options for rebaseline, see argument `proceed_from`
+>   ([development version](#devel))
 > - Updated [citation](#citation) (v1.0.1) – **[new
 >   paper](https://doi.org/10.1177/13524585261478492) out now!**
 > - Info on initial baseline (first eligible baseline visit) in results
->   data frame (v1.0.1) <!-- ([development version](#devel)) -->
+>   data frame (v1.0.1)
 > - **Now available on CRAN** (supporting **R \>= 4.1.0**) (v1.0.0).
+>   <!-- ([development version](#devel)) -->
 
 # msprog: reproducible assessment of disability course in MS
 
@@ -38,7 +44,7 @@ page**](https://cran.r-project.org/package=msprog)<br> [📖
 
 `msprog` is an R package providing tools for reproducible analysis of
 disability course in multiple sclerosis (MS) from longitudinal data
-\[[1](#ref-msprog2024)\]. A [**Python
+\[[2](#ref-msprog2026)\]. A [**Python
 version**](https://pymsprog.readthedocs.io/en/stable/) of the package is
 available as well.
 
@@ -131,7 +137,6 @@ output <- MSprog(toydata_visits,                                      # provide 
                  relapse=toydata_relapses)                            # provide data on relapses
 ```
 
-
     ---
     Outcome: edss
     Confirmation over: 84 days (-7 days, +730.5 days)
@@ -141,9 +146,7 @@ output <- MSprog(toydata_visits,                                      # provide 
     Confirmation visit skipped if: <30 days from last relapse
     Events detected: firstCDW
 
-
     *Please use `print(output)` to display full info on event detection criteria*
-
 
     ---
     Total subjects: 7
@@ -167,7 +170,6 @@ output <- MSprog(toydata_visits,                                      # provide 
                  relapse=toydata_relapses)                            # provide data on relapses
 ```
 
-
     ---
     Outcome: edss
     Confirmation over: 84 days (-7 days, +730.5 days)
@@ -177,9 +179,7 @@ output <- MSprog(toydata_visits,                                      # provide 
     Confirmation visit skipped if: <30 days from last relapse
     Events detected: multiple
 
-
     *Please use `print(output)` to display full info on event detection criteria*
-
 
     ---
     Total subjects: 7
@@ -251,14 +251,14 @@ print(output)
 ```
 
     ---
-    msprog version: 1.0.1 
+    msprog version: 1.0.1.9000 
     ---
     MSprog() arguments:
-    outcome=edss, event=multiple, RAW_PIRA=FALSE, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7, 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_visit=0, worsening=increase,
+    outcome=edss, event=multiple, RAW_PIRA=FALSE, baseline=roving, proceed_from=firstconf, validconf_col=validconf, skip_local_extrema=none, conf_days=84, conf_tol_days=c(7, 730.5), require_sust_days=0, check_intermediate=TRUE, relapse_to_bl=c(30, 0), relapse_to_event=c(0, 0), relapse_to_conf=c(30, 0), relapse_assoc=c(90, 0), relapse_indep=list(prec = list(0, 0), event = list(90, 30), conf = list(90, 30), prec_type = "baseline"), renddate_col=NULL, sub_threshold_rebl=none, bl_geq=FALSE, relapse_rebl=FALSE, impute_last_worsening=0, worsening=increase,
     delta_fun=NULL
 
     Textual description of applied criteria:
-    We detected all confirmed EDSS changes (in chronological order) confirmed over 84 days (with a lower tolerance of 7 days and an upper tolerance of 730.5 days). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first eligible confirmation visit for the event that triggered the re-baseline. Whenever the current baseline fell within 30 days after the onset of a relapse, it was moved to the next eligible visit. 
+    We detected all confirmed outcome changes (in chronological order) confirmed over 84 days (with a lower tolerance of 7 days and an upper tolerance of 730.5 days). A visit could not be used as confirmation if occurring within 30 days after the onset of a relapse. A roving baseline scheme was applied where the reference value was updated after each confirmed worsening or improvement event. The new baseline was set at the first eligible confirmation visit for the event that triggered the re-baseline. Whenever the current baseline fell within 30 days after the onset of a relapse, it was moved to the next eligible visit. 
     ---
     Clinically meaningful threshold for EDSS change (delta function): default for EDSS (1.5 if baseline=0, 1.0 if 0.0<baseline<=5.0, 0.5 if baseline>5.0)
 
@@ -322,6 +322,51 @@ repeatable evaluation of disability progression in clinical studies for
 multiple sclerosis. Mult Scler. Department of Health Sciences (DISSAL),
 University of Genoa, Genoa, Italy.; 2024;30:1185–92.
 <https://doi.org/10.1177/13524585241243157>
+
+</div>
+
+<div id="ref-msprog2026" class="csl-entry">
+
+2\. Montobbio N, Bovis F, Hofer L, Häring DA, Benkert P, Tur C, et al. A
+community-validated tool for clinical outcome calculation in multiple
+sclerosis: Consensus development and scenario-specific recommendations.
+Mult Scler. Department of Health Sciences, University of Genoa, Italy.;
+Department of Health Sciences, University of Genoa, Italy.; Departments
+of Biomedicine; Clinical Research, Neurology, Multiple Sclerosis Centre;
+Research Center for Clinical Neuroimmunology; Neuroscience (RC2NB),
+University Hospital Basel, Switzerland.; Biostatistics, Novartis Pharma
+AG, Basel, Switzerland.; Departments of Biomedicine; Clinical Research,
+Neurology, Multiple Sclerosis Centre; Research Center for Clinical
+Neuroimmunology; Neuroscience (RC2NB), University Hospital Basel,
+Switzerland.; Department of Neurology, Multiple Sclerosis Center of
+Catalonia (Cemcat), Hospital Universitari Vall d’Hebron, Barcelona,
+Spain.; Neuroimmunology Centre, The Royal Melbourne Hospital, VIC,
+Australia.; Department of Medicine, CORe, The University of Melbourne,
+VIC, Australia.; Neuroimmunology Centre, The Royal Melbourne Hospital,
+VIC, Australia.; Department of Medicine, CORe, The University of
+Melbourne, VIC, Australia.; Department of Neurology, Multiple Sclerosis
+Center of Catalonia (Cemcat), Hospital Universitari Vall d’Hebron,
+Barcelona, Spain.; Department of Neurology, Multiple Sclerosis Center of
+Catalonia (Cemcat), Hospital Universitari Vall d’Hebron, Barcelona,
+Spain.; Department of Neurology, Section on Biostatistics; Clinical
+Informatics, UT Southwestern Medical Center, Dallas, TX, USA.; The
+Neuro, Brain Imaging Centre, McGill University, Montréal, QC, Canada.;
+Neuroscience, F. Hoffmann-La Roche Ltd, Basel, Switzerland.; Departments
+of Biomedicine; Clinical Research, Neurology, Multiple Sclerosis Centre;
+Research Center for Clinical Neuroimmunology; Neuroscience (RC2NB),
+University Hospital Basel, Switzerland.; Neuroscience, F. Hoffmann-La
+Roche Ltd, Basel, Switzerland.; Multiple Sclerosis Center, Montichiari
+Hospital, Italy.; Multiple Sclerosis Center, Montichiari Hospital,
+Italy.; Departments of Biomedicine; Clinical Research, Neurology,
+Multiple Sclerosis Centre; Research Center for Clinical Neuroimmunology;
+Neuroscience (RC2NB), University Hospital Basel, Switzerland.; National
+Multiple Sclerosis Society, New York, NY, USA.; Department of Neurology,
+Multiple Sclerosis Center of Catalonia (Cemcat), Hospital Universitari
+Vall d’Hebron, Barcelona, Spain.; The Neuro, Brain Imaging Centre,
+McGill University, Montréal, QC, Canada.; Department of Neurological
+Sciences, Larner College of Medicine, University of Vermont, Burlington,
+USA.; Department of Health Sciences, University of Genoa, Italy.;
+2026;32:1347–52. <https://doi.org/10.1177/13524585261478492>
 
 </div>
 
